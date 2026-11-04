@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Rust: `OAuth::revoke` / `OAuth::clear` (async), `OAuthError::RevokeFailed`, `OAuthError::TokenFileDelete`. C: `lb_oauth_revoke` / `lb_oauth_clear`. C++: `OAuth::revoke` / `OAuth::clear`. Java: `OAuth.revoke()` / `OAuth.clear()` returning `CompletableFuture<Void>`, which fails with `OpenApiException` like other SDK calls; both are `synchronized` with `close()`, so a concurrent `close()` cannot free the native handle while it is in use (a closed handle throws `IllegalStateException`). Node.js: `oauth.revoke()` / `oauth.clear()` returning promises. Python: `OAuth.revoke()` / `OAuth.clear()` plus `revoke_async()` / `clear_async()`; the `openapi.pyi` stub is updated. The blocking Python calls release the GIL while waiting. In C/C++, a NULL handle (e.g. a moved-from C++ `OAuth`) is reported through the callback as an error instead of crashing.
 - **Rust:** `TokenStorage::delete(client_id)` removes a persisted token. It has a default implementation that returns an error, so existing custom storage backends keep compiling but `OAuth::clear` fails loudly (and keeps the in-memory token) instead of reporting success without wiping anything; override it to support `clear`. `FileTokenStorage` deletes the token file.
 
+### Changed
+
+- **Rust:** the internal OAuth dependency is upgraded from `oauth2` 4.4 to 5, which uses the workspace's `reqwest` 0.12 stack instead of a separate `reqwest` 0.11 / `hyper` 0.14 / `rustls` 0.21 chain. The public OAuth API, token persistence and redirect protection (token requests do not follow redirects) are unchanged; error text coming from the HTTP layer may differ.
+
 ### Breaking changes
 
 - **Rust:** `Error::OAuth` now holds the typed `longbridge::oauth::OAuthError` instead of a `String` (it is also `From<OAuthError>`), `SimpleError::OAuth` becomes `SimpleError::OAuth { code, message }`, and `HttpClientError::OAuth` holds an `OAuthError`. Code that constructs or destructures these variants needs updating; `Display` output is unchanged.

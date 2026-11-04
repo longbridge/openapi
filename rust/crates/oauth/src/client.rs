@@ -1,11 +1,11 @@
-use std::{fmt, future::Future, sync::Arc, time::Duration};
+use std::{fmt, sync::Arc, time::Duration};
 
 use longbridge_geo::is_cn;
 use oauth2::{
-    AccessToken, AuthUrl, AuthorizationCode, ClientId, CsrfToken, HttpRequest, HttpResponse,
-    PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, RefreshToken, RequestTokenError,
+    AccessToken, AsyncHttpClient, AuthUrl, AuthorizationCode, ClientId, CsrfToken, EndpointNotSet,
+    EndpointSet, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, RefreshToken, RequestTokenError,
     RevocationErrorResponseType, RevocationUrl, Scope, StandardErrorResponse,
-    StandardRevocableToken, TokenUrl, basic::BasicClient, reqwest::async_http_client,
+    StandardRevocableToken, TokenUrl, basic::BasicClient, reqwest,
 };
 use poem::listener::{Acceptor, Listener, TcpListener};
 
@@ -20,18 +20,35 @@ const OAUTH_BASE_URL: &str = "https://openapi.longbridge.com/oauth2";
 const OAUTH_BASE_URL_CN: &str = "https://openapi.longbridge.cn/oauth2";
 const OAUTH_BASE_URL_TEST: &str = "https://openapi-global.longbridge.xyz/oauth2";
 
-async fn oauth_base_url() -> &'static str {
+#[cfg(test)]
+tokio::task_local! {
+    pub(crate) static TEST_OAUTH_BASE_URL: String;
+}
+
+async fn oauth_base_url() -> String {
+    // Keep protocol tests on their own loopback server without process-wide
+    // state.
+    #[cfg(test)]
+    if let Ok(base) = TEST_OAUTH_BASE_URL.try_with(Clone::clone) {
+        return base;
+    }
+
     if std::env::var("LONGBRIDGE_ENV")
         .map(|v| v == "staging")
         .unwrap_or(false)
     {
-        OAUTH_BASE_URL_TEST
+        OAUTH_BASE_URL_TEST.to_string()
     } else if is_cn().await {
-        OAUTH_BASE_URL_CN
+        OAUTH_BASE_URL_CN.to_string()
     } else {
-        OAUTH_BASE_URL
+        OAUTH_BASE_URL.to_string()
     }
 }
+
+/// The oauth2 client with the authorization, token and revocation endpoints
+/// set.
+type LongbridgeClient =
+    BasicClient<EndpointSet, EndpointNotSet, EndpointNotSet, EndpointSet, EndpointSet>;
 
 /// Default port for the local OAuth callback server.
 pub(crate) const DEFAULT_CALLBACK_PORT: u16 = 60355;
@@ -151,16 +168,17 @@ impl OAuth {
             &format!("http://localhost:{}/callback", self.0.callback_port),
         )
         .await;
-        self.revoke_with(&client, async_http_client).await
+        let http_client = create_http_client().map_err(|e| OAuthError::RevokeFailed {
+            message: e.to_string(),
+        })?;
+        self.revoke_with(&client, &http_client).await
     }
 
     /// Revoke through `http_client` (injectable for tests), holding the token
     /// lock for the whole request.
-    async fn revoke_with<C, F, RE>(&self, client: &BasicClient, http_client: C) -> OAuthResult<()>
+    async fn revoke_with<C>(&self, client: &LongbridgeClient, http_client: &C) -> OAuthResult<()>
     where
-        C: FnOnce(HttpRequest) -> F,
-        F: Future<Output = Result<HttpResponse, RE>>,
-        RE: std::error::Error + 'static,
+        C: for<'c> AsyncHttpClient<'c>,
     {
         let guard = self.0.token.lock().await;
         let token = guard.as_ref().ok_or(OAuthError::NoTokenAvailable)?;
@@ -262,10 +280,13 @@ impl OAuth {
         }
 
         tracing::debug!(client_id = %self.0.client_id, "exchanging authorization code for token");
+        let http_client = create_http_client().map_err(|e| OAuthError::ExchangeCodeFailed {
+            message: e.to_string(),
+        })?;
         let token_response = client
             .exchange_code(AuthorizationCode::new(code))
             .set_pkce_verifier(pkce_verifier)
-            .request_async(async_http_client)
+            .request_async(&http_client)
             .await
             .map_err(|e| {
                 tracing::error!(client_id = %self.0.client_id, error = %e, "failed to exchange authorization code for token");
@@ -295,10 +316,13 @@ impl OAuth {
         .await;
         // Refreshes run under the token lock (see `access_token`), so a hung
         // request must not hold it forever.
+        let http_client = create_http_client().map_err(|e| OAuthError::RefreshTokenFailed {
+            message: e.to_string(),
+        })?;
         let refresh_token = RefreshToken::new(refresh_token_str.to_string());
         let request = client
             .exchange_refresh_token(&refresh_token)
-            .request_async(async_http_client);
+            .request_async(&http_client);
         let token_response = tokio::time::timeout(TOKEN_REQUEST_TIMEOUT, request)
             .await
             .map_err(|_| {
@@ -352,7 +376,9 @@ where
 /// PKCE (RFC 7636, `S256`) is required by the server for public clients and
 /// ignored for clients that don't need it. The returned verifier must be sent
 /// with the token exchange.
-fn build_authorize_url(client: &BasicClient) -> (oauth2::url::Url, CsrfToken, PkceCodeVerifier) {
+fn build_authorize_url(
+    client: &LongbridgeClient,
+) -> (oauth2::url::Url, CsrfToken, PkceCodeVerifier) {
     let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
     let (auth_url, csrf_token) = client
         .authorize_url(CsrfToken::new_random)
@@ -363,24 +389,31 @@ fn build_authorize_url(client: &BasicClient) -> (oauth2::url::Url, CsrfToken, Pk
 }
 
 /// Build the oauth2 BasicClient for Longbridge endpoints.
-async fn create_oauth_client(client_id: &str, redirect_uri: &str) -> BasicClient {
-    build_oauth_client(oauth_base_url().await, client_id, redirect_uri)
+async fn create_oauth_client(client_id: &str, redirect_uri: &str) -> LongbridgeClient {
+    build_oauth_client(&oauth_base_url().await, client_id, redirect_uri)
 }
 
-fn build_oauth_client(base: &str, client_id: &str, redirect_uri: &str) -> BasicClient {
-    BasicClient::new(
-        ClientId::new(client_id.to_string()),
-        None,
-        AuthUrl::new(format!("{base}/authorize")).unwrap(),
-        Some(TokenUrl::new(format!("{base}/token")).unwrap()),
-    )
-    .set_redirect_uri(RedirectUrl::new(redirect_uri.to_string()).unwrap())
-    .set_revocation_uri(RevocationUrl::new(format!("{base}/revoke")).unwrap())
+fn build_oauth_client(base: &str, client_id: &str, redirect_uri: &str) -> LongbridgeClient {
+    BasicClient::new(ClientId::new(client_id.to_string()))
+        .set_auth_uri(AuthUrl::new(format!("{base}/authorize")).unwrap())
+        .set_token_uri(TokenUrl::new(format!("{base}/token")).unwrap())
+        .set_redirect_uri(RedirectUrl::new(redirect_uri.to_string()).unwrap())
+        .set_revocation_url(RevocationUrl::new(format!("{base}/revoke")).unwrap())
+}
+
+/// HTTP client for token requests.
+fn create_http_client() -> Result<reqwest::Client, reqwest::Error> {
+    reqwest::Client::builder()
+        // Preserve the previous OAuth transport's protection against redirects.
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+
+    use oauth2::{HttpRequest, HttpResponse};
 
     use super::*;
     use crate::storage::StoredToken;
@@ -518,25 +551,26 @@ mod tests {
             "http://localhost:60355/callback",
         );
 
+        // oauth2 5 requires an `Fn` client; it is called exactly once here.
         let (started_tx, started_rx) = tokio::sync::oneshot::channel::<HttpRequest>();
         let (release_tx, release_rx) = tokio::sync::oneshot::channel::<()>();
-        let http_client = move |req: HttpRequest| async move {
-            started_tx.send(req).unwrap();
-            release_rx.await.unwrap();
-            Ok::<_, std::io::Error>(HttpResponse {
-                status_code: oauth2::http::StatusCode::OK,
-                headers: Default::default(),
-                body: Vec::new(),
-            })
+        let channels = std::sync::Mutex::new(Some((started_tx, release_rx)));
+        let http_client = move |req: HttpRequest| {
+            let (started_tx, release_rx) = channels.lock().unwrap().take().unwrap();
+            async move {
+                started_tx.send(req).unwrap();
+                release_rx.await.unwrap();
+                Ok::<_, std::io::Error>(HttpResponse::new(Vec::new()))
+            }
         };
 
         let task = {
             let oauth = oauth.clone();
-            tokio::spawn(async move { oauth.revoke_with(&client, http_client).await })
+            tokio::spawn(async move { oauth.revoke_with(&client, &http_client).await })
         };
 
         let req = started_rx.await.unwrap();
-        let body = String::from_utf8(req.body).unwrap();
+        let body = String::from_utf8(req.into_body()).unwrap();
         assert!(body.contains("token=refresh"), "{body}");
         assert!(body.contains("token_type_hint=refresh_token"), "{body}");
         // A refresh (access_token) cannot run while the request is in flight.
@@ -560,7 +594,7 @@ mod tests {
         let http_client =
             |_req: HttpRequest| std::future::pending::<Result<HttpResponse, std::io::Error>>();
 
-        match oauth.revoke_with(&client, http_client).await {
+        match oauth.revoke_with(&client, &http_client).await {
             Err(OAuthError::RevokeFailed { message }) => {
                 assert_eq!(message, "timed out after 30s")
             }

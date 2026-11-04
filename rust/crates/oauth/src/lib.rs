@@ -42,6 +42,8 @@ pub use storage::{FileTokenStorage, StoredToken, TokenStorage};
 
 #[cfg(test)]
 mod tests {
+    mod flows;
+
     use std::{
         sync::{Arc, Mutex},
         time::{SystemTime, UNIX_EPOCH},
