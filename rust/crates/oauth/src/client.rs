@@ -133,7 +133,7 @@ impl OAuth {
     /// token between reading and revoking it (which would revoke a stale token
     /// while the new one stays valid). While it runs, `access_token` (and every
     /// request that needs a token) waits; the request is therefore bounded by a
-    /// 30-second timeout.
+    /// 30-second timeout, as is a token refresh it may have to wait for.
     pub async fn revoke(&self) -> OAuthResult<()> {
         // `from_token` clients have no client ID: the token was issued
         // elsewhere, so the server cannot revoke it on our behalf.
@@ -182,12 +182,12 @@ impl OAuth {
                 message: e.to_string(),
             })?
             .request_async(http_client);
-        tokio::time::timeout(REVOKE_TIMEOUT, request)
+        tokio::time::timeout(TOKEN_REQUEST_TIMEOUT, request)
             .await
             .map_err(|_| {
                 tracing::error!(client_id = %self.0.client_id, "token revocation timed out");
                 OAuthError::RevokeFailed {
-                    message: format!("timed out after {}s", REVOKE_TIMEOUT.as_secs()),
+                    message: format!("timed out after {}s", TOKEN_REQUEST_TIMEOUT.as_secs()),
                 }
             })?
             .map_err(|e| {
@@ -293,10 +293,20 @@ impl OAuth {
             &format!("http://localhost:{}/callback", self.0.callback_port),
         )
         .await;
-        let token_response = client
-            .exchange_refresh_token(&RefreshToken::new(refresh_token_str.to_string()))
-            .request_async(async_http_client)
+        // Refreshes run under the token lock (see `access_token`), so a hung
+        // request must not hold it forever.
+        let refresh_token = RefreshToken::new(refresh_token_str.to_string());
+        let request = client
+            .exchange_refresh_token(&refresh_token)
+            .request_async(async_http_client);
+        let token_response = tokio::time::timeout(TOKEN_REQUEST_TIMEOUT, request)
             .await
+            .map_err(|_| {
+                tracing::error!(client_id = %self.0.client_id, "token refresh timed out");
+                OAuthError::RefreshTokenFailed {
+                    message: format!("timed out after {}s", TOKEN_REQUEST_TIMEOUT.as_secs()),
+                }
+            })?
             .map_err(|e| {
                 tracing::error!(client_id = %self.0.client_id, error = %e, "failed to refresh token");
                 OAuthError::RefreshTokenFailed {
@@ -317,8 +327,8 @@ impl OAuth {
     }
 }
 
-/// Upper bound for a revocation request, which holds the token lock.
-const REVOKE_TIMEOUT: Duration = Duration::from_secs(30);
+/// Upper bound for a refresh or revocation request; both hold the token lock.
+const TOKEN_REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Describe a revocation failure, including the server's `error` and
 /// `error_description` (the `Display` of `ServerResponse` omits them).
@@ -535,6 +545,49 @@ mod tests {
         release_tx.send(()).unwrap();
         task.await.unwrap().unwrap();
         assert!(oauth.0.token.try_lock().is_ok());
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn revoke_times_out_and_releases_the_token_lock() {
+        let oauth = oauth_with_storage(Arc::new(LegacyStorage));
+        let client = build_oauth_client(
+            OAUTH_BASE_URL,
+            "my-client",
+            "http://localhost:60355/callback",
+        );
+        // The request never completes; the paused clock auto-advances to the
+        // timeout.
+        let http_client =
+            |_req: HttpRequest| std::future::pending::<Result<HttpResponse, std::io::Error>>();
+
+        match oauth.revoke_with(&client, http_client).await {
+            Err(OAuthError::RevokeFailed { message }) => {
+                assert_eq!(message, "timed out after 30s")
+            }
+            other => panic!("unexpected result: {other:?}"),
+        }
+        assert_eq!(oauth.access_token().await.unwrap(), "access");
+    }
+
+    #[test]
+    fn oauth_error_codes_are_stable() {
+        assert_eq!(OAuthError::Other(String::new()).code(), 0);
+        assert_eq!(OAuthError::NoTokenAvailable.code(), 1);
+        assert_eq!(
+            OAuthError::RevokeFailed {
+                message: String::new()
+            }
+            .code(),
+            4
+        );
+        assert_eq!(
+            OAuthError::TokenFileDelete {
+                path: Default::default(),
+                source: std::io::Error::other("x"),
+            }
+            .code(),
+            16
+        );
     }
 
     #[tokio::test]
