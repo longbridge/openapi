@@ -31,6 +31,10 @@ impl TokenStorage for Arc<MemoryStorage> {
     fn save(&self, token: &StoredToken) -> OAuthResult<()> {
         self.as_ref().save(token)
     }
+
+    fn delete(&self, client_id: &str) -> OAuthResult<()> {
+        self.as_ref().delete(client_id)
+    }
 }
 
 struct FailSecondSaveStorage {
@@ -127,6 +131,7 @@ impl TokenServer {
         }));
         let app = Route::new()
             .at("/oauth2/token", poem::post(token_handler))
+            .at("/oauth2/revoke", poem::post(token_handler))
             .data(Arc::clone(&state));
         let task = tokio::spawn(async move {
             Server::new_with_acceptor(acceptor)
@@ -320,10 +325,17 @@ async fn build_authorizes_and_persists_token() {
         let form: BTreeMap<_, _> = form_urlencoded::parse(request.body.as_bytes())
             .into_owned()
             .collect();
+        assert_eq!(authorization_params["code_challenge_method"], "S256");
+        let verifier = oauth2::PkceCodeVerifier::new(form["code_verifier"].clone());
+        assert_eq!(
+            authorization_params["code_challenge"],
+            oauth2::PkceCodeChallenge::from_code_verifier_sha256(&verifier).as_str()
+        );
         let expected = BTreeMap::from([
             ("client_id".to_string(), "test-client".to_string()),
             ("grant_type".to_string(), "authorization_code".to_string()),
             ("code".to_string(), "authorization-code+ /value".to_string()),
+            ("code_verifier".to_string(), form["code_verifier"].clone()),
             (
                 "redirect_uri".to_string(),
                 authorization_params.get("redirect_uri").unwrap().clone(),
@@ -334,6 +346,45 @@ async fn build_authorizes_and_persists_token() {
     })
     .await
     .expect("OAuth authorization flow timed out");
+}
+
+#[tokio::test]
+async fn revoke_rejects_insecure_endpoint_without_changing_local_tokens() {
+    timeout(Duration::from_secs(5), async {
+        for refresh_token in [Some("cached-refresh-token"), None] {
+            let server = TokenServer::start([]).await;
+            let storage = Arc::new(MemoryStorage::with_token(StoredToken {
+                client_id: "test-client".to_string(),
+                access_token: "cached-access-token".to_string(),
+                refresh_token: refresh_token.map(str::to_string),
+                expires_at: now_secs() + 7200,
+            }));
+
+            TEST_OAUTH_BASE_URL
+                .scope(server.base_url.clone(), async {
+                    let oauth = OAuthBuilder::new("test-client")
+                        .token_storage(Arc::clone(&storage))
+                        .build(|_| panic!("cached token must not trigger authorization"))
+                        .await
+                        .unwrap();
+                    assert!(matches!(
+                        oauth.revoke().await,
+                        Err(OAuthError::RevokeFailed { message })
+                            if message == "Scheme for revocation endpoint URL must be HTTPS"
+                    ));
+                    assert_eq!(oauth.access_token().await.unwrap(), "cached-access-token");
+                })
+                .await;
+
+            let stored = storage.load("test-client").unwrap();
+            assert_eq!(stored.access_token, "cached-access-token");
+            assert_eq!(stored.refresh_token.as_deref(), refresh_token);
+            assert_eq!(storage.save_count(), 0);
+            assert!(server.requests().is_empty());
+        }
+    })
+    .await
+    .expect("OAuth insecure revocation rejection timed out");
 }
 
 #[tokio::test]

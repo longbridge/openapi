@@ -86,6 +86,26 @@ impl OAuthToken {
         Ok(token)
     }
 
+    /// Delete the token file at the given path. A missing file is not an
+    /// error.
+    pub(crate) fn delete_from_path(path: impl AsRef<Path>) -> OAuthResult<()> {
+        let path = path.as_ref();
+        match std::fs::remove_file(path) {
+            Ok(()) => {
+                tracing::debug!(path = %path.display(), "token file deleted");
+                Ok(())
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(e) => {
+                tracing::error!(path = %path.display(), error = %e, "failed to delete token file");
+                Err(OAuthError::TokenFileDelete {
+                    path: path.to_path_buf(),
+                    source: e,
+                })
+            }
+        }
+    }
+
     /// Save token to a JSON file at the given path.
     pub(crate) fn save_to_path(&self, path: impl AsRef<Path>) -> OAuthResult<()> {
         let path = path.as_ref();

@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 /// Error type for OAuth operations
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum OAuthError {
     /// Cannot determine home directory for token storage
     #[error("cannot determine home directory")]
@@ -57,6 +58,16 @@ pub enum OAuthError {
         source: std::io::Error,
     },
 
+    /// Failed to delete token file
+    #[error("failed to delete token file {path}: {source}")]
+    TokenFileDelete {
+        /// Path to the token file
+        path: PathBuf,
+        /// I/O error from deleting the file
+        #[source]
+        source: std::io::Error,
+    },
+
     /// No token available (not loaded and authorization not yet completed)
     #[error("no token available")]
     NoTokenAvailable,
@@ -92,6 +103,13 @@ pub enum OAuthError {
     /// Failed to refresh access token
     #[error("failed to refresh token: {message}")]
     RefreshTokenFailed {
+        /// Server or protocol error message
+        message: String,
+    },
+
+    /// Failed to revoke token on the server
+    #[error("failed to revoke token: {message}")]
+    RevokeFailed {
         /// Server or protocol error message
         message: String,
     },

@@ -73,6 +73,11 @@ mod tests {
             *self.save_count.lock().unwrap() += 1;
             Ok(())
         }
+
+        fn delete(&self, _client_id: &str) -> OAuthResult<()> {
+            *self.token.lock().unwrap() = None;
+            Ok(())
+        }
     }
 
     impl MemoryStorage {
@@ -402,6 +407,80 @@ mod tests {
 
         // Clean up.
         let _ = fs::remove_file(&path);
+    }
+
+    #[test]
+    fn test_file_token_storage_delete() {
+        use crate::storage::FileTokenStorage;
+
+        let client_id = format!("__test_delete__{}", std::process::id());
+        let storage = FileTokenStorage;
+        storage
+            .save(&StoredToken {
+                client_id: client_id.clone(),
+                access_token: "a".to_string(),
+                refresh_token: None,
+                expires_at: 9999999999,
+            })
+            .unwrap();
+        assert!(storage.load(&client_id).is_some());
+
+        storage.delete(&client_id).unwrap();
+        assert!(storage.load(&client_id).is_none());
+        // Deleting again (missing file) is not an error.
+        storage.delete(&client_id).unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_oauth_clear_drops_memory_and_storage() {
+        let storage = Arc::new(MemoryStorage::with_token(StoredToken {
+            client_id: "my-client".to_string(),
+            access_token: "access".to_string(),
+            refresh_token: Some("refresh".to_string()),
+            expires_at: now_secs() + 7200,
+        }));
+
+        struct Shared(Arc<MemoryStorage>);
+        impl TokenStorage for Shared {
+            fn load(&self, client_id: &str) -> Option<StoredToken> {
+                self.0.load(client_id)
+            }
+            fn save(&self, token: &StoredToken) -> OAuthResult<()> {
+                self.0.save(token)
+            }
+            fn delete(&self, client_id: &str) -> OAuthResult<()> {
+                self.0.delete(client_id)
+            }
+        }
+
+        let oauth = OAuthBuilder::new("my-client")
+            .token_storage(Shared(Arc::clone(&storage)))
+            .build(|_url| panic!("browser flow must not be triggered"))
+            .await
+            .unwrap();
+        assert!(storage.load("my-client").is_some());
+
+        oauth.clear().await.unwrap();
+
+        assert!(storage.load("my-client").is_none());
+        assert!(matches!(
+            oauth.access_token().await,
+            Err(crate::OAuthError::NoTokenAvailable)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_oauth_revoke_without_token_fails() {
+        let oauth = OAuth(Arc::new(OAuthInner {
+            client_id: "c".to_string(),
+            callback_port: DEFAULT_CALLBACK_PORT,
+            storage: default_storage(),
+            token: tokio::sync::Mutex::new(None),
+        }));
+        assert!(matches!(
+            oauth.revoke().await,
+            Err(crate::OAuthError::NoTokenAvailable)
+        ));
     }
 
     #[test]

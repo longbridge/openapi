@@ -15652,6 +15652,32 @@ struct lb_oauth_t *lb_oauth_clone(const struct lb_oauth_t *oauth);
  */
 void lb_oauth_free(struct lb_oauth_t *oauth);
 
+/**
+ * Asynchronously revoke the current token on the server (RFC 7009)
+ *
+ * The refresh token is revoked when present, otherwise the access token.
+ * Only the server is contacted; the cached token on disk is left untouched
+ * (use `lb_oauth_clear` to remove it).
+ *
+ * @param oauth     OAuth 2.0 client; if NULL, `callback` receives an error
+ * @param callback  Async completion callback; `error` is set on failure
+ * @param userdata  Opaque pointer forwarded to `callback`
+ */
+void lb_oauth_revoke(const struct lb_oauth_t *oauth, lb_async_callback_t callback, void *userdata);
+
+/**
+ * Asynchronously clear the token locally
+ *
+ * Drops the in-memory token and deletes the cached token file
+ * (`~/.longbridge/openapi/tokens/<client_id>`). The server is not contacted
+ * (use `lb_oauth_revoke` for that).
+ *
+ * @param oauth     OAuth 2.0 client; if NULL, `callback` receives an error
+ * @param callback  Async completion callback; `error` is set on failure
+ * @param userdata  Opaque pointer forwarded to `callback`
+ */
+void lb_oauth_clear(const struct lb_oauth_t *oauth, lb_async_callback_t callback, void *userdata);
+
 const struct lb_portfolio_context_t *lb_portfolio_context_new(const struct lb_config_t *config);
 
 void lb_portfolio_context_retain(const struct lb_portfolio_context_t *ctx);
