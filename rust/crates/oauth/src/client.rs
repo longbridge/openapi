@@ -127,6 +127,11 @@ impl OAuth {
     /// The refresh token is revoked when present, otherwise the access token.
     /// This only calls the server: the in-memory and persisted tokens are left
     /// untouched. Call [`clear`](OAuth::clear) afterwards to drop them locally.
+    ///
+    /// The token lock is held for the whole request, so a concurrent
+    /// [`access_token`](OAuth::access_token) refresh cannot rotate the refresh
+    /// token between reading and revoking it (which would revoke a stale token
+    /// while the new one stays valid).
     pub async fn revoke(&self) -> OAuthResult<()> {
         // `from_token` clients have no client ID: the token was issued
         // elsewhere, so the server cannot revoke it on our behalf.
@@ -138,19 +143,16 @@ impl OAuth {
             });
         }
 
-        let token = self
-            .0
-            .token
-            .lock()
-            .await
-            .clone()
-            .ok_or(OAuthError::NoTokenAvailable)?;
+        let guard = self.0.token.lock().await;
+        let token = guard.as_ref().ok_or(OAuthError::NoTokenAvailable)?;
 
-        let revocable = match token.refresh_token {
+        let revocable = match &token.refresh_token {
             Some(refresh_token) => {
-                StandardRevocableToken::RefreshToken(RefreshToken::new(refresh_token))
+                StandardRevocableToken::RefreshToken(RefreshToken::new(refresh_token.clone()))
             }
-            None => StandardRevocableToken::AccessToken(AccessToken::new(token.access_token)),
+            None => {
+                StandardRevocableToken::AccessToken(AccessToken::new(token.access_token.clone()))
+            }
         };
 
         tracing::debug!(client_id = %self.0.client_id, "revoking OAuth token");
@@ -173,6 +175,7 @@ impl OAuth {
                 OAuthError::RevokeFailed { message }
             })?;
 
+        drop(guard);
         tracing::info!(client_id = %self.0.client_id, "token revoked");
         Ok(())
     }
