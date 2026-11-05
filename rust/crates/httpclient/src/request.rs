@@ -314,10 +314,7 @@ where
                 DcRegion::from_credentials(&[app_key, access_token, app_secret]),
             ),
             AuthConfig::OAuth(oauth) => {
-                let token = oauth
-                    .access_token()
-                    .await
-                    .map_err(|e| HttpClientError::OAuth(e.to_string()))?;
+                let token = oauth.access_token().await.map_err(HttpClientError::OAuth)?;
                 // Derive DC region from the token prefix (us_→US, others→AP).
                 // The token is sent as-is (including any prefix); the gateway
                 // accepts the full token and routes via the x-dc-region header.

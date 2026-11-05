@@ -26,7 +26,7 @@ public class FundContext implements AutoCloseable {
      */
     public static FundContext create(Config config) {
         FundContext ctx = new FundContext();
-        ctx.raw = SdkNative.newFundContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newFundContext(config.getRaw()); }
         return ctx;
     }
 

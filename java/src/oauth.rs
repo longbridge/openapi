@@ -50,7 +50,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_oauthBuild(
                     }
                 })
                 .await
-                .map_err(|e| crate::error::JniError::Other(e.to_string()))?;
+                .map_err(crate::error::JniError::from)?;
             Ok(JavaLong::from(Box::into_raw(Box::new(oauth)) as jlong))
         })?;
         Ok(())
@@ -81,7 +81,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_oauthRevoke(
             oauth
                 .revoke()
                 .await
-                .map_err(|e| crate::error::JniError::Other(e.to_string()))
+                .map_err(|e| longbridge::Error::OAuth(e).into())
         })?;
         Ok(())
     })
@@ -101,7 +101,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_oauthClear(
             oauth
                 .clear()
                 .await
-                .map_err(|e| crate::error::JniError::Other(e.to_string()))
+                .map_err(|e| longbridge::Error::OAuth(e).into())
         })?;
         Ok(())
     })

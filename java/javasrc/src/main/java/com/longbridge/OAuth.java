@@ -57,8 +57,9 @@ public class OAuth implements AutoCloseable {
      * (see {@link #clear()}).
      *
      * @return A Future that completes when the token has been revoked
+     * @throws IllegalStateException If the handle has already been closed
      */
-    public CompletableFuture<Void> revoke() {
+    public synchronized CompletableFuture<Void> revoke() {
         long r = getRaw();
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.oauthRevoke(r, callback);
@@ -74,8 +75,9 @@ public class OAuth implements AutoCloseable {
      * contacted (see {@link #revoke()}).
      *
      * @return A Future that completes when the local token has been cleared
+     * @throws IllegalStateException If the handle has already been closed
      */
-    public CompletableFuture<Void> clear() {
+    public synchronized CompletableFuture<Void> clear() {
         long r = getRaw();
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.oauthClear(r, callback);

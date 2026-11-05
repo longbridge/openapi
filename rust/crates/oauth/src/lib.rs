@@ -477,10 +477,11 @@ mod tests {
             storage: default_storage(),
             token: tokio::sync::Mutex::new(None),
         }));
-        assert!(matches!(
-            oauth.revoke().await,
-            Err(crate::OAuthError::NoTokenAvailable)
-        ));
+        // Keep `revoke` off the real endpoints and the region probe.
+        let result = crate::client::TEST_OAUTH_BASE_URL
+            .scope("http://127.0.0.1:9/oauth2".to_string(), oauth.revoke())
+            .await;
+        assert!(matches!(result, Err(crate::OAuthError::NoTokenAvailable)));
     }
 
     #[test]
