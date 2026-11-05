@@ -1,5 +1,6 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
+use time::OffsetDateTime;
 
 use crate::trade::{AttachedOrderType, OrderType, OutsideRTH, TimeInForceType};
 
@@ -27,6 +28,8 @@ pub struct ReplaceOrderOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     remark: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    delayed_until: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     attached_params: Option<ReplaceAttachedParams>,
 }
 
@@ -46,6 +49,7 @@ impl ReplaceOrderOptions {
             trigger_count: None,
             monitor_price: None,
             remark: None,
+            delayed_until: None,
             attached_params: None,
         }
     }
@@ -140,6 +144,33 @@ impl ReplaceOrderOptions {
         }
     }
 
+    /// Set a new time-condition submit time.
+    ///
+    /// Must be later than now and no more than 90 days ahead. Leave unset to
+    /// keep the order's current time condition. If combined with
+    /// [`clear_delayed_until`](Self::clear_delayed_until), the last call wins.
+    #[inline]
+    #[must_use]
+    pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
+        Self {
+            delayed_until: Some(super::delayed_until_timestamp(delayed_until)),
+            ..self
+        }
+    }
+
+    /// Clear the time condition, turning the order into a regular order.
+    ///
+    /// If combined with [`delayed_until`](Self::delayed_until), the last call
+    /// wins.
+    #[inline]
+    #[must_use]
+    pub fn clear_delayed_until(self) -> Self {
+        Self {
+            delayed_until: Some(1),
+            ..self
+        }
+    }
+
     /// Set attached order parameters
     pub fn attached_params(self, params: ReplaceAttachedParams) -> Self {
         Self {
@@ -181,6 +212,10 @@ pub struct ReplaceAttachedParams {
     quantity: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
     market_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    profit_taker_depth_level: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stop_loss_depth_level: Option<i32>,
 }
 
 impl ReplaceAttachedParams {
@@ -202,6 +237,8 @@ impl ReplaceAttachedParams {
             main_id: None,
             quantity: None,
             market_price: None,
+            profit_taker_depth_level: None,
+            stop_loss_depth_level: None,
         }
     }
     /// Set the take-profit trigger price
@@ -260,6 +297,24 @@ impl ReplaceAttachedParams {
             ..self
         }
     }
+
+    /// Set the bid/ask depth level for the take-profit limit order submitted
+    /// price, valid when `activate_order_type` is `LIT`
+    pub fn profit_taker_depth_level(self, v: i32) -> Self {
+        Self {
+            profit_taker_depth_level: Some(v),
+            ..self
+        }
+    }
+
+    /// Set the bid/ask depth level for the stop-loss limit order submitted
+    /// price, valid when `activate_order_type` is `LIT`
+    pub fn stop_loss_depth_level(self, v: i32) -> Self {
+        Self {
+            stop_loss_depth_level: Some(v),
+            ..self
+        }
+    }
     /// Set the take-profit order ID (for modifying existing attached order)
     pub fn profit_taker_id(self, v: i64) -> Self {
         Self {
@@ -301,5 +356,62 @@ impl ReplaceAttachedParams {
             market_price: Some(v),
             ..self
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use time::macros::datetime;
+
+    use super::*;
+
+    #[test]
+    fn delayed_until() {
+        let opts = ReplaceOrderOptions::new("1", Decimal::from(100));
+        assert!(
+            serde_json::to_value(&opts)
+                .unwrap()
+                .get("delayed_until")
+                .is_none()
+        );
+
+        let opts = opts.delayed_until(datetime!(2026-01-01 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767225600)
+        );
+
+        let opts = opts.delayed_until(OffsetDateTime::UNIX_EPOCH + time::Duration::SECOND);
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(2),
+            "a time that maps to the clear sentinel must not be sent as 1"
+        );
+
+        let opts = opts.clear_delayed_until();
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1)
+        );
+
+        // The last of `delayed_until` / `clear_delayed_until` wins.
+        let opts = opts.delayed_until(datetime!(2026-01-02 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767312000)
+        );
+    }
+
+    #[test]
+    fn attached_params_depth_level() {
+        let params = ReplaceAttachedParams::new(AttachedOrderType::Bracket);
+        let value = serde_json::to_value(&params).unwrap();
+        assert!(value.get("profit_taker_depth_level").is_none());
+        assert!(value.get("stop_loss_depth_level").is_none());
+
+        let params = params.profit_taker_depth_level(2).stop_loss_depth_level(5);
+        let value = serde_json::to_value(&params).unwrap();
+        assert_eq!(value["profit_taker_depth_level"], serde_json::json!(2));
+        assert_eq!(value["stop_loss_depth_level"], serde_json::json!(5));
     }
 }

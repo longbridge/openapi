@@ -29,6 +29,24 @@ public:
   ~OAuth();
 
   operator const lb_oauth_t*() const { return oauth_; }
+
+  /// Asynchronously revoke the current token on the server (RFC 7009)
+  ///
+  /// The refresh token is revoked when present, otherwise the access token.
+  /// Only the server is contacted; the cached token on disk is left untouched
+  /// (see `clear`).
+  ///
+  /// @param callback  Invoked on completion; check `status()` for errors
+  void revoke(AsyncCallback<NoContext, void> callback) const;
+
+  /// Asynchronously clear the token locally
+  ///
+  /// Drops the in-memory token and deletes the cached token file
+  /// (`~/.longbridge/openapi/tokens/<client_id>`). The server is not contacted
+  /// (see `revoke`).
+  ///
+  /// @param callback  Invoked on completion; check `status()` for errors
+  void clear(AsyncCallback<NoContext, void> callback) const;
 };
 
 /// Builder for constructing an OAuth 2.0 client

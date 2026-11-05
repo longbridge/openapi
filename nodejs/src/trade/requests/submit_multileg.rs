@@ -1,8 +1,10 @@
+use chrono::{DateTime, Utc};
 use napi::bindgen_prelude::ClassInstance;
 
 use crate::{
     decimal::Decimal,
     trade::types::{MultiLegStrategy, OrderSide, OrderType},
+    utils::try_from_datetime,
 };
 
 /// A leg of a multi-leg combination order to submit
@@ -38,13 +40,19 @@ pub struct SubmitMultiLegOrderOptions<'env> {
     /// If not specified, idempotency control is skipped.
     /// The server caches this ID for 10 minutes.
     pub client_request_id: Option<String>,
+    /// Time-condition submit time. The order is held in `DelayedNotReported`
+    /// status and only submitted at this time, which must be later than now
+    /// and no more than 90 days ahead. Only `LO` / `MO` support time
+    /// conditions.
+    pub delayed_until: Option<DateTime<Utc>>,
 }
 
-impl<'env> From<SubmitMultiLegOrderOptions<'env>>
+impl<'env> TryFrom<SubmitMultiLegOrderOptions<'env>>
     for longbridge::trade::SubmitMultiLegOrderOptions
 {
-    #[inline]
-    fn from(opts: SubmitMultiLegOrderOptions<'env>) -> Self {
+    type Error = napi::Error;
+
+    fn try_from(opts: SubmitMultiLegOrderOptions<'env>) -> napi::Result<Self> {
         let legs = opts.legs.into_iter().map(|leg| {
             longbridge::trade::SubmitMultiLegOrderLeg::new(leg.symbol, leg.ratio_quantity.0)
         });
@@ -64,6 +72,9 @@ impl<'env> From<SubmitMultiLegOrderOptions<'env>>
         if let Some(id) = opts.client_request_id {
             opts2 = opts2.client_request_id(id);
         }
-        opts2
+        if let Some(delayed_until) = opts.delayed_until {
+            opts2 = opts2.delayed_until(try_from_datetime("delayedUntil", delayed_until)?);
+        }
+        Ok(opts2)
     }
 }

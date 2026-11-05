@@ -232,6 +232,19 @@ convert(PushCandlestickMode mode)
   }
 }
 
+inline lb_quote_transport_t
+convert(QuoteTransport transport)
+{
+  switch (transport) {
+    case QuoteTransport::WebSocket:
+      return QuoteTransport_WebSocket;
+    case QuoteTransport::Http:
+      return QuoteTransport_Http;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
 inline Market
 convert(lb_market_t market)
 {
@@ -1133,6 +1146,8 @@ convert(lb_order_status_t status)
       return OrderStatus::Expired;
     case OrderStatusPartialWithdrawal:
       return OrderStatus::PartialWithdrawal;
+    case OrderStatusDelayedNotReported:
+      return OrderStatus::DelayedNotReported;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1178,6 +1193,8 @@ convert(OrderStatus status)
       return OrderStatusExpired;
     case OrderStatus::PartialWithdrawal:
       return OrderStatusPartialWithdrawal;
+    case OrderStatus::DelayedNotReported:
+      return OrderStatusDelayedNotReported;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1456,6 +1473,8 @@ convert(const CAttachedOrderDetail* detail)
                          : std::nullopt,
     detail->submit_price ? std::optional{ Decimal(detail->submit_price) }
                          : std::nullopt,
+    detail->limit_depth_level ? std::optional{ *detail->limit_depth_level }
+                              : std::nullopt,
   };
 }
 
@@ -1500,6 +1519,10 @@ convert_submit_attached(const SubmitAttachedParams& src)
     s.activate_rth = convert(*src.activate_rth);
     s.params.activate_rth = &s.activate_rth;
   }
+  s.params.profit_taker_depth_level =
+    src.profit_taker_depth_level ? &*src.profit_taker_depth_level : nullptr;
+  s.params.stop_loss_depth_level =
+    src.stop_loss_depth_level ? &*src.stop_loss_depth_level : nullptr;
   return s;
 }
 
@@ -1554,6 +1577,10 @@ convert_replace_attached(const ReplaceAttachedParams& src)
     src.quantity ? (const lb_decimal_t*)src.quantity.value() : nullptr;
   s.params.market_price =
     src.market_price ? (const lb_decimal_t*)src.market_price.value() : nullptr;
+  s.params.profit_taker_depth_level =
+    src.profit_taker_depth_level ? &*src.profit_taker_depth_level : nullptr;
+  s.params.stop_loss_depth_level =
+    src.stop_loss_depth_level ? &*src.stop_loss_depth_level : nullptr;
   return s;
 }
 
@@ -1724,6 +1751,8 @@ convert(const lb_order_t* order)
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark,
+    order->delayed_until ? std::optional{ *order->delayed_until }
+                         : std::nullopt,
     attached_orders,
     order->has_multi_leg ? std::optional{ convert(&order->multi_leg) }
                          : std::nullopt,
@@ -2157,6 +2186,8 @@ convert(const lb_order_detail_t* order)
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark,
+    order->delayed_until ? std::optional{ *order->delayed_until }
+                         : std::nullopt,
     convert(order->free_status),
     order->free_amount ? std::optional{ Decimal(order->free_amount) }
                        : std::nullopt,

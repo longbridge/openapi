@@ -110,6 +110,8 @@ public:
   /// Create a PortfolioContext from a Config.
   static PortfolioContext create(const Config& config);
   /// Get exchange rates for all supported currencies.
+  ///
+  /// AP accounts only: US data-center accounts get a region error.
   void exchange_rate(AsyncCallback<PortfolioContext, ExchangeRates> callback) const;
   /// Get portfolio P&L analysis. start/end: optional "YYYY-MM-DD"; pass empty string for none.
   void profit_analysis(const std::string& start, const std::string& end, AsyncCallback<PortfolioContext, ProfitAnalysis> callback) const;

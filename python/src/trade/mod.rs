@@ -58,6 +58,15 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::USRealizedPLMetric>()?;
     parent.add_class::<types::USRealizedPLEntry>()?;
     parent.add_class::<types::USRealizedPL>()?;
+    parent.add_class::<types::USAvailableHolding>()?;
+    parent.add_class::<types::USBuyLimitInfo>()?;
+    parent.add_class::<types::USCashDetail>()?;
+    parent.add_class::<types::USMarginStatus>()?;
+    parent.add_class::<types::USCashAndBuyPower>()?;
+    parent.add_class::<types::USTransaction>()?;
+    parent.add_class::<types::USTransactionHistory>()?;
+    parent.add_class::<types::USExchangeRate>()?;
+    parent.add_class::<types::USExchangeRates>()?;
     parent.add_class::<types::USOrderHistory>()?;
     parent.add_class::<types::USButtonControl>()?;
     parent.add_class::<types::USChargeItem>()?;

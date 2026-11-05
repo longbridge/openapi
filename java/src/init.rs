@@ -86,6 +86,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::SimpleErrorKind,
         longbridge::Language,
         longbridge::PushCandlestickMode,
+        longbridge::QuoteTransport,
         longbridge::Market,
         longbridge::quote::TradeStatus,
         longbridge::quote::TradeSession,
@@ -290,7 +291,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::DcaSupportInfo,
         longbridge::dca::DcaSupportList,
         longbridge::dca::DcaCalcDateResult,
-        // AlertContext - list returns JSON via AlertList IntoJValue (serde_json)
+        // AlertContext - list returns JSON via AlertList IntoJValue
+        // (serde_json)
         longbridge::dca::DcaPlan,
         longbridge::dca::DcaList,
         longbridge::dca::DcaStats,
@@ -362,7 +364,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::DcaSupportInfo,
         longbridge::dca::DcaSupportList,
         longbridge::dca::DcaCalcDateResult,
-        // AlertContext - list returns JSON via AlertList IntoJValue (serde_json)
+        // AlertContext - list returns JSON via AlertList IntoJValue
+        // (serde_json)
         longbridge::dca::DcaPlan,
         longbridge::dca::DcaList,
         longbridge::dca::DcaStats,

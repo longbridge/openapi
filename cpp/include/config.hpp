@@ -32,7 +32,8 @@ public:
   /// Optional environment variables are read automatically:
   /// `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
   /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
-  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+  /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
   /// `LONGBRIDGE_LOG_PATH`.  Use the chainable `set_*` methods to override any
   /// of these values.
   ///
@@ -48,7 +49,8 @@ public:
   /// Variables: `LONGBRIDGE_APP_KEY`, `LONGBRIDGE_APP_SECRET`,
   /// `LONGBRIDGE_ACCESS_TOKEN`, `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_QUOTE_WS_URL`,
   /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
-  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+  /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
   /// `LONGBRIDGE_LOG_PATH`
   static Config from_apikey_env(Status& status);
 
@@ -57,7 +59,8 @@ public:
   /// Optional environment variables are read automatically:
   /// `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
   /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
-  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+  /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
   /// `LONGBRIDGE_LOG_PATH`.  Use the chainable `set_*` methods to override any
   /// of these values.
   ///
@@ -95,6 +98,12 @@ public:
 
   /// Set the push candlestick mode
   Config& set_push_candlestick_mode(PushCandlestickMode mode);
+
+  /// Set the transport used by the quote pull APIs
+  ///
+  /// Default: `QuoteTransport::WebSocket` (or `LONGBRIDGE_QUOTE_TRANSPORT` =
+  /// `ws` / `http`)
+  Config& set_quote_transport(QuoteTransport transport);
 
   /// Disable printing of quote packages on connection
   Config& disable_print_quote_packages();

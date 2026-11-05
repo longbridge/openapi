@@ -56,4 +56,41 @@ impl OAuth {
             .map_err(|e| napi::Error::from_reason(e.to_string()))?;
         Ok(OAuth(oauth))
     }
+
+    /// Revoke the current token on the server (RFC 7009).
+    ///
+    /// The refresh token is revoked when present, otherwise the access token.
+    /// Only the server is contacted; the cached token on disk is left
+    /// untouched (see `clear`).
+    ///
+    /// @example
+    /// ```javascript
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Open:', url));
+    /// await oauth.revoke();
+    /// ```
+    #[napi]
+    pub async fn revoke(&self) -> Result<()> {
+        self.0
+            .revoke()
+            .await
+            .map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
+
+    /// Clear the token locally.
+    ///
+    /// Drops the in-memory token and deletes the cached token file
+    /// (`~/.longbridge/openapi/tokens/<clientId>`). The server is not
+    /// contacted (see `revoke`).
+    ///
+    /// @example
+    /// ```javascript
+    /// await oauth.clear();
+    /// ```
+    #[napi]
+    pub async fn clear(&self) -> Result<()> {
+        self.0
+            .clear()
+            .await
+            .map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
 }

@@ -31,6 +31,8 @@ public class PortfolioContext implements AutoCloseable {
 
     /**
      * Get exchange rates for supported currencies.
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      *
      * @return A Future resolving to the current exchange rates
      * @throws OpenApiException If an error occurs

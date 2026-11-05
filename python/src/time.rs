@@ -55,6 +55,32 @@ impl<'py> IntoPyObject<'py> for PyOffsetDateTimeWrapper {
     }
 }
 
+/// A Python `datetime` read as an exact instant: a timezone-aware value
+/// (one whose `utcoffset()` is not `None`) converts by its actual offset, and a
+/// naive value is read as UTC like [`PyOffsetDateTimeWrapper`].
+///
+/// Used where the value decides *when* something happens (e.g. the submit
+/// time of a time-condition order), so an aware `datetime` must not be shifted
+/// by its UTC offset. Existing parameters keep [`PyOffsetDateTimeWrapper`],
+/// whose wall-clock semantics some callers rely on.
+#[derive(Copy, Clone)]
+pub(crate) struct PyInstantWrapper(pub(crate) OffsetDateTime);
+
+impl<'a, 'py> FromPyObject<'a, 'py> for PyInstantWrapper {
+    type Error = PyErr;
+
+    fn extract(ob: Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
+        let date: Bound<PyDateTime> = ob.extract()?;
+        if date.call_method0("utcoffset")?.is_none() {
+            return Ok(Self(PyOffsetDateTimeWrapper::extract(ob)?.0));
+        }
+        let timestamp: f64 = date.call_method0("timestamp")?.extract()?;
+        OffsetDateTime::from_unix_timestamp(timestamp.floor() as i64)
+            .map(Self)
+            .map_err(|err| pyo3::exceptions::PyValueError::new_err(err.to_string()))
+    }
+}
+
 #[derive(Copy, Clone)]
 pub(crate) struct PyDateWrapper(pub(crate) Date);
 

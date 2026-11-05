@@ -318,6 +318,22 @@ typedef enum lb_push_candlestick_mode_t {
 } lb_push_candlestick_mode_t;
 
 /**
+ * Transport used by the quote pull APIs
+ */
+typedef enum lb_quote_transport_t {
+  /**
+   * Send pull requests over the quote WebSocket connection (default)
+   */
+  QuoteTransport_WebSocket,
+  /**
+   * Send pull requests over HTTP (`POST /quote/...`) where the API has a
+   * REST equivalent, falling back to the WebSocket for the rest. Using
+   * only HTTP-backed APIs never opens a WebSocket connection.
+   */
+  QuoteTransport_Http,
+} lb_quote_transport_t;
+
+/**
  * DCA investment frequency
  */
 typedef enum lb_dca_frequency_t {
@@ -1275,6 +1291,10 @@ typedef enum lb_order_status_t {
    * Partial Withdrawal
    */
   OrderStatusPartialWithdrawal,
+  /**
+   * Monitoring (Time-Conditional Order)
+   */
+  OrderStatusDelayedNotReported,
 } lb_order_status_t;
 
 /**
@@ -4644,6 +4664,16 @@ typedef struct CReplaceAttachedParams {
    * Market price (can be null)
    */
   const struct lb_decimal_t *market_price;
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *profit_taker_depth_level;
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *stop_loss_depth_level;
 } CReplaceAttachedParams;
 
 /**
@@ -4698,6 +4728,17 @@ typedef struct lb_replace_order_options_t {
    * Attached order parameters (can be null)
    */
   const struct CReplaceAttachedParams *attached_params;
+  /**
+   * New time-condition submit time, Unix timestamp in seconds; must be
+   * later than now and no more than 90 days ahead (can be null to keep the
+   * current time condition)
+   */
+  const int64_t *delayed_until;
+  /**
+   * Clear the time condition, turning the order into a regular order
+   * (takes precedence over `delayed_until`)
+   */
+  bool clear_delayed_until;
 } lb_replace_order_options_t;
 
 /**
@@ -4740,6 +4781,16 @@ typedef struct CSubmitAttachedParams {
    * RTH setting for activated order (can be null)
    */
   const enum lb_outside_rth_t *activate_rth;
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *profit_taker_depth_level;
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *stop_loss_depth_level;
 } CSubmitAttachedParams;
 
 /**
@@ -4821,6 +4872,12 @@ typedef struct lb_submit_order_options_t {
    * Attached order parameters (can be null)
    */
   const struct CSubmitAttachedParams *attached_params;
+  /**
+   * Time-condition submit time, Unix timestamp in seconds (can be null).
+   * The order is held in `DelayedNotReported` status and only submitted at
+   * this time, which must be later than now and no more than 90 days ahead.
+   */
+  const int64_t *delayed_until;
 } lb_submit_order_options_t;
 
 /**
@@ -4883,6 +4940,12 @@ typedef struct CSubmitMultiLegOrderOptions {
    * The server caches this ID for 10 minutes.
    */
   const char *client_request_id;
+  /**
+   * Time-condition submit time, Unix timestamp in seconds (can be null);
+   * must be later than now and no more than 90 days ahead. Only `LO` / `MO`
+   * support time conditions.
+   */
+  const int64_t *delayed_until;
 } CSubmitMultiLegOrderOptions;
 
 /**
@@ -5697,7 +5760,8 @@ typedef struct lb_execution_t {
    */
   const struct lb_decimal_t *price;
   /**
-   * Order side
+   * Order side. `Unknown` when the response omits it (Longbridge US
+   * `/v1/trade/execution/history`)
    */
   enum lb_order_side_t side;
 } lb_execution_t;
@@ -5808,6 +5872,10 @@ typedef struct CAttachedOrderDetail {
    * Submit price (maybe null)
    */
   const struct lb_decimal_t *submit_price;
+  /**
+   * Bid/ask depth level of the limit order submitted price (maybe null)
+   */
+  const int32_t *limit_depth_level;
 } CAttachedOrderDetail;
 
 /**
@@ -5947,6 +6015,10 @@ typedef struct lb_order_t {
    * Multi-leg strategy information (only valid when has_multi_leg is true)
    */
   struct CMultiLegInfo multi_leg;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
 } lb_order_t;
 
 /**
@@ -6583,6 +6655,10 @@ typedef struct lb_order_detail_t {
    * Multi-leg strategy information (only valid when has_multi_leg is true)
    */
   struct CMultiLegInfo multi_leg;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
 } lb_order_detail_t;
 
 /**
@@ -14386,9 +14462,10 @@ void lb_calendar_context_finance_calendar(const struct lb_calendar_context_t *ct
  * Optional environment variables are read automatically:
  * `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
- * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
- * `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
- * to override any of these values after construction.
+ * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+ * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`.  Use the
+ * corresponding `lb_config_set_*` functions to override any of these values
+ * after construction.
  *
  * @param app_key       App key
  * @param app_secret    App secret
@@ -14407,7 +14484,8 @@ struct lb_config_t *lb_config_from_apikey(const char *app_key,
  * `LONGBRIDGE_ACCESS_TOKEN`, `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_LANGUAGE`,
  * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
- * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`
+ * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+ * `LONGBRIDGE_LOG_PATH`
  */
 struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
 
@@ -14417,9 +14495,10 @@ struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
  * Optional environment variables are read automatically:
  * `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
- * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
- * `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
- * to override any of these values after construction.
+ * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+ * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`.  Use the
+ * corresponding `lb_config_set_*` functions to override any of these values
+ * after construction.
  *
  * Does **not** take ownership of `oauth`. The caller must free `oauth` with
  * `lb_oauth_free` after this call returns.
@@ -14475,6 +14554,17 @@ void lb_config_enable_overnight(struct lb_config_t *config);
  */
 void lb_config_set_push_candlestick_mode(struct lb_config_t *config,
                                          enum lb_push_candlestick_mode_t mode);
+
+/**
+ * Set the transport used by the quote pull APIs
+ *
+ * Default: `QuoteTransport_WebSocket` (or `LONGBRIDGE_QUOTE_TRANSPORT` =
+ * `ws` / `http`)
+ *
+ * @param config     Config object
+ * @param transport  Quote transport
+ */
+void lb_config_set_quote_transport(struct lb_config_t *config, enum lb_quote_transport_t transport);
 
 /**
  * Disable printing of quote packages on connection
@@ -14740,6 +14830,37 @@ void lb_error_free(struct lb_error_t *error);
 
 const char *lb_error_message(const struct lb_error_t *error);
 
+/**
+ * Returns the error code.
+ *
+ * For `ErrorKindHttp` it is the HTTP status, for
+ * `ErrorKindOpenApi` the OpenAPI error code. For `ErrorKindOAuth`
+ * it is a stable code identifying the failure:
+ *
+ * | Code | Meaning |
+ * |------|---------|
+ * | 0 | other (e.g. NULL OAuth handle) |
+ * | 1 | no token available |
+ * | 2 | no refresh token |
+ * | 3 | token refresh failed |
+ * | 4 | token revocation failed |
+ * | 5 | authorization failed |
+ * | 6 | authorization timeout |
+ * | 7 | authorization code exchange failed |
+ * | 8 | CSRF token mismatch |
+ * | 9 | failed to bind the callback server |
+ * | 10 | failed to get the local address |
+ * | 11 | callback channel closed |
+ * | 12 | cannot determine the home directory |
+ * | 13 | failed to read the token file |
+ * | 14 | failed to parse the token file |
+ * | 15 | failed to write the token file |
+ * | 16 | failed to delete the token file |
+ * | 17 | failed to create the token directory |
+ * | 18 | failed to serialize the token |
+ *
+ * It is 0 when the error carries no code; check `lb_error_kind` first.
+ */
 int64_t lb_error_code(const struct lb_error_t *error);
 
 enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
@@ -15672,6 +15793,32 @@ struct lb_oauth_t *lb_oauth_clone(const struct lb_oauth_t *oauth);
  */
 void lb_oauth_free(struct lb_oauth_t *oauth);
 
+/**
+ * Asynchronously revoke the current token on the server (RFC 7009)
+ *
+ * The refresh token is revoked when present, otherwise the access token.
+ * Only the server is contacted; the cached token on disk is left untouched
+ * (use `lb_oauth_clear` to remove it).
+ *
+ * @param oauth     OAuth 2.0 client; if NULL, `callback` receives an error
+ * @param callback  Async completion callback; `error` is set on failure
+ * @param userdata  Opaque pointer forwarded to `callback`
+ */
+void lb_oauth_revoke(const struct lb_oauth_t *oauth, lb_async_callback_t callback, void *userdata);
+
+/**
+ * Asynchronously clear the token locally
+ *
+ * Drops the in-memory token and deletes the cached token file
+ * (`~/.longbridge/openapi/tokens/<client_id>`). The server is not contacted
+ * (use `lb_oauth_revoke` for that).
+ *
+ * @param oauth     OAuth 2.0 client; if NULL, `callback` receives an error
+ * @param callback  Async completion callback; `error` is set on failure
+ * @param userdata  Opaque pointer forwarded to `callback`
+ */
+void lb_oauth_clear(const struct lb_oauth_t *oauth, lb_async_callback_t callback, void *userdata);
+
 const struct lb_portfolio_context_t *lb_portfolio_context_new(const struct lb_config_t *config);
 
 void lb_portfolio_context_retain(const struct lb_portfolio_context_t *ctx);
@@ -15680,6 +15827,8 @@ void lb_portfolio_context_release(const struct lb_portfolio_context_t *ctx);
 
 /**
  * Get exchange rates. Returns CExchangeRates.
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_portfolio_context_exchange_rate(const struct lb_portfolio_context_t *ctx,
                                         lb_async_callback_t callback,
@@ -16411,6 +16560,8 @@ void lb_trade_context_unsubscribe(const struct lb_trade_context_t *ctx,
 /**
  * Get history executions
  *
+ * `side` may be `Unknown` on Longbridge US accounts.
+ *
  * @param[in] opts Options for get history executions request (can be null)
  */
 void lb_trade_context_history_executions(const struct lb_trade_context_t *ctx,
@@ -16430,6 +16581,9 @@ void lb_trade_context_today_executions(const struct lb_trade_context_t *ctx,
 
 /**
  * Get all executions
+ *
+ * AP accounts only: US data-center accounts get a region error; use
+ * `lb_trade_context_history_executions` instead.
  *
  * @param[in] opts Options for get all executions request (can be null)
  */
@@ -16508,6 +16662,8 @@ void lb_trade_context_cancel_order_attached(const struct lb_trade_context_t *ctx
 
 /**
  * Get account balance
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_trade_context_account_balance(const struct lb_trade_context_t *ctx,
                                       const char *currency,
@@ -16516,6 +16672,8 @@ void lb_trade_context_account_balance(const struct lb_trade_context_t *ctx,
 
 /**
  * Get cash flow
+ *
+ * AP accounts only: US data-center accounts get a region error.
  *
  * @param[in] opts Options for get cash flow request
  */
@@ -16527,6 +16685,9 @@ void lb_trade_context_cash_flow(const struct lb_trade_context_t *ctx,
 /**
  * Get fund positions
  *
+ * AP accounts only: US data-center accounts have no fund holdings and get a
+ * region error. No US equivalent.
+ *
  * @param[in] opts Options for get fund positions request
  */
 void lb_trade_context_fund_positions(const struct lb_trade_context_t *ctx,
@@ -16537,6 +16698,8 @@ void lb_trade_context_fund_positions(const struct lb_trade_context_t *ctx,
 /**
  * Get stock positions
  *
+ * AP accounts only: US data-center accounts get a region error.
+ *
  * @param[in] opts Options for get stock positions request
  */
 void lb_trade_context_stock_positions(const struct lb_trade_context_t *ctx,
@@ -16546,6 +16709,9 @@ void lb_trade_context_stock_positions(const struct lb_trade_context_t *ctx,
 
 /**
  * Get margin ratio
+ *
+ * AP accounts only: US data-center accounts get a region error. No US
+ * equivalent.
  */
 void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
                                    const char *symbol,
@@ -16554,6 +16720,8 @@ void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
 
 /**
  * Get order detail
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_trade_context_order_detail(const struct lb_trade_context_t *ctx,
                                    const char *order_id,

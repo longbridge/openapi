@@ -42,13 +42,13 @@ pub use agent::AgentContext;
 pub use alert::AlertContext;
 pub use asset::AssetContext;
 pub use calendar::CalendarContext;
-pub use config::{Config, Language, PushCandlestickMode};
+pub use config::{Config, Language, PushCandlestickMode, QuoteTransport};
 pub use content::ContentContext;
 pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
 pub use fund::FundContext;
 pub use fundamental::FundamentalContext;
-// ── US-market type re-exports ─────────────────────────────────────────────────
+// US-market type re-exports
 pub use fundamental::types::{
     FinancialStatementKind, IndustryRankIndicator, IndustryRankSortType, USCompanyDividends,
     USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile, USETFFilesResponse,
@@ -66,8 +66,11 @@ pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
 pub use signal::SignalContext;
 pub use trade::{
-    GetUSHistoryOrders, GetUSRealizedPLOptions, QueryUSOrdersOptions, QueryUSOrdersResponse,
-    TradeContext, USAssetOverview, USCashEntry, USCryptoEntry, USOrderDetailResponse,
-    USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
+    GetUSAvailableHoldingOptions, GetUSHistoryOrders, GetUSRealizedPLOptions,
+    GetUSTransactionHistoryOptions, QueryUSOrdersOptions, QueryUSOrdersResponse, TradeContext,
+    USAssetOverview, USAvailableHolding, USBuyLimitInfo, USCashAndBuyPower, USCashDetail,
+    USCashEntry, USCryptoEntry, USExchangeRate, USExchangeRates, USMarginStatus,
+    USOrderDetailResponse, USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
+    USTransaction, USTransactionHistory,
 };
 pub use types::Market;

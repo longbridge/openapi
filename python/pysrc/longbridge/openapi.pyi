@@ -33,6 +33,11 @@ class ErrorKind:
         Other error
         """
 
+    class OAuth(ErrorKind):
+        """
+        OAuth error
+        """
+
 class OpenApiException(Exception):
     """
     OpenAPI exception
@@ -43,9 +48,16 @@ class OpenApiException(Exception):
     Error kind
     """
 
-    code: int
+    code: Optional[int]
     """
-    Error code
+    Error code: the HTTP status or OpenAPI code returned by the server, or for
+    ``ErrorKind.OAuth`` a stable code identifying the failure (1 no token available, 2 no refresh token, 3 refresh failed, 4 revoke failed, 5 authorization failed, 6 authorization timeout, 7 code exchange failed, 8 CSRF mismatch, 9 callback bind failed, 10 local address failed, 11 callback channel closed, 12 no home dir, 13 token file read, 14 token file parse, 15 token file write, 16 token file delete, 17 create dir failed, 18 serialize token, 0 other).
+    `None` for other client-side errors.
+    """
+
+    trace_id: Optional[str]
+    """
+    Trace ID of the request, if any
     """
 
     message: str
@@ -53,7 +65,13 @@ class OpenApiException(Exception):
     Error message
     """
 
-    def __init__(self, code: int, message: str) -> None: ...
+    def __init__(
+        self,
+        kind: ErrorKind,
+        code: Optional[int],
+        trace_id: Optional[str],
+        message: str,
+    ) -> None: ...
 
 class HttpClient:
     """
@@ -198,6 +216,23 @@ class PushCandlestickMode:
         Confirmed
         """
 
+class QuoteTransport:
+    """
+    Transport used by the quote pull APIs
+    """
+
+    class WebSocket(QuoteTransport):
+        """
+        Send pull requests over the quote WebSocket connection (default)
+        """
+
+    class Http(QuoteTransport):
+        """
+        Send pull requests over HTTP (``POST /quote/*``) where the API has a
+        REST equivalent, falling back to the WebSocket for the rest. Using
+        only HTTP-backed APIs never opens a WebSocket connection.
+        """
+
 class OAuth:
     """
     OAuth 2.0 client handle for Longbridge OpenAPI.
@@ -206,6 +241,28 @@ class OAuth:
     :meth:`AsyncOAuthBuilder.build` (async).  Pass it to
     :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`.
     """
+
+    def revoke(self) -> None:
+        """
+        Revoke the current token on the server (RFC 7009), blocking.
+
+        The refresh token is revoked when present, otherwise the access token.
+        Only the server is contacted; the cached token on disk
+        (``~/.longbridge/openapi/tokens/<client_id>``) is left untouched.
+        Call :meth:`clear` afterwards to drop it locally.
+        """
+    async def revoke_async(self) -> None:
+        """Async version of :meth:`revoke`."""
+    def clear(self) -> None:
+        """
+        Clear the token locally, blocking.
+
+        Drops the in-memory token and deletes the cached token file
+        (``~/.longbridge/openapi/tokens/<client_id>``). The server is not
+        contacted; use :meth:`revoke` for that.
+        """
+    async def clear_async(self) -> None:
+        """Async version of :meth:`clear`."""
 
 class OAuthBuilder:
     """
@@ -291,6 +348,8 @@ class Config:
         enable_print_quote_packages: Print opened quote packages on connect
             (default: ``True``)
         log_path: Path for log files (default: no logs)
+        quote_transport: Transport used by the quote pull APIs
+            (default: ``QuoteTransport.WebSocket``)
     """
 
     @staticmethod
@@ -307,6 +366,7 @@ class Config:
         enable_print_quote_packages: bool = True,
         log_path: Optional[str] = None,
         enable_papertrading: bool = False,
+        quote_transport: Optional[Type[QuoteTransport]] = None,
     ) -> Config:
         """
         Create a new ``Config`` using API Key authentication.
@@ -316,7 +376,7 @@ class Config:
         ``LONGBRIDGE_QUOTE_WS_URL``, ``LONGBRIDGE_TRADE_WS_URL``,
         ``LONGBRIDGE_ENABLE_OVERNIGHT``, ``LONGBRIDGE_PUSH_CANDLESTICK_MODE``,
         ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``,
-        ``LONGBRIDGE_PAPERTRADING``).
+        ``LONGBRIDGE_PAPERTRADING``, ``LONGBRIDGE_QUOTE_TRANSPORT``).
         Any explicit parameter overrides the corresponding env variable.
 
         Args:
@@ -341,6 +401,9 @@ class Config:
                 the token: if it belongs to a real-money account the server
                 returns an error.  Default: ``False`` (no restriction imposed
                 by server).
+            quote_transport: Transport used by the quote pull APIs (reads
+                ``LONGBRIDGE_QUOTE_TRANSPORT`` from env if omitted; default:
+                ``QuoteTransport.WebSocket``)
         """
 
     @classmethod
@@ -369,6 +432,7 @@ class Config:
         - ``LONGBRIDGE_PRINT_QUOTE_PACKAGES`` - ``true`` or ``false``
           (Default: ``true``)
         - ``LONGBRIDGE_LOG_PATH`` - Log file directory (Default: no logs)
+        - ``LONGBRIDGE_QUOTE_TRANSPORT`` - ``ws`` or ``http`` (Default: ``ws``)
         """
 
     @classmethod
@@ -384,6 +448,7 @@ class Config:
         enable_print_quote_packages: Optional[bool] = None,
         log_path: Optional[str] = None,
         enable_papertrading: Optional[bool] = None,
+        quote_transport: Optional[Type[QuoteTransport]] = None,
     ) -> Config:
         """
         Create a new ``Config`` for OAuth 2.0 authentication.
@@ -396,7 +461,7 @@ class Config:
         ``LONGBRIDGE_QUOTE_WS_URL``, ``LONGBRIDGE_TRADE_WS_URL``,
         ``LONGBRIDGE_ENABLE_OVERNIGHT``, ``LONGBRIDGE_PUSH_CANDLESTICK_MODE``,
         ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``,
-        ``LONGBRIDGE_PAPERTRADING``).
+        ``LONGBRIDGE_PAPERTRADING``, ``LONGBRIDGE_QUOTE_TRANSPORT``).
         Any explicit parameter overrides the corresponding env variable.
 
         Args:
@@ -420,6 +485,7 @@ class Config:
                 the token: if it belongs to a real-money account the server
                 returns an error.  Default: ``None`` (no restriction imposed
                 by server).
+            quote_transport: Transport used by the quote pull APIs (optional)
 
         Returns:
             Config object
@@ -5788,6 +5854,11 @@ class OrderStatus:
         PartialWithdrawal
         """
 
+    class DelayedNotReported(OrderStatus):
+        """
+        Monitoring (Time-Conditional Order)
+        """
+
 class OrderTag:
     """
     Order tag
@@ -5875,7 +5946,7 @@ class Execution:
 
     side: OrderSide
     """
-    Order side
+    Order side. `Unknown` when the response omits it (Longbridge US `/v1/trade/execution/history`)
     """
 
 class AllExecutionsResponse:
@@ -6269,9 +6340,18 @@ class AttachedOrderDetail:
     Submit price
     """
 
+    limit_depth_level: Optional[int]
+    """
+    Bid/ask depth level of the limit order submitted price
+    """
+
 class SubmitAttachedParams:
     """
     Submit attached order parameters
+
+    ``profit_taker_depth_level`` / ``stop_loss_depth_level`` set the bid/ask
+    depth level for the take-profit / stop-loss limit order submitted price,
+    valid when ``activate_order_type`` is ``LIT``.
     """
 
     def __init__(
@@ -6286,11 +6366,17 @@ class SubmitAttachedParams:
         profit_taker_submit_price: Optional[Decimal] = None,
         stop_loss_submit_price: Optional[Decimal] = None,
         activate_rth: Optional[Type[OutsideRTH]] = None,
+        profit_taker_depth_level: Optional[int] = None,
+        stop_loss_depth_level: Optional[int] = None,
     ) -> None: ...
 
 class ReplaceAttachedParams:
     """
     Replace attached order parameters
+
+    ``profit_taker_depth_level`` / ``stop_loss_depth_level`` set the bid/ask
+    depth level for the take-profit / stop-loss limit order submitted price,
+    valid when ``activate_order_type`` is ``LIT``.
     """
 
     def __init__(
@@ -6311,6 +6397,8 @@ class ReplaceAttachedParams:
         main_id: Optional[int] = None,
         quantity: Optional[Decimal] = None,
         market_price: Optional[Decimal] = None,
+        profit_taker_depth_level: Optional[int] = None,
+        stop_loss_depth_level: Optional[int] = None,
     ) -> None: ...
 
 class MultiLegStrategy:
@@ -6626,6 +6714,11 @@ class Order:
     remark: str
     """
     Remark
+    """
+
+    delayed_until: Optional[datetime]
+    """
+    Time-condition submit time (``None`` when the order is not a time-condition order)
     """
 
     attached_orders: List[AttachedOrderDetail]
@@ -6962,6 +7055,11 @@ class OrderDetail:
     remark: str
     """
     Remark
+    """
+
+    delayed_until: Optional[datetime]
+    """
+    Time-condition submit time (``None`` when the order is not a time-condition order)
     """
 
     free_status: Type[CommissionFreeStatus]
@@ -7468,6 +7566,8 @@ class TradeContext:
         """
         Get history executions
 
+        ``side`` may be ``OrderSide.Unknown`` on Longbridge US accounts.
+
         Args:
             symbol: Filter by security code, example: `700.HK`, `AAPL.US`
             start_at: Start time
@@ -7534,6 +7634,8 @@ class TradeContext:
     ) -> AllExecutionsResponse:
         """
         Get all executions
+
+        AP accounts only: US data-center accounts get a region error; use ``history_executions`` instead.
 
         Args:
             symbol: Filter by security code
@@ -7649,6 +7751,8 @@ class TradeContext:
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         attached_params: Optional[ReplaceAttachedParams] = None,
+        delayed_until: Optional[datetime] = None,
+        clear_delayed_until: bool = False,
     ) -> None:
         """
         Replace order
@@ -7664,6 +7768,8 @@ class TradeContext:
             trigger_count: Trigger count
             monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
+            delayed_until: New time-condition submit time (later than now, at most 90 days ahead); ``None`` keeps the current time condition. Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
+            clear_delayed_until: Clear the time condition, turning the order into a regular order (takes precedence over ``delayed_until``)
 
         Examples:
             ::
@@ -7704,6 +7810,7 @@ class TradeContext:
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
         attached_params: Optional[SubmitAttachedParams] = None,
+        delayed_until: Optional[datetime] = None,
     ) -> SubmitOrderResponse:
         """
         Submit order
@@ -7727,6 +7834,7 @@ class TradeContext:
             remark: Remark (Maximum 64 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
             attached_params: Attached order parameters
+            delayed_until: Time-condition submit time. The order is held in ``DelayedNotReported`` status and only submitted at this time (later than now, at most 90 days ahead). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
 
         Returns:
             Response
@@ -7765,6 +7873,7 @@ class TradeContext:
         submitted_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
+        delayed_until: Optional[datetime] = None,
     ) -> SubmitOrderResponse:
         """
         Submit a multi-leg option combination order (such as vertical spreads,
@@ -7782,6 +7891,7 @@ class TradeContext:
             submitted_price: Submitted price (required for limit order types such as `LO`)
             remark: Remark (Maximum 255 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+            delayed_until: Time-condition submit time (later than now, at most 90 days ahead; only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
 
         Returns:
             Response
@@ -7838,6 +7948,8 @@ class TradeContext:
         """
         Get account balance
 
+        AP accounts only: US data-center accounts get a region error; use ``us_cash_and_buy_power`` (or ``us_asset_overview``) instead.
+
         Args:
             currency: Currency
 
@@ -7870,6 +7982,8 @@ class TradeContext:
     ) -> List[CashFlow]:
         """
         Get cash flow
+
+        AP accounts only: US data-center accounts get a region error; use ``us_transaction_history`` instead.
 
         Args:
             start_at: Start time
@@ -7907,6 +8021,8 @@ class TradeContext:
         """
         Get fund positions
 
+        AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
+
         Args:
             symbols: Filter by fund codes
 
@@ -7934,6 +8050,8 @@ class TradeContext:
         """
         Get stock positions
 
+        AP accounts only: US data-center accounts get a region error; use ``us_asset_overview`` (``stock_list``) instead.
+
         Args:
             symbols: Filter by stock codes
 
@@ -7959,6 +8077,8 @@ class TradeContext:
         """
         Get margin ratio
 
+        AP accounts only: US data-center accounts get a region error. No US equivalent; for US margin info see ``us_cash_and_buy_power`` (``margin_status``).
+
         Args:
             symbol: Security symbol
 
@@ -7983,6 +8103,8 @@ class TradeContext:
     def order_detail(self, order_id: str, is_attached: bool = False) -> OrderDetail:
         """
         Get order detail
+
+        AP accounts only: US data-center accounts get a region error; use ``us_order_detail`` instead.
 
         Args:
             order_id: Order id
@@ -8106,6 +8228,72 @@ class TradeContext:
 
         Returns:
             :class:`USRealizedPL`
+        """
+        ...
+
+    def us_cash_and_buy_power(self, currency: Optional[str] = None) -> "USCashAndBuyPower":
+        """Get cash, buying power and margin status for the US account. US token required.
+
+        Args:
+            currency: Currency (e.g. ``"USD"``); ``None`` for the server default
+
+        Returns:
+            :class:`USCashAndBuyPower`
+        """
+        ...
+
+    def us_available_holding(
+        self,
+        symbol: str,
+        equity_type: Optional[str] = None,
+        position_side: Optional[str] = None,
+    ) -> "USAvailableHolding":
+        """Get the quantity of a US holding that is available to trade. US token required.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``, an option symbol such as
+                ``"AAPL261120C345000.US"``, or a crypto pair such as ``"BTCUSD.BKKT"``
+            equity_type: ``"STOCK"`` (default), ``"OPTION"`` or ``"CRYPTO"``
+            position_side: ``"LONG"`` (default) or ``"SHORT"``
+
+        Returns:
+            :class:`USAvailableHolding`
+        """
+        ...
+
+    def us_transaction_history(
+        self,
+        start_at: datetime,
+        end_at: datetime,
+        page: int = 1,
+        size: int = 20,
+        types: Optional[List[str]] = None,
+        currency: Optional[str] = None,
+    ) -> "USTransactionHistory":
+        """Get the US account transaction history, one page at a time. US token required.
+
+        Args:
+            start_at: Start time (inclusive)
+            end_at: End time (inclusive)
+            page: Page number, starting at 1
+            size: Page size
+            types: Transaction types to include; ``None`` for all. Values:
+                ``"TT_DEPOSIT_AND_WITHDRAWAL"``, ``"TT_STOCKS_AND_ETFS_TRADING"``,
+                ``"TT_OPTIONS_TRADING"``, ``"TT_CRYPTO_TRADING"``,
+                ``"TT_CORPORATE_ACTION"``, ``"TT_TRANSFER_IN_AND_OUT"``,
+                ``"TT_CRYPTO_TRANSFER"``, ``"TT_MARGIN_FINANCING"``, ``"TT_OTHER"``
+            currency: Currency filter (e.g. ``"USD"``); ``None`` for all
+
+        Returns:
+            :class:`USTransactionHistory`
+        """
+        ...
+
+    def us_exchange_rates(self) -> "USExchangeRates":
+        """Get the exchange rates used by the US account. US token required.
+
+        Returns:
+            :class:`USExchangeRates`
         """
         ...
 
@@ -11470,6 +11658,8 @@ class AsyncTradeContext:
         """
         Get history executions. Optional filters: symbol, start_at, end_at. Returns an awaitable that resolves to execution list.
 
+        ``side`` may be ``OrderSide.Unknown`` on Longbridge US accounts.
+
         Args:
             symbol: Filter by security code.
             start_at: Start time.
@@ -11538,6 +11728,8 @@ class AsyncTradeContext:
     ) -> Awaitable[AllExecutionsResponse]:
         """
         Get all executions. Returns an awaitable that resolves to AllExecutionsResponse.
+
+        AP accounts only: US data-center accounts get a region error; use ``history_executions`` instead.
 
         Args:
             symbol: Filter by security code.
@@ -11665,6 +11857,8 @@ class AsyncTradeContext:
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         attached_params: Optional[ReplaceAttachedParams] = None,
+        delayed_until: Optional[datetime] = None,
+        clear_delayed_until: bool = False,
     ) -> Awaitable[None]:
         """
         Replace order. Returns an awaitable. Same parameters as sync TradeContext.replace_order.
@@ -11682,6 +11876,8 @@ class AsyncTradeContext:
             monitor_price: Monitor price.
             remark: Remark (max 64 characters).
             attached_params: Attached order parameters.
+            delayed_until: New time-condition submit time (later than now, at most 90 days ahead); ``None`` keeps the current time condition. Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
+            clear_delayed_until: Clear the time condition, turning the order into a regular order (takes precedence over ``delayed_until``).
 
         Examples:
             ::
@@ -11726,6 +11922,7 @@ class AsyncTradeContext:
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
         attached_params: Optional[SubmitAttachedParams] = None,
+        delayed_until: Optional[datetime] = None,
     ) -> Awaitable[SubmitOrderResponse]:
         """
         Submit order. Returns an awaitable that resolves to SubmitOrderResponse. Same parameters as sync TradeContext.submit_order.
@@ -11749,6 +11946,7 @@ class AsyncTradeContext:
             remark: Remark (max 64 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
             attached_params: Attached order parameters.
+            delayed_until: Time-condition submit time. The order is held in ``DelayedNotReported`` status and only submitted at this time (later than now, at most 90 days ahead). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
 
         Examples:
             ::
@@ -11794,6 +11992,7 @@ class AsyncTradeContext:
         submitted_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
+        delayed_until: Optional[datetime] = None,
     ) -> Awaitable[SubmitOrderResponse]:
         """
         Submit a multi-leg option combination order (such as vertical spreads,
@@ -11812,6 +12011,7 @@ class AsyncTradeContext:
             submitted_price: Submitted price (required for limit order types such as `LO`).
             remark: Remark (max 255 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+            delayed_until: Time-condition submit time (later than now, at most 90 days ahead; only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
 
         Examples:
             ::
@@ -11882,6 +12082,8 @@ class AsyncTradeContext:
         """
         Get account balance. Optional currency filter. Returns an awaitable that resolves to account balance list.
 
+        AP accounts only: US data-center accounts get a region error; use ``us_cash_and_buy_power`` (or ``us_asset_overview``) instead.
+
         Args:
             currency: Currency filter.
 
@@ -11915,6 +12117,8 @@ class AsyncTradeContext:
     ) -> Awaitable[List[CashFlow]]:
         """
         Get cash flow. Required: start_at, end_at. Optional: business_type, symbol, page, size. Returns an awaitable that resolves to cash flow list.
+
+        AP accounts only: US data-center accounts get a region error; use ``us_transaction_history`` instead.
 
         Args:
             start_at: Start time.
@@ -11953,6 +12157,8 @@ class AsyncTradeContext:
         """
         Get fund positions. Optional filter: symbols. Returns an awaitable that resolves to fund positions response.
 
+        AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
+
         Args:
             symbols: Filter by fund codes.
 
@@ -11981,6 +12187,8 @@ class AsyncTradeContext:
         """
         Get stock positions. Optional filter: symbols. Returns an awaitable that resolves to stock positions response.
 
+        AP accounts only: US data-center accounts get a region error; use ``us_asset_overview`` (``stock_list``) instead.
+
         Args:
             symbols: Filter by stock codes.
 
@@ -12007,6 +12215,8 @@ class AsyncTradeContext:
         """
         Get margin ratio for symbol. Returns an awaitable that resolves to margin ratio.
 
+        AP accounts only: US data-center accounts get a region error. No US equivalent; for US margin info see ``us_cash_and_buy_power`` (``margin_status``).
+
         Args:
             symbol: Security symbol.
 
@@ -12032,6 +12242,8 @@ class AsyncTradeContext:
     def order_detail(self, order_id: str, is_attached: bool = False) -> Awaitable[OrderDetail]:
         """
         Get order detail by order_id. Returns an awaitable that resolves to order detail.
+
+        AP accounts only: US data-center accounts get a region error; use ``us_order_detail`` instead.
 
         Args:
             order_id: Order ID.
@@ -12156,6 +12368,72 @@ class AsyncTradeContext:
 
         Returns:
             Awaitable resolving to :class:`USRealizedPL`
+        """
+        ...
+
+    def us_cash_and_buy_power(self, currency: Optional[str] = None) -> "Awaitable[USCashAndBuyPower]":
+        """Get cash, buying power and margin status for the US account. US token required. Returns awaitable.
+
+        Args:
+            currency: Currency (e.g. ``"USD"``); ``None`` for the server default
+
+        Returns:
+            Awaitable resolving to :class:`USCashAndBuyPower`
+        """
+        ...
+
+    def us_available_holding(
+        self,
+        symbol: str,
+        equity_type: Optional[str] = None,
+        position_side: Optional[str] = None,
+    ) -> "Awaitable[USAvailableHolding]":
+        """Get the quantity of a US holding that is available to trade. US token required. Returns awaitable.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``, an option symbol such as
+                ``"AAPL261120C345000.US"``, or a crypto pair such as ``"BTCUSD.BKKT"``
+            equity_type: ``"STOCK"`` (default), ``"OPTION"`` or ``"CRYPTO"``
+            position_side: ``"LONG"`` (default) or ``"SHORT"``
+
+        Returns:
+            Awaitable resolving to :class:`USAvailableHolding`
+        """
+        ...
+
+    def us_transaction_history(
+        self,
+        start_at: datetime,
+        end_at: datetime,
+        page: int = 1,
+        size: int = 20,
+        types: Optional[List[str]] = None,
+        currency: Optional[str] = None,
+    ) -> "Awaitable[USTransactionHistory]":
+        """Get the US account transaction history, one page at a time. US token required. Returns awaitable.
+
+        Args:
+            start_at: Start time (inclusive)
+            end_at: End time (inclusive)
+            page: Page number, starting at 1
+            size: Page size
+            types: Transaction types to include; ``None`` for all. Values:
+                ``"TT_DEPOSIT_AND_WITHDRAWAL"``, ``"TT_STOCKS_AND_ETFS_TRADING"``,
+                ``"TT_OPTIONS_TRADING"``, ``"TT_CRYPTO_TRADING"``,
+                ``"TT_CORPORATE_ACTION"``, ``"TT_TRANSFER_IN_AND_OUT"``,
+                ``"TT_CRYPTO_TRANSFER"``, ``"TT_MARGIN_FINANCING"``, ``"TT_OTHER"``
+            currency: Currency filter (e.g. ``"USD"``); ``None`` for all
+
+        Returns:
+            Awaitable resolving to :class:`USTransactionHistory`
+        """
+        ...
+
+    def us_exchange_rates(self) -> "Awaitable[USExchangeRates]":
+        """Get the exchange rates used by the US account. US token required. Returns awaitable.
+
+        Returns:
+            Awaitable resolving to :class:`USExchangeRates`
         """
         ...
 
@@ -16363,7 +16641,11 @@ class PortfolioContext:
         ...
 
     def exchange_rate(self) -> "ExchangeRates":
-        """Get exchange rates for supported currencies."""
+        """
+        Get exchange rates for supported currencies.
+
+        AP accounts only: US data-center accounts get a region error; use ``TradeContext.us_exchange_rates`` instead.
+        """
         ...
 
     def profit_analysis(
@@ -16450,7 +16732,11 @@ class AsyncPortfolioContext:
     def create(cls, config: Config) -> AsyncPortfolioContext: ...
 
     async def exchange_rate(self) -> "ExchangeRates":
-        """Get exchange rates for supported currencies."""
+        """
+        Get exchange rates for supported currencies.
+
+        AP accounts only: US data-center accounts get a region error; use ``AsyncTradeContext.us_exchange_rates`` instead.
+        """
         ...
 
     async def profit_analysis(
@@ -17458,12 +17744,32 @@ class USCryptoEntry:
 
     asset_type: str
     """Asset type, e.g. ``"CRYPTO"``"""
-    average_cost: str
-    """Average cost price"""
     symbol: str
-    """Symbol"""
+    """Trading-pair code, e.g. ``"BTCUSD"``; the user-facing symbol is ``"<symbol>.<market>"``, e.g. ``"BTCUSD.BKKT"``"""
+    quantity: str
+    """Holding quantity"""
     currency: str
     """Settlement currency"""
+    average_cost: str
+    """Average cost price; empty when the server has none"""
+    market: str
+    """Market code, e.g. ``"BKKT"``"""
+    trade_status: str
+    prev_close: str
+    last_done: str
+    market_price: str
+    pretrade_close: str
+    stock_invest_of_today: str
+    today_pl: str
+    pretrade_stock_invest_of_today: str
+    pretrade_today_pl: str
+    night_last_done: str
+    night_prev_close: str
+    position_side: str
+    open_position_time: str
+    """Position open time (Unix-second string; ``"0"`` when unknown)"""
+    name: str
+    """Asset name, e.g. ``"Bitcoin"``"""
     industry_counter_id: str
     """Industry counter_id"""
     industry_name: str
@@ -17550,6 +17856,161 @@ class USRealizedPL:
 
     realized_pl_list: List[USRealizedPLEntry]
     """Per-category realized P&L entries"""
+
+
+class USAvailableHolding:
+    """Quantity of a US holding that is available to trade. Returned by TradeContext.us_available_holding."""
+
+    available_qty: str
+    """Quantity available to sell (long) or buy to cover (short); negative for a short position"""
+
+
+class USBuyLimitInfo:
+    """Buying power in USCashAndBuyPower."""
+
+    currency: str
+    """Currency"""
+    cash_buy_power: str
+    """Cash buying power"""
+    overnight_buy_power: str
+    """Overnight buying power"""
+    day_trade_buy_power: str
+    """Day-trade buying power"""
+    instant_buy_power: str
+    """Instant buying power"""
+    intraday_margin_buy_power: str
+    """Intraday margin buying power"""
+    option_buy_power: str
+    """Option buying power"""
+    crypto_buy_power: str
+    """Crypto buying power"""
+    mme: str
+    """Margin maintenance excess used for buying power"""
+
+
+class USCashDetail:
+    """One cash currency entry in USCashAndBuyPower."""
+
+    currency: str
+    """Currency"""
+    total_amount: str
+    """Total cash"""
+    available_cash: str
+    """Available cash"""
+    withdraw_cash: str
+    """Withdrawable cash"""
+    frozen_cash: str
+    """Cash frozen for pending orders"""
+    settled_cash: str
+    """Settled cash"""
+    outstanding: str
+    """Outstanding (unsettled) amount"""
+    external_amount: str
+    """Amount held for external use (e.g. IPO or fund subscriptions)"""
+
+
+class USMarginStatus:
+    """Margin account status in USCashAndBuyPower."""
+
+    currency: str
+    """Currency"""
+    nlv: str
+    """Net liquidation value"""
+    margin_equity: str
+    """Margin equity"""
+    margin_maintenance_excess: str
+    """Margin maintenance excess"""
+    mmr: str
+    """Maintenance margin requirement"""
+    reg_t_excess: str
+    """Regulation T excess"""
+    sma: str
+    """Special memorandum account"""
+
+
+class USCashAndBuyPower:
+    """Cash, buying power and margin status of a US account. Returned by TradeContext.us_cash_and_buy_power."""
+
+    buy_limit_info: USBuyLimitInfo
+    """Buying power"""
+    cash_list: List[USCashDetail]
+    """Cash per currency"""
+    margin_status: USMarginStatus
+    """Margin account status"""
+
+
+class USTransaction:
+    """One record in USTransactionHistory."""
+
+    title: str
+    """Display title"""
+    biz_code: str
+    """Business code"""
+    biz_code_name: str
+    """Business code name"""
+    amount: str
+    """Amount; negative for outflows"""
+    currency: str
+    """Currency"""
+    symbol: str
+    """Security symbol, if the record relates to one (e.g. ``"AAPL.US"``)"""
+    market: str
+    """Market code"""
+    equity_type: str
+    """Holding type"""
+    position_side: str
+    """Position side"""
+    quantity: str
+    """Quantity"""
+    quantity_description: str
+    """Quantity description"""
+    ref_no: str
+    """Reference number"""
+    remark: str
+    """Remark"""
+    create_at: Optional[datetime]
+    """Creation time"""
+    done_at: Optional[datetime]
+    """Completion time"""
+
+
+class USTransactionHistory:
+    """One page of US account transaction history. Returned by TradeContext.us_transaction_history."""
+
+    current_page: int
+    """Current page number"""
+    items: List[USTransaction]
+    """Records on this page. There is no total count: a page shorter than the requested size is the last one."""
+
+
+class USExchangeRate:
+    """One exchange rate in USExchangeRates."""
+
+    universal_key: str
+    """Account channel the rates apply to, e.g. ``us_lb_apex`` (outer ``universal_exchanges`` key)"""
+    spec_key: str
+    """Rate type, e.g. ``am`` or ``reference`` (inner ``spec_exchanges`` key)"""
+    base_currency: str
+    """Base currency"""
+    other_currency: str
+    """Other (quote) currency"""
+    bid_rate: str
+    """Bid rate; empty if not provided"""
+    offer_rate: str
+    """Offer rate; empty if not provided"""
+    average_rate: str
+    """Average rate; empty if not provided"""
+
+
+class USExchangeRates:
+    """Exchange rates of a US account. Returned by TradeContext.us_exchange_rates.
+
+    The upstream two-level map is flattened into ``exchanges``, sorted by the two
+    upstream map keys, which are kept on each entry as ``universal_key`` and ``spec_key``.
+    """
+
+    exchanges: List[USExchangeRate]
+    """Exchange rates"""
 
 
 class USOrderHistory:

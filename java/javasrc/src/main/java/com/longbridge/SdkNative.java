@@ -50,6 +50,8 @@ public class SdkNative {
 
         public static native long configSetPushCandlestickMode(long config, PushCandlestickMode mode);
 
+        public static native long configSetQuoteTransport(long config, QuoteTransport transport);
+
         public static native long configSetEnablePrintQuotePackages(long config, boolean enable);
 
         public static native long configSetLogPath(long config, String logPath);
@@ -63,6 +65,10 @@ public class SdkNative {
 
         public static native void oauthBuild(String clientId, int callbackPort,
                         Consumer<String> openUrlCallback, AsyncCallback callback);
+
+        public static native void oauthRevoke(long oauth, AsyncCallback callback);
+
+        public static native void oauthClear(long oauth, AsyncCallback callback);
 
         public static native void freeOAuth(long oauth);
 

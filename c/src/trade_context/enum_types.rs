@@ -138,6 +138,9 @@ pub enum COrderStatus {
     /// Partial Withdrawal
     #[c(remote = "PartialWithdrawal")]
     OrderStatusPartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    #[c(remote = "DelayedNotReported")]
+    OrderStatusDelayedNotReported,
 }
 
 /// Order tag

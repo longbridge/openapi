@@ -4,7 +4,7 @@ use napi::Result;
 use crate::{
     error::ErrorNewType,
     oauth::OAuth,
-    types::{Language, PushCandlestickMode},
+    types::{Language, PushCandlestickMode, QuoteTransport},
     utils::from_datetime,
 };
 
@@ -26,6 +26,12 @@ pub struct ExtraConfigParams {
     pub enable_overnight: Option<bool>,
     /// Push candlesticks mode (default: PushCandlestickMode.Realtime)
     pub push_candlestick_mode: Option<PushCandlestickMode>,
+    /// Transport for quote pull (request/response) APIs (default:
+    /// QuoteTransport.WebSocket)
+    ///
+    /// Subscriptions and push events always use the WebSocket connection; this
+    /// only selects how request/response quote APIs reach the server.
+    pub quote_transport: Option<QuoteTransport>,
     /// Enable printing the opened quote packages when connected to the server
     /// (default: true).  Set to `false` to suppress the output.
     pub enable_print_quote_packages: Option<bool>,
@@ -67,6 +73,9 @@ fn apply_extra(
         if let Some(mode) = extra.push_candlestick_mode {
             config.set_push_candlestick_mode(mode.into());
         }
+        if let Some(quote_transport) = extra.quote_transport {
+            config.set_quote_transport(quote_transport.into());
+        }
         if let Some(false) = extra.enable_print_quote_packages {
             config.set_dont_print_quote_packages();
         }
@@ -92,7 +101,8 @@ impl Config {
     /// (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
     /// `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
     /// `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-    /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+    /// `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+    /// `LONGBRIDGE_LOG_PATH`).  Fields
     /// set in `extra` override the corresponding environment variables.
     ///
     /// @param appKey       Application key
@@ -140,6 +150,8 @@ impl Config {
     ///   `false` (Default: `false`)
     /// - `LONGBRIDGE_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
     ///   (Default: `realtime`)
+    /// - `LONGBRIDGE_QUOTE_TRANSPORT` - Transport for quote pull APIs, `ws` or
+    ///   `http` (Default: `ws`)
     /// - `LONGBRIDGE_PRINT_QUOTE_PACKAGES` - Print quote packages when
     ///   connected, `true` or `false` (Default: `true`)
     /// - `LONGBRIDGE_LOG_PATH` - Log file directory (Default: no logs)
@@ -159,7 +171,8 @@ impl Config {
     /// (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
     /// `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
     /// `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-    /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+    /// `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+    /// `LONGBRIDGE_LOG_PATH`).  Fields
     /// set in `extra` override the corresponding environment variables.
     ///
     /// @param oauth  OAuth handle obtained from `OAuth.build(...)`
