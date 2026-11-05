@@ -281,13 +281,8 @@ impl OAuth {
         tracing::info!("starting OAuth authorization flow");
         open_url(auth_url.as_str());
 
-        let (code, state) = wait_for_callback(acceptor).await?;
-
-        tracing::debug!(client_id = %self.0.client_id, "received OAuth callback, verifying CSRF token");
-        if state != *csrf_token.secret() {
-            tracing::warn!(client_id = %self.0.client_id, "CSRF token mismatch, possible CSRF attack");
-            return Err(OAuthError::CsrfTokenMismatch);
-        }
+        // Also verifies the CSRF state, for error redirects too.
+        let code = wait_for_callback(acceptor, csrf_token.secret()).await?;
 
         tracing::debug!(client_id = %self.0.client_id, "exchanging authorization code for token");
         let http_client = create_http_client().map_err(|e| OAuthError::ExchangeCodeFailed {

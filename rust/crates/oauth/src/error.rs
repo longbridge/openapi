@@ -86,6 +86,10 @@ pub enum OAuthError {
     LocalAddressFailed,
 
     /// CSRF token mismatch (possible CSRF attack)
+    ///
+    /// No longer returned by the browser authorization flow: a callback whose
+    /// `state` does not match is ignored and the flow keeps waiting. Kept for
+    /// compatibility (code 8).
     #[error("CSRF token mismatch")]
     CsrfTokenMismatch,
 
