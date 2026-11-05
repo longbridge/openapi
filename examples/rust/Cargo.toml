@@ -9,4 +9,5 @@ members = [
     "subscribe_candlesticks",
     "http_client",
     "grid_trading",
+    "quote_http_compare",
 ]

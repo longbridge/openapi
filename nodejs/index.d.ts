@@ -229,6 +229,8 @@ export declare class AttachedOrderDetail {
   get activateRth(): OutsideRTH | null
   /** Submit price */
   get submitPrice(): Decimal | null
+  /** Bid/ask depth level of the limit order submitted price */
+  get limitDepthLevel(): number | null
 }
 
 /** Brokers */
@@ -367,7 +369,8 @@ export declare class Config {
    * (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
    * `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
    * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-   * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+   * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+   * `LONGBRIDGE_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
    * @param appKey       Application key
@@ -407,6 +410,8 @@ export declare class Config {
    *   `false` (Default: `false`)
    * - `LONGBRIDGE_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
    *   (Default: `realtime`)
+   * - `LONGBRIDGE_QUOTE_TRANSPORT` - Transport for quote pull APIs, `ws` or
+   *   `http` (Default: `ws`)
    * - `LONGBRIDGE_PRINT_QUOTE_PACKAGES` - Print quote packages when
    *   connected, `true` or `false` (Default: `true`)
    * - `LONGBRIDGE_LOG_PATH` - Log file directory (Default: no logs)
@@ -422,7 +427,8 @@ export declare class Config {
    * (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
    * `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
    * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-   * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+   * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+   * `LONGBRIDGE_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
    * @param oauth  OAuth handle obtained from `OAuth.build(...)`
@@ -743,7 +749,10 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
-  /** Order side */
+  /**
+   * Order side. `Unknown` when the response omits it (Longbridge US
+   * `/v1/trade/execution/history`)
+   */
   get side(): OrderSide
 }
 
@@ -2575,6 +2584,33 @@ export declare class OAuth {
    *          `HttpClient.fromOAuth`
    */
   static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
+  /**
+   * Revoke the current token on the server (RFC 7009).
+   *
+   * The refresh token is revoked when present, otherwise the access token.
+   * Only the server is contacted; the cached token on disk is left
+   * untouched (see `clear`).
+   *
+   * @example
+   * ```javascript
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Open:', url));
+   * await oauth.revoke();
+   * ```
+   */
+  revoke(): Promise<void>
+  /**
+   * Clear the token locally.
+   *
+   * Drops the in-memory token and deletes the cached token file
+   * (`~/.longbridge/openapi/tokens/<clientId>`). The server is not
+   * contacted (see `revoke`).
+   *
+   * @example
+   * ```javascript
+   * await oauth.clear();
+   * ```
+   */
+  clear(): Promise<void>
 }
 
 /**
@@ -2752,6 +2788,11 @@ export declare class Order {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /**
+   * Time-condition submit time (not set when the order is not a
+   * time-condition order)
+   */
+  get delayedUntil(): Date | null
   /** Attached orders */
   get attachedOrders(): Array<AttachedOrderDetail>
   /**
@@ -2861,6 +2902,11 @@ export declare class OrderDetail {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /**
+   * Time-condition submit time (not set when the order is not a
+   * time-condition order)
+   */
+  get delayedUntil(): Date | null
   /** Commission-free Status */
   get freeStatus(): CommissionFreeStatus
   /** Commission-free amount */
@@ -2970,7 +3016,12 @@ export declare class ParticipantInfo {
 export declare class PortfolioContext {
   /** Create a new PortfolioContext. */
   static new(config: Config): PortfolioContext
-  /** Get exchange rates for supported currencies. */
+  /**
+   * Get exchange rates for supported currencies.
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `TradeContext.usExchangeRates` instead.
+   */
   exchangeRate(): Promise<ExchangeRates>
   /**
    * Get portfolio P&L analysis (summary + per-security breakdown).
@@ -4331,6 +4382,8 @@ export declare class TradeContext {
   /**
    * Get history executions
    *
+   * `side` may be `Unknown` on Longbridge US accounts.
+   *
    * #### Example
    *
    * ```javascript
@@ -4366,7 +4419,12 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
-  /** Get all executions */
+  /**
+   * Get all executions
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `historyExecutions` instead.
+   */
   allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
@@ -4524,6 +4582,9 @@ export declare class TradeContext {
   /**
    * Get account balance
    *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usCashAndBuyPower` (or `usAssetOverview`) instead.
+   *
    * #### Example
    *
    * ```javascript
@@ -4540,6 +4601,9 @@ export declare class TradeContext {
   accountBalance(currency?: string | undefined | null): Promise<Array<AccountBalance>>
   /**
    * Get cash flow
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usTransactionHistory` instead.
    *
    * #### Example
    *
@@ -4561,6 +4625,9 @@ export declare class TradeContext {
   /**
    * Get fund positions
    *
+   * AP accounts only: US data-center accounts have no fund holdings and
+   * get a region error. No US equivalent.
+   *
    * #### Example
    *
    * ```javascript
@@ -4575,6 +4642,9 @@ export declare class TradeContext {
   fundPositions(symbols?: Array<string> | undefined | null): Promise<FundPositionsResponse>
   /**
    * Get stock positions
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usAssetOverview` (`stockList`) instead.
    *
    * #### Example
    *
@@ -4591,6 +4661,10 @@ export declare class TradeContext {
   /**
    * Get margin ratio
    *
+   * AP accounts only: US data-center accounts get a region error. No US
+   * equivalent; for US margin info see `usCashAndBuyPower`
+   * (`marginStatus`).
+   *
    * #### Example
    *
    * ```javascript
@@ -4605,6 +4679,9 @@ export declare class TradeContext {
   marginRatio(symbol: string): Promise<MarginRatio>
   /**
    * Get order detail
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usOrderDetail` instead.
    *
    * #### Example
    *
@@ -4629,6 +4706,28 @@ export declare class TradeContext {
   usAssetOverview(): Promise<USAssetOverview>
   /** Get US realized P&L. US token required. */
   usRealizedPl(currency: string, category?: string | undefined | null): Promise<USRealizedPL>
+  /**
+   * Get cash, buying power and margin status for the US account. US token
+   * required.
+   *
+   * `currency`: optional, e.g. `"USD"`.
+   */
+  usCashAndBuyPower(currency?: string | undefined | null): Promise<USCashAndBuyPower>
+  /**
+   * Get the quantity of a US holding that is available to trade. US token
+   * required.
+   *
+   * `equityType`: `"STOCK"` (default), `"OPTION"` or `"CRYPTO"`;
+   * `positionSide`: `"LONG"` (default) or `"SHORT"`.
+   */
+  usAvailableHolding(symbol: string, equityType?: string | undefined | null, positionSide?: string | undefined | null): Promise<USAvailableHolding>
+  /**
+   * Get the US account transaction history, one page at a time. US token
+   * required.
+   */
+  usTransactionHistory(opts: GetUSTransactionHistoryOptions): Promise<USTransactionHistory>
+  /** Get the exchange rates used by the US account. US token required. */
+  usExchangeRates(): Promise<USExchangeRates>
   orderDetailAttached(orderId: string): Promise<OrderDetail>
   /**
    * Estimating the maximum purchase quantity for Hong Kong and US stocks,
@@ -6288,6 +6387,14 @@ export interface ExtraConfigParams {
   /** Push candlesticks mode (default: PushCandlestickMode.Realtime) */
   pushCandlestickMode?: PushCandlestickMode
   /**
+   * Transport for quote pull (request/response) APIs (default:
+   * QuoteTransport.WebSocket)
+   *
+   * Subscriptions and push events always use the WebSocket connection; this
+   * only selects how request/response quote APIs reach the server.
+   */
+  quoteTransport?: QuoteTransport
+  /**
    * Enable printing the opened quote packages when connected to the server
    * (default: true).  Set to `false` to suppress the output.
    */
@@ -6764,6 +6871,28 @@ export interface GetTodayOrdersOptions {
    * Order entry (not the parent order). Has no effect without order_id.
    */
   isAttached?: boolean
+}
+
+/** Options for the US transaction history request */
+export interface GetUSTransactionHistoryOptions {
+  /** Start time (inclusive) */
+  startAt: Date
+  /** End time (inclusive) */
+  endAt: Date
+  /** Page number, starting at 1 (default 1) */
+  page?: number
+  /** Page size (default 20) */
+  size?: number
+  /**
+   * Transaction types to include; empty means all. Values:
+   * `TT_DEPOSIT_AND_WITHDRAWAL`, `TT_STOCKS_AND_ETFS_TRADING`,
+   * `TT_OPTIONS_TRADING`, `TT_CRYPTO_TRADING`, `TT_CORPORATE_ACTION`,
+   * `TT_TRANSFER_IN_AND_OUT`, `TT_CRYPTO_TRANSFER`, `TT_MARGIN_FINANCING`,
+   * `TT_OTHER`
+   */
+  types?: Array<string>
+  /** Currency filter, e.g. `USD`; empty means all */
+  currency?: string
 }
 
 /** Data granularity */
@@ -7578,7 +7707,9 @@ export declare const enum OrderStatus {
   /** Expired */
   Expired = 16,
   /** Partial Withdrawal */
-  PartialWithdrawal = 17
+  PartialWithdrawal = 17,
+  /** Monitoring (Time-Conditional Order) */
+  DelayedNotReported = 18
 }
 
 /** Order tag */
@@ -7984,6 +8115,17 @@ export interface QuestionOption {
   description: string
 }
 
+export declare const enum QuoteTransport {
+  /** Send pull requests over the quote WebSocket connection (default) */
+  WebSocket = 0,
+  /**
+   * Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+   * equivalent, falling back to the WebSocket for the rest. Using only
+   * HTTP-backed APIs never opens a WebSocket connection.
+   */
+  Http = 1
+}
+
 /** Rank categories response. */
 export interface RankCategoriesResponse {
   /** All top-level rank categories */
@@ -8166,6 +8308,16 @@ export interface ReplaceAttachedParams {
   quantity?: Decimal
   /** Market price */
   marketPrice?: Decimal
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  profitTakerDepthLevel?: number
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  stopLossDepthLevel?: number
 }
 
 /** Options for replace grid trading order request */
@@ -8202,6 +8354,16 @@ export interface ReplaceOrderOptions {
   remark?: string
   /** Attached order parameters */
   attachedParams?: ReplaceAttachedParams
+  /**
+   * New time-condition submit time, which must be later than now and no
+   * more than 90 days ahead. Leave unset to keep the current time condition.
+   */
+  delayedUntil?: Date
+  /**
+   * Clear the time condition, turning the order into a regular order (takes
+   * precedence over `delayedUntil`)
+   */
+  clearDelayedUntil?: boolean
 }
 
 /** A filter condition for screener_search Mode B. */
@@ -8651,6 +8813,16 @@ export interface SubmitAttachedParams {
   stopLossSubmitPrice?: Decimal
   /** Activate RTH */
   activateRth?: OutsideRTH
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  profitTakerDepthLevel?: number
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  stopLossDepthLevel?: number
 }
 
 /** Options for submitting a fund order. */
@@ -8722,6 +8894,13 @@ export interface SubmitMultiLegOrderOptions {
    * The server caches this ID for 10 minutes.
    */
   clientRequestId?: string
+  /**
+   * Time-condition submit time. The order is held in `DelayedNotReported`
+   * status and only submitted at this time, which must be later than now
+   * and no more than 90 days ahead. Only `LO` / `MO` support time
+   * conditions.
+   */
+  delayedUntil?: Date
 }
 
 /** Options for submit order request */
@@ -8769,6 +8948,12 @@ export interface SubmitOrderOptions {
   clientRequestId?: string
   /** Attached order parameters */
   attachedParams?: SubmitAttachedParams
+  /**
+   * Time-condition submit time. The order is held in `DelayedNotReported`
+   * status and only submitted at this time, which must be later than now
+   * and no more than 90 days ahead.
+   */
+  delayedUntil?: Date
 }
 
 /** Quote type of subscription */
@@ -9057,11 +9242,48 @@ export interface USAttachedOrder {
   withdrawn: boolean
 }
 
+/** Quantity of a US holding that is available to trade */
+export interface USAvailableHolding {
+  availableQty: string
+}
+
 /** Action-button state for an order. */
 export interface USButtonControl {
   withdraw: number
   replace: number
   exceptionable: Array<string>
+}
+
+/** Buying power in USCashAndBuyPower */
+export interface USBuyLimitInfo {
+  currency: string
+  cashBuyPower: string
+  overnightBuyPower: string
+  dayTradeBuyPower: string
+  instantBuyPower: string
+  intradayMarginBuyPower: string
+  optionBuyPower: string
+  cryptoBuyPower: string
+  mme: string
+}
+
+/** Cash, buying power and margin status of a US account */
+export interface USCashAndBuyPower {
+  buyLimitInfo: USBuyLimitInfo
+  cashList: Array<USCashDetail>
+  marginStatus: USMarginStatus
+}
+
+/** One cash currency entry in USCashAndBuyPower */
+export interface USCashDetail {
+  currency: string
+  totalAmount: string
+  availableCash: string
+  withdrawCash: string
+  frozenCash: string
+  settledCash: string
+  outstanding: string
+  externalAmount: string
 }
 
 /** One cash currency entry in USAssetOverview */
@@ -9124,9 +9346,26 @@ export interface USConsensusItem {
 /** One cryptocurrency holding in USAssetOverview */
 export interface USCryptoEntry {
   assetType: string
-  averageCost: string
   symbol: string
+  quantity: string
   currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
   industryName: string
 }
 
@@ -9212,6 +9451,22 @@ export interface USETFFile {
 /** US ETF files response */
 export interface USETFFilesResponse {
   files: Array<USETFFile>
+}
+
+/** One exchange rate in USExchangeRates */
+export interface USExchangeRate {
+  universalKey: string
+  specKey: string
+  baseCurrency: string
+  otherCurrency: string
+  bidRate: string
+  offerRate: string
+  averageRate: string
+}
+
+/** Exchange rates of a US account */
+export interface USExchangeRates {
+  exchanges: Array<USExchangeRate>
 }
 
 /** One balance-sheet entry in USFinancialOverview. */
@@ -9302,6 +9557,17 @@ export interface USKeyMetricItem {
   reportTxt: string
   rptDate: string
   fields: Array<any>
+}
+
+/** Margin account status in USCashAndBuyPower */
+export interface USMarginStatus {
+  currency: string
+  nlv: string
+  marginEquity: string
+  marginMaintenanceExcess: string
+  mmr: string
+  regTExcess: string
+  sma: string
 }
 
 /** Full typed order object within USOrderDetailResponse. */
@@ -9488,6 +9754,31 @@ export interface USStockEntry {
   name: string
   industryCounterId: string
   industryName: string
+}
+
+/** One record in USTransactionHistory */
+export interface USTransaction {
+  title: string
+  bizCode: string
+  bizCodeName: string
+  amount: string
+  currency: string
+  symbol: string
+  market: string
+  equityType: string
+  positionSide: string
+  quantity: string
+  quantityDescription: string
+  refNo: string
+  remark: string
+  createAt?: Date
+  doneAt?: Date
+}
+
+/** One page of US account transaction history */
+export interface USTransactionHistory {
+  currentPage: number
+  items: Array<USTransaction>
 }
 
 /** One valuation metric entry in USValuationOverview.metrics */

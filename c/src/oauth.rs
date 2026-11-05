@@ -55,7 +55,7 @@ pub unsafe extern "C" fn lb_oauth_new(
                 open_url_callback(c_url.as_ptr(), open_url_userdata_usize as *mut c_void);
             })
             .await
-            .map_err(|e| longbridge::Error::OAuth(e.to_string()))?;
+            .map_err(longbridge::Error::OAuth)?;
         Ok(Box::into_raw(Box::new(COAuth { inner: oauth })))
     });
 }
@@ -77,4 +77,68 @@ pub unsafe extern "C" fn lb_oauth_free(oauth: *mut COAuth) {
     if !oauth.is_null() {
         drop(Box::from_raw(oauth));
     }
+}
+
+/// Clone the inner client; `None` if the handle is NULL (e.g. a moved-from C++
+/// wrapper).
+unsafe fn clone_inner(oauth: *const COAuth) -> Option<OAuth> {
+    oauth.as_ref().map(|oauth| oauth.inner.clone())
+}
+
+fn null_oauth_error() -> longbridge::Error {
+    longbridge::Error::OAuth(longbridge::oauth::OAuthError::Other(
+        "OAuth client is NULL".to_string(),
+    ))
+}
+
+/// Asynchronously revoke the current token on the server (RFC 7009)
+///
+/// The refresh token is revoked when present, otherwise the access token.
+/// Only the server is contacted; the cached token on disk is left untouched
+/// (use `lb_oauth_clear` to remove it).
+///
+/// @param oauth     OAuth 2.0 client; if NULL, `callback` receives an error
+/// @param callback  Async completion callback; `error` is set on failure
+/// @param userdata  Opaque pointer forwarded to `callback`
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_oauth_revoke(
+    oauth: *const COAuth,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let oauth = clone_inner(oauth);
+    execute_async::<c_void, _, _>(callback, std::ptr::null(), userdata, async move {
+        oauth
+            .ok_or_else(null_oauth_error)?
+            .revoke()
+            .await
+            .map_err(longbridge::Error::OAuth)?;
+        Ok(())
+    });
+}
+
+/// Asynchronously clear the token locally
+///
+/// Drops the in-memory token and deletes the cached token file
+/// (`~/.longbridge/openapi/tokens/<client_id>`). The server is not contacted
+/// (use `lb_oauth_revoke` for that).
+///
+/// @param oauth     OAuth 2.0 client; if NULL, `callback` receives an error
+/// @param callback  Async completion callback; `error` is set on failure
+/// @param userdata  Opaque pointer forwarded to `callback`
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_oauth_clear(
+    oauth: *const COAuth,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let oauth = clone_inner(oauth);
+    execute_async::<c_void, _, _>(callback, std::ptr::null(), userdata, async move {
+        oauth
+            .ok_or_else(null_oauth_error)?
+            .clear()
+            .await
+            .map_err(longbridge::Error::OAuth)?;
+        Ok(())
+    });
 }

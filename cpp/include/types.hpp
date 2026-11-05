@@ -47,6 +47,17 @@ enum class PushCandlestickMode
   Confirmed,
 };
 
+/// Transport used by the quote pull APIs
+enum class QuoteTransport
+{
+  /// Send pull requests over the quote WebSocket connection (default)
+  WebSocket,
+  /// Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+  /// equivalent, falling back to the WebSocket for the rest. Using only
+  /// HTTP-backed APIs never opens a WebSocket connection.
+  Http,
+};
+
 /// Market
 enum class Market
 {
@@ -1429,7 +1440,8 @@ struct Execution
   int64_t trade_done_at;
   Decimal quantity;
   Decimal price;
-  /// Order side
+  /// Order side. `Unknown` when the response omits it (Longbridge US
+  /// `/v1/trade/execution/history`)
   OrderSide side;
 };
 
@@ -1516,6 +1528,8 @@ enum class OrderStatus
   Expired,
   /// Partial Withdrawal
   PartialWithdrawal,
+  /// Monitoring (Time-Conditional Order)
+  DelayedNotReported,
 };
 
 /// Order type
@@ -1642,6 +1656,8 @@ struct AttachedOrderDetail
   OrderType activate_order_type;
   std::optional<OutsideRTH> activate_rth;
   std::optional<Decimal> submit_price;
+  /// Bid/ask depth level of the limit order submitted price
+  std::optional<int32_t> limit_depth_level;
 };
 
 /// Submit attached order params
@@ -1656,6 +1672,12 @@ struct SubmitAttachedParams
   std::optional<Decimal> profit_taker_submit_price;
   std::optional<Decimal> stop_loss_submit_price;
   std::optional<OutsideRTH> activate_rth;
+  /// Bid/ask depth level for the take-profit limit order submitted price,
+  /// valid when `activate_order_type` is `LIT`
+  std::optional<int32_t> profit_taker_depth_level;
+  /// Bid/ask depth level for the stop-loss limit order submitted price, valid
+  /// when `activate_order_type` is `LIT`
+  std::optional<int32_t> stop_loss_depth_level;
 };
 
 /// Replace attached order params
@@ -1676,6 +1698,12 @@ struct ReplaceAttachedParams
   std::optional<int64_t> main_id;
   std::optional<Decimal> quantity;
   std::optional<Decimal> market_price;
+  /// Bid/ask depth level for the take-profit limit order submitted price,
+  /// valid when `activate_order_type` is `LIT`
+  std::optional<int32_t> profit_taker_depth_level;
+  /// Bid/ask depth level for the stop-loss limit order submitted price, valid
+  /// when `activate_order_type` is `LIT`
+  std::optional<int32_t> stop_loss_depth_level;
 };
 
 /// Multi-leg strategy
@@ -1820,6 +1848,9 @@ struct Order
   std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
+  /// Time-condition submit time (Unix timestamp in seconds, not set when
+  /// the order is not a time-condition order)
+  std::optional<int64_t> delayed_until;
   /// Attached orders
   std::vector<AttachedOrderDetail> attached_orders;
   /// Multi-leg strategy information (only present for multi-leg option
@@ -1946,6 +1977,13 @@ struct ReplaceOrderOptions
   std::optional<std::string> remark;
   /// Attached order params
   std::optional<ReplaceAttachedParams> attached_params;
+  /// New time-condition submit time (Unix timestamp in seconds), later than
+  /// now and no more than 90 days ahead; not set keeps the current time
+  /// condition
+  std::optional<int64_t> delayed_until;
+  /// Clear the time condition, turning the order into a regular order (takes
+  /// precedence over `delayed_until`)
+  bool clear_delayed_until = false;
 };
 
 /// Options for submit order request
@@ -1990,6 +2028,10 @@ struct SubmitOrderOptions
   std::optional<std::string> client_request_id;
   /// Attached order params
   std::optional<SubmitAttachedParams> attached_params;
+  /// Time-condition submit time (Unix timestamp in seconds). The order is held
+  /// in `DelayedNotReported` status and only submitted at this time, which
+  /// must be later than now and no more than 90 days ahead.
+  std::optional<int64_t> delayed_until;
 };
 
 /// Response for submit order request
@@ -2032,6 +2074,9 @@ struct SubmitMultiLegOrderOptions
   /// If not specified, idempotency control is skipped.
   /// The server caches this ID for 10 minutes.
   std::optional<std::string> client_request_id;
+  /// Time-condition submit time (Unix timestamp in seconds), later than now
+  /// and no more than 90 days ahead. Only `LO` / `MO` support time conditions.
+  std::optional<int64_t> delayed_until;
 };
 
 /// Cash info
@@ -2386,6 +2431,9 @@ struct OrderDetail
   std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
+  /// Time-condition submit time (Unix timestamp in seconds, not set when
+  /// the order is not a time-condition order)
+  std::optional<int64_t> delayed_until;
   /// Commission-free Status
   CommissionFreeStatus free_status;
   /// Commission-free amount

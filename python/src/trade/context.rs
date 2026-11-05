@@ -19,7 +19,7 @@ use crate::{
     config::Config,
     decimal::PyDecimal,
     error::ErrorNewType,
-    time::{PyDateWrapper, PyOffsetDateTimeWrapper},
+    time::{PyDateWrapper, PyInstantWrapper, PyOffsetDateTimeWrapper},
     trade::{
         push::handle_push_event,
         types::{
@@ -150,6 +150,9 @@ impl TradeContext {
     }
 
     /// Get all executions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `history_executions` instead.
     #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
     fn all_executions(
         &self,
@@ -260,7 +263,7 @@ impl TradeContext {
     }
 
     /// Replace order
-    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, attached_params = None))]
+    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, attached_params = None, delayed_until = None, clear_delayed_until = false))]
     #[allow(clippy::too_many_arguments)]
     fn replace_order(
         &self,
@@ -276,6 +279,8 @@ impl TradeContext {
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
         attached_params: Option<ReplaceAttachedParams>,
+        delayed_until: Option<PyInstantWrapper>,
+        clear_delayed_until: bool,
     ) -> PyResult<()> {
         let mut opts = ReplaceOrderOptions::new(order_id, quantity.into());
 
@@ -309,13 +314,18 @@ impl TradeContext {
         if let Some(p) = attached_params {
             opts = opts.attached_params(p.0);
         }
+        if clear_delayed_until {
+            opts = opts.clear_delayed_until();
+        } else if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
+        }
 
         self.ctx.replace_order(opts).map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Submit order
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None, attached_params = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None, attached_params = None, delayed_until = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -337,6 +347,7 @@ impl TradeContext {
         remark: Option<String>,
         client_request_id: Option<String>,
         attached_params: Option<SubmitAttachedParams>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<SubmitOrderResponse> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
@@ -385,6 +396,9 @@ impl TradeContext {
         if let Some(p) = attached_params {
             opts = opts.attached_params(p.0);
         }
+        if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
+        }
 
         self.ctx
             .submit_order(opts)
@@ -401,7 +415,7 @@ impl TradeContext {
     /// implied by `strategy` together with `side`, not by the sign of the
     /// ratio, and a negative or zero ratio is rejected by the server with
     /// `602001`.
-    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None))]
+    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None, delayed_until = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_multileg(
         &self,
@@ -413,6 +427,7 @@ impl TradeContext {
         submitted_price: Option<PyDecimal>,
         remark: Option<String>,
         client_request_id: Option<String>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<SubmitOrderResponse> {
         let legs = legs
             .into_iter()
@@ -436,6 +451,9 @@ impl TradeContext {
         if let Some(id) = client_request_id {
             opts = opts.client_request_id(id);
         }
+        if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
+        }
         self.ctx
             .submit_multileg(opts)
             .map_err(ErrorNewType)?
@@ -454,6 +472,9 @@ impl TradeContext {
     }
 
     /// Get account balance
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
     #[pyo3(signature = (currency = None))]
     fn account_balance(&self, currency: Option<String>) -> PyResult<Vec<AccountBalance>> {
         self.ctx
@@ -465,6 +486,9 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
     #[pyo3(signature = (start_at, end_at, business_type = None, symbol = None, page = None, size = None))]
     fn cash_flow(
         &self,
@@ -499,6 +523,9 @@ impl TradeContext {
     }
 
     /// Get fund positions
+    ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     #[pyo3(signature = (symbols = None))]
     fn fund_positions(&self, symbols: Option<Vec<String>>) -> PyResult<FundPositionsResponse> {
         self.ctx
@@ -508,6 +535,9 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
     #[pyo3(signature = (symbols = None))]
     fn stock_positions(&self, symbols: Option<Vec<String>>) -> PyResult<StockPositionsResponse> {
         self.ctx
@@ -517,6 +547,10 @@ impl TradeContext {
     }
 
     /// Get margin ratio
+    ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
     fn margin_ratio(&self, symbol: String) -> PyResult<MarginRatio> {
         self.ctx
             .margin_ratio(symbol)
@@ -525,6 +559,9 @@ impl TradeContext {
     }
 
     /// Get order detail
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
     #[pyo3(signature = (order_id, is_attached = false))]
     fn order_detail(&self, order_id: String, is_attached: bool) -> PyResult<OrderDetail> {
         let mut opts = GetOrderDetailOptions::new(order_id);
@@ -600,6 +637,68 @@ impl TradeContext {
             })
             .map_err(ErrorNewType)?
             .into())
+    }
+
+    /// Get cash, buying power and margin status for the US account. US token
+    /// required.
+    #[pyo3(signature = (currency = None))]
+    fn us_cash_and_buy_power(
+        &self,
+        currency: Option<String>,
+    ) -> PyResult<crate::trade::types::USCashAndBuyPower> {
+        Ok(self
+            .ctx
+            .us_cash_and_buy_power(currency.as_deref())
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get the quantity of a US holding that is available to trade. US token
+    /// required.
+    #[pyo3(signature = (symbol, equity_type = None, position_side = None))]
+    fn us_available_holding(
+        &self,
+        symbol: String,
+        equity_type: Option<String>,
+        position_side: Option<String>,
+    ) -> PyResult<crate::trade::types::USAvailableHolding> {
+        Ok(self
+            .ctx
+            .us_available_holding(longbridge::trade::GetUSAvailableHoldingOptions {
+                symbol,
+                equity_type: equity_type.unwrap_or_default(),
+                position_side: position_side.unwrap_or_default(),
+            })
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get the US account transaction history. US token required.
+    #[pyo3(signature = (start_at, end_at, page = 1, size = 20, types = None, currency = None))]
+    fn us_transaction_history(
+        &self,
+        start_at: PyOffsetDateTimeWrapper,
+        end_at: PyOffsetDateTimeWrapper,
+        page: i32,
+        size: i32,
+        types: Option<Vec<String>>,
+        currency: Option<String>,
+    ) -> PyResult<crate::trade::types::USTransactionHistory> {
+        let mut opts = longbridge::trade::GetUSTransactionHistoryOptions::new(start_at.0, end_at.0);
+        opts.page = page;
+        opts.size = size;
+        opts.types = types.unwrap_or_default();
+        opts.currency = currency.unwrap_or_default();
+        Ok(self
+            .ctx
+            .us_transaction_history(opts)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get the exchange rates used by the US account. US token required.
+    fn us_exchange_rates(&self) -> PyResult<crate::trade::types::USExchangeRates> {
+        Ok(self.ctx.us_exchange_rates().map_err(ErrorNewType)?.into())
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

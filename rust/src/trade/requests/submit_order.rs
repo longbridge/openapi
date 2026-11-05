@@ -1,6 +1,6 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
-use time::Date;
+use time::{Date, OffsetDateTime};
 
 use crate::{
     serde_utils,
@@ -43,6 +43,8 @@ pub struct SubmitOrderOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     client_request_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    delayed_until: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     attached_params: Option<SubmitAttachedParams>,
 }
 
@@ -74,6 +76,7 @@ impl SubmitOrderOptions {
             monitor_price: None,
             remark: None,
             client_request_id: None,
+            delayed_until: None,
             attached_params: None,
         }
     }
@@ -194,6 +197,19 @@ impl SubmitOrderOptions {
         }
     }
 
+    /// Set the time-condition submit time.
+    ///
+    /// The order is held in `DelayedNotReported` status and only submitted at
+    /// this time, which must be later than now and no more than 90 days ahead.
+    #[inline]
+    #[must_use]
+    pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
+        Self {
+            delayed_until: Some(super::delayed_until_timestamp(delayed_until)),
+            ..self
+        }
+    }
+
     /// Set attached order parameters
     pub fn attached_params(self, params: SubmitAttachedParams) -> Self {
         Self {
@@ -223,6 +239,10 @@ pub struct SubmitAttachedParams {
     stop_loss_submit_price: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
     activate_rth: Option<OutsideRTH>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    profit_taker_depth_level: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stop_loss_depth_level: Option<i32>,
 }
 
 impl SubmitAttachedParams {
@@ -238,6 +258,8 @@ impl SubmitAttachedParams {
             profit_taker_submit_price: None,
             stop_loss_submit_price: None,
             activate_rth: None,
+            profit_taker_depth_level: None,
+            stop_loss_depth_level: None,
         }
     }
     /// Set the take-profit trigger price
@@ -295,5 +317,76 @@ impl SubmitAttachedParams {
             activate_rth: Some(v),
             ..self
         }
+    }
+
+    /// Set the bid/ask depth level for the take-profit limit order submitted
+    /// price, valid when `activate_order_type` is `LIT`
+    pub fn profit_taker_depth_level(self, v: i32) -> Self {
+        Self {
+            profit_taker_depth_level: Some(v),
+            ..self
+        }
+    }
+
+    /// Set the bid/ask depth level for the stop-loss limit order submitted
+    /// price, valid when `activate_order_type` is `LIT`
+    pub fn stop_loss_depth_level(self, v: i32) -> Self {
+        Self {
+            stop_loss_depth_level: Some(v),
+            ..self
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use time::macros::datetime;
+
+    use super::*;
+
+    fn options() -> SubmitOrderOptions {
+        SubmitOrderOptions::new(
+            "700.HK",
+            OrderType::LO,
+            OrderSide::Buy,
+            Decimal::from(100),
+            TimeInForceType::Day,
+        )
+    }
+
+    #[test]
+    fn delayed_until() {
+        assert!(
+            serde_json::to_value(options())
+                .unwrap()
+                .get("delayed_until")
+                .is_none()
+        );
+
+        let opts = options().delayed_until(datetime!(2026-01-01 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767225600)
+        );
+
+        let opts = options().delayed_until(OffsetDateTime::UNIX_EPOCH);
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(2),
+            "a time that maps to 0 must not be sent as a regular order"
+        );
+    }
+
+    #[test]
+    fn attached_params_depth_level() {
+        let params = SubmitAttachedParams::new(AttachedOrderType::Bracket);
+        let value = serde_json::to_value(&params).unwrap();
+        assert!(value.get("profit_taker_depth_level").is_none());
+        assert!(value.get("stop_loss_depth_level").is_none());
+
+        let params = params.profit_taker_depth_level(2).stop_loss_depth_level(5);
+        let value = serde_json::to_value(&params).unwrap();
+        assert_eq!(value["profit_taker_depth_level"], serde_json::json!(2));
+        assert_eq!(value["stop_loss_depth_level"], serde_json::json!(5));
     }
 }

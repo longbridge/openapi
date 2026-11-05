@@ -37,11 +37,10 @@ pub(crate) struct OAuthToken {
 
 impl OAuthToken {
     /// Build from oauth2 crate token response.
-    pub(crate) fn from_oauth2_response<TT, T>(client_id: String, token_response: &T) -> Self
-    where
-        TT: oauth2::TokenType,
-        T: TokenResponse<TT>,
-    {
+    pub(crate) fn from_oauth2_response<T: TokenResponse>(
+        client_id: String,
+        token_response: &T,
+    ) -> Self {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
@@ -85,6 +84,26 @@ impl OAuthToken {
         })?;
         tracing::debug!(path = %path.display(), "token loaded successfully");
         Ok(token)
+    }
+
+    /// Delete the token file at the given path. A missing file is not an
+    /// error.
+    pub(crate) fn delete_from_path(path: impl AsRef<Path>) -> OAuthResult<()> {
+        let path = path.as_ref();
+        match std::fs::remove_file(path) {
+            Ok(()) => {
+                tracing::debug!(path = %path.display(), "token file deleted");
+                Ok(())
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(e) => {
+                tracing::error!(path = %path.display(), error = %e, "failed to delete token file");
+                Err(OAuthError::TokenFileDelete {
+                    path: path.to_path_buf(),
+                    source: e,
+                })
+            }
+        }
     }
 
     /// Save token to a JSON file at the given path.

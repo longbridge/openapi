@@ -26,7 +26,7 @@ public class GridContext implements AutoCloseable {
      */
     public static GridContext create(Config config) {
         GridContext ctx = new GridContext();
-        ctx.raw = SdkNative.newGridContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newGridContext(config.getRaw()); }
         return ctx;
     }
 

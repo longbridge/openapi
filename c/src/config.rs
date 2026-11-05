@@ -11,7 +11,7 @@ use crate::{
     async_call::{CAsyncCallback, execute_async},
     error::{CError, set_error},
     oauth::COAuth,
-    types::{CLanguage, CPushCandlestickMode, CString},
+    types::{CLanguage, CPushCandlestickMode, CQuoteTransport, CString},
 };
 
 /// Configuration options for Longbridge SDK
@@ -22,9 +22,10 @@ pub struct CConfig(pub(crate) Config);
 /// Optional environment variables are read automatically:
 /// `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
 /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
-/// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
-/// `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
-/// to override any of these values after construction.
+/// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+/// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`.  Use the
+/// corresponding `lb_config_set_*` functions to override any of these values
+/// after construction.
 ///
 /// @param app_key       App key
 /// @param app_secret    App secret
@@ -54,7 +55,8 @@ pub unsafe extern "C" fn lb_config_from_apikey(
 /// `LONGBRIDGE_ACCESS_TOKEN`, `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_QUOTE_WS_URL`,
 /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_LANGUAGE`,
 /// `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-/// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`
+/// `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+/// `LONGBRIDGE_LOG_PATH`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_from_apikey_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_apikey_env() {
@@ -74,9 +76,10 @@ pub unsafe extern "C" fn lb_config_from_apikey_env(error: *mut *mut CError) -> *
 /// Optional environment variables are read automatically:
 /// `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
 /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
-/// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
-/// `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
-/// to override any of these values after construction.
+/// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+/// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`.  Use the
+/// corresponding `lb_config_set_*` functions to override any of these values
+/// after construction.
 ///
 /// Does **not** take ownership of `oauth`. The caller must free `oauth` with
 /// `lb_oauth_free` after this call returns.
@@ -161,6 +164,21 @@ pub unsafe extern "C" fn lb_config_set_push_candlestick_mode(
     mode: CPushCandlestickMode,
 ) {
     (*config).0.set_push_candlestick_mode(mode.into());
+}
+
+/// Set the transport used by the quote pull APIs
+///
+/// Default: `QuoteTransport_WebSocket` (or `LONGBRIDGE_QUOTE_TRANSPORT` =
+/// `ws` / `http`)
+///
+/// @param config     Config object
+/// @param transport  Quote transport
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_config_set_quote_transport(
+    config: *mut CConfig,
+    transport: CQuoteTransport,
+) {
+    (*config).0.set_quote_transport(transport.into());
 }
 
 /// Disable printing of quote packages on connection

@@ -107,6 +107,8 @@ pub struct CAttachedOrderDetail {
     pub activate_rth: *const COutsideRTH,
     /// Submit price (maybe null)
     pub submit_price: *const CDecimal,
+    /// Bid/ask depth level of the limit order submitted price (maybe null)
+    pub limit_depth_level: *const i32,
 }
 
 #[derive(Debug)]
@@ -132,6 +134,7 @@ pub(crate) struct CAttachedOrderDetailOwned {
     activate_order_type: OrderType,
     activate_rth: Option<COutsideRTH>,
     submit_price: Option<CDecimal>,
+    limit_depth_level: Option<i32>,
 }
 
 impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
@@ -158,6 +161,7 @@ impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
             activate_order_type,
             activate_rth,
             submit_price,
+            limit_depth_level,
         } = detail;
         Self {
             order_id: order_id.into(),
@@ -181,6 +185,7 @@ impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
             activate_order_type,
             activate_rth: activate_rth.map(Into::into),
             submit_price: submit_price.map(Into::into),
+            limit_depth_level,
         }
     }
 }
@@ -211,6 +216,7 @@ impl ToFFI for CAttachedOrderDetailOwned {
             activate_order_type,
             activate_rth,
             submit_price,
+            limit_depth_level,
         } = self;
         CAttachedOrderDetail {
             order_id: order_id.to_ffi_type(),
@@ -254,6 +260,10 @@ impl ToFFI for CAttachedOrderDetailOwned {
             submit_price: submit_price
                 .as_ref()
                 .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            limit_depth_level: limit_depth_level
+                .as_ref()
+                .map(|value| value as *const i32)
                 .unwrap_or(std::ptr::null()),
         }
     }
@@ -445,6 +455,12 @@ pub struct CSubmitAttachedParams {
     pub stop_loss_submit_price: *const CDecimal,
     /// RTH setting for activated order (can be null)
     pub activate_rth: *const COutsideRTH,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub profit_taker_depth_level: *const i32,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub stop_loss_depth_level: *const i32,
 }
 
 /// Options for replace attached order params
@@ -481,6 +497,12 @@ pub struct CReplaceAttachedParams {
     pub quantity: *const CDecimal,
     /// Market price (can be null)
     pub market_price: *const CDecimal,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub profit_taker_depth_level: *const i32,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub stop_loss_depth_level: *const i32,
 }
 
 /// Order changed message
@@ -743,7 +765,8 @@ pub struct CExecution {
     pub quantity: *const CDecimal,
     /// Executed price
     pub price: *const CDecimal,
-    /// Order side
+    /// Order side. `Unknown` when the response omits it (Longbridge US
+    /// `/v1/trade/execution/history`)
     pub side: COrderSide,
 }
 
@@ -950,6 +973,8 @@ pub struct COrder {
     pub has_multi_leg: bool,
     /// Multi-leg strategy information (only valid when has_multi_leg is true)
     pub multi_leg: CMultiLegInfo,
+    /// Time-condition submit time (maybe null)
+    pub delayed_until: *const i64,
 }
 
 #[derive(Debug)]
@@ -983,6 +1008,7 @@ pub(crate) struct COrderOwned {
     trigger_count: Option<i32>,
     monitor_price: Option<CDecimal>,
     remark: CString,
+    delayed_until: Option<i64>,
     attached_orders: CVec<CAttachedOrderDetailOwned>,
     multi_leg: Option<CMultiLegInfoOwned>,
 }
@@ -1019,6 +1045,7 @@ impl From<Order> for COrderOwned {
             trigger_count,
             monitor_price,
             remark,
+            delayed_until,
             attached_orders,
             multi_leg,
         } = order;
@@ -1052,6 +1079,7 @@ impl From<Order> for COrderOwned {
             trigger_count,
             monitor_price: monitor_price.map(Into::into),
             remark: remark.into(),
+            delayed_until: delayed_until.map(OffsetDateTime::unix_timestamp),
             attached_orders: attached_orders.into(),
             multi_leg: multi_leg.map(Into::into),
         }
@@ -1092,6 +1120,7 @@ impl ToFFI for COrderOwned {
             trigger_count,
             monitor_price,
             remark,
+            delayed_until,
             attached_orders,
             multi_leg,
         } = self;
@@ -1170,6 +1199,10 @@ impl ToFFI for COrderOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             remark: remark.to_ffi_type(),
+            delayed_until: delayed_until
+                .as_ref()
+                .map(|value| value as *const i64)
+                .unwrap_or(std::ptr::null()),
             attached_orders: attached_orders.to_ffi_type(),
             num_attached_orders: attached_orders.len(),
             has_multi_leg: multi_leg.is_some(),
@@ -1249,6 +1282,13 @@ pub struct CReplaceOrderOptions {
     pub remark: *const c_char,
     /// Attached order parameters (can be null)
     pub attached_params: *const CReplaceAttachedParams,
+    /// New time-condition submit time, Unix timestamp in seconds; must be
+    /// later than now and no more than 90 days ahead (can be null to keep the
+    /// current time condition)
+    pub delayed_until: *const i64,
+    /// Clear the time condition, turning the order into a regular order
+    /// (takes precedence over `delayed_until`)
+    pub clear_delayed_until: bool,
 }
 
 /// Options for submit order request
@@ -1294,6 +1334,10 @@ pub struct CSubmitOrderOptions {
     pub client_request_id: *const c_char,
     /// Attached order parameters (can be null)
     pub attached_params: *const CSubmitAttachedParams,
+    /// Time-condition submit time, Unix timestamp in seconds (can be null).
+    /// The order is held in `DelayedNotReported` status and only submitted at
+    /// this time, which must be later than now and no more than 90 days ahead.
+    pub delayed_until: *const i64,
 }
 
 /// Response for submit order request
@@ -1362,6 +1406,10 @@ pub struct CSubmitMultiLegOrderOptions {
     /// If not specified, idempotency control is skipped.
     /// The server caches this ID for 10 minutes.
     pub client_request_id: *const c_char,
+    /// Time-condition submit time, Unix timestamp in seconds (can be null);
+    /// must be later than now and no more than 90 days ahead. Only `LO` / `MO`
+    /// support time conditions.
+    pub delayed_until: *const i64,
 }
 
 /// Account balance
@@ -2402,6 +2450,8 @@ pub struct COrderDetail {
     pub has_multi_leg: bool,
     /// Multi-leg strategy information (only valid when has_multi_leg is true)
     pub multi_leg: CMultiLegInfo,
+    /// Time-condition submit time (maybe null)
+    pub delayed_until: *const i64,
 }
 
 #[derive(Debug)]
@@ -2435,6 +2485,7 @@ pub(crate) struct COrderDetailOwned {
     trigger_count: Option<i32>,
     monitor_price: Option<CDecimal>,
     remark: CString,
+    delayed_until: Option<i64>,
     free_status: CCommissionFreeStatus,
     free_amount: Option<CDecimal>,
     free_currency: Option<CString>,
@@ -2482,6 +2533,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             trigger_count,
             monitor_price,
             remark,
+            delayed_until,
             free_status,
             free_amount,
             free_currency,
@@ -2526,6 +2578,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             trigger_count,
             monitor_price: monitor_price.map(Into::into),
             remark: remark.into(),
+            delayed_until: delayed_until.map(OffsetDateTime::unix_timestamp),
             free_status: free_status.into(),
             free_amount: free_amount.map(Into::into),
             free_currency: free_currency.map(Into::into),
@@ -2577,6 +2630,7 @@ impl ToFFI for COrderDetailOwned {
             trigger_count,
             monitor_price,
             remark,
+            delayed_until,
             free_status,
             free_amount,
             free_currency,
@@ -2666,6 +2720,10 @@ impl ToFFI for COrderDetailOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             remark: remark.to_ffi_type(),
+            delayed_until: delayed_until
+                .as_ref()
+                .map(|value| value as *const i64)
+                .unwrap_or(std::ptr::null()),
             free_status: *free_status,
             free_amount: free_amount
                 .as_ref()

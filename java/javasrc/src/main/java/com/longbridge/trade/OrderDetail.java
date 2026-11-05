@@ -38,6 +38,7 @@ public class OrderDetail {
     private Integer triggerCount;
     private BigDecimal monitorPrice;
     private String remark;
+    private OffsetDateTime delayedUntil;
     private CommissionFreeStatus freeStatus;
     private BigDecimal freeAmount;
     private String freeCurrency;
@@ -314,6 +315,16 @@ public class OrderDetail {
     }
 
     /**
+     * Returns the time-condition submit time.
+     *
+     * @return time-condition submit time, or {@code null} when the order is not
+     *         a time-condition order
+     */
+    public OffsetDateTime getDelayedUntil() {
+        return delayedUntil;
+    }
+
+    /**
      * Returns the commission-free status.
      *
      * @return commission-free status
@@ -441,7 +452,7 @@ public class OrderDetail {
                 + updatedAt + ", triggerAt=" + triggerAt + ", trailingAmount=" + trailingAmount + ", trailingPercent="
                 + trailingPercent + ", limitOffset=" + limitOffset + ", triggerStatus=" + triggerStatus + ", currency="
                 + currency + ", outsideRth=" + outsideRth + ", limitDepthLevel=" + limitDepthLevel + ", triggerCount="
-                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + ", freeStatus=" + freeStatus
+                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + ", delayedUntil=" + delayedUntil + ", freeStatus=" + freeStatus
                 + ", freeAmount=" + freeAmount + ", freeCurrency=" + freeCurrency + ", deductionsStatus="
                 + deductionsStatus + ", deductionsAmount=" + deductionsAmount + ", deductionsCurrency="
                 + deductionsCurrency + ", platformDeductedStatus=" + platformDeductedStatus

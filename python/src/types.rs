@@ -42,3 +42,16 @@ pub(crate) enum PushCandlestickMode {
     /// Confirmed mode
     Confirmed,
 }
+
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[allow(non_camel_case_types)]
+#[py(remote = "longbridge::QuoteTransport")]
+pub(crate) enum QuoteTransport {
+    /// Send pull requests over the quote WebSocket connection (default)
+    WebSocket,
+    /// Send pull requests over HTTP (``POST /quote/*``) where the API has a
+    /// REST equivalent, falling back to the WebSocket for the rest. Using only
+    /// HTTP-backed APIs never opens a WebSocket connection.
+    Http,
+}

@@ -1,5 +1,6 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
+use time::OffsetDateTime;
 
 use crate::trade::{MultiLegStrategy, OrderSide, OrderType};
 
@@ -40,6 +41,8 @@ pub struct SubmitMultiLegOrderOptions {
     remark: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     client_request_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    delayed_until: Option<i64>,
 }
 
 impl SubmitMultiLegOrderOptions {
@@ -61,6 +64,7 @@ impl SubmitMultiLegOrderOptions {
             submitted_price: None,
             remark: None,
             client_request_id: None,
+            delayed_until: None,
         }
     }
 
@@ -98,5 +102,49 @@ impl SubmitMultiLegOrderOptions {
             client_request_id: Some(id.into()),
             ..self
         }
+    }
+
+    /// Set the time-condition submit time.
+    ///
+    /// The order is held in `DelayedNotReported` status and only submitted at
+    /// this time, which must be later than now and no more than 90 days ahead.
+    /// Only `LO` / `MO` support time conditions.
+    #[inline]
+    #[must_use]
+    pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
+        Self {
+            delayed_until: Some(super::delayed_until_timestamp(delayed_until)),
+            ..self
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use time::macros::datetime;
+
+    use super::*;
+
+    #[test]
+    fn delayed_until() {
+        let opts = SubmitMultiLegOrderOptions::new(
+            OrderSide::Buy,
+            OrderType::MO,
+            Decimal::from(1),
+            MultiLegStrategy::Straddle,
+            [],
+        );
+        assert!(
+            serde_json::to_value(&opts)
+                .unwrap()
+                .get("delayed_until")
+                .is_none()
+        );
+
+        let opts = opts.delayed_until(datetime!(2026-01-01 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767225600)
+        );
     }
 }

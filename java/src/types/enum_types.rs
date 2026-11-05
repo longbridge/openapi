@@ -31,6 +31,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/QuoteTransport",
+    longbridge::QuoteTransport,
+    [WebSocket, Http]
+);
+
+impl_java_enum!(
     "com/longbridge/Market",
     longbridge::Market,
     [Unknown, US, HK, CN, SG, Crypto]
@@ -393,6 +399,7 @@ impl_java_enum!(
         Canceled,
         Expired,
         PartialWithdrawal,
+        DelayedNotReported,
     ]
 );
 

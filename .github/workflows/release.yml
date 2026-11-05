@@ -34,7 +34,12 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          args: -i python --release --out dist -m python/Cargo.toml
+          manylinux: ${{ startsWith(matrix.runs-on, 'ubuntu') && '2_28' || 'auto' }}
+          # Inside the manylinux container a bare `python` is the image's default
+          # interpreter, not the runner's setup-python one, so name the version
+          # explicitly there (same as the musl job). Windows/macOS build on the
+          # runner itself, where `python` is the setup-python interpreter.
+          args: -i ${{ startsWith(matrix.runs-on, 'ubuntu') && format('python{0}', matrix.python-version) || 'python' }} --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
           pip install longbridge --no-index --find-links dist --force-reinstall
@@ -94,10 +99,17 @@ jobs:
       matrix:
         settings:
           - host: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            build: yarn build:debug --target x86_64-unknown-linux-gnu --use-napi-cross
           - host: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            build: yarn build:debug --target aarch64-unknown-linux-gnu --use-napi-cross
           - host: macos-15
+            build: yarn build:debug --target aarch64-apple-darwin
           - host: macos-15-intel
+            build: yarn build:debug
           - host: windows-latest
+            build: yarn build:debug
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -124,14 +136,8 @@ jobs:
         run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
 
       - name: Build
-        if: ${{ matrix.settings.host != 'macos-15' }}
         working-directory: nodejs
-        run: yarn build:debug
-
-      - name: Build
-        if: ${{ matrix.settings.host == 'macos-15' }}
-        working-directory: nodejs
-        run: yarn build:debug --target aarch64-apple-darwin
+        run: ${{ matrix.settings.build }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -787,7 +793,23 @@ jobs:
         run: ls -R ./npm
         shell: bash
         working-directory: ./nodejs
+      # npm refuses to publish over an existing version (E403), so a re-run of
+      # the release (e.g. to retry a different SDK's publish) would fail here.
+      # Skip when this version is already published. Only the main package is
+      # checked: it is published last, after every platform package.
+      - name: Check if version already on npm
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ -n "$(npm view "longbridge@${version}" version 2>/dev/null)" ]; then
+            echo "longbridge ${version} already on npm; skipping publish."
+            echo "NPM_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "longbridge ${version} not found on npm; will publish."
+            echo "NPM_EXISTS=false" >> $GITHUB_ENV
+          fi
+        working-directory: ./nodejs
       - name: Publish
+        if: env.NPM_EXISTS != 'true'
         run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
           npm publish --access public

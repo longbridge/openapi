@@ -1,9 +1,11 @@
+use chrono::{DateTime, Utc};
 use napi::bindgen_prelude::ClassInstance;
 
 use crate::{
     decimal::Decimal,
     time::NaiveDate,
     trade::types::{AttachedOrderType, OrderSide, OrderType, OutsideRTH, TimeInForceType},
+    utils::try_from_datetime,
 };
 
 /// Parameters for submitting an attached order
@@ -27,6 +29,12 @@ pub struct SubmitAttachedParams<'env> {
     pub stop_loss_submit_price: Option<ClassInstance<'env, Decimal>>,
     /// Activate RTH
     pub activate_rth: Option<OutsideRTH>,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activateOrderType` is `LIT`
+    pub profit_taker_depth_level: Option<i32>,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activateOrderType` is `LIT`
+    pub stop_loss_depth_level: Option<i32>,
 }
 
 impl<'env> From<SubmitAttachedParams<'env>> for longbridge::trade::SubmitAttachedParams {
@@ -55,6 +63,12 @@ impl<'env> From<SubmitAttachedParams<'env>> for longbridge::trade::SubmitAttache
         }
         if let Some(v) = p.activate_rth {
             opts = opts.activate_rth(v.into());
+        }
+        if let Some(v) = p.profit_taker_depth_level {
+            opts = opts.profit_taker_depth_level(v);
+        }
+        if let Some(v) = p.stop_loss_depth_level {
+            opts = opts.stop_loss_depth_level(v);
         }
         opts
     }
@@ -102,11 +116,16 @@ pub struct SubmitOrderOptions<'env> {
     pub client_request_id: Option<String>,
     /// Attached order parameters
     pub attached_params: Option<SubmitAttachedParams<'env>>,
+    /// Time-condition submit time. The order is held in `DelayedNotReported`
+    /// status and only submitted at this time, which must be later than now
+    /// and no more than 90 days ahead.
+    pub delayed_until: Option<DateTime<Utc>>,
 }
 
-impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
-    #[inline]
-    fn from(opts: SubmitOrderOptions<'env>) -> Self {
+impl<'env> TryFrom<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
+    type Error = napi::Error;
+
+    fn try_from(opts: SubmitOrderOptions<'env>) -> napi::Result<Self> {
         let mut opts2 = longbridge::trade::SubmitOrderOptions::new(
             opts.symbol,
             opts.order_type.into(),
@@ -153,6 +172,9 @@ impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOpti
         if let Some(p) = opts.attached_params {
             opts2 = opts2.attached_params(p.into());
         }
-        opts2
+        if let Some(delayed_until) = opts.delayed_until {
+            opts2 = opts2.delayed_until(try_from_datetime("delayedUntil", delayed_until)?);
+        }
+        Ok(opts2)
     }
 }

@@ -32,6 +32,8 @@ pub unsafe extern "C" fn lb_portfolio_context_release(ctx: *const CPortfolioCont
 }
 
 /// Get exchange rates. Returns CExchangeRates.
+///
+/// AP accounts only: US data-center accounts get a region error.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_portfolio_context_exchange_rate(
     ctx: *const CPortfolioContext,

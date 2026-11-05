@@ -255,6 +255,8 @@ pub unsafe extern "C" fn lb_trade_context_unsubscribe(
 
 /// Get history executions
 ///
+/// `side` may be `Unknown` on Longbridge US accounts.
+///
 /// @param[in] opts Options for get history executions request (can be null)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_history_executions(
@@ -313,6 +315,9 @@ pub unsafe extern "C" fn lb_trade_context_today_executions(
 }
 
 /// Get all executions
+///
+/// AP accounts only: US data-center accounts get a region error; use
+/// `lb_trade_context_history_executions` instead.
 ///
 /// @param[in] opts Options for get all executions request (can be null)
 #[unsafe(no_mangle)]
@@ -475,6 +480,12 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
     }
+    let delayed_until = if (*opts).clear_delayed_until {
+        opts2 = opts2.clear_delayed_until();
+        Ok(None)
+    } else {
+        parse_delayed_until((*opts).delayed_until)
+    };
     if !(*opts).attached_params.is_null() {
         let ap = &*(*opts).attached_params;
         let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
@@ -521,9 +532,18 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
         if !ap.market_price.is_null() {
             rp = rp.market_price((*ap.market_price).value);
         }
+        if !ap.profit_taker_depth_level.is_null() {
+            rp = rp.profit_taker_depth_level(*ap.profit_taker_depth_level);
+        }
+        if !ap.stop_loss_depth_level.is_null() {
+            rp = rp.stop_loss_depth_level(*ap.stop_loss_depth_level);
+        }
         opts2 = opts2.attached_params(rp);
     }
     execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
         ctx_inner.replace_order(opts2).await?;
         Ok(())
     });
@@ -588,6 +608,7 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     if !(*opts).client_request_id.is_null() {
         opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
     }
+    let delayed_until = parse_delayed_until((*opts).delayed_until);
     if !(*opts).attached_params.is_null() {
         let ap = &*(*opts).attached_params;
         let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
@@ -616,9 +637,18 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
         if !ap.activate_rth.is_null() {
             sp = sp.activate_rth((*ap.activate_rth).into());
         }
+        if !ap.profit_taker_depth_level.is_null() {
+            sp = sp.profit_taker_depth_level(*ap.profit_taker_depth_level);
+        }
+        if !ap.stop_loss_depth_level.is_null() {
+            sp = sp.stop_loss_depth_level(*ap.stop_loss_depth_level);
+        }
         opts2 = opts2.attached_params(sp);
     }
     execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
         let resp: CCow<CSubmitOrderResponseOwned> = CCow::new(ctx_inner.submit_order(opts2).await?);
         Ok(resp)
     });
@@ -658,7 +688,11 @@ pub unsafe extern "C" fn lb_trade_context_submit_multileg(
     if !(*opts).client_request_id.is_null() {
         opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
     }
+    let delayed_until = parse_delayed_until((*opts).delayed_until);
     execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
         let resp: CCow<CSubmitOrderResponseOwned> =
             CCow::new(ctx_inner.submit_multileg(opts2).await?);
         Ok(resp)
@@ -700,6 +734,8 @@ pub unsafe extern "C" fn lb_trade_context_cancel_order_attached(
 }
 
 /// Get account balance
+///
+/// AP accounts only: US data-center accounts get a region error.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_account_balance(
     ctx: *const CTradeContext,
@@ -717,6 +753,8 @@ pub unsafe extern "C" fn lb_trade_context_account_balance(
 }
 
 /// Get cash flow
+///
+/// AP accounts only: US data-center accounts get a region error.
 ///
 /// @param[in] opts Options for get cash flow request
 #[unsafe(no_mangle)]
@@ -751,6 +789,9 @@ pub unsafe extern "C" fn lb_trade_context_cash_flow(
 
 /// Get fund positions
 ///
+/// AP accounts only: US data-center accounts have no fund holdings and get a
+/// region error. No US equivalent.
+///
 /// @param[in] opts Options for get fund positions request
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_fund_positions(
@@ -773,6 +814,8 @@ pub unsafe extern "C" fn lb_trade_context_fund_positions(
 
 /// Get stock positions
 ///
+/// AP accounts only: US data-center accounts get a region error.
+///
 /// @param[in] opts Options for get stock positions request
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_stock_positions(
@@ -794,6 +837,9 @@ pub unsafe extern "C" fn lb_trade_context_stock_positions(
 }
 
 /// Get margin ratio
+///
+/// AP accounts only: US data-center accounts get a region error. No US
+/// equivalent.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_margin_ratio(
     ctx: *const CTradeContext,
@@ -810,6 +856,8 @@ pub unsafe extern "C" fn lb_trade_context_margin_ratio(
 }
 
 /// Get order detail
+///
+/// AP accounts only: US data-center accounts get a region error.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_order_detail(
     ctx: *const CTradeContext,
@@ -921,4 +969,22 @@ pub unsafe extern "C" fn lb_trade_context_estimate_multileg_available_quantity(
         );
         Ok(resp)
     });
+}
+
+/// Converts an optional C `delayed_until` (Unix seconds) into a time, reporting
+/// an out-of-range value through the callback instead of panicking.
+unsafe fn parse_delayed_until(
+    value: *const i64,
+) -> Result<Option<OffsetDateTime>, time::error::ComponentRange> {
+    if value.is_null() {
+        return Ok(None);
+    }
+    unsafe { OffsetDateTime::from_unix_timestamp(*value) }.map(Some)
+}
+
+fn delayed_until_error(err: time::error::ComponentRange) -> longbridge::Error {
+    longbridge::Error::ParseField {
+        name: "delayed_until",
+        error: err.to_string(),
+    }
 }

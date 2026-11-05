@@ -617,7 +617,8 @@ impl_java_class!(
         reviewed,
         activate_order_type,
         activate_rth,
-        submit_price
+        submit_price,
+        limit_depth_level
     ]
 );
 
@@ -740,6 +741,7 @@ impl_java_class!(
         trigger_count,
         monitor_price,
         remark,
+        delayed_until,
         #[java(objarray)]
         attached_orders,
         multi_leg
@@ -1008,6 +1010,7 @@ impl_java_class!(
         trigger_count,
         monitor_price,
         remark,
+        delayed_until,
         free_status,
         free_amount,
         free_currency,
