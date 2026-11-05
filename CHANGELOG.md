@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Rust: `OAuth::revoke` / `OAuth::clear` (async), `OAuthError::RevokeFailed`, `OAuthError::TokenFileDelete`. C: `lb_oauth_revoke` / `lb_oauth_clear`. C++: `OAuth::revoke` / `OAuth::clear`. Java: `OAuth.revoke()` / `OAuth.clear()` returning `CompletableFuture<Void>`. Node.js: `oauth.revoke()` / `oauth.clear()` returning promises. Python: `OAuth.revoke()` / `OAuth.clear()` plus `revoke_async()` / `clear_async()`; the `openapi.pyi` stub is updated. The blocking Python calls release the GIL while waiting. In C/C++, a NULL handle (e.g. a moved-from C++ `OAuth`) is reported through the callback as an error instead of crashing.
 - **Rust:** `TokenStorage::delete(client_id)` removes a persisted token. It has a default implementation that returns an error, so existing custom storage backends keep compiling but `OAuth::clear` fails loudly (and keeps the in-memory token) instead of reporting success without wiping anything; override it to support `clear`. `FileTokenStorage` deletes the token file.
 
+### Changed
+
+- Upgrade the internal OAuth dependency from `oauth2` 4.4 to 5 to share the
+  `reqwest` 0.12 HTTP stack, preserving the public OAuth API, token persistence
+  behavior, and redirect protection.
+
 ### Breaking changes
 
 - **Rust:** `OAuthError` is now `#[non_exhaustive]` and gains `RevokeFailed` and `TokenFileDelete`. Exhaustive `match`es on `OAuthError` outside this crate need a wildcard arm; adding variants will no longer be a breaking change.
