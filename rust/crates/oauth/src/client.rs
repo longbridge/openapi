@@ -3,9 +3,8 @@ use std::{fmt, sync::Arc, time::Duration};
 use longbridge_geo::is_cn;
 use oauth2::{
     AccessToken, AsyncHttpClient, AuthUrl, AuthorizationCode, ClientId, CsrfToken, EndpointNotSet,
-    EndpointSet, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, RefreshToken, RequestTokenError,
-    RevocationErrorResponseType, RevocationUrl, Scope, StandardErrorResponse,
-    StandardRevocableToken, TokenUrl, basic::BasicClient, reqwest,
+    EndpointSet, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, RefreshToken, RevocationUrl,
+    Scope, StandardRevocableToken, TokenUrl, basic::BasicClient, reqwest,
 };
 use poem::listener::{Acceptor, Listener, TcpListener};
 
@@ -219,7 +218,7 @@ impl OAuth {
                 }
             })?
             .map_err(|e| {
-                let message = revoke_error_message(&e);
+                let message = error_chain(&e);
                 tracing::error!(client_id = %self.0.client_id, error = %message, "failed to revoke token");
                 OAuthError::RevokeFailed { message }
             })?;
@@ -385,23 +384,6 @@ fn error_chain(e: &dyn std::error::Error) -> String {
     message
 }
 
-/// Describe a revocation failure, including the server's `error` and
-/// `error_description` (the `Display` of `ServerResponse` omits them).
-fn revoke_error_message<RE>(
-    e: &RequestTokenError<RE, StandardErrorResponse<RevocationErrorResponseType>>,
-) -> String
-where
-    RE: std::error::Error + 'static,
-{
-    match e {
-        RequestTokenError::ServerResponse(resp) => match resp.error_description() {
-            Some(desc) => format!("{}: {desc}", resp.error()),
-            None => resp.error().to_string(),
-        },
-        other => error_chain(other),
-    }
-}
-
 /// Build the authorization URL with a fresh CSRF token and PKCE challenge.
 ///
 /// PKCE (RFC 7636, `S256`) is required by the server for public clients and
@@ -449,7 +431,10 @@ fn create_http_client() -> Result<reqwest::Client, reqwest::Error> {
 mod tests {
     use std::collections::HashMap;
 
-    use oauth2::{HttpRequest, HttpResponse};
+    use oauth2::{
+        HttpRequest, HttpResponse, RequestTokenError, RevocationErrorResponseType,
+        StandardErrorResponse,
+    };
 
     use super::*;
     use crate::storage::StoredToken;
@@ -482,7 +467,7 @@ mod tests {
     }
 
     #[test]
-    fn revoke_error_message_includes_server_error_and_description() {
+    fn server_error_messages_include_error_and_description() {
         let with_desc: RequestTokenError<std::io::Error, _> =
             RequestTokenError::ServerResponse(StandardErrorResponse::new(
                 RevocationErrorResponseType::UnsupportedTokenType,
@@ -490,8 +475,8 @@ mod tests {
                 None,
             ));
         assert_eq!(
-            revoke_error_message(&with_desc),
-            "unsupported_token_type: token type not supported"
+            error_chain(&with_desc),
+            "Server returned error response: unsupported_token_type: token type not supported"
         );
 
         let without_desc: RequestTokenError<std::io::Error, _> =
@@ -501,18 +486,43 @@ mod tests {
                 None,
             ));
         assert_eq!(
-            revoke_error_message(&without_desc),
-            "unsupported_token_type"
+            error_chain(&without_desc),
+            "Server returned error response: unsupported_token_type"
         );
     }
 
-    #[test]
-    fn revoke_error_message_falls_back_to_display_for_other_errors() {
-        let e: RequestTokenError<
-            std::io::Error,
-            StandardErrorResponse<RevocationErrorResponseType>,
-        > = RequestTokenError::Other("boom".to_string());
-        assert_eq!(revoke_error_message(&e), e.to_string());
+    #[tokio::test]
+    async fn refresh_transport_failure_reports_the_cause() {
+        // A port with nothing listening: the connection is refused.
+        let port = {
+            let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+            listener.local_addr().unwrap().port()
+        };
+        let oauth = OAuth(Arc::new(OAuthInner {
+            client_id: "my-client".to_string(),
+            callback_port: DEFAULT_CALLBACK_PORT,
+            storage: Arc::new(LegacyStorage),
+            token: tokio::sync::Mutex::new(Some(OAuthToken {
+                client_id: "my-client".to_string(),
+                access_token: "access".to_string(),
+                refresh_token: Some("refresh".to_string()),
+                expires_at: 0,
+            })),
+        }));
+        let result = TEST_OAUTH_BASE_URL
+            .scope(
+                format!("http://127.0.0.1:{port}/oauth2"),
+                oauth.access_token(),
+            )
+            .await;
+        match result {
+            Err(OAuthError::RefreshTokenFailed { message }) => {
+                // oauth2 5 alone would only say "Request failed".
+                assert!(message.starts_with("Request failed: "), "{message}");
+                assert!(message.contains("tcp connect error"), "{message}");
+            }
+            other => panic!("unexpected result: {other:?}"),
+        }
     }
 
     #[tokio::test]
@@ -624,10 +634,6 @@ mod tests {
             StandardErrorResponse<RevocationErrorResponseType>,
         > = RequestTokenError::Request(std::io::Error::other("connection refused"));
         assert_eq!(error_chain(&e), "Request failed: connection refused");
-        assert_eq!(
-            revoke_error_message(&e),
-            "Request failed: connection refused"
-        );
     }
 
     #[tokio::test(start_paused = true)]
