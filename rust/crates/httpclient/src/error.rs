@@ -106,9 +106,9 @@ pub enum HttpClientError {
         online: i32,
     },
 
-    /// OAuth error
+    /// OAuth error (e.g. the access token could not be obtained)
     #[error("oauth error: {0}")]
-    OAuth(String),
+    OAuth(#[from] longbridge_oauth::OAuthError),
 
     /// Server-sent events stream error
     #[error("sse stream error: {0}")]

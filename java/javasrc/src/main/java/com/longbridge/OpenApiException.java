@@ -7,8 +7,9 @@ package com.longbridge;
  * pieces of diagnostic information:
  * <ul>
  *   <li>{@link #getKind()} – broad category of the error (HTTP, OpenAPI, OAuth, Other)</li>
- *   <li>{@link #getCode()} – numeric error code returned by the server, or {@code null} for
- *       client-side errors</li>
+ *   <li>{@link #getCode()} – numeric error code: the HTTP status or OpenAPI code returned
+ *       by the server, a stable OAuth error code for {@link ErrorKind#OAuth} (see
+ *       {@link #getCode()}), or {@code null} for other client-side errors</li>
  *   <li>{@link #getMessage()} – human-readable error description</li>
  * </ul>
  */
@@ -40,9 +41,13 @@ public class OpenApiException extends Exception {
     }
 
     /**
-     * Returns the numeric error code returned by the server.
+     * Returns the numeric error code.
      *
-     * @return error code, or {@code null} for client-side errors
+     * <p>
+     * For {@link ErrorKind#OAuth} errors this is a stable code identifying the
+     * failure: 1 no token available, 2 no refresh token, 3 refresh failed, 4 revoke failed, 5 authorization failed, 6 authorization timeout, 7 code exchange failed, 8 CSRF mismatch, 9 callback bind failed, 10 local address failed, 11 callback channel closed, 12 no home dir, 13 token file read, 14 token file parse, 15 token file write, 16 token file delete, 17 create dir failed, 18 serialize token, 0 other.
+     *
+     * @return error code, or {@code null} for client-side errors other than OAuth
      */
     public Long getCode() {
         return code;

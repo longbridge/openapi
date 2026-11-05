@@ -55,7 +55,7 @@ pub unsafe extern "C" fn lb_oauth_new(
                 open_url_callback(c_url.as_ptr(), open_url_userdata_usize as *mut c_void);
             })
             .await
-            .map_err(|e| longbridge::Error::OAuth(e.to_string()))?;
+            .map_err(longbridge::Error::OAuth)?;
         Ok(Box::into_raw(Box::new(COAuth { inner: oauth })))
     });
 }
@@ -86,7 +86,9 @@ unsafe fn clone_inner(oauth: *const COAuth) -> Option<OAuth> {
 }
 
 fn null_oauth_error() -> longbridge::Error {
-    longbridge::Error::OAuth("OAuth client is NULL".to_string())
+    longbridge::Error::OAuth(longbridge::oauth::OAuthError::Other(
+        "OAuth client is NULL".to_string(),
+    ))
 }
 
 /// Asynchronously revoke the current token on the server (RFC 7009)
@@ -110,7 +112,7 @@ pub unsafe extern "C" fn lb_oauth_revoke(
             .ok_or_else(null_oauth_error)?
             .revoke()
             .await
-            .map_err(|e| longbridge::Error::OAuth(e.to_string()))?;
+            .map_err(longbridge::Error::OAuth)?;
         Ok(())
     });
 }
@@ -136,7 +138,7 @@ pub unsafe extern "C" fn lb_oauth_clear(
             .ok_or_else(null_oauth_error)?
             .clear()
             .await
-            .map_err(|e| longbridge::Error::OAuth(e.to_string()))?;
+            .map_err(longbridge::Error::OAuth)?;
         Ok(())
     });
 }

@@ -4,7 +4,7 @@ use pyo3::prelude::*;
 use crate::error::ErrorNewType;
 
 fn oauth_err(e: OAuthError) -> PyErr {
-    ErrorNewType(longbridge::Error::OAuth(e.to_string())).into()
+    ErrorNewType(longbridge::Error::OAuth(e)).into()
 }
 
 /// OAuth 2.0 client handle for Longbridge OpenAPI

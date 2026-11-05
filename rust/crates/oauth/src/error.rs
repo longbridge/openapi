@@ -134,5 +134,58 @@ pub enum OAuthError {
     Other(String),
 }
 
+impl OAuthError {
+    /// Stable numeric code identifying the kind of error, so that callers of
+    /// the language bindings (where the error crosses the FFI boundary as a
+    /// message plus a code) can tell failures apart without parsing messages.
+    ///
+    /// | Code | Variant |
+    /// |------|---------|
+    /// | 1 | [`NoTokenAvailable`](Self::NoTokenAvailable) |
+    /// | 2 | [`NoRefreshToken`](Self::NoRefreshToken) |
+    /// | 3 | [`RefreshTokenFailed`](Self::RefreshTokenFailed) |
+    /// | 4 | [`RevokeFailed`](Self::RevokeFailed) |
+    /// | 5 | [`AuthorizationFailed`](Self::AuthorizationFailed) |
+    /// | 6 | [`AuthorizationTimeout`](Self::AuthorizationTimeout) |
+    /// | 7 | [`ExchangeCodeFailed`](Self::ExchangeCodeFailed) |
+    /// | 8 | [`CsrfTokenMismatch`](Self::CsrfTokenMismatch) |
+    /// | 9 | [`BindCallbackFailed`](Self::BindCallbackFailed) |
+    /// | 10 | [`LocalAddressFailed`](Self::LocalAddressFailed) |
+    /// | 11 | [`CallbackChannelClosed`](Self::CallbackChannelClosed) |
+    /// | 12 | [`NoHomeDir`](Self::NoHomeDir) |
+    /// | 13 | [`TokenFileRead`](Self::TokenFileRead) |
+    /// | 14 | [`TokenFileParse`](Self::TokenFileParse) |
+    /// | 15 | [`TokenFileWrite`](Self::TokenFileWrite) |
+    /// | 16 | [`TokenFileDelete`](Self::TokenFileDelete) |
+    /// | 17 | [`CreateDirFailed`](Self::CreateDirFailed) |
+    /// | 18 | [`SerializeToken`](Self::SerializeToken) |
+    /// | 0 | [`Other`](Self::Other) |
+    ///
+    /// Codes are never reused; a new variant gets a new code.
+    pub fn code(&self) -> i64 {
+        match self {
+            OAuthError::Other(_) => 0,
+            OAuthError::NoTokenAvailable => 1,
+            OAuthError::NoRefreshToken => 2,
+            OAuthError::RefreshTokenFailed { .. } => 3,
+            OAuthError::RevokeFailed { .. } => 4,
+            OAuthError::AuthorizationFailed { .. } => 5,
+            OAuthError::AuthorizationTimeout => 6,
+            OAuthError::ExchangeCodeFailed { .. } => 7,
+            OAuthError::CsrfTokenMismatch => 8,
+            OAuthError::BindCallbackFailed { .. } => 9,
+            OAuthError::LocalAddressFailed => 10,
+            OAuthError::CallbackChannelClosed => 11,
+            OAuthError::NoHomeDir => 12,
+            OAuthError::TokenFileRead { .. } => 13,
+            OAuthError::TokenFileParse { .. } => 14,
+            OAuthError::TokenFileWrite { .. } => 15,
+            OAuthError::TokenFileDelete { .. } => 16,
+            OAuthError::CreateDirFailed { .. } => 17,
+            OAuthError::SerializeToken { .. } => 18,
+        }
+    }
+}
+
 /// Result type for OAuth operations
 pub type OAuthResult<T> = std::result::Result<T, OAuthError>;

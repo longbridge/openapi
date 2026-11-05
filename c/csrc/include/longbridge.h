@@ -14762,6 +14762,37 @@ void lb_error_free(struct lb_error_t *error);
 
 const char *lb_error_message(const struct lb_error_t *error);
 
+/**
+ * Returns the error code.
+ *
+ * For `ErrorKindHttp` it is the HTTP status, for
+ * `ErrorKindOpenApi` the OpenAPI error code. For `ErrorKindOAuth`
+ * it is a stable code identifying the failure:
+ *
+ * | Code | Meaning |
+ * |------|---------|
+ * | 0 | other (e.g. NULL OAuth handle) |
+ * | 1 | no token available |
+ * | 2 | no refresh token |
+ * | 3 | token refresh failed |
+ * | 4 | token revocation failed |
+ * | 5 | authorization failed |
+ * | 6 | authorization timeout |
+ * | 7 | authorization code exchange failed |
+ * | 8 | CSRF token mismatch |
+ * | 9 | failed to bind the callback server |
+ * | 10 | failed to get the local address |
+ * | 11 | callback channel closed |
+ * | 12 | cannot determine the home directory |
+ * | 13 | failed to read the token file |
+ * | 14 | failed to parse the token file |
+ * | 15 | failed to write the token file |
+ * | 16 | failed to delete the token file |
+ * | 17 | failed to create the token directory |
+ * | 18 | failed to serialize the token |
+ *
+ * It is 0 when the error carries no code; check `lb_error_kind` first.
+ */
 int64_t lb_error_code(const struct lb_error_t *error);
 
 enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
