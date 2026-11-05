@@ -152,7 +152,7 @@ impl OAuthError {
     /// | 5 | [`AuthorizationFailed`](Self::AuthorizationFailed) |
     /// | 6 | [`AuthorizationTimeout`](Self::AuthorizationTimeout) |
     /// | 7 | [`ExchangeCodeFailed`](Self::ExchangeCodeFailed) |
-    /// | 8 | [`CsrfTokenMismatch`](Self::CsrfTokenMismatch) |
+    /// | 8 | [`CsrfTokenMismatch`](Self::CsrfTokenMismatch) (no longer returned) |
     /// | 9 | [`BindCallbackFailed`](Self::BindCallbackFailed) |
     /// | 10 | [`LocalAddressFailed`](Self::LocalAddressFailed) |
     /// | 11 | [`CallbackChannelClosed`](Self::CallbackChannelClosed) |

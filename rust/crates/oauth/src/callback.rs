@@ -33,18 +33,31 @@ fn escape_html(s: &str) -> String {
 }
 
 /// Make redirect-supplied text safe to put in an error, a log line or a
-/// terminal: control characters (including ANSI escape sequences) become
-/// spaces and the length is capped.
+/// terminal: control characters (including ANSI escape sequences), line and
+/// paragraph separators, zero-width characters and bidirectional overrides
+/// become spaces, and the length is capped.
 fn sanitize(s: &str) -> String {
     let mut out: String = s
         .chars()
         .take(MAX_ERROR_LEN)
-        .map(|c| if c.is_control() { ' ' } else { c })
+        .map(|c| if is_unsafe_char(c) { ' ' } else { c })
         .collect();
     if s.chars().count() > MAX_ERROR_LEN {
         out.push('…');
     }
     out
+}
+
+/// Characters that can hide or reorder text in a terminal or log.
+fn is_unsafe_char(c: char) -> bool {
+    c.is_control()
+        || matches!(
+            c,
+            '\u{200b}'..='\u{200f}'
+                | '\u{2028}'..='\u{202e}'
+                | '\u{2060}'..='\u{2069}'
+                | '\u{feff}'
+        )
 }
 
 /// Build the error message for an error redirect (RFC 6749 §4.1.2.1):
@@ -94,9 +107,10 @@ pub(crate) async fn wait_for_callback(
             tracing::warn!("ignoring OAuth callback with a mismatched state, possible CSRF attack");
             return html_response(
                 poem::http::StatusCode::BAD_REQUEST,
-                "<h1>Authorization Failed</h1>\
-                 <p>Error: this response does not belong to the pending \
-                 authorization request.</p>",
+                "<h1>Not the pending authorization</h1>\
+                 <p>This page belongs to an earlier or different authorization \
+                 request. Finish the authorization in the most recently opened \
+                 window.</p>",
             );
         }
 
@@ -208,6 +222,10 @@ mod tests {
         assert_eq!(
             error_message("bad\u{1b}[31m", Some("line1\nline2")),
             "bad [31m: line1 line2"
+        );
+        assert_eq!(
+            error_message("a\u{202e}b\u{2028}c\u{200b}d", None),
+            "a b c d"
         );
         let long = "x".repeat(MAX_ERROR_LEN + 10);
         let message = error_message(&long, None);

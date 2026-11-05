@@ -474,7 +474,7 @@ async fn build_ignores_callbacks_with_a_mismatched_state() {
         let (code_response, error_response) = callback.await.unwrap();
         for response in [&code_response, &error_response] {
             assert!(response.starts_with("HTTP/1.1 400"), "{response}");
-            assert!(response.contains("does not belong"), "{response}");
+            assert!(response.contains("earlier or different"), "{response}");
             assert!(!response.contains("attacker.example"), "{response}");
         }
         match result {
