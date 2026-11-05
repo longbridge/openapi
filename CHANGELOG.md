@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **All SDKs:** an OAuth authorization error redirected back by the server now includes its `error_description`, e.g. `OAuth authorization failed: internal_server_error: validate client err:oauth client not found`, instead of only the bare error code. The same text is shown on the browser callback page. This makes an unknown or placeholder `client_id` (such as `your-client-id` from the examples) easy to spot.
 - **All SDKs:** the OAuth browser authorization flow now uses PKCE (RFC 7636, `S256`): the authorization request carries a `code_challenge` and the token exchange sends the matching `code_verifier`. The server requires PKCE for `public` clients, so previously such clients (e.g. those created through dynamic client registration) could not authorize through the SDK and failed with `OAuth authorization failed: server_error`. Clients that don't require PKCE are unaffected.
 
 ## [5.3.0] - 2026-10-23

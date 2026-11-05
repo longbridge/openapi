@@ -14,6 +14,16 @@ const AUTH_TIMEOUT: Duration = Duration::from_secs(300); // 5 minutes
 type CallbackTx =
     Arc<tokio::sync::Mutex<Option<oneshot::Sender<std::result::Result<(String, String), String>>>>>;
 
+/// The error text comes from the redirect query string, so it must not be
+/// echoed into the page as raw HTML.
+fn escape_html(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&#39;")
+}
+
 /// Runs the local HTTP server until the OAuth redirect is received or timeout.
 pub(crate) async fn wait_for_callback(
     acceptor: poem::listener::TcpAcceptor,
@@ -23,6 +33,7 @@ pub(crate) async fn wait_for_callback(
         code: Option<String>,
         state: Option<String>,
         error: Option<String>,
+        error_description: Option<String>,
     }
 
     const STYLE: &str = "<style>html { \
@@ -39,7 +50,11 @@ pub(crate) async fn wait_for_callback(
         tx: poem::web::Data<&CallbackTx>,
     ) -> poem::Response {
         let result = if let Some(err) = params.error {
-            Err(err)
+            // RFC 6749 §4.1.2.1: `error_description` carries the human-readable detail.
+            Err(match params.error_description.filter(|d| !d.is_empty()) {
+                Some(desc) => format!("{err}: {desc}"),
+                None => err,
+            })
         } else if let (Some(code), Some(state)) = (params.code, params.state) {
             Ok((code, state))
         } else {
@@ -58,7 +73,8 @@ pub(crate) async fn wait_for_callback(
                 poem::http::StatusCode::BAD_REQUEST,
                 format!(
                     "<html><body>{STYLE}<h1>Authorization Failed</h1>\
-                     <p>Error: {err}</p></body></html>"
+                     <p>Error: {}</p></body></html>",
+                    escape_html(err)
                 ),
             ),
         };
