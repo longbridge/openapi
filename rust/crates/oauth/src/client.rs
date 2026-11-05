@@ -301,7 +301,7 @@ impl OAuth {
             .map_err(|e| {
                 tracing::error!(client_id = %self.0.client_id, error = %e, "failed to exchange authorization code for token");
                 OAuthError::ExchangeCodeFailed {
-                    message: e.to_string(),
+                    message: error_chain(&e),
                 }
             })?;
 
@@ -344,7 +344,7 @@ impl OAuth {
             .map_err(|e| {
                 tracing::error!(client_id = %self.0.client_id, error = %e, "failed to refresh token");
                 OAuthError::RefreshTokenFailed {
-                    message: e.to_string(),
+                    message: error_chain(&e),
                 }
             })?;
 
@@ -364,6 +364,27 @@ impl OAuth {
 /// Upper bound for a refresh or revocation request; both hold the token lock.
 const TOKEN_REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
 
+/// Total timeout of the HTTP client, which also bounds the authorization code
+/// exchange. It must exceed `TOKEN_REQUEST_TIMEOUT`, so that for refresh and
+/// revoke the tokio timeout fires first and reports "timed out after 30s"
+/// instead of the client's generic transport error.
+const HTTP_REQUEST_TIMEOUT: Duration = Duration::from_secs(35);
+const _: () = assert!(HTTP_REQUEST_TIMEOUT.as_secs() > TOKEN_REQUEST_TIMEOUT.as_secs());
+
+/// `e` followed by its `source()` chain. oauth2 5 reports every transport
+/// failure as a bare "Request failed"; the cause (connection refused, timed
+/// out, ...) is only in the sources.
+fn error_chain(e: &dyn std::error::Error) -> String {
+    let mut message = e.to_string();
+    let mut source = e.source();
+    while let Some(cause) = source {
+        message.push_str(": ");
+        message.push_str(&cause.to_string());
+        source = cause.source();
+    }
+    message
+}
+
 /// Describe a revocation failure, including the server's `error` and
 /// `error_description` (the `Display` of `ServerResponse` omits them).
 fn revoke_error_message<RE>(
@@ -377,7 +398,7 @@ where
             Some(desc) => format!("{}: {desc}", resp.error()),
             None => resp.error().to_string(),
         },
-        other => other.to_string(),
+        other => error_chain(other),
     }
 }
 
@@ -417,9 +438,10 @@ fn create_http_client() -> Result<reqwest::Client, reqwest::Error> {
         // Preserve the previous OAuth transport's protection against redirects.
         .redirect(reqwest::redirect::Policy::none())
         // Bounds every token request, including the authorization code
-        // exchange (refresh and revoke are also wrapped in a tokio timeout).
+        // exchange. Refresh and revoke are wrapped in TOKEN_REQUEST_TIMEOUT,
+        // which must fire first so they report "timed out after 30s".
         .connect_timeout(Duration::from_secs(10))
-        .timeout(TOKEN_REQUEST_TIMEOUT)
+        .timeout(HTTP_REQUEST_TIMEOUT)
         .build()
 }
 
@@ -593,6 +615,19 @@ mod tests {
         release_tx.send(()).unwrap();
         task.await.unwrap().unwrap();
         assert!(oauth.0.token.try_lock().is_ok());
+    }
+
+    #[test]
+    fn error_chain_includes_the_transport_cause() {
+        let e: RequestTokenError<
+            std::io::Error,
+            StandardErrorResponse<RevocationErrorResponseType>,
+        > = RequestTokenError::Request(std::io::Error::other("connection refused"));
+        assert_eq!(error_chain(&e), "Request failed: connection refused");
+        assert_eq!(
+            revoke_error_message(&e),
+            "Request failed: connection refused"
+        );
     }
 
     #[tokio::test(start_paused = true)]
