@@ -23,6 +23,11 @@ impl_java_enum!(
     longbridge::Language,
     [ZH_CN, ZH_HK, EN]
 );
+impl_java_enum!(
+    "com/longbridge/forex/ForexOrderStatus",
+    longbridge::forex::ForexOrderStatus,
+    [Processing, Success, Failed]
+);
 
 impl_java_enum!(
     "com/longbridge/PushCandlestickMode",
