@@ -15,7 +15,12 @@ use poem::{
     listener::{Acceptor, Listener, TcpListener},
     web::Data,
 };
-use tokio::{io::AsyncWriteExt, net::TcpStream, task::JoinHandle, time::timeout};
+use tokio::{
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::TcpStream,
+    task::JoinHandle,
+    time::timeout,
+};
 
 use super::{MemoryStorage, now_secs};
 
@@ -227,6 +232,31 @@ async fn send_callback(url: Url) {
     stream.shutdown().await.unwrap();
 }
 
+/// Like `send_callback`, but returns the raw HTTP response.
+async fn send_callback_and_read(url: Url) -> String {
+    let port = url.port().expect("callback must use an explicit port");
+    let mut stream = TcpStream::connect(("127.0.0.1", port)).await.unwrap();
+    let request = format!(
+        "GET {}?{} HTTP/1.1\r\nHost: localhost:{port}\r\nConnection: close\r\n\r\n",
+        url.path(),
+        url.query().unwrap()
+    );
+    stream.write_all(request.as_bytes()).await.unwrap();
+    let mut response = String::new();
+    stream.read_to_string(&mut response).await.unwrap();
+    response
+}
+
+/// The callback URL for an error redirect.
+fn error_callback_url(redirect_uri: &str, params: &[(&str, &str)]) -> Url {
+    let mut url = Url::parse(redirect_uri).unwrap();
+    assert_eq!(url.path(), "/callback");
+    for (key, value) in params {
+        url.query_pairs_mut().append_pair(key, value);
+    }
+    url
+}
+
 async fn build_with_callback(storage: impl TokenStorage) -> OAuthResult<OAuth> {
     let callback = Mutex::new(None);
     let result = OAuthBuilder::new("test-client")
@@ -392,7 +422,7 @@ async fn revoke_rejects_insecure_endpoint_without_changing_local_tokens() {
 }
 
 #[tokio::test]
-async fn build_rejects_mismatched_csrf_state_without_exchanging_token() {
+async fn build_ignores_callbacks_with_a_mismatched_state() {
     timeout(HANG_GUARD, async {
         let server = TokenServer::start([]).await;
         let storage = Arc::new(MemoryStorage::default());
@@ -406,31 +436,113 @@ async fn build_rejects_mismatched_csrf_state_without_exchanging_token() {
                     .build(|url| {
                         let url = Url::parse(url).unwrap();
                         let params: BTreeMap<_, _> = url.query_pairs().into_owned().collect();
-                        let mismatched_state =
-                            format!("{}-mismatched", params.get("state").unwrap());
-                        let redirect = callback_url(
-                            params.get("redirect_uri").unwrap(),
-                            "authorization-code",
-                            &mismatched_state,
-                        );
-                        *callback.lock().unwrap() = Some(tokio::spawn(send_callback(redirect)));
+                        let redirect_uri = params.get("redirect_uri").unwrap().clone();
+                        let state = params.get("state").unwrap().clone();
+                        let forged_state = format!("{state}-forged");
+                        *callback.lock().unwrap() = Some(tokio::spawn(async move {
+                            // Forged redirects (another page) are rejected
+                            // without ending the flow...
+                            let code = send_callback_and_read(callback_url(
+                                &redirect_uri,
+                                "authorization-code",
+                                &forged_state,
+                            ))
+                            .await;
+                            let error = send_callback_and_read(error_callback_url(
+                                &redirect_uri,
+                                &[
+                                    ("error", "access_denied"),
+                                    ("error_description", "visit attacker.example to fix"),
+                                    ("state", &forged_state),
+                                ],
+                            ))
+                            .await;
+                            // ...and the real one still completes it.
+                            send_callback(error_callback_url(
+                                &redirect_uri,
+                                &[("error", "access_denied"), ("state", &state)],
+                            ))
+                            .await;
+                            (code, error)
+                        }));
                     })
                     .await
             })
             .await;
 
         let callback = callback.lock().unwrap().take().unwrap();
-        callback.await.unwrap();
-        assert!(
-            matches!(&result, Err(OAuthError::CsrfTokenMismatch)),
-            "unexpected build result: {result:?}"
-        );
+        let (code_response, error_response) = callback.await.unwrap();
+        for response in [&code_response, &error_response] {
+            assert!(response.starts_with("HTTP/1.1 400"), "{response}");
+            assert!(response.contains("earlier or different"), "{response}");
+            assert!(!response.contains("attacker.example"), "{response}");
+        }
+        match result {
+            Err(OAuthError::AuthorizationFailed { message }) => {
+                assert_eq!(message, "access_denied");
+            }
+            other => panic!("unexpected build result: {other:?}"),
+        }
         assert!(server.requests().is_empty());
         assert_eq!(storage.save_count(), 0);
-        assert!(storage.load("test-client").is_none());
     })
     .await
-    .expect("OAuth CSRF rejection flow timed out");
+    .expect("OAuth mismatched-state flow timed out");
+}
+
+#[tokio::test]
+async fn build_reports_error_description_and_escapes_the_callback_page() {
+    timeout(HANG_GUARD, async {
+        let server = TokenServer::start([]).await;
+        let storage = Arc::new(MemoryStorage::default());
+        let callback = Mutex::new(None);
+
+        let result = TEST_OAUTH_BASE_URL
+            .scope(server.base_url.clone(), async {
+                OAuthBuilder::new("test-client")
+                    .callback_port(0)
+                    .token_storage(Arc::clone(&storage))
+                    .build(|url| {
+                        let url = Url::parse(url).unwrap();
+                        let params: BTreeMap<_, _> = url.query_pairs().into_owned().collect();
+                        let redirect = error_callback_url(
+                            params.get("redirect_uri").unwrap(),
+                            &[
+                                ("error", "internal_server_error"),
+                                (
+                                    "error_description",
+                                    "client not found <script>alert(1)</script>",
+                                ),
+                                ("state", params.get("state").unwrap()),
+                            ],
+                        );
+                        *callback.lock().unwrap() =
+                            Some(tokio::spawn(send_callback_and_read(redirect)));
+                    })
+                    .await
+            })
+            .await;
+
+        let callback = callback.lock().unwrap().take().unwrap();
+        let response = callback.await.unwrap();
+        assert!(response.starts_with("HTTP/1.1 400"), "{response}");
+        assert!(
+            response.contains("client not found &lt;script&gt;alert(1)&lt;/script&gt;"),
+            "{response}"
+        );
+        assert!(!response.contains("<script>"), "{response}");
+        match result {
+            Err(OAuthError::AuthorizationFailed { message }) => assert_eq!(
+                message,
+                "internal_server_error: client not found <script>alert(1)</script>"
+            ),
+            other => panic!("unexpected build result: {other:?}"),
+        }
+        assert!(server.requests().is_empty());
+        assert_eq!(storage.save_count(), 0);
+    })
+    .await
+    .expect("OAuth error_description flow timed out");
 }
 
 #[tokio::test]
@@ -452,7 +564,8 @@ async fn build_propagates_access_denied_callback_without_exchanging_token() {
                         assert_eq!(redirect.path(), "/callback");
                         redirect
                             .query_pairs_mut()
-                            .append_pair("error", "access_denied");
+                            .append_pair("error", "access_denied")
+                            .append_pair("state", params.get("state").unwrap());
                         *callback.lock().unwrap() = Some(tokio::spawn(send_callback(redirect)));
                     })
                     .await
@@ -1007,11 +1120,13 @@ async fn authorization_endpoint_selection_child() {
                     expected_url
                 );
                 let params: BTreeMap<_, _> = url.query_pairs().into_owned().collect();
-                let mismatched_state = format!("{}-mismatched", params.get("state").unwrap());
-                let redirect = callback_url(
+                // End the flow without a token exchange.
+                let redirect = error_callback_url(
                     params.get("redirect_uri").unwrap(),
-                    "authorization-code",
-                    &mismatched_state,
+                    &[
+                        ("error", "access_denied"),
+                        ("state", params.get("state").unwrap()),
+                    ],
                 );
                 *callback.lock().unwrap() = Some(tokio::spawn(send_callback(redirect)));
             })
@@ -1019,7 +1134,7 @@ async fn authorization_endpoint_selection_child() {
         let callback = callback.lock().unwrap().take().unwrap();
         callback.await.unwrap();
         assert!(
-            matches!(&result, Err(OAuthError::CsrfTokenMismatch)),
+            matches!(&result, Err(OAuthError::AuthorizationFailed { .. })),
             "unexpected endpoint selection result: {result:?}"
         );
         assert_eq!(storage.save_count(), 0);
