@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use num_enum::{FromPrimitive, IntoPrimitive};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -109,6 +111,9 @@ pub enum OrderStatus {
     /// Partial Withdrawal
     #[strum(serialize = "PartialWithdrawal")]
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    #[strum(serialize = "DelayedNotReported")]
+    DelayedNotReported,
 }
 
 /// Execution
@@ -130,6 +135,20 @@ pub struct Execution {
     pub quantity: Decimal,
     /// Executed price
     pub price: Decimal,
+    /// Order side. `Unknown` when the response omits it, as
+    /// `/v1/trade/execution/history` does for Longbridge US accounts.
+    #[serde(default)]
+    pub side: OrderSide,
+}
+
+/// Response for get all executions request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AllExecutionsResponse {
+    /// Has more records
+    pub has_more: bool,
+    /// Execution list
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trades: Vec<Execution>,
 }
 
 /// Order side
@@ -167,23 +186,11 @@ pub enum OrderTag {
     #[strum(serialize = "Normal")]
     Normal,
     /// Long term Order
-    #[strum(serialize = "GTC")]
+    #[strum(serialize = "Gtc")]
     LongTerm,
     /// Grey Order
     #[strum(serialize = "Grey")]
     Grey,
-    /// Force Selling
-    MarginCall,
-    /// OTC
-    Offline,
-    /// Option Exercise Long
-    Creditor,
-    /// Option Exercise Short
-    Debtor,
-    /// Wavier Of Option Exercise
-    NonExercise,
-    /// Trade Allocation
-    AllocatedSub,
 }
 
 /// Time in force Type
@@ -232,6 +239,192 @@ pub enum OutsideRTH {
     /// Overnight
     #[strum(serialize = "OVERNIGHT")]
     Overnight,
+    /// Overnight option
+    #[strum(serialize = "OPTION_PRE_MARKET")]
+    OptionPreMarket,
+}
+
+/// Attached order type
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum AttachedOrderType {
+    /// Unknown
+    Unknown,
+    /// Take profit
+    #[strum(serialize = "PROFIT_TAKER")]
+    ProfitTaker,
+    /// Stop loss
+    #[strum(serialize = "STOP_LOSS")]
+    StopLoss,
+    /// Bracket order
+    #[strum(serialize = "BRACKET")]
+    Bracket,
+}
+
+/// Attached order detail
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AttachedOrderDetail {
+    /// Attached order ID
+    pub order_id: String,
+    /// Attached order type
+    pub attached_type_display: AttachedOrderType,
+    /// Trigger price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub trigger_price: Option<Decimal>,
+    /// Quantity
+    pub quantity: Decimal,
+    /// Executed quantity
+    pub executed_qty: Decimal,
+    /// Order status
+    pub status: OrderStatus,
+    /// Last updated time (unix timestamp seconds)
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
+    pub updated_at: OffsetDateTime,
+    /// Whether withdrawn
+    pub withdrawn: bool,
+    /// GTD date
+    #[serde(with = "serde_utils::date_opt")]
+    pub gtd: Option<Date>,
+    /// Time in force
+    pub time_in_force: TimeInForceType,
+    /// Counter order ID
+    pub counter_id: String,
+    /// Trigger status
+    #[serde(with = "serde_utils::trigger_status")]
+    pub trigger_status: Option<TriggerStatus>,
+    /// Executed amount
+    pub executed_amount: Decimal,
+    /// Tag
+    pub tag: OrderTag,
+    /// Submitted time (unix timestamp seconds)
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
+    pub submitted_at: OffsetDateTime,
+    /// Executed price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub executed_price: Option<Decimal>,
+    /// Force RTH only
+    #[serde(with = "serde_utils::outside_rth")]
+    pub force_only_rth: Option<OutsideRTH>,
+    /// Whether reviewed
+    pub reviewed: bool,
+    /// Order type to submit after trigger
+    pub activate_order_type: OrderType,
+    /// RTH setting for activated order
+    #[serde(with = "serde_utils::outside_rth")]
+    pub activate_rth: Option<OutsideRTH>,
+    /// Submit price (limit price)
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub submit_price: Option<Decimal>,
+    /// Bid/ask depth level of the limit order submitted price
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::int32_opt_null_or_0_is_none::deserialize",
+        serialize_with = "serde_utils::int32_opt_0_is_none::serialize"
+    )]
+    pub limit_depth_level: Option<i32>,
+}
+
+/// Multi-leg strategy
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum MultiLegStrategy {
+    /// Unknown
+    Unknown,
+    /// Covered call (covered stock)
+    #[strum(to_string = "CoveredCall", serialize = "0")]
+    CoveredCall,
+    /// Covered put (covered stock)
+    #[strum(to_string = "CoveredPut", serialize = "1")]
+    CoveredPut,
+    /// Vertical call spread
+    #[strum(to_string = "VerticalCallSpread", serialize = "2")]
+    VerticalCallSpread,
+    /// Vertical put spread
+    #[strum(to_string = "VerticalPutSpread", serialize = "3")]
+    VerticalPutSpread,
+    /// Collar
+    #[strum(to_string = "Collar", serialize = "4")]
+    Collar,
+    /// Straddle
+    #[strum(to_string = "Straddle", serialize = "5")]
+    Straddle,
+    /// Strangle
+    #[strum(to_string = "Strangle", serialize = "6")]
+    Strangle,
+    /// Calendar call spread
+    #[strum(to_string = "CalendarCallSpread", serialize = "7")]
+    CalendarCallSpread,
+    /// Calendar put spread
+    #[strum(to_string = "CalendarPutSpread", serialize = "8")]
+    CalendarPutSpread,
+}
+
+/// Multi-leg position direction
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum MultiLegPosition {
+    /// Unknown
+    Unknown,
+    /// Long
+    #[strum(serialize = "LONG")]
+    Long,
+    /// Short
+    #[strum(serialize = "SHORT")]
+    Short,
+}
+
+/// Option contract type
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum ContractDirection {
+    /// Unknown
+    Unknown,
+    /// Call
+    #[strum(serialize = "C")]
+    Call,
+    /// Put
+    #[strum(serialize = "P")]
+    Put,
+}
+
+/// A leg of a multi-leg combination order
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    pub symbol: String,
+    /// Order side
+    pub side: OrderSide,
+    /// Position direction
+    pub position: MultiLegPosition,
+    /// Leg ratio quantity
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub ratio_quantity: Decimal,
+    /// Strike price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub strike_price: Option<Decimal>,
+    /// Option expiry date
+    #[serde(default, with = "serde_utils::date_ymd_opt")]
+    pub expire_date: Option<Date>,
+    /// Contract type
+    pub contract_direction: ContractDirection,
+}
+
+/// Multi-leg strategy information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiLegInfo {
+    /// Multi-leg strategy
+    pub strategy: MultiLegStrategy,
+    /// Strategy name
+    pub strategy_name: String,
+    /// Multi-leg combination ID
+    pub multileg_id: String,
+    /// Multi-leg combination code
+    pub code: String,
+    /// Legs of the combination order
+    #[serde(default)]
+    pub legs: Vec<MultiLegOrderLeg>,
 }
 
 /// Order
@@ -320,6 +513,21 @@ pub struct Order {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Time-condition submit time (`None` when the order is not a
+    /// time-condition order)
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
+    pub delayed_until: Option<OffsetDateTime>,
+    /// Attached orders
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[serde(default)]
+    pub multi_leg: Option<MultiLegInfo>,
 }
 
 /// Commission-free Status
@@ -514,6 +722,14 @@ pub struct OrderDetail {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Time-condition submit time (`None` when the order is not a
+    /// time-condition order)
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
+    pub delayed_until: Option<OffsetDateTime>,
     /// Commission-free Status
     pub free_status: CommissionFreeStatus,
     /// Commission-free amount
@@ -541,7 +757,14 @@ pub struct OrderDetail {
     /// Order history details
     pub history: Vec<OrderHistoryDetail>,
     /// Order charges
-    pub charge_detail: OrderChargeDetail,
+    pub charge_detail: Option<OrderChargeDetail>,
+    /// Attached orders
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[serde(default)]
+    pub multi_leg: Option<MultiLegInfo>,
 }
 
 /// Cash info
@@ -585,7 +808,7 @@ pub struct AccountBalance {
     /// Currency
     pub currency: String,
     /// Cash details
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cash_infos: Vec<CashInfo>,
     /// Net assets
     #[serde(with = "serde_utils::decimal_empty_is_0")]
@@ -693,15 +916,20 @@ pub struct FundPositionChannel {
     pub account_channel: String,
 
     /// Fund positions
-    #[serde(default, rename = "fund_info")]
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "fund_info"
+    )]
     pub positions: Vec<FundPosition>,
 }
 
 /// Fund position
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FundPosition {
-    /// Fund ISIN code
-    pub symbol: String,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    #[serde(alias = "symbol")]
+    pub counter_id: String,
     /// Current equity
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub current_net_asset_value: Decimal,
@@ -738,7 +966,11 @@ pub struct StockPositionChannel {
     pub account_channel: String,
 
     /// Stock positions
-    #[serde(default, rename = "stock_info")]
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "stock_info"
+    )]
     pub positions: Vec<StockPosition>,
 }
 
@@ -790,6 +1022,10 @@ impl_serde_for_enum_string!(
     DeductionStatus,
     ChargeCategoryCode
 );
+impl_serde_for_enum_string!(AttachedOrderType);
+impl_default_for_enum_string!(AttachedOrderType);
+impl_serde_for_enum_string!(MultiLegStrategy, MultiLegPosition, ContractDirection);
+impl_default_for_enum_string!(MultiLegStrategy, MultiLegPosition, ContractDirection);
 impl_default_for_enum_string!(
     OrderType,
     OrderStatus,
@@ -804,11 +1040,1180 @@ impl_default_for_enum_string!(
     ChargeCategoryCode
 );
 
+// ── US-market types
+// ───────────────────────────────────────────────────────────
+
+/// Request for [`crate::TradeContext::us_query_orders`], modelled after
+/// [`crate::GetHistoryOrdersOptions`] for HK/CN orders.
+///
+/// `query_type`: 0 = all (includes Rejected), 1 = pending, 2 = history (filled
+/// only). Default 0 matches what the app shows as "past orders".
+///
+/// `symbol` accepts a user-facing symbol e.g. `"AAPL.US"` or `"DOGEUSD.BKKT"`
+/// and is sent to the server as-is.
+#[derive(Debug, Clone, Default)]
+pub struct GetUSHistoryOrders {
+    /// Optional symbol filter, e.g. `"AAPL.US"`.
+    pub symbol: Option<String>,
+    /// Direction filter. [`crate::OrderSide::Unknown`] = all (default).
+    pub side: OrderSide,
+    /// Start timestamp (seconds). Defaults to 90 days ago.
+    pub start_at: i64,
+    /// End timestamp (seconds). Defaults to now.
+    pub end_at: i64,
+    /// 0 = all, 1 = pending, 2 = history (filled only). Default 0.
+    pub query_type: i32,
+    /// Page number, 1-based. Default 1.
+    pub page: i32,
+    /// Page size. Default 20.
+    pub limit: i32,
+}
+
+/// Alias kept for backward compatibility.
+pub type QueryUSOrdersOptions = GetUSHistoryOrders;
+
+/// Internal JSON body sent to POST /v1/us/orders/query.
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct USQueryOrdersBody {
+    pub account_channel: String,
+    pub action: i32,
+    pub start_at: f64,
+    pub end_at: f64,
+    pub symbols: Vec<String>,
+    pub security_types: Vec<String>,
+    pub query_type: i32,
+    pub page: i32,
+    pub limit: i32,
+    pub query_version: f64,
+}
+
+/// Response for [`crate::TradeContext::us_query_orders`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct QueryUSOrdersResponse {
+    /// Order list (raw JSON for forward compatibility).
+    /// Order ID field is `id` (not `order_id`).
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub orders: Vec<serde_json::Value>,
+    /// Total number of orders matching the query.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub total_count: i32,
+}
+
+/// One order state-transition entry within [`USOrderDetail`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USOrderHistory {
+    /// Execution type code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub exec_type: i32,
+    /// Order status at this transition
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub status: String,
+    /// Price at this transition
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub price: String,
+    /// Quantity at this transition
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub qty: String,
+    /// Transition time (Unix-second string)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub time: String,
+    /// Message / note
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub msg: String,
+    /// Whether the action was manual
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub is_manually: bool,
+    /// Counterparty ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub opp_party_id: String,
+    /// Trade match ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trd_match_id: String,
+    /// Operator identifier
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub operator: String,
+    /// Entrust channel of the operation
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub op_entrust_way: String,
+    /// Cancel/reject response-to code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cxl_rej_response_to: i32,
+    /// Withdrawal reason
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub withdrawal_reason: String,
+    /// Counterparty name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub opp_name: String,
+    /// Execution ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub exec_id: String,
+}
+
+/// Action-button state for an order.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USButtonControl {
+    /// Whether the withdraw/cancel action is available
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub withdraw: i32,
+    /// Whether the replace/modify action is available
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub replace: i32,
+    /// Actions blocked with an exception reason
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub exceptionable: Vec<String>,
+}
+
+/// One fee category within [`USChargeDetail`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USChargeItem {
+    /// Fee category code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub code: i32,
+    /// Fee category name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub name: String,
+    /// Individual fee amounts in this category
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub fees: Vec<String>,
+}
+
+/// Fee breakdown for an order.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USChargeDetail {
+    /// Fee currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Total fee amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub total_amount: String,
+    /// Per-category fee breakdown
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub items: Vec<USChargeItem>,
+}
+
+/// One bracket/conditional sub-order attached to a main order.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAttachedOrder {
+    /// Attached-order type (display code)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub attached_type_display: i32,
+    /// Executed quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub executed_qty: String,
+    /// Order quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
+    /// Order status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub status: String,
+    /// Trigger price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trigger_price: String,
+    /// Order ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub order_id: String,
+    /// Good-till date
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub gtd: String,
+    /// Time-in-force code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub time_in_force: i32,
+    /// Order tag code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub tag: i32,
+    /// Order type to activate on trigger
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub activate_order_type: String,
+    /// Whether to activate outside regular trading hours
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub activate_rth: i32,
+    /// Submitted price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub submit_price: String,
+    /// User-facing trading symbol (e.g. `"NKE.US"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub symbol: String,
+    /// Whether the order has been withdrawn
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub withdrawn: bool,
+}
+
+/// Full typed order object within [`USOrderDetailResponse`].
+/// `submitted_at` and `done_at` are raw unix-second strings.
+/// `order_histories` is nested inside this object, not at the response top
+/// level.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USOrderDetail {
+    /// Order ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub id: String,
+    /// Internal account ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub aaid: String,
+    /// Account channel
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub account_channel: String,
+    /// Order action code (buy/sell)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub action: i32,
+    /// User-facing trading symbol (e.g. `"NKE.US"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub symbol: String,
+    /// User-facing underlying symbol (options only)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub underlying_symbol: String,
+    /// Security type
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub security_type: String,
+    /// Security name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub name: String,
+    /// Order currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Trade currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trade_currency: String,
+    /// Order type
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub order_type: String,
+    /// Order status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub status: String,
+    /// Order price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub price: String,
+    /// Order quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
+    /// Executed quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub executed_qty: String,
+    /// Executed price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub executed_price: String,
+    /// Executed amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub executed_amount: String,
+    /// Operate direction
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub operate_direction: String,
+    /// Time-in-force code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub time_in_force: i32,
+    /// Good-till date
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub gtd: String,
+    /// Order tag code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub tag: i32,
+    /// Message / note
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub msg: String,
+    /// Whether the order is restricted to regular trading hours
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub force_only_rth: i32,
+    /// Submission time (Unix-second string)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub submitted_at: String,
+    /// Completion time (Unix-second string)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub done_at: String,
+    /// Trigger price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trigger_price: String,
+    /// Trigger time (Unix-second string)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trigger_at: String,
+    /// Trigger status code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trigger_status: i32,
+    /// Trigger exchange
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trigger_exchange: String,
+    /// Last-done price at trigger
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trigger_last_done: String,
+    /// Number of times triggered
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trigger_count: i32,
+    /// Trailing amount (trailing-stop orders)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub tailing_amount: String,
+    /// Trailing percent (trailing-stop orders)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub tailing_percent: String,
+    /// Limit offset (trailing-limit orders)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub limit_offset: String,
+    /// Order-book depth level for limit orders
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub limit_depth_level: i32,
+    /// Market price at reference
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market_price: String,
+    /// Submitted amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub submitted_amount: String,
+    /// Estimated fee
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub estimated_fee: String,
+    /// Commission-free status code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub free_status: i32,
+    /// Commission-free amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub free_amount: String,
+    /// Commission-free currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub free_currency: String,
+    /// Deduction status code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub deductions_status: i32,
+    /// Deduction amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub deductions_amount: String,
+    /// Deduction currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub deductions_currency: String,
+    /// Platform deduction status code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub platform_deductions_status: i32,
+    /// Platform deduction amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub platform_deductions_amount: String,
+    /// Platform deduction currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub platform_deductions_currency: String,
+    /// Display account
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub display_account: String,
+    /// Settlement account
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub settlement_account: String,
+    /// Settlement channel
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub settlement_channel: String,
+    /// Customer name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub customer_name: String,
+    /// Account holder real name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub real_name: String,
+    /// Account holder English name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub en_name: String,
+    /// Joint-account holder real name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub joint_real_name: String,
+    /// Joint-account holder English name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub joint_en_name: String,
+    /// Organization ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub org_id: String,
+    /// Broker-to-client assigned number (HK)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub bcan: String,
+    /// Entrust channel code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub op_entrust_way: i32,
+    /// Entrust channel name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub op_entrust_way_name: String,
+    /// Remark
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub remark: String,
+    /// Notice text
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub notice: String,
+    /// Short-sell type code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub short_sell_type: i32,
+    /// Strategy (ploy) type
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub ploy_type: String,
+    /// Strategy (ploy) ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub ploy_id: String,
+    /// Strategy (ploy) status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub ploy_status: String,
+    /// Trend direction code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trend: i32,
+    /// Withdrawal reason
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub withdrawal_reason: String,
+    /// Order type to activate on trigger
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub activate_order_type: String,
+    /// Whether to activate outside regular trading hours
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub activate_rth: i32,
+    /// Submitted price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub submit_price: String,
+    /// Contract direction (options)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub contract_direction: String,
+    /// Strike price (options)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub strike_price: String,
+    /// Contract size (options)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub contract_size: String,
+    /// Monitor price (conditional orders)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub monitor_price: String,
+    /// Available action buttons
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub button_control: USButtonControl,
+    /// Fee breakdown (absent when not applicable)
+    pub charge_detail: Option<USChargeDetail>,
+    /// Attached bracket/conditional sub-orders
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub attached_orders: Vec<USAttachedOrder>,
+    /// Order state-transition history
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub order_histories: Vec<USOrderHistory>,
+}
+
+/// Response for [`crate::TradeContext::us_order_detail`].
+/// Path: `GET /v1/us/orders/{order_id}`
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USOrderDetailResponse {
+    /// Full typed order object; None only on error.
+    pub order: Option<USOrderDetail>,
+    /// Active bracket/conditional sub-order, or None.
+    pub current_attached_order: Option<USOrderDetail>,
+    /// Server response timestamp (milliseconds string).
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub current_millisecond: String,
+}
+
+/// One cash currency entry in [`USAssetOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashEntry {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Cash frozen for pending buys
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub frozen_buy_cash: String,
+    /// Outstanding (unsettled) amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub outstanding: String,
+    /// Settled cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub settled_cash: String,
+    /// Total amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub total_amount: String,
+    /// Total cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub total_cash: String,
+}
+
+/// One cryptocurrency holding in [`USAssetOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCryptoEntry {
+    /// Asset type (e.g. `"CRYPTO"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub asset_type: String,
+    /// Trading-pair code (e.g. `"BTCUSD"`); the user-facing symbol is
+    /// `"<symbol>.<market>"` (e.g. `"BTCUSD.BKKT"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub symbol: String,
+    /// Holding quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
+    /// Settlement currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Average cost price; empty when the server has none
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub average_cost: String,
+    /// Market code (e.g. `"BKKT"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market: String,
+    /// Trade status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trade_status: String,
+    /// Previous close price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub prev_close: String,
+    /// Latest price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub last_done: String,
+    /// Market price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market_price: String,
+    /// Pre-market close price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_close: String,
+    /// Today's investment value
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub stock_invest_of_today: String,
+    /// Today's profit/loss
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub today_pl: String,
+    /// Today's investment value (pre-market)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_stock_invest_of_today: String,
+    /// Today's profit/loss (pre-market)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_today_pl: String,
+    /// Overnight-session latest price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub night_last_done: String,
+    /// Overnight-session previous close
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub night_prev_close: String,
+    /// Position side (long/short)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub position_side: String,
+    /// Position open time (Unix-second string; `"0"` when unknown)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub open_position_time: String,
+    /// Asset name (e.g. `"Bitcoin"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub name: String,
+    /// Industry classification ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub industry_counter_id: String,
+    /// Industry name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub industry_name: String,
+}
+
+/// One stock/equity position in [`USAssetOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USStockEntry {
+    /// Ticker code returned by the API (e.g. `"AAPL"`). See `full_symbol` for
+    /// the qualified form.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub symbol: String,
+    /// Qualified user-facing symbol (e.g. `"AAPL.US"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub full_symbol: String,
+    /// Asset type
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub asset_type: String,
+    /// Holding quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Average cost price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub average_cost: String,
+    /// Market code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market: String,
+    /// Trade status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trade_status: String,
+    /// Previous close price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub prev_close: String,
+    /// Latest price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub last_done: String,
+    /// Market price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market_price: String,
+    /// Pre-market close price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_close: String,
+    /// Today's stock investment value
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub stock_invest_of_today: String,
+    /// Today's profit/loss
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub today_pl: String,
+    /// Today's stock investment value (pre-market)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_stock_invest_of_today: String,
+    /// Today's profit/loss (pre-market)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_today_pl: String,
+    /// Overnight-session latest price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub night_last_done: String,
+    /// Overnight-session previous close
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub night_prev_close: String,
+    /// Position side (long/short)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub position_side: String,
+    /// Position open time (Unix-second string)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub open_position_time: String,
+    /// Security name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub name: String,
+    /// Industry classification ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub industry_counter_id: String,
+    /// Industry name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub industry_name: String,
+}
+
+/// Response for [`crate::TradeContext::us_asset_overview`].
+/// Field names match the actual API response from `GET /v1/us/assets/overview`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAssetOverview {
+    /// Account type
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub account_type: String,
+    /// Account snapshot timestamp (Unix-second string → OffsetDateTime).
+    #[serde(default, with = "crate::serde_utils::timestamp_opt")]
+    pub asset_timestamp: Option<time::OffsetDateTime>,
+    /// Cash buying power (top-level convenience field).
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cash_buy_power: String,
+    /// Overnight buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub overnight_buy_power: String,
+    /// Account currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Cash balances per currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cash_list: Vec<USCashEntry>,
+    /// Stock/equity positions
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub stock_list: Vec<USStockEntry>,
+    /// Option positions (raw JSON)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub option_list: Vec<serde_json::Value>,
+    /// Cryptocurrency holdings
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub crypto_list: Vec<USCryptoEntry>,
+    /// Multi-leg option strategies (raw JSON)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub multi_leg: serde_json::Value,
+}
+
+/// One time-period metric in a [`USRealizedPLEntry`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPLMetric {
+    /// Realized P&L amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub amount: String,
+    /// Period code (server-defined; 2 = current month observed in testing).
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub period: i32,
+    /// Realized P&L rate
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub rate: String,
+}
+
+/// One asset-category entry in [`USRealizedPL`].
+/// `category`: 0 = all, 1 = stock, 2 = option, 3 = crypto (server-defined).
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPLEntry {
+    /// Asset category (0 = all, 1 = stock, 2 = option, 3 = crypto)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub category: i32,
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Per-period realized P&L metrics
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub metrics: Vec<USRealizedPLMetric>,
+}
+
+/// Request for [`crate::TradeContext::us_realized_pl`], modelled after
+/// [`crate::GetUSHistoryOrders`].
+#[derive(Debug, Clone, Default)]
+pub struct GetUSRealizedPLOptions {
+    /// Currency, e.g. `"USD"`. Defaults to `"USD"` if empty.
+    pub currency: String,
+    /// Asset category filter: `""` = all, `"STOCK"`, `"OPTION"`, `"CRYPTO"`.
+    pub category: String,
+}
+
+/// Response for [`crate::TradeContext::us_realized_pl`].
+/// Field name matches the actual API response from `GET
+/// /v1/us/assets/pl/realized`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPL {
+    /// Per-asset-category realized P&L entries
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub realized_pl_list: Vec<USRealizedPLEntry>,
+}
+
+/// Request for [`crate::TradeContext::us_available_holding`].
+#[derive(Debug, Clone, Default)]
+pub struct GetUSAvailableHoldingOptions {
+    /// Security symbol, e.g. `"AAPL.US"`, an option symbol such as
+    /// `"AAPL261120C345000.US"`, or a crypto pair such as `"BTCUSD.BKKT"`.
+    pub symbol: String,
+    /// Holding type: `"STOCK"`, `"OPTION"` or `"CRYPTO"`. Defaults to
+    /// `"STOCK"` if empty.
+    pub equity_type: String,
+    /// Position side: `"LONG"` or `"SHORT"`. Defaults to `"LONG"` if empty.
+    pub position_side: String,
+}
+
+/// Response for [`crate::TradeContext::us_available_holding`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAvailableHolding {
+    /// Quantity available to sell (long) or buy to cover (short); negative for
+    /// a short position
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub available_qty: String,
+}
+
+/// Buying power in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USBuyLimitInfo {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Cash buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cash_buy_power: String,
+    /// Overnight buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub overnight_buy_power: String,
+    /// Day-trade buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub day_trade_buy_power: String,
+    /// Instant buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub instant_buy_power: String,
+    /// Intraday margin buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub intraday_margin_buy_power: String,
+    /// Option buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub option_buy_power: String,
+    /// Crypto buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub crypto_buy_power: String,
+    /// Margin maintenance excess used for buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub mme: String,
+}
+
+/// One cash currency entry in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashDetail {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Total cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub total_amount: String,
+    /// Available cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub available_cash: String,
+    /// Withdrawable cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub withdraw_cash: String,
+    /// Cash frozen for pending orders
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub frozen_cash: String,
+    /// Settled cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub settled_cash: String,
+    /// Outstanding (unsettled) amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub outstanding: String,
+    /// Amount held for external use (e.g. IPO or fund subscriptions)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub external_amount: String,
+}
+
+/// Margin account status in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USMarginStatus {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Net liquidation value
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub nlv: String,
+    /// Margin equity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_equity: String,
+    /// Margin maintenance excess
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_maintenance_excess: String,
+    /// Maintenance margin requirement
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub mmr: String,
+    /// Regulation T excess
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub reg_t_excess: String,
+    /// Special memorandum account
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub sma: String,
+}
+
+/// Response for [`crate::TradeContext::us_cash_and_buy_power`].
+/// Field names match `GET /v1/us/assets/cash-and-buy-power`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashAndBuyPower {
+    /// Buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub buy_limit_info: USBuyLimitInfo,
+    /// Cash per currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cash_list: Vec<USCashDetail>,
+    /// Margin account status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_status: USMarginStatus,
+}
+
+/// Request for [`crate::TradeContext::us_transaction_history`].
+#[derive(Debug, Clone)]
+pub struct GetUSTransactionHistoryOptions {
+    /// Start time (inclusive)
+    pub start_at: OffsetDateTime,
+    /// End time (inclusive)
+    pub end_at: OffsetDateTime,
+    /// Page number, starting at 1. Defaults to 1 if 0.
+    pub page: i32,
+    /// Page size. Defaults to 20 if 0.
+    pub size: i32,
+    /// Transaction types to include; empty means all. Values:
+    /// `"TT_DEPOSIT_AND_WITHDRAWAL"`, `"TT_STOCKS_AND_ETFS_TRADING"`,
+    /// `"TT_OPTIONS_TRADING"`, `"TT_CRYPTO_TRADING"`, `"TT_CORPORATE_ACTION"`,
+    /// `"TT_TRANSFER_IN_AND_OUT"`, `"TT_CRYPTO_TRANSFER"`,
+    /// `"TT_MARGIN_FINANCING"`, `"TT_OTHER"`.
+    pub types: Vec<String>,
+    /// Currency filter, e.g. `"USD"`; empty means all.
+    pub currency: String,
+}
+
+impl GetUSTransactionHistoryOptions {
+    /// Create a request for transactions between `start_at` and `end_at`.
+    pub fn new(start_at: OffsetDateTime, end_at: OffsetDateTime) -> Self {
+        Self {
+            start_at,
+            end_at,
+            page: 1,
+            size: 20,
+            types: Vec::new(),
+            currency: String::new(),
+        }
+    }
+}
+
+/// One record in [`USTransactionHistory`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USTransaction {
+    /// Display title
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub title: String,
+    /// Business code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub biz_code: String,
+    /// Business code name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub biz_code_name: String,
+    /// Amount; negative for outflows
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub amount: String,
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Security symbol, if the record relates to one (e.g. `"AAPL.US"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub symbol: String,
+    /// Market code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market: String,
+    /// Holding type
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub equity_type: String,
+    /// Position side
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub position_side: String,
+    /// Quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
+    /// Quantity description
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity_description: String,
+    /// Reference number
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub ref_no: String,
+    /// Remark
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub remark: String,
+    /// Creation time
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "crate::serde_utils::rfc3339_opt::serialize"
+    )]
+    pub create_at: Option<OffsetDateTime>,
+    /// Completion time
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "crate::serde_utils::rfc3339_opt::serialize"
+    )]
+    pub done_at: Option<OffsetDateTime>,
+}
+
+/// Response for [`crate::TradeContext::us_transaction_history`].
+/// Field names match `POST /v1/us/assets/transaction-history`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USTransactionHistory {
+    /// Current page number
+    #[serde(default, with = "crate::serde_utils::int64_str")]
+    pub current_page: i64,
+    /// Records on this page. The API returns no total count: a page shorter
+    /// than the requested size is the last one.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub items: Vec<USTransaction>,
+}
+
+/// One exchange rate in [`USExchangeRates`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USExchangeRate {
+    /// Account channel the rates apply to, e.g. `"us_lb_apex"` (outer
+    /// `universal_exchanges` key)
+    pub universal_key: String,
+    /// Rate type, e.g. `"am"` or `"reference"` (inner `spec_exchanges` key)
+    pub spec_key: String,
+    /// Base currency
+    pub base_currency: String,
+    /// Other (quote) currency
+    pub other_currency: String,
+    /// Bid rate
+    pub bid_rate: String,
+    /// Offer rate
+    pub offer_rate: String,
+    /// Average rate
+    pub average_rate: String,
+}
+
+/// Response for [`crate::TradeContext::us_exchange_rates`].
+///
+/// The upstream response is a two-level map
+/// (`universal_exchanges.<key>.spec_exchanges.<key>.exchanges[]`); it is
+/// flattened into a single list, sorted by the two upstream map keys, with
+/// the keys kept on each entry as [`USExchangeRate::universal_key`] and
+/// [`USExchangeRate::spec_key`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(from = "RawUSExchangeRates")]
+pub struct USExchangeRates {
+    /// Exchange rates
+    pub exchanges: Vec<USExchangeRate>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSExchangeRate {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    base_currency: String,
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    other_currency: String,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    bid_rate: Option<String>,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    offer_rate: Option<String>,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    average_rate: Option<String>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSSpecExchanges {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    exchanges: Vec<RawUSExchangeRate>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSUniversalExchanges {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    spec_exchanges: BTreeMap<String, RawUSSpecExchanges>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSExchangeRates {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    universal_exchanges: BTreeMap<String, RawUSUniversalExchanges>,
+    /// Already-flattened form, so that the serialized [`USExchangeRates`]
+    /// deserializes back.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    exchanges: Vec<USExchangeRate>,
+}
+
+impl From<RawUSExchangeRates> for USExchangeRates {
+    fn from(raw: RawUSExchangeRates) -> Self {
+        let mut exchanges = raw.exchanges;
+        for (universal_key, universal) in raw.universal_exchanges {
+            for (spec_key, spec) in universal.spec_exchanges {
+                exchanges.extend(spec.exchanges.into_iter().map(|rate| USExchangeRate {
+                    universal_key: universal_key.clone(),
+                    spec_key: spec_key.clone(),
+                    base_currency: rate.base_currency,
+                    other_currency: rate.other_currency,
+                    bid_rate: rate.bid_rate.unwrap_or_default(),
+                    offer_rate: rate.offer_rate.unwrap_or_default(),
+                    average_rate: rate.average_rate.unwrap_or_default(),
+                }));
+            }
+        }
+        Self { exchanges }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use time::macros::datetime;
 
     use super::*;
+
+    #[test]
+    fn execution_without_side_defaults_to_unknown() {
+        // `/v1/trade/execution/history` on a Longbridge US account returns
+        // trades with no `side`; they must still deserialize.
+        let data = r#"{
+            "order_id": "1000000000000000001",
+            "trade_id": "1000000000000000001-1",
+            "symbol": "ETHUSD.BKKT",
+            "trade_done_at": "1790203596",
+            "quantity": "0.168",
+            "price": "2690.34165646"
+        }"#;
+        let execution: Execution = serde_json::from_str(data).expect("execution without side");
+        assert_eq!(
+            execution.side,
+            OrderSide::Unknown,
+            "missing side defaults to Unknown"
+        );
+        assert_eq!(execution.symbol, "ETHUSD.BKKT", "symbol is kept");
+    }
+
+    #[test]
+    fn us_exchange_rates_response() {
+        let data = r#"{
+            "universal_exchanges": {
+                "2": {"spec_exchanges": {"USD": {"exchanges": [
+                    {"base_currency": "USD", "other_currency": "HKD", "bid_rate": 7.8, "offer_rate": "7.85", "average_rate": null}
+                ]}}},
+                "1": {"spec_exchanges": {
+                    "b": {"exchanges": [{"base_currency": "USD", "other_currency": "CNH", "bid_rate": "7.1"}]},
+                    "a": {"exchanges": null}
+                }}
+            }
+        }"#;
+        let resp: USExchangeRates = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.exchanges.len(), 2);
+        assert_eq!(resp.exchanges[0].universal_key, "1");
+        assert_eq!(resp.exchanges[0].spec_key, "b");
+        assert_eq!(resp.exchanges[0].other_currency, "CNH");
+        assert_eq!(resp.exchanges[0].offer_rate, "");
+        assert_eq!(resp.exchanges[1].universal_key, "2");
+        assert_eq!(resp.exchanges[1].spec_key, "USD");
+        assert_eq!(resp.exchanges[1].bid_rate, "7.8");
+        assert_eq!(resp.exchanges[1].offer_rate, "7.85");
+        assert_eq!(resp.exchanges[1].average_rate, "");
+
+        let json = serde_json::to_string(&resp).unwrap();
+        let back: USExchangeRates = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.exchanges.len(), 2);
+        assert_eq!(back.exchanges[1].bid_rate, "7.8");
+    }
+
+    #[test]
+    fn us_cash_and_buy_power_response() {
+        let data = r#"{
+            "buy_limit_info": {"currency": "USD", "cash_buy_power": "100.5", "overnight_buy_power": "90"},
+            "cash_list": [{"currency": "USD", "total_amount": "120", "available_cash": "100.5", "withdraw_cash": "80", "frozen_cash": null}],
+            "margin_status": {"currency": "USD", "nlv": "1200"}
+        }"#;
+        let resp: USCashAndBuyPower = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.buy_limit_info.cash_buy_power, "100.5");
+        assert_eq!(resp.cash_list[0].withdraw_cash, "80");
+        assert_eq!(resp.cash_list[0].frozen_cash, "");
+        assert_eq!(resp.margin_status.nlv, "1200");
+    }
+
+    #[test]
+    fn us_transaction_history_response() {
+        let data = r#"{
+            "current_page": "2",
+            "items": [
+                {"title": "Buy", "amount": "-100", "currency": "USD", "symbol": "AAPL.US", "create_at": "1792600000", "done_at": 1792600060},
+                {"title": "Buy", "amount": "-10", "currency": "USD", "symbol": "BTCUSD.BKKT", "counter_id": "VA/BKKT/BTCUSD", "done_at": "0"}
+            ]
+        }"#;
+        let resp: USTransactionHistory = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.current_page, 2);
+        assert_eq!(resp.items[0].symbol, "AAPL.US");
+        assert_eq!(
+            resp.items[0].create_at.unwrap().unix_timestamp(),
+            1792600000
+        );
+        assert_eq!(resp.items[0].done_at.unwrap().unix_timestamp(), 1792600060);
+        assert_eq!(resp.items[1].symbol, "BTCUSD.BKKT");
+        assert!(resp.items[1].done_at.is_none());
+    }
+
+    /// Shapes (field names, JSON types, map keys) as returned by US prod.
+    #[test]
+    fn us_asset_responses_as_returned_by_prod() {
+        let data = r#"{
+            "current_page": 1,
+            "items": [{
+                "amount": "0.5", "biz_code": "LVAVNSCR", "biz_code_name": "Cryptocurrency Deposit",
+                "counter_id": "VA/BKKT/BTCUSD", "create_at": "1791478565", "currency": "",
+                "done_at": "1791478565", "equity_type": "CRYPTO", "market": "BKKT",
+                "position_side": "LONG", "quantity": "0.5", "quantity_description": "0.5",
+                "ref_no": "R1", "remark": "", "symbol": "BTCUSD.BKKT",
+                "title": "Cryptocurrency Deposit: BTCUSD"
+            }]
+        }"#;
+        let resp: USTransactionHistory = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.current_page, 1);
+        assert_eq!(resp.items[0].symbol, "BTCUSD.BKKT");
+        assert_eq!(resp.items[0].equity_type, "CRYPTO");
+        assert_eq!(resp.items[0].done_at.unwrap().unix_timestamp(), 1791478565);
+
+        let data = r#"{"universal_exchanges": {"us_lb_apex": {"spec_exchanges": {
+            "reference": {"exchanges": [{"average_rate": 1, "base_currency": "USD", "bid_rate": 1, "offer_rate": 1, "other_currency": "USD"}]},
+            "am": {"exchanges": [{"average_rate": 1, "base_currency": "USD", "bid_rate": 1, "offer_rate": 1, "other_currency": "USD"}]}
+        }}}}"#;
+        let resp: USExchangeRates = serde_json::from_str(data).unwrap();
+        let keys: Vec<_> = resp
+            .exchanges
+            .iter()
+            .map(|e| (e.universal_key.as_str(), e.spec_key.as_str()))
+            .collect();
+        assert_eq!(keys, [("us_lb_apex", "am"), ("us_lb_apex", "reference")]);
+        assert_eq!(resp.exchanges[0].average_rate, "1");
+
+        let data = r#"{
+            "account_type": "1", "asset_timestamp": "1792661597", "currency": "USD",
+            "stock_list": [{"symbol": "MULL", "full_symbol": "MULL.US", "counter_id": "ETF/US/MULL", "quantity": "10", "market": "US"}],
+            "crypto_list": [{
+                "asset_type": "CRYPTO", "average_cost": "", "counter_id": "VA/BKKT/ETHUSD",
+                "currency": "USD", "last_done": "2500", "market": "BKKT", "market_price": "2500",
+                "name": "Ethereum", "open_position_time": "0", "position_side": "LONG",
+                "quantity": "0.1", "symbol": "ETHUSD", "today_pl": "", "trade_status": "105"
+            }],
+            "option_list": [], "multi_leg": {"holdings": []}
+        }"#;
+        let resp: USAssetOverview = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.asset_timestamp.unwrap().unix_timestamp(), 1792661597);
+        assert_eq!(resp.stock_list[0].full_symbol, "MULL.US");
+        let crypto = &resp.crypto_list[0];
+        assert_eq!(crypto.symbol, "ETHUSD");
+        assert_eq!(crypto.market, "BKKT");
+        assert_eq!(crypto.quantity, "0.1");
+        assert_eq!(crypto.name, "Ethereum");
+        assert_eq!(crypto.market_price, "2500");
+    }
 
     #[test]
     fn fund_position_response() {
@@ -817,7 +2222,7 @@ mod tests {
             "list": [{
                 "account_channel": "lb",
                 "fund_info": [{
-                    "symbol": "HK0000447943",
+                    "counter_id": "UT/FD/HK0000447943",
                     "symbol_name": "高腾亚洲收益基金",
                     "currency": "USD",
                     "holding_units": "5.000",
@@ -837,13 +2242,19 @@ mod tests {
         assert_eq!(channel.positions.len(), 1);
 
         let position = &channel.positions[0];
-        assert_eq!(position.symbol, "HK0000447943");
+        assert_eq!(position.counter_id, "UT/FD/HK0000447943");
         assert_eq!(position.symbol_name, "高腾亚洲收益基金");
         assert_eq!(position.currency, "USD");
         assert_eq!(position.current_net_asset_value, decimal!(0i32));
         assert_eq!(position.cost_net_asset_value, decimal!(0i32));
         assert_eq!(position.holding_units, decimal!(5i32));
         assert_eq!(position.net_asset_value_day, datetime!(2022-4-14 0:00 +8));
+
+        // Transition compatibility: the legacy `symbol` key (which carried a
+        // bare ISIN) still deserializes into `counter_id` via the serde alias.
+        let legacy = r#"{"list":[{"account_channel":"lb","fund_info":[{"symbol":"HK0000447943","symbol_name":"x","currency":"USD","holding_units":"0","current_net_asset_value":"0","cost_net_asset_value":"0","net_asset_value_day":"1649865600"}]}]}"#;
+        let resp: FundPositionsResponse = serde_json::from_str(legacy).unwrap();
+        assert_eq!(resp.channels[0].positions[0].counter_id, "HK0000447943");
     }
 
     #[test]
@@ -1096,7 +2507,8 @@ mod tests {
                 "limit_depth_level": 0,
                 "trigger_count": 0,
                 "monitor_price": "",
-                "remark": "abc"
+                "remark": "abc",
+                "delayed_until": "1767225600"
               }
             ]
           }
@@ -1137,6 +2549,7 @@ mod tests {
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
         assert_eq!(order.remark, "abc");
+        assert_eq!(order.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
     }
 
     #[test]
@@ -1214,6 +2627,7 @@ mod tests {
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
         assert_eq!(order.remark, "abc");
+        assert!(order.delayed_until.is_none());
     }
 
     #[test]
@@ -1228,7 +2642,8 @@ mod tests {
                 "quantity": "100",
                 "symbol": "700.HK",
                 "trade_done_at": "1648611351",
-                "trade_id": "693664675163312128-1648611351433741210"
+                "trade_id": "693664675163312128-1648611351433741210",
+                "side": "Buy"
               }
             ]
           }
@@ -1249,6 +2664,7 @@ mod tests {
         assert_eq!(execution.symbol, "700.HK");
         assert_eq!(execution.trade_done_at, datetime!(2022-03-30 11:35:51 +8));
         assert_eq!(execution.trade_id, "693664675163312128-1648611351433741210");
+        assert_eq!(execution.side, OrderSide::Buy);
     }
 
     #[test]
@@ -1284,6 +2700,7 @@ mod tests {
             "trigger_count": 0,
             "monitor_price": "",
             "remark": "1680863603.927165",
+            "delayed_until": "0",
             "free_status": "None",
             "free_amount": "",
             "free_currency": "",
@@ -1322,6 +2739,89 @@ mod tests {
         }
         "#;
 
-        _ = serde_json::from_str::<OrderDetail>(data).unwrap();
+        let detail = serde_json::from_str::<OrderDetail>(data).unwrap();
+        assert!(
+            detail.delayed_until.is_none(),
+            "\"0\" means no time condition"
+        );
+
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value["status"] = "DelayedNotReported".into();
+        value["delayed_until"] = "1767225600".into();
+        let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+        assert_eq!(detail.status, OrderStatus::DelayedNotReported);
+        assert_eq!(detail.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
+
+        // The spec marks delayed_until nullable.
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value["delayed_until"] = serde_json::Value::Null;
+        let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+        assert!(detail.delayed_until.is_none());
+
+        // A malformed value in this new field must not fail the whole response.
+        for (raw, expected) in [
+            (
+                serde_json::json!(1767225600),
+                Some(datetime!(2026-01-01 00:00 UTC)),
+            ),
+            (serde_json::json!("abc"), None),
+            (serde_json::json!("99999999999999"), None),
+            (serde_json::json!(""), None),
+            (serde_json::json!("-5"), None),
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+            value["delayed_until"] = raw.clone();
+            let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+            assert_eq!(detail.delayed_until, expected, "{raw}");
+        }
+    }
+
+    #[test]
+    fn attached_order_limit_depth_level() {
+        let data = r#"
+        {
+            "order_id": "706388312699592705",
+            "attached_type_display": "STOP_LOSS",
+            "trigger_price": "10.500",
+            "quantity": "200",
+            "executed_qty": "0",
+            "status": "NewStatus",
+            "updated_at": "1651644898",
+            "withdrawn": false,
+            "gtd": "",
+            "time_in_force": "Day",
+            "counter_id": "",
+            "trigger_status": "NOT_USED",
+            "executed_amount": "0",
+            "tag": "Normal",
+            "submitted_at": "1651644897",
+            "executed_price": "0.000",
+            "force_only_rth": "RTH_ONLY",
+            "reviewed": false,
+            "activate_order_type": "MIT",
+            "activate_rth": "RTH_ONLY",
+            "submit_price": "",
+            "limit_depth_level": 0
+        }
+        "#;
+        for (raw, expected) in [
+            (serde_json::json!(0), None),
+            (serde_json::json!(3), Some(3)),
+            (serde_json::json!(-2), Some(-2)),
+            (serde_json::json!("3"), Some(3)),
+            (serde_json::json!("abc"), None),
+            (serde_json::Value::Null, None),
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+            value["limit_depth_level"] = raw.clone();
+            let detail = serde_json::from_value::<AttachedOrderDetail>(value).unwrap();
+            assert_eq!(detail.limit_depth_level, expected, "{raw}");
+        }
+
+        // Responses that predate the field still deserialize.
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value.as_object_mut().unwrap().remove("limit_depth_level");
+        let detail = serde_json::from_value::<AttachedOrderDetail>(value).unwrap();
+        assert!(detail.limit_depth_level.is_none());
     }
 }

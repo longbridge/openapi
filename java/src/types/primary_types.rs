@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use jni::{JNIEnv, errors::Result, objects::JValueOwned};
 
 use crate::{
-    init::{INTEGER_CLASS, LONG_CLASS},
+    init::{DOUBLE_CLASS, INTEGER_CLASS, LONG_CLASS},
     types::{FromJValue, IntoJValue, JSignature},
 };
 
@@ -135,6 +135,47 @@ impl IntoJValue for JavaLong {
         let obj = env.new_object(
             LONG_CLASS.get().unwrap(),
             "(J)V",
+            &[JValueOwned::from(self.0).borrow()],
+        )?;
+        Ok(JValueOwned::from(obj))
+    }
+}
+
+pub(crate) struct JavaDouble(f64);
+
+impl From<f64> for JavaDouble {
+    #[inline]
+    fn from(value: f64) -> Self {
+        JavaDouble(value)
+    }
+}
+
+impl From<JavaDouble> for f64 {
+    #[inline]
+    fn from(value: JavaDouble) -> Self {
+        value.0
+    }
+}
+
+impl JSignature for JavaDouble {
+    fn signature() -> Cow<'static, str> {
+        "Ljava/lang/Double;".into()
+    }
+}
+
+impl FromJValue for JavaDouble {
+    fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
+        let obj = value.l()?;
+        let value = env.call_method(obj, "doubleValue", "()D", &[])?;
+        Ok(JavaDouble(value.d()?))
+    }
+}
+
+impl IntoJValue for JavaDouble {
+    fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        let obj = env.new_object(
+            DOUBLE_CLASS.get().unwrap(),
+            "(D)V",
             &[JValueOwned::from(self.0).borrow()],
         )?;
         Ok(JValueOwned::from(obj))

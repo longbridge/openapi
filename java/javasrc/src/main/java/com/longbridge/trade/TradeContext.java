@@ -10,6 +10,15 @@ import com.longbridge.*;
 public class TradeContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create a TradeContext object
      *
@@ -18,13 +27,17 @@ public class TradeContext implements AutoCloseable {
      */
     public static TradeContext create(Config config) {
         TradeContext ctx = new TradeContext();
-        ctx.raw = SdkNative.newTradeContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newTradeContext(config.getRaw()); }
         return ctx;
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeTradeContext(raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeTradeContext(h);
+        }
     }
 
     /**
@@ -33,8 +46,8 @@ public class TradeContext implements AutoCloseable {
      * 
      * @param handler A order changed handler
      */
-    public void setOnOrderChange(OrderChangedHandler handler) {
-        SdkNative.tradeContextSetOnOrderChanged(this.raw, handler);
+    public synchronized void setOnOrderChange(OrderChangedHandler handler) {
+        SdkNative.tradeContextSetOnOrderChanged(raw(), handler);
     }
 
     /**
@@ -74,9 +87,9 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> subscribe(TopicType[] topics) throws OpenApiException {
+    public synchronized CompletableFuture<Void> subscribe(TopicType[] topics) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextSubscribe(this.raw, topics, callback);
+            SdkNative.tradeContextSubscribe(raw(), topics, callback);
         });
     }
 
@@ -87,14 +100,16 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> unsubscribe(TopicType[] topics) throws OpenApiException {
+    public synchronized CompletableFuture<Void> unsubscribe(TopicType[] topics) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextUnsubscribe(this.raw, topics, callback);
+            SdkNative.tradeContextUnsubscribe(raw(), topics, callback);
         });
     }
 
     /**
      * Get history executions
+     * <p>
+     * {@code side} may be {@code Unknown} on Longbridge US accounts.
      * 
      * <pre>
      * {@code
@@ -124,10 +139,10 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Execution[]> getHistoryExecutions(GetHistoryExecutionsOptions opts)
+    public synchronized CompletableFuture<Execution[]> getHistoryExecutions(GetHistoryExecutionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextHistoryExecutions(this.raw, opts, callback);
+            SdkNative.tradeContextHistoryExecutions(raw(), opts, callback);
         });
     }
 
@@ -160,9 +175,26 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Execution[]> getTodayExecutions(GetTodayExecutionsOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<Execution[]> getTodayExecutions(GetTodayExecutionsOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextTodayExecutions(this.raw, opts, callback);
+            SdkNative.tradeContextTodayExecutions(raw(), opts, callback);
+        });
+    }
+
+    /**
+     * Get all executions
+     * <p>
+     * AP accounts only: US data-center accounts get a region error; use
+     * {@link #getHistoryExecutions} instead.
+     *
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<AllExecutionsResponse> getAllExecutions(GetAllExecutionsOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextAllExecutions(raw(), opts, callback);
         });
     }
 
@@ -200,9 +232,9 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Order[]> getHistoryOrders(GetHistoryOrdersOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<Order[]> getHistoryOrders(GetHistoryOrdersOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextHistoryOrders(this.raw, opts, callback);
+            SdkNative.tradeContextHistoryOrders(raw(), opts, callback);
         });
     }
 
@@ -237,9 +269,9 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Order[]> getTodayOrders(GetTodayOrdersOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<Order[]> getTodayOrders(GetTodayOrdersOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextTodayOrders(this.raw, opts, callback);
+            SdkNative.tradeContextTodayOrders(raw(), opts, callback);
         });
     }
 
@@ -270,9 +302,9 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> replaceOrder(ReplaceOrderOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<Void> replaceOrder(ReplaceOrderOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextReplaceOrder(this.raw, opts, callback);
+            SdkNative.tradeContextReplaceOrder(raw(), opts, callback);
         });
     }
 
@@ -308,9 +340,52 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SubmitOrderResponse> submitOrder(SubmitOrderOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<SubmitOrderResponse> submitOrder(SubmitOrderOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextSubmitOrder(this.raw, opts, callback);
+            SdkNative.tradeContextSubmitOrder(raw(), opts, callback);
+        });
+    }
+
+    /**
+     * Submit a multi-leg option combination order (such as vertical spreads,
+     * straddles, strangles, collars, etc.). All legs are submitted together as
+     * a single strategy order.
+     *
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * import java.math.BigDecimal;
+     *
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
+     *             SubmitMultiLegOrderOptions opts = new SubmitMultiLegOrderOptions(
+     *                     OrderSide.Buy,
+     *                     OrderType.LO,
+     *                     new BigDecimal(1),
+     *                     MultiLegStrategy.VerticalCallSpread,
+     *                     new SubmitMultiLegOrderLeg[] {
+     *                             new SubmitMultiLegOrderLeg("QQQ260731C764000.US", new BigDecimal(1)),
+     *                             new SubmitMultiLegOrderLeg("QQQ260731C767000.US", new BigDecimal(1)),
+     *                     }).setSubmittedPrice(new BigDecimal("1.5"));
+     *             SubmitOrderResponse resp = ctx.submitMultileg(opts).get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     *
+     * @param opts Options for this request, not null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<SubmitOrderResponse> submitMultileg(SubmitMultiLegOrderOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextSubmitMultileg(raw(), opts, callback);
         });
     }
 
@@ -338,14 +413,35 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> cancelOrder(String orderId) throws OpenApiException {
+    public synchronized CompletableFuture<Void> cancelOrder(String orderId) throws OpenApiException {
+        return cancelOrder(orderId, false);
+    }
+
+    /**
+     * Cancel order
+     *
+     * @param orderId    Order ID
+     * @param isAttached When set together with orderId, indicates that orderId is
+     *                   an attached sub-order ID. The server will look up using
+     *                   the attached order ID instead of treating it as a regular
+     *                   order ID.
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<Void> cancelOrder(String orderId, boolean isAttached) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextCancelOrder(this.raw, orderId, callback);
+            if (isAttached) {
+                SdkNative.tradeContextCancelOrderAttached(raw(), orderId, callback);
+            } else {
+                SdkNative.tradeContextCancelOrder(raw(), orderId, callback);
+            }
         });
     }
 
     /**
      * Get account balance with currency
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -371,14 +467,16 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<AccountBalance[]> getAccountBalance(String currency) throws OpenApiException {
+    public synchronized CompletableFuture<AccountBalance[]> getAccountBalance(String currency) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextAccountBalance(this.raw, currency, callback);
+            SdkNative.tradeContextAccountBalance(raw(), currency, callback);
         });
     }
 
     /**
      * Get account balance
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -403,14 +501,16 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<AccountBalance[]> getAccountBalance() throws OpenApiException {
+    public synchronized CompletableFuture<AccountBalance[]> getAccountBalance() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextAccountBalance(this.raw, null, callback);
+            SdkNative.tradeContextAccountBalance(raw(), null, callback);
         });
     }
 
     /**
      * Get cash flow
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -440,14 +540,16 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<CashFlow[]> getCashFlow(GetCashFlowOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<CashFlow[]> getCashFlow(GetCashFlowOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextCashFlow(this.raw, opts, callback);
+            SdkNative.tradeContextCashFlow(raw(), opts, callback);
         });
     }
 
     /**
      * Get fund positions
+     * <p>
+     * AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
      * 
      * <pre>
      * {@code
@@ -471,15 +573,17 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<FundPositionsResponse> getFundPositions(GetFundPositionsOptions opts)
+    public synchronized CompletableFuture<FundPositionsResponse> getFundPositions(GetFundPositionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextFundPositions(this.raw, opts, callback);
+            SdkNative.tradeContextFundPositions(raw(), opts, callback);
         });
     }
 
     /**
      * Get stock positions
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -503,15 +607,17 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<StockPositionsResponse> getStockPositions(GetStockPositionsOptions opts)
+    public synchronized CompletableFuture<StockPositionsResponse> getStockPositions(GetStockPositionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextStockPositions(this.raw, opts, callback);
+            SdkNative.tradeContextStockPositions(raw(), opts, callback);
         });
     }
 
     /**
      * Get margin ratio
+     * <p>
+     * AP accounts only: US data-center accounts get a region error. No US equivalent.
      * 
      * <pre>
      * {@code
@@ -535,15 +641,17 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<MarginRatio> getMarginRatio(String symbol)
+    public synchronized CompletableFuture<MarginRatio> getMarginRatio(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextMarginRatio(this.raw, symbol, callback);
+            SdkNative.tradeContextMarginRatio(raw(), symbol, callback);
         });
     }
 
     /**
      * Get order detail
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -567,10 +675,24 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OrderDetail> getOrderDetail(String orderId)
+    public synchronized CompletableFuture<OrderDetail> getOrderDetail(String orderId)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextOrderDetail(this.raw, orderId, callback);
+            SdkNative.tradeContextOrderDetail(raw(), orderId, callback);
+        });
+    }
+
+    /**
+     * Get order detail for an attached order
+     *
+     * @param orderId Attached order ID
+     * @return A Future representing the result
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<OrderDetail> getOrderDetailAttached(String orderId)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextOrderDetailAttached(raw(), orderId, callback);
         });
     }
 
@@ -582,11 +704,21 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<EstimateMaxPurchaseQuantityResponse> getEstimateMaxPurchaseQuantity(
+    public synchronized CompletableFuture<EstimateMaxPurchaseQuantityResponse> getEstimateMaxPurchaseQuantity(
             EstimateMaxPurchaseQuantityOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextEstimateMaxPurchaseQuantity(this.raw, opts, callback);
+            SdkNative.tradeContextEstimateMaxPurchaseQuantity(raw(), opts, callback);
         });
+    }
+
+    /**
+     * Set grid trading order changed event callback. After receiving a grid order
+     * changed event, it will call back to this handler.
+     *
+     * @param handler A grid order changed handler
+     */
+    public void setOnGridOrderChange(GridOrderChangedHandler handler) {
+        SdkNative.tradeContextSetOnGridOrderChanged(raw(), handler);
     }
 }

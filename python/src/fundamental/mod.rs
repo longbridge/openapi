@@ -58,6 +58,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<OperatingFinancial>()?;
     parent.add_class::<OperatingIndicator>()?;
     parent.add_class::<FinancialReportKind>()?;
+    parent.add_class::<FinancialStatementKind>()?;
     parent.add_class::<FinancialReportPeriod>()?;
     parent.add_class::<RecentBuybacks>()?;
     parent.add_class::<BuybackHistoryItem>()?;
@@ -80,6 +81,35 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<MacroeconomicIndicator>()?;
     parent.add_class::<Macroeconomic>()?;
     parent.add_class::<MacroeconomicResponse>()?;
+    // US-market types
+    parent.add_class::<USRankTag>()?;
+    parent.add_class::<USSharelistItem>()?;
+    parent.add_class::<USCompanyOverview>()?;
+    parent.add_class::<USValuationMetric>()?;
+    parent.add_class::<USValuationOverview>()?;
+    parent.add_class::<USFinancialStatementField>()?;
+    parent.add_class::<USFinancialStatementPeriod>()?;
+    parent.add_class::<USFinancialStatement>()?;
+    parent.add_class::<USFiscalYearDividend>()?;
+    parent.add_class::<USETFDividendInfo>()?;
+    parent.add_class::<USDividendItem>()?;
+    parent.add_class::<USRecentDividend>()?;
+    parent.add_class::<USDividendHistoryItem>()?;
+    parent.add_class::<USDividendPayoutRecord>()?;
+    parent.add_class::<USCompanyDividends>()?;
+    parent.add_class::<USETFFile>()?;
+    parent.add_class::<USETFFilesResponse>()?;
+    parent.add_class::<USReportPeriod>()?;
+    parent.add_class::<USFinancialISItem>()?;
+    parent.add_class::<USFinancialBSItem>()?;
+    parent.add_class::<USFinancialCFItem>()?;
+    parent.add_class::<USFinancialOverview>()?;
+    parent.add_class::<USKeyMetricItem>()?;
+    parent.add_class::<USKeyFinancialMetrics>()?;
+    parent.add_class::<USAIChatData>()?;
+    parent.add_class::<USConsensusEstimate>()?;
+    parent.add_class::<USConsensusItem>()?;
+    parent.add_class::<USAnalystConsensus>()?;
     parent.add_class::<context::FundamentalContext>()?;
     parent.add_class::<context_async::AsyncFundamentalContext>()?;
     Ok(())

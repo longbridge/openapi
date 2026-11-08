@@ -47,6 +47,153 @@
 #define LB_WATCHLIST_GROUP_SECURITIES 2
 
 /**
+ * Kind of a [`crate::agent_context::types::CConversationStreamEvent`]. Only
+ * the field matching this kind is non-null, all others are null.
+ */
+typedef enum lb_conversation_stream_event_type_t {
+  /**
+   * The run has started; `chat_started` is non-null
+   */
+  ChatStarted,
+  /**
+   * Observed right after `ChatStarted` on every run seen so far;
+   * `workflow_started` is non-null
+   */
+  WorkflowStarted,
+  /**
+   * An incremental piece of the answer; `message` is non-null
+   */
+  Message,
+  /**
+   * A heartbeat with no payload, observed at arbitrary points in the
+   * stream (including in between `Message` chunks); every field below is
+   * null
+   */
+  Ping,
+  /**
+   * The Agent has entered the reasoning phase; `thinking_started` is
+   * non-null
+   */
+  ThinkingStarted,
+  /**
+   * The reasoning phase is over; `thinking_finished` is non-null
+   */
+  ThinkingFinished,
+  /**
+   * An ordinary tool call has started; `node_tool_use_started` is
+   * non-null
+   */
+  NodeToolUseStarted,
+  /**
+   * An ordinary tool call has ended; `node_tool_use_finished` is
+   * non-null
+   */
+  NodeToolUseFinished,
+  /**
+   * The Agent has spawned a subagent to work on a sub-task;
+   * `subagent_started` is non-null
+   */
+  SubagentStarted,
+  /**
+   * The subagent has called one of its own tools; `subagent_progress` is
+   * non-null
+   */
+  SubagentProgress,
+  /**
+   * The subagent has finished its sub-task; `subagent_finished` is
+   * non-null
+   */
+  SubagentFinished,
+  /**
+   * The Agent has delegated to another Agent as a tool;
+   * `agent_tool_started` is non-null
+   */
+  AgentToolStarted,
+  /**
+   * The delegated Agent has called one of its own tools;
+   * `agent_tool_progress` is non-null
+   */
+  AgentToolProgress,
+  /**
+   * The delegated Agent's run has finished; `agent_tool_finished` is
+   * non-null
+   */
+  AgentToolFinished,
+  /**
+   * The run is paused: the Agent needs more information or confirmation
+   * from you; `human_interaction_required` is non-null. Unlike
+   * `WorkflowFinished`, this is emitted instead of (never alongside)
+   * `WorkflowFinished` for the same run
+   */
+  HumanInteractionRequired,
+  /**
+   * Sensitive content in the user query was masked before processing;
+   * `query_masked` is non-null
+   */
+  QueryMasked,
+  /**
+   * The Agent created or updated its task plan; `plan_changed` is
+   * non-null
+   */
+  PlanChanged,
+  /**
+   * A context-compression pass has started; `context_compress_started`
+   * is non-null
+   */
+  ContextCompressStarted,
+  /**
+   * The context-compression pass has finished;
+   * `context_compress_finished` is non-null
+   */
+  ContextCompressFinished,
+  /**
+   * Observed once all `Message` events for this round have been sent;
+   * `chat_finished` is non-null
+   */
+  ChatFinished,
+  /**
+   * The run finished successfully, with a failure, or stopped by the
+   * user; `workflow_finished` is non-null. Never emitted for an
+   * interrupted run — see `HumanInteractionRequired` for that case
+   */
+  WorkflowFinished,
+  /**
+   * The server auto-generating a short title for the conversation;
+   * `chat_title_updated` is non-null
+   */
+  ChatTitleUpdated,
+  /**
+   * An event type not recognized by this SDK version; `other_json` is
+   * non-null and contains the raw event JSON
+   */
+  Other,
+} lb_conversation_stream_event_type_t;
+
+/**
+ * Final run status of a conversation
+ */
+typedef enum lb_conversation_status_t {
+  /**
+   * The run completed successfully
+   */
+  ConversationStatusSucceeded,
+  /**
+   * The run is paused, waiting for
+   * `lb_agent_context_continue_conversation`/
+   * `lb_agent_context_continue_conversation_streamed`
+   */
+  ConversationStatusInterrupted,
+  /**
+   * The run failed
+   */
+  ConversationStatusFailed,
+  /**
+   * The run was stopped
+   */
+  ConversationStatusStopped,
+} lb_conversation_status_t;
+
+/**
  * Alert trigger condition
  */
 typedef enum lb_alert_condition_t {
@@ -125,6 +272,20 @@ typedef enum lb_calendar_category_t {
 } lb_calendar_category_t;
 
 /**
+ * Pagination direction for finance_calendar (the `next` query parameter)
+ */
+typedef enum lb_calendar_page_direction_t {
+  /**
+   * Page towards later dates
+   */
+  CalendarPageDirectionLater,
+  /**
+   * Page towards earlier dates
+   */
+  CalendarPageDirectionEarlier,
+} lb_calendar_page_direction_t;
+
+/**
  * Language identifer
  */
 typedef enum lb_language_t {
@@ -155,6 +316,22 @@ typedef enum lb_push_candlestick_mode_t {
    */
   PushCandlestickMode_Confirmed,
 } lb_push_candlestick_mode_t;
+
+/**
+ * Transport used by the quote pull APIs
+ */
+typedef enum lb_quote_transport_t {
+  /**
+   * Send pull requests over the quote WebSocket connection (default)
+   */
+  QuoteTransport_WebSocket,
+  /**
+   * Send pull requests over HTTP (`POST /quote/...`) where the API has a
+   * REST equivalent, falling back to the WebSocket for the rest. Using
+   * only HTTP-backed APIs never opens a WebSocket connection.
+   */
+  QuoteTransport_Http,
+} lb_quote_transport_t;
 
 /**
  * DCA investment frequency
@@ -221,6 +398,88 @@ typedef enum lb_financial_report_kind_t {
    */
   FinancialReportKindAll,
 } lb_financial_report_kind_t;
+
+/**
+ * Market type
+ */
+typedef enum lb_market_t {
+  /**
+   * Unknown
+   */
+  MarketUnknown,
+  /**
+   * US market
+   */
+  MarketUS,
+  /**
+   * HK market
+   */
+  MarketHK,
+  /**
+   * CN market
+   */
+  MarketCN,
+  /**
+   * SG market
+   */
+  MarketSG,
+  /**
+   * Crypto market
+   */
+  MarketCrypto,
+} lb_market_t;
+
+/**
+ * Ranking indicator for industry rank
+ */
+typedef enum lb_industry_rank_indicator_t {
+  /**
+   * Leading gainer
+   */
+  IndustryRankIndicatorLeadingGainer,
+  /**
+   * Today's trend
+   */
+  IndustryRankIndicatorTodayTrend,
+  /**
+   * Popularity
+   */
+  IndustryRankIndicatorPopularity,
+  /**
+   * Market capitalisation
+   */
+  IndustryRankIndicatorMarketCap,
+  /**
+   * Revenue
+   */
+  IndustryRankIndicatorRevenue,
+  /**
+   * Revenue growth
+   */
+  IndustryRankIndicatorRevenueGrowth,
+  /**
+   * Net profit
+   */
+  IndustryRankIndicatorNetProfit,
+  /**
+   * Net profit growth
+   */
+  IndustryRankIndicatorNetProfitGrowth,
+} lb_industry_rank_indicator_t;
+
+/**
+ * Sort mode for industry rank
+ */
+typedef enum lb_industry_rank_sort_type_t {
+  /**
+   * Rank by the single selected indicator
+   */
+  IndustryRankSortTypeSingle,
+  /**
+   * Rank by a composite of several indicators
+   */
+  IndustryRankSortTypeMulti,
+} lb_industry_rank_sort_type_t;
 
 /**
  * Broker holding lookback period
@@ -665,6 +924,10 @@ typedef enum lb_filter_warrant_in_out_bounds_type_t {
  */
 typedef enum lb_warrant_status_t {
   /**
+   * Unknown
+   */
+  WarrantStatusUnknown,
+  /**
    * Suspend
    */
   WarrantStatusSuspend,
@@ -677,36 +940,6 @@ typedef enum lb_warrant_status_t {
    */
   WarrantStatusNormal,
 } lb_warrant_status_t;
-
-/**
- * Market type
- */
-typedef enum lb_market_t {
-  /**
-   * Unknown
-   */
-  MarketUnknown,
-  /**
-   * US market
-   */
-  MarketUS,
-  /**
-   * HK market
-   */
-  MarketHK,
-  /**
-   * CN market
-   */
-  MarketCN,
-  /**
-   * SG market
-   */
-  MarketSG,
-  /**
-   * Crypto market
-   */
-  MarketCrypto,
-} lb_market_t;
 
 /**
  * Calc index
@@ -1058,6 +1291,10 @@ typedef enum lb_order_status_t {
    * Partial Withdrawal
    */
   OrderStatusPartialWithdrawal,
+  /**
+   * Monitoring (Time-Conditional Order)
+   */
+  OrderStatusDelayedNotReported,
 } lb_order_status_t;
 
 /**
@@ -1080,30 +1317,6 @@ typedef enum lb_order_tag_t {
    * Grey Order
    */
   OrderTagGrey,
-  /**
-   * Force Selling
-   */
-  OrderTagMarginCall,
-  /**
-   * OTC
-   */
-  OrderTagOffline,
-  /**
-   * Option Exercise Long
-   */
-  OrderTagCreditor,
-  /**
-   * Option Exercise Short
-   */
-  OrderTagDebtor,
-  /**
-   * Wavier Of Option Exercise
-   */
-  OrderTagNonExercise,
-  /**
-   * Trade Allocation
-   */
-  OrderTagAllocatedSub,
 } lb_order_tag_t;
 
 /**
@@ -1129,6 +1342,88 @@ typedef enum lb_trigger_status_t {
 } lb_trigger_status_t;
 
 /**
+ * Multi-leg strategy
+ */
+typedef enum CMultiLegStrategy {
+  /**
+   * Unknown
+   */
+  MultiLegStrategyUnknown,
+  /**
+   * Covered call (covered stock)
+   */
+  MultiLegStrategyCoveredCall,
+  /**
+   * Covered put (covered stock)
+   */
+  MultiLegStrategyCoveredPut,
+  /**
+   * Vertical call spread
+   */
+  MultiLegStrategyVerticalCallSpread,
+  /**
+   * Vertical put spread
+   */
+  MultiLegStrategyVerticalPutSpread,
+  /**
+   * Collar
+   */
+  MultiLegStrategyCollar,
+  /**
+   * Straddle
+   */
+  MultiLegStrategyStraddle,
+  /**
+   * Strangle
+   */
+  MultiLegStrategyStrangle,
+  /**
+   * Calendar call spread
+   */
+  MultiLegStrategyCalendarCallSpread,
+  /**
+   * Calendar put spread
+   */
+  MultiLegStrategyCalendarPutSpread,
+} CMultiLegStrategy;
+
+/**
+ * Multi-leg position direction
+ */
+typedef enum CMultiLegPosition {
+  /**
+   * Unknown
+   */
+  MultiLegPositionUnknown,
+  /**
+   * Long
+   */
+  MultiLegPositionLong,
+  /**
+   * Short
+   */
+  MultiLegPositionShort,
+} CMultiLegPosition;
+
+/**
+ * Option contract type
+ */
+typedef enum CContractDirection {
+  /**
+   * Unknown
+   */
+  ContractDirectionUnknown,
+  /**
+   * Call
+   */
+  ContractDirectionCall,
+  /**
+   * Put
+   */
+  ContractDirectionPut,
+} CContractDirection;
+
+/**
  * Topic type
  */
 typedef enum lb_topic_type_t {
@@ -1137,6 +1432,28 @@ typedef enum lb_topic_type_t {
    */
   TopicPrivate,
 } lb_topic_type_t;
+
+/**
+ * Attached order type
+ */
+typedef enum CAttachedOrderType {
+  /**
+   * Unknown
+   */
+  AttachedOrderTypeUnknown = 0,
+  /**
+   * Take profit
+   */
+  AttachedOrderTypeProfitTaker = 1,
+  /**
+   * Stop loss
+   */
+  AttachedOrderTypeStopLoss = 2,
+  /**
+   * Bracket order
+   */
+  AttachedOrderTypeBracket = 3,
+} CAttachedOrderType;
 
 /**
  * Time in force Type
@@ -1180,6 +1497,10 @@ typedef enum lb_outside_rth_t {
    * Overnight
    */
   OutsideRTHOvernight,
+  /**
+   * Overnight option
+   */
+  OutsideRTHOptionPreMarket,
 } lb_outside_rth_t;
 
 /**
@@ -1353,6 +1674,47 @@ typedef enum lb_option_direction_t {
    */
   OptionDirectionCall,
 } lb_option_direction_t;
+
+/**
+ * Special expiration cycle of an option contract
+ */
+typedef enum lb_option_expiry_cycle_type_t {
+  /**
+   * Unknown
+   */
+  OptionExpiryCycleTypeUnknown,
+  /**
+   * Standard monthly option
+   */
+  OptionExpiryCycleTypeMonthly,
+  /**
+   * Weekly option, expires weekly
+   */
+  OptionExpiryCycleTypeWeekly,
+  /**
+   * Quarterly option, expires quarterly
+   */
+  OptionExpiryCycleTypeQuarterly,
+} lb_option_expiry_cycle_type_t;
+
+/**
+ * Whether an option contract is a legacy contract left over from a corporate
+ * action
+ */
+typedef enum lb_option_standard_attr_t {
+  /**
+   * Unknown
+   */
+  OptionStandardAttrUnknown,
+  /**
+   * A normal, active contract
+   */
+  OptionStandardAttrNormal,
+  /**
+   * A legacy contract produced by a corporate action
+   */
+  OptionStandardAttrOld,
+} lb_option_standard_attr_t;
 
 /**
  * Cash flow direction
@@ -1620,12 +1982,17 @@ typedef enum lb_element_type_t {
   ElementTypeIndustry,
 } lb_element_type_t;
 
+/**
+ * AI Agent conversation context
+ */
+typedef struct lb_agent_context_t lb_agent_context_t;
+
 typedef struct lb_alert_context_t lb_alert_context_t;
 
 /**
  * Asset context
  */
-typedef struct CAssetContext CAssetContext;
+typedef struct lb_asset_context_t lb_asset_context_t;
 
 typedef struct lb_calendar_context_t lb_calendar_context_t;
 
@@ -1645,7 +2012,11 @@ typedef struct lb_decimal_t lb_decimal_t;
 
 typedef struct lb_error_t lb_error_t;
 
+typedef struct lb_fund_context_t lb_fund_context_t;
+
 typedef struct lb_fundamental_context_t lb_fundamental_context_t;
+
+typedef struct lb_grid_context_t lb_grid_context_t;
 
 /**
  * A HTTP client for Longbridge OpenAPI
@@ -1694,6 +2065,1159 @@ typedef struct lb_async_result_t {
 typedef void (*lb_async_callback_t)(const struct lb_async_result_t*);
 
 /**
+ * Options for `lb_agent_context_agents` (all fields can be null)
+ */
+typedef struct lb_get_agents_options_t {
+  /**
+   * Page number, starts at 1 (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+  /**
+   * Fuzzy search by Agent name (can be null)
+   */
+  const char *name;
+} lb_get_agents_options_t;
+
+/**
+ * One answer to a [`CInterrupt`] question, used as an entry of
+ * [`CAnswersByToolCallEntry::answers`]
+ */
+typedef struct lb_answer_question_t {
+  /**
+   * Question text, must match `CQuestion::question` verbatim
+   */
+  const char *question;
+  /**
+   * Your answer text
+   */
+  const char *answer;
+} lb_answer_question_t;
+
+/**
+ * Answers for one `tool_call_id`, used as an entry of the `answers` array of
+ * `lb_agent_context_continue_conversation`/
+ * `lb_agent_context_continue_conversation_streamed`.
+ *
+ * The Rust core's `AnswersByToolCall` is a
+ * `HashMap<String, HashMap<String, String>>` keyed by `tool_call_id`, then by
+ * question text. Since C has no native map type, it's flattened into an
+ * array of `(tool_call_id, [(question, answer)])` entries — this array of
+ * `CAnswersByToolCallEntry` mirrors the outer map, and each entry's
+ * `answers` array (of `CAnswerQuestion`) mirrors the inner map.
+ */
+typedef struct lb_answers_by_tool_call_entry_t {
+  /**
+   * Tool call ID, see [`CInterrupt::tool_call_id`]
+   */
+  const char *tool_call_id;
+  /**
+   * Answers to the questions raised for this tool call
+   */
+  const struct lb_answer_question_t *answers;
+  /**
+   * Number of answers
+   */
+  uintptr_t num_answers;
+} lb_answers_by_tool_call_entry_t;
+
+/**
+ * Payload of a `ChatStarted` conversation stream event
+ */
+typedef struct lb_chat_started_payload_t {
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Numeric conversation identifier
+   */
+  int64_t chat_id;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * Error code; empty when absent
+   */
+  const char *error;
+  /**
+   * Error message; empty when absent
+   */
+  const char *error_message;
+} lb_chat_started_payload_t;
+
+/**
+ * `inputs` of a `WorkflowStarted` conversation stream event
+ */
+typedef struct lb_workflow_started_inputs_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * The question that was asked
+   */
+  const char *query;
+} lb_workflow_started_inputs_t;
+
+/**
+ * Payload of a `WorkflowStarted` conversation stream event, observed right
+ * after `ChatStarted` on every run seen so far
+ */
+typedef struct lb_workflow_started_payload_t {
+  /**
+   * Whether this run's answer was served from a cache
+   */
+  bool hit_cache;
+  /**
+   * Echoes the run's inputs
+   */
+  const struct lb_workflow_started_inputs_t *inputs;
+  /**
+   * Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Internal workflow run ID
+   */
+  int64_t workflow_id;
+} lb_workflow_started_payload_t;
+
+/**
+ * Payload of a `Message` conversation stream event — an incremental text
+ * chunk. This is the highest-frequency event; concatenate `text` fragments
+ * in arrival order.
+ */
+typedef struct lb_message_payload_t {
+  /**
+   * Incremental text fragment
+   */
+  const char *text;
+  /**
+   * `answer` — final answer text; `think` — reasoning process; `process`
+   * — stage progress description
+   */
+  const char *message_type;
+  /**
+   * Identifier of the stream segment this fragment belongs to. Fragments
+   * with the same `key` form one continuous block — group by `key` when
+   * rendering
+   */
+  const char *key;
+  /**
+   * Time this segment started, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Stage identifier; only present when `message_type` is `"process"`
+   */
+  const char *stage;
+  /**
+   * Stage title while running; only present when `message_type` is
+   * `"process"`
+   */
+  const char *stage_title;
+  /**
+   * Stage title after it finishes; only present when `message_type` is
+   * `"process"`
+   */
+  const char *stage_finished_title;
+  /**
+   * Extra payload attached to the fragment, as a JSON string; empty when
+   * absent
+   */
+  const char *outputs_json;
+} lb_message_payload_t;
+
+/**
+ * Payload of a `ThinkingStarted` conversation stream event — the Agent has
+ * entered the reasoning phase (analyzing the question, planning tool
+ * calls). Between this and `ThinkingFinished`, `Message` events with
+ * `message_type == "think"` and tool-call events may arrive.
+ */
+typedef struct lb_thinking_started_payload_t {
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+} lb_thinking_started_payload_t;
+
+/**
+ * Payload of a `ThinkingFinished` conversation stream event — the
+ * reasoning phase is over; answer text (`Message` with `message_type ==
+ * "answer"`) follows.
+ */
+typedef struct lb_thinking_finished_payload_t {
+  /**
+   * Finish time, Unix timestamp in seconds
+   */
+  int64_t finished_at;
+  /**
+   * Reasoning duration in seconds
+   */
+  int32_t elapsed_time;
+} lb_thinking_finished_payload_t;
+
+/**
+ * Payload of a `NodeToolUseStarted` conversation stream event — an
+ * ordinary tool call has started. Match it to its `NodeToolUseFinished`
+ * counterpart by `tool_use_id`.
+ */
+typedef struct lb_node_tool_use_started_payload_t {
+  /**
+   * Unique ID of this call; matches the finished event
+   */
+  const char *tool_use_id;
+  /**
+   * Localized display name of the tool
+   */
+  const char *tool_name;
+  /**
+   * Locale-stable tool identifier; use this for logic keyed on the tool
+   * kind
+   */
+  const char *tool_func_name;
+  /**
+   * Call arguments as a JSON string
+   */
+  const char *tool_args;
+  /**
+   * Progress text suitable for direct display, e.g. `"Searching the
+   * web…"`
+   */
+  const char *tips;
+  /**
+   * Short tags accompanying `tips`; may be empty
+   */
+  const char *const *tip_chips;
+  /**
+   * Number of tags in `tip_chips`
+   */
+  uintptr_t num_tip_chips;
+  /**
+   * Round number. Calls in the same round (same `iteration`) run in
+   * parallel
+   */
+  int32_t iteration;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+} lb_node_tool_use_started_payload_t;
+
+/**
+ * A source referenced by the answer
+ */
+typedef struct lb_reference_t {
+  /**
+   * Reference index
+   */
+  int32_t index;
+  /**
+   * Original reference index as provided by the source
+   */
+  int32_t original_index;
+  /**
+   * Reference type (wire field `type`)
+   */
+  const char *ref_type;
+  /**
+   * Reference identifier
+   */
+  const char *id;
+  /**
+   * Reference title
+   */
+  const char *title;
+  /**
+   * Reference URL
+   */
+  const char *url;
+  /**
+   * Full nested reference payload, as a JSON string; empty when absent
+   */
+  const char *content_json;
+} lb_reference_t;
+
+/**
+ * `outputs` of a `NodeToolUseFinished` conversation stream event — only
+ * carries fields meant for display
+ */
+typedef struct lb_node_tool_use_outputs_t {
+  /**
+   * Sources referenced by the tool result
+   */
+  const struct lb_reference_t *references;
+  /**
+   * Number of references
+   */
+  uintptr_t num_references;
+  /**
+   * Domains of the referenced sources
+   */
+  const char *const *reference_domains;
+  /**
+   * Number of reference domains
+   */
+  uintptr_t num_reference_domains;
+  /**
+   * The query the tool executed; empty when absent
+   */
+  const char *query;
+  /**
+   * Raw response text of the tool; empty when absent
+   */
+  const char *text;
+  /**
+   * Parsed request arguments, as a JSON string; empty when absent
+   */
+  const char *tool_args_json;
+  /**
+   * Structured result, as a JSON string; present only for selected
+   * tools, empty when absent
+   */
+  const char *data_json;
+} lb_node_tool_use_outputs_t;
+
+/**
+ * Payload of a `NodeToolUseFinished` conversation stream event — the tool
+ * call has ended.
+ */
+typedef struct lb_node_tool_use_finished_payload_t {
+  /**
+   * Matches the `tool_use_id` of the started event
+   */
+  const char *tool_use_id;
+  /**
+   * `succeeded` / `failed`
+   */
+  const char *status;
+  /**
+   * Error description on failure
+   */
+  const char *error;
+  /**
+   * Call duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Localized display name
+   */
+  const char *tool_name;
+  /**
+   * Locale-stable tool identifier
+   */
+  const char *tool_func_name;
+  /**
+   * Call arguments as a JSON string
+   */
+  const char *tool_args;
+  /**
+   * Tool category
+   */
+  const char *tool_type;
+  /**
+   * Progress text
+   */
+  const char *tips;
+  /**
+   * Short tags; may be empty
+   */
+  const char *const *tip_chips;
+  /**
+   * Number of tags in `tip_chips`
+   */
+  uintptr_t num_tip_chips;
+  /**
+   * Round number
+   */
+  int32_t iteration;
+  /**
+   * `true` if the call happened during the thinking phase
+   */
+  bool is_thinking;
+  /**
+   * Filtered call results, for display
+   */
+  const struct lb_node_tool_use_outputs_t *outputs;
+} lb_node_tool_use_finished_payload_t;
+
+/**
+ * Payload of a `SubagentStarted` conversation stream event. When the Agent
+ * spawns a subagent to work on a sub-task, the subagent's lifecycle is
+ * reported with this dedicated event family instead of `NodeToolUse*`.
+ */
+typedef struct lb_subagent_started_payload_t {
+  /**
+   * ID of the node that spawned the subagent
+   */
+  const char *node_id;
+  /**
+   * Unique ID of this spawn; matches the finished event
+   */
+  const char *tool_use_id;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Goal assigned to the subagent
+   */
+  const char *goal;
+  /**
+   * Full task prompt given to the subagent
+   */
+  const char *prompt;
+  /**
+   * Subagent identifier; may be empty
+   */
+  const char *subagent_id;
+  /**
+   * Tools granted to the subagent, as a JSON array string; empty when
+   * absent
+   */
+  const char *tools_json;
+} lb_subagent_started_payload_t;
+
+/**
+ * Payload of a `SubagentProgress` conversation stream event, emitted every
+ * time the subagent calls one of its own tools. Use it to render a live
+ * timeline inside the subagent card.
+ */
+typedef struct lb_subagent_progress_payload_t {
+  /**
+   * ID of the node that spawned the subagent
+   */
+  const char *node_id;
+  /**
+   * `tool_use_id` of the owning `SubagentStarted` event
+   */
+  const char *parent_tool_call_id;
+  /**
+   * Name of the tool the subagent called
+   */
+  const char *subagent_tool_name;
+  /**
+   * Arguments of that call, as a JSON string
+   */
+  const char *subagent_tool_args;
+  /**
+   * Status of that call: `running` / `succeeded` / `failed`
+   */
+  const char *subagent_status;
+  /**
+   * Duration of that call in milliseconds
+   */
+  int64_t subagent_duration_ms;
+  /**
+   * The subagent's internal round number
+   */
+  int32_t subagent_iteration;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+} lb_subagent_progress_payload_t;
+
+/**
+ * `outputs` of a `SubagentFinished` conversation stream event
+ */
+typedef struct lb_subagent_outputs_t {
+  /**
+   * The goal that was assigned to the subagent; empty when absent
+   */
+  const char *goal;
+  /**
+   * The subagent's result; empty when absent
+   */
+  const char *result;
+  /**
+   * Timeline of tool calls the subagent made, as a JSON array string;
+   * empty when absent
+   */
+  const char *subagent_tools_json;
+} lb_subagent_outputs_t;
+
+/**
+ * Payload of a `SubagentFinished` conversation stream event
+ */
+typedef struct lb_subagent_finished_payload_t {
+  /**
+   * ID of the node that spawned the subagent
+   */
+  const char *node_id;
+  /**
+   * Matches the `tool_use_id` of `SubagentStarted`
+   */
+  const char *tool_use_id;
+  /**
+   * `succeeded` / `failed`
+   */
+  const char *status;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Total subagent duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Error description on failure
+   */
+  const char *error;
+  /**
+   * Subagent result: `goal`, `result`, and the timeline of tool calls it
+   * made
+   */
+  const struct lb_subagent_outputs_t *outputs;
+} lb_subagent_finished_payload_t;
+
+/**
+ * Payload of an `AgentToolStarted` conversation stream event. When the
+ * Agent delegates to another Agent as a tool, that inner run is reported
+ * with the `AgentTool*` family — the shape mirrors the subagent events.
+ */
+typedef struct lb_agent_tool_started_payload_t {
+  /**
+   * ID of the calling node
+   */
+  const char *node_id;
+  /**
+   * Unique ID of this call; matches the finished event
+   */
+  const char *tool_use_id;
+  /**
+   * Identifier of the Agent being called
+   */
+  const char *agent_tool_name;
+  /**
+   * Display title; may be empty
+   */
+  const char *title;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Call arguments as a JSON string
+   */
+  const char *tool_args;
+  /**
+   * Localized display name
+   */
+  const char *tool_name;
+  /**
+   * Progress text; may be empty
+   */
+  const char *tips;
+  /**
+   * Short tags; may be empty
+   */
+  const char *const *tip_chips;
+  /**
+   * Number of tags in `tip_chips`
+   */
+  uintptr_t num_tip_chips;
+  /**
+   * `true` if called during the thinking phase
+   */
+  bool is_thinking;
+} lb_agent_tool_started_payload_t;
+
+/**
+ * Payload of an `AgentToolProgress` conversation stream event, emitted for
+ * each inner tool call the delegated Agent makes.
+ */
+typedef struct lb_agent_tool_progress_payload_t {
+  /**
+   * ID of the calling node
+   */
+  const char *node_id;
+  /**
+   * `tool_use_id` of the owning `AgentToolStarted` event
+   */
+  const char *parent_tool_call_id;
+  /**
+   * Identifier of the Agent being called
+   */
+  const char *agent_tool_name;
+  /**
+   * Name of the inner tool the delegated Agent called
+   */
+  const char *inner_tool_name;
+  /**
+   * Arguments of that inner call, as a JSON string
+   */
+  const char *inner_tool_args;
+  /**
+   * Status of the inner call: `running` / `succeeded` / `failed`
+   */
+  const char *status;
+  /**
+   * Duration of the inner call in milliseconds
+   */
+  int64_t duration_ms;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * `true` if during the thinking phase
+   */
+  bool is_thinking;
+} lb_agent_tool_progress_payload_t;
+
+/**
+ * Payload of an `AgentToolFinished` conversation stream event
+ */
+typedef struct lb_agent_tool_finished_payload_t {
+  /**
+   * ID of the calling node
+   */
+  const char *node_id;
+  /**
+   * Matches the `tool_use_id` of `AgentToolStarted`
+   */
+  const char *tool_use_id;
+  /**
+   * Identifier of the Agent being called
+   */
+  const char *agent_tool_name;
+  /**
+   * `succeeded` / `failed`
+   */
+  const char *status;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Total duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Error description on failure
+   */
+  const char *error;
+  /**
+   * Call arguments as a JSON string
+   */
+  const char *tool_args;
+  /**
+   * Result of the delegated Agent, as a JSON string; empty when absent
+   */
+  const char *outputs_json;
+  /**
+   * Tool category
+   */
+  const char *tool_type;
+  /**
+   * Progress text; may be empty
+   */
+  const char *tips;
+  /**
+   * Short tags; may be empty
+   */
+  const char *const *tip_chips;
+  /**
+   * Number of tags in `tip_chips`
+   */
+  uintptr_t num_tip_chips;
+  /**
+   * `true` if during the thinking phase
+   */
+  bool is_thinking;
+} lb_agent_tool_finished_payload_t;
+
+/**
+ * One option of a [`CQuestion`]
+ */
+typedef struct lb_question_option_t {
+  /**
+   * Short UI label for the option
+   */
+  const char *label;
+  /**
+   * Option text
+   */
+  const char *description;
+} lb_question_option_t;
+
+/**
+ * One question the Agent needs you to answer
+ */
+typedef struct lb_question_t {
+  /**
+   * Question text
+   */
+  const char *question;
+  /**
+   * Options; empty means free-form answer
+   */
+  const struct lb_question_option_t *options;
+  /**
+   * Number of options
+   */
+  uintptr_t num_options;
+  /**
+   * Whether multiple options may be selected
+   */
+  bool multi_select;
+} lb_question_t;
+
+/**
+ * A single interaction requested while an Agent workflow is paused
+ */
+typedef struct lb_human_interaction_t {
+  /**
+   * Tool call that requested the interaction
+   */
+  const char *tool_call_id;
+  /**
+   * Stable key expected by the answers map when continuing
+   */
+  const char *interrupt_id;
+  /**
+   * Interaction type such as `ask_human` or `trade_password`
+   */
+  const char *interaction_type;
+  /**
+   * Human-readable tool name
+   */
+  const char *tool_name;
+  /**
+   * Questions and answer options presented to the user
+   */
+  const struct lb_question_t *questions;
+  /**
+   * Number of questions
+   */
+  uintptr_t num_questions;
+  /**
+   * Original tool arguments as a JSON string; empty when absent
+   */
+  const char *tool_args_json;
+} lb_human_interaction_t;
+
+/**
+ * Present when a conversation run is interrupted, waiting for
+ * `lb_agent_context_continue_conversation`
+ */
+typedef struct lb_interrupt_t {
+  /**
+   * ID of the node that triggered the interrupt
+   */
+  const char *node_id;
+  /**
+   * Tool call ID of this inquiry; used as the answer key when continuing
+   */
+  const char *tool_call_id;
+  /**
+   * Questions you need to answer
+   */
+  const struct lb_question_t *questions;
+  /**
+   * Number of questions
+   */
+  uintptr_t num_questions;
+  /**
+   * Full interaction descriptors used to render and answer the pause
+   */
+  const struct lb_human_interaction_t *interactions;
+  /**
+   * Number of interactions
+   */
+  uintptr_t num_interactions;
+  /**
+   * ID of the paused message
+   */
+  int64_t message_id;
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+} lb_interrupt_t;
+
+/**
+ * Present when a conversation run failed
+ */
+typedef struct lb_agent_error_t {
+  /**
+   * Error code
+   */
+  int32_t code;
+  /**
+   * Error message
+   */
+  const char *message;
+} lb_agent_error_t;
+
+/**
+ * Response for `lb_agent_context_conversation`,
+ * `lb_agent_context_continue_conversation`, and the final result of the
+ * streamed counterparts
+ */
+typedef struct lb_conversation_response_t {
+  /**
+   * Conversation identifier, used for follow-up questions and
+   * troubleshooting
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * Final run status
+   */
+  enum lb_conversation_status_t status;
+  /**
+   * Final answer text; valid when `status` is
+   * `ConversationStatusSucceeded`
+   */
+  const char *answer;
+  /**
+   * Sources referenced by the answer
+   */
+  const struct lb_reference_t *references;
+  /**
+   * Number of references
+   */
+  uintptr_t num_references;
+  /**
+   * Suggested follow-up questions ("you might also ask"); empty when absent
+   */
+  const char *const *further_questions;
+  /**
+   * Number of follow-up questions
+   */
+  uintptr_t num_further_questions;
+  /**
+   * Run duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Present only when `status` is `ConversationStatusInterrupted` (can be
+   * null)
+   */
+  const struct lb_interrupt_t *interrupt;
+  /**
+   * Present only when the run failed (can be null)
+   */
+  const struct lb_agent_error_t *error;
+} lb_conversation_response_t;
+
+/**
+ * Payload of a `QueryMasked` conversation stream event — sensitive content
+ * in the user query was masked before processing. Display `masked_query`
+ * instead of the original query.
+ */
+typedef struct lb_query_masked_payload_t {
+  /**
+   * The original user query
+   */
+  const char *raw_query;
+  /**
+   * The masked query
+   */
+  const char *masked_query;
+} lb_query_masked_payload_t;
+
+/**
+ * Payload of a `PlanChanged` conversation stream event — the Agent created
+ * or updated its task plan.
+ */
+typedef struct lb_plan_changed_payload_t {
+  /**
+   * ID of the planning node
+   */
+  const char *node_id;
+  /**
+   * Time of the change, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * The current plan content, as a JSON string; empty when absent
+   */
+  const char *outputs_json;
+  /**
+   * Identifies the planning tool
+   */
+  const char *tool_name;
+} lb_plan_changed_payload_t;
+
+/**
+ * Payload of a `ContextCompressStarted` conversation stream event, marking
+ * the start of a context-compression pass triggered by a long
+ * conversation. Unlike other events, `started_at` here is an RFC 3339
+ * string.
+ */
+typedef struct lb_context_compress_started_payload_t {
+  /**
+   * Start time, RFC 3339
+   */
+  const char *started_at;
+  /**
+   * Compression input summary, as a JSON string; empty when absent
+   */
+  const char *inputs_json;
+} lb_context_compress_started_payload_t;
+
+/**
+ * Payload of a `ContextCompressFinished` conversation stream event. Unlike
+ * other events, `created_at` here is an RFC 3339 string.
+ */
+typedef struct lb_context_compress_finished_payload_t {
+  /**
+   * Finish time, RFC 3339
+   */
+  const char *created_at;
+  /**
+   * Compression input summary, as a JSON string; empty when absent
+   */
+  const char *inputs_json;
+  /**
+   * Compression result summary, as a JSON string; empty when absent
+   */
+  const char *outputs_json;
+} lb_context_compress_finished_payload_t;
+
+/**
+ * Payload of a `ChatFinished` conversation stream event, observed once all
+ * `Message` events for this round have been sent, shortly before
+ * `WorkflowFinished`
+ */
+typedef struct lb_chat_finished_payload_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * Empty string in every run observed so far
+   */
+  const char *error;
+  /**
+   * Empty string in every run observed so far
+   */
+  const char *error_message;
+} lb_chat_finished_payload_t;
+
+/**
+ * Payload of a `ChatTitleUpdated` conversation stream event — the server
+ * auto-generates a short title for the conversation as a UI convenience.
+ * Can arrive before *or* after `WorkflowFinished`; not tied to the run's
+ * outcome.
+ */
+typedef struct lb_chat_title_updated_payload_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Where the title came from, e.g. `"ai_generated"`
+   */
+  const char *source;
+  /**
+   * The new (possibly truncated) title
+   */
+  const char *title;
+  /**
+   * Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_chat_title_updated_payload_t;
+
+/**
+ * One event observed while streaming `lb_agent_context_conversation_streamed`
+ * or `lb_agent_context_continue_conversation_streamed`.
+ *
+ * This is a tagged union: `kind` tells you which one field below is
+ * non-null; all others are always null. When `kind` is `Ping` (a
+ * heartbeat with no payload), every field below is null.
+ */
+typedef struct lb_conversation_stream_event_t {
+  /**
+   * Discriminant, tells you which field below is populated
+   */
+  enum lb_conversation_stream_event_type_t kind;
+  /**
+   * Non-null when `kind` is `ChatStarted`
+   */
+  const struct lb_chat_started_payload_t *chat_started;
+  /**
+   * Non-null when `kind` is `WorkflowStarted`, observed right after
+   * `ChatStarted` on every run seen so far
+   */
+  const struct lb_workflow_started_payload_t *workflow_started;
+  /**
+   * Non-null when `kind` is `Message`
+   */
+  const struct lb_message_payload_t *message;
+  /**
+   * Non-null when `kind` is `ThinkingStarted`, the Agent entering the
+   * reasoning phase
+   */
+  const struct lb_thinking_started_payload_t *thinking_started;
+  /**
+   * Non-null when `kind` is `ThinkingFinished`, the reasoning phase
+   * ending
+   */
+  const struct lb_thinking_finished_payload_t *thinking_finished;
+  /**
+   * Non-null when `kind` is `NodeToolUseStarted`, an ordinary tool call
+   * starting
+   */
+  const struct lb_node_tool_use_started_payload_t *node_tool_use_started;
+  /**
+   * Non-null when `kind` is `NodeToolUseFinished`, an ordinary tool call
+   * ending
+   */
+  const struct lb_node_tool_use_finished_payload_t *node_tool_use_finished;
+  /**
+   * Non-null when `kind` is `SubagentStarted`, the Agent spawning a
+   * subagent to work on a sub-task
+   */
+  const struct lb_subagent_started_payload_t *subagent_started;
+  /**
+   * Non-null when `kind` is `SubagentProgress`, the subagent calling one
+   * of its own tools
+   */
+  const struct lb_subagent_progress_payload_t *subagent_progress;
+  /**
+   * Non-null when `kind` is `SubagentFinished`, the subagent finishing
+   * its sub-task
+   */
+  const struct lb_subagent_finished_payload_t *subagent_finished;
+  /**
+   * Non-null when `kind` is `AgentToolStarted`, the Agent delegating to
+   * another Agent as a tool
+   */
+  const struct lb_agent_tool_started_payload_t *agent_tool_started;
+  /**
+   * Non-null when `kind` is `AgentToolProgress`, the delegated Agent
+   * calling one of its own tools
+   */
+  const struct lb_agent_tool_progress_payload_t *agent_tool_progress;
+  /**
+   * Non-null when `kind` is `AgentToolFinished`, the delegated Agent's
+   * run finishing
+   */
+  const struct lb_agent_tool_finished_payload_t *agent_tool_finished;
+  /**
+   * Non-null when `kind` is `HumanInteractionRequired`, carrying the
+   * run's outcome for an interrupted run. Unlike `WorkflowFinished`, this
+   * is emitted instead of (never alongside) `WorkflowFinished` for the
+   * same run
+   */
+  const struct lb_conversation_response_t *human_interaction_required;
+  /**
+   * Non-null when `kind` is `QueryMasked`, sensitive content in the user
+   * query having been masked before processing
+   */
+  const struct lb_query_masked_payload_t *query_masked;
+  /**
+   * Non-null when `kind` is `PlanChanged`, the Agent creating or
+   * updating its task plan
+   */
+  const struct lb_plan_changed_payload_t *plan_changed;
+  /**
+   * Non-null when `kind` is `ContextCompressStarted`, a
+   * context-compression pass starting
+   */
+  const struct lb_context_compress_started_payload_t *context_compress_started;
+  /**
+   * Non-null when `kind` is `ContextCompressFinished`, a
+   * context-compression pass finishing
+   */
+  const struct lb_context_compress_finished_payload_t *context_compress_finished;
+  /**
+   * Non-null when `kind` is `ChatFinished`, observed once all `Message`
+   * events for this round have been sent
+   */
+  const struct lb_chat_finished_payload_t *chat_finished;
+  /**
+   * Non-null when `kind` is `WorkflowFinished`, carrying the run's
+   * outcome — not necessarily the last event of the stream, since the
+   * server may still emit a few more housekeeping events before actually
+   * closing the connection
+   */
+  const struct lb_conversation_response_t *workflow_finished;
+  /**
+   * Non-null when `kind` is `ChatTitleUpdated`, the server auto-generating
+   * a short title for the conversation
+   */
+  const struct lb_chat_title_updated_payload_t *chat_title_updated;
+  /**
+   * Non-null when `kind` is `Other`; the SSE envelope's `event` field (the
+   * event type name)
+   */
+  const char *other_event;
+  /**
+   * Non-null when `kind` is `Other`; raw JSON of an event type not
+   * recognized by this SDK version
+   */
+  const char *other_json;
+} lb_conversation_stream_event_t;
+
+/**
+ * Called once for every event observed while streaming a conversation. See
+ * `lb_agent_context_conversation_streamed`/
+ * `lb_agent_context_continue_conversation_streamed`.
+ *
+ * Unlike the `lb_xxx_context_set_on_xxx` push callbacks, this callback is
+ * scoped to a single streamed call — it's supplied directly as an argument
+ * and is never stored on the context.
+ */
+typedef void (*lb_conversation_event_callback_t)(const struct lb_agent_context_t*,
+                                                 const struct lb_conversation_stream_event_t*,
+                                                 void*);
+
+typedef void (*lb_free_userdata_func_t)(void*);
+
+/**
+ * Trigger value of a price alert (exactly one field is populated).
+ */
+typedef struct CAlertValueMap {
+  /**
+   * Absolute price threshold as a decimal string (empty string if not set).
+   */
+  const char *price;
+  /**
+   * Percentage-change threshold (NULL if not set).
+   */
+  const double *chg;
+} CAlertValueMap;
+
+/**
  * A single alert indicator configuration for a symbol.
  */
 typedef struct lb_alert_item_t {
@@ -1730,10 +3254,574 @@ typedef struct lb_alert_item_t {
    */
   uintptr_t num_state;
   /**
-   * JSON-serialized map of additional indicator parameter values.
+   * Trigger value of the alert.
    */
-  const char *value_map;
+  struct CAlertValueMap value_map;
 } lb_alert_item_t;
+
+/**
+ * Options for the fund list request.
+ */
+typedef struct lb_get_funds_options_t {
+  /**
+   * Server-defined filter object as a JSON string (can be null)
+   */
+  const char *filter;
+  /**
+   * Quick-filter ids (can be null)
+   */
+  const int64_t *quick_ids;
+  /**
+   * Number of quick-filter ids
+   */
+  uintptr_t num_quick_ids;
+  /**
+   * Earning-rate time intervals (can be null)
+   */
+  const char *const *time_interval;
+  /**
+   * Number of time intervals
+   */
+  uintptr_t num_time_interval;
+} lb_get_funds_options_t;
+
+/**
+ * Options for the fund analysis / trend / comparison request.
+ */
+typedef struct lb_get_fund_analysis_options_t {
+  /**
+   * Analysis period (can be null)
+   */
+  const int32_t *period;
+} lb_get_fund_analysis_options_t;
+
+/**
+ * Paging options (page / size).
+ */
+typedef struct lb_fund_page_options_t {
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} lb_fund_page_options_t;
+
+/**
+ * Net-value range options (relative months / years before now).
+ */
+typedef struct lb_fund_nav_range_options_t {
+  /**
+   * Number of months before now (can be null)
+   */
+  const int32_t *month_before;
+  /**
+   * Number of years before now (can be null)
+   */
+  const int32_t *year_before;
+} lb_fund_nav_range_options_t;
+
+/**
+ * Options for the fund holdings request.
+ */
+typedef struct lb_get_fund_holdings_options_t {
+  /**
+   * Scene (can be null)
+   */
+  const int32_t *scene;
+} lb_get_fund_holdings_options_t;
+
+/**
+ * Options for the fund stock-holdings (reverse) request.
+ */
+typedef struct lb_get_fund_stock_holdings_options_t {
+  /**
+   * Maximum number of stocks to return (can be null)
+   */
+  const int32_t *limit;
+} lb_get_fund_stock_holdings_options_t;
+
+/**
+ * Options for the fund positions overview request.
+ */
+typedef struct lb_fund_positions_options_t {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Account id (can be null)
+   */
+  const int64_t *aaid;
+} lb_fund_positions_options_t;
+
+/**
+ * Options for a single fund position detail request.
+ */
+typedef struct lb_get_fund_position_options_t {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Account id (can be null)
+   */
+  const int64_t *aaid;
+  /**
+   * Range start (can be null)
+   */
+  const char *start;
+  /**
+   * Range end (can be null)
+   */
+  const char *end;
+} lb_get_fund_position_options_t;
+
+/**
+ * Options for a single fund position cumulative-profit request.
+ */
+typedef struct lb_get_fund_position_profits_options_t {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Account id (can be null)
+   */
+  const int64_t *aaid;
+  /**
+   * Range start (can be null)
+   */
+  const char *start;
+  /**
+   * Range end (can be null)
+   */
+  const char *end;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} lb_get_fund_position_profits_options_t;
+
+/**
+ * Options for a single fund position dividend request.
+ */
+typedef struct lb_get_fund_position_dividends_options_t {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Account id (can be null)
+   */
+  const int64_t *aaid;
+  /**
+   * Currency (can be null)
+   */
+  const char *currency;
+  /**
+   * Range start (unix seconds) (can be null)
+   */
+  const int64_t *start;
+  /**
+   * Range end (unix seconds) (can be null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} lb_get_fund_position_dividends_options_t;
+
+/**
+ * Options for the fund orders list request.
+ */
+typedef struct lb_get_fund_orders_options_t {
+  /**
+   * Filter by fund counter ids (can be null)
+   */
+  const char *const *counter_ids;
+  /**
+   * Number of fund counter ids
+   */
+  uintptr_t num_counter_ids;
+  /**
+   * Filter by actions (comma-separated) (can be null)
+   */
+  const char *actions;
+  /**
+   * Filter by states (comma-separated) (can be null)
+   */
+  const char *states;
+  /**
+   * Filter by currency (can be null)
+   */
+  const char *currency;
+  /**
+   * Range start (unix seconds) (can be null)
+   */
+  const int64_t *start;
+  /**
+   * Range end (unix seconds) (can be null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} lb_get_fund_orders_options_t;
+
+/**
+ * Options for the fund transactions (cash-flow) list request.
+ */
+typedef struct lb_get_fund_transactions_options_t {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Business type (can be null)
+   */
+  const char *business_type;
+  /**
+   * Category (can be null)
+   */
+  const char *category;
+  /**
+   * Currencies (comma-separated) (can be null)
+   */
+  const char *currencies;
+  /**
+   * Range start (unix seconds) (can be null)
+   */
+  const int64_t *start;
+  /**
+   * Range end (unix seconds) (can be null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} lb_get_fund_transactions_options_t;
+
+/**
+ * Options for validating a fund order.
+ */
+typedef struct lb_validate_fund_order_options_t {
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Amount (for amount-based orders) (can be null)
+   */
+  const char *amount;
+  /**
+   * Units (for unit-based orders) (can be null)
+   */
+  const char *units;
+  /**
+   * Dividend option (can be null)
+   */
+  const int32_t *dividend_option;
+  /**
+   * Fund source (can be null)
+   */
+  const int32_t *fund_source;
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+} lb_validate_fund_order_options_t;
+
+/**
+ * Options for submitting a fund order.
+ */
+typedef struct lb_submit_fund_order_options_t {
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Amount (for amount-based orders) (can be null)
+   */
+  const char *amount;
+  /**
+   * Units (for unit-based orders) (can be null)
+   */
+  const char *units;
+  /**
+   * Dividend option (can be null)
+   */
+  const int32_t *dividend_option;
+  /**
+   * Fee (can be null)
+   */
+  const char *fee;
+  /**
+   * Whether to sell all (can be null)
+   */
+  const bool *is_sell_all;
+  /**
+   * Remark (can be null)
+   */
+  const char *remark;
+  /**
+   * Trade method (can be null)
+   */
+  const int32_t *trade_method;
+} lb_submit_fund_order_options_t;
+
+/**
+ * Grid trading rule — parameters for submit / replace.
+ */
+typedef struct lb_grid_trade_rule_t {
+  /**
+   * Base price the grid is anchored to (can be null)
+   */
+  const struct lb_decimal_t *submitted_base_price;
+  /**
+   * Upper price bound (can be null)
+   */
+  const struct lb_decimal_t *upper_limit_price;
+  /**
+   * Lower price bound (can be null)
+   */
+  const struct lb_decimal_t *lower_limit_price;
+  /**
+   * Trigger price type (only `1` / `2` allowed) (can be null)
+   */
+  const int32_t *trigger_price_type;
+  /**
+   * Upward trigger spread (absolute) (can be null)
+   */
+  const struct lb_decimal_t *trigger_spread_up;
+  /**
+   * Downward trigger spread (absolute) (can be null)
+   */
+  const struct lb_decimal_t *trigger_spread_down;
+  /**
+   * Upward trigger percent (can be null)
+   */
+  const struct lb_decimal_t *trigger_percent_up;
+  /**
+   * Downward trigger percent (can be null)
+   */
+  const struct lb_decimal_t *trigger_percent_down;
+  /**
+   * Whether a single grid level may trigger multiple times (can be null)
+   */
+  const bool *multiple_trigger;
+  /**
+   * Time in force (`0` = Day, `1` = GTC, `6` = GTD) (can be null)
+   */
+  const int32_t *time_in_force;
+  /**
+   * Quantity handled when the upper bound is reached (can be null)
+   */
+  const struct lb_decimal_t *upper_limit_quantity;
+  /**
+   * Quantity handled when the lower bound is reached (can be null)
+   */
+  const struct lb_decimal_t *lower_limit_quantity;
+  /**
+   * Expiry time (unix seconds), used with GTD (can be null)
+   */
+  const int64_t *expire_time;
+  /**
+   * Action when the upper bound is reached (only `1` / `2` allowed) (can be
+   * null)
+   */
+  const int32_t *upper_limit_event;
+  /**
+   * Action when the lower bound is reached (only `1` / `2` allowed) (can be
+   * null)
+   */
+  const int32_t *lower_limit_event;
+  /**
+   * Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`) (can
+   * be null)
+   */
+  const int32_t *trigger_sell_depth;
+  /**
+   * Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`) (can
+   * be null)
+   */
+  const int32_t *trigger_buy_depth;
+  /**
+   * Quantity per trigger (can be null)
+   */
+  const struct lb_decimal_t *trigger_quantity;
+  /**
+   * Whether short selling is allowed (can be null)
+   */
+  const bool *support_shortsell;
+  /**
+   * Regular trading hours flag (`0` / `1` / `2`) (can be null)
+   */
+  const int32_t *rth;
+  /**
+   * Sell-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) (can be
+   * null)
+   */
+  const char *grid_order_type_up;
+  /**
+   * Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) (can be
+   * null)
+   */
+  const char *grid_order_type_down;
+} lb_grid_trade_rule_t;
+
+/**
+ * Options for submit grid trading order request
+ */
+typedef struct lb_submit_grid_order_options_t {
+  /**
+   * Security symbol (e.g. `700.HK`)
+   */
+  const char *symbol;
+  /**
+   * Settlement currency
+   */
+  const char *settlement_currency;
+  /**
+   * Grid trading rule
+   */
+  struct lb_grid_trade_rule_t grid_trading_rule;
+} lb_submit_grid_order_options_t;
+
+/**
+ * Options for replace grid trading order request
+ */
+typedef struct lb_replace_grid_order_options_t {
+  /**
+   * Grid master order ID
+   */
+  const char *order_id;
+  /**
+   * Grid trading rule
+   */
+  struct lb_grid_trade_rule_t grid_trading_rule;
+} lb_replace_grid_order_options_t;
+
+/**
+ * Options for get grid trading orders (list) request
+ */
+typedef struct lb_get_grid_orders_options_t {
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+  /**
+   * Market (can be null)
+   */
+  const enum lb_market_t *market;
+  /**
+   * Comma-joined status filter (e.g. `Performing,Suspended`) (can be null)
+   */
+  const char *status;
+  /**
+   * Security symbol filter (e.g. `700.HK`) (can be null)
+   */
+  const char *symbol;
+  /**
+   * Sort field (can be null)
+   */
+  const char *sort_by;
+  /**
+   * Sort order (can be null)
+   */
+  const char *sort_order;
+} lb_get_grid_orders_options_t;
+
+/**
+ * Options for query grid trading orders by IDs request
+ */
+typedef struct lb_get_grid_orders_by_ids_options_t {
+  /**
+   * Grid master order IDs
+   */
+  const char *const *order_ids;
+  /**
+   * Number of order IDs
+   */
+  uintptr_t num_order_ids;
+} lb_get_grid_orders_by_ids_options_t;
+
+/**
+ * Options for get grid trading order detail request
+ */
+typedef struct lb_get_grid_order_detail_options_t {
+  /**
+   * Grid master order ID
+   */
+  const char *order_id;
+  /**
+   * History cursor for paging through the trigger history (can be null)
+   */
+  const char *history_id;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+} lb_get_grid_order_detail_options_t;
+
+/**
+ * Options for get grid trading trigger history request
+ */
+typedef struct lb_get_grid_trigger_history_options_t {
+  /**
+   * Grid master order ID
+   */
+  const char *grid_order_id;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+} lb_get_grid_trigger_history_options_t;
 
 /**
  * HTTP Header
@@ -1742,8 +3830,6 @@ typedef struct lb_http_header_t {
   const char *name;
   const char *value;
 } lb_http_header_t;
-
-typedef void (*lb_free_userdata_func_t)(void*);
 
 /**
  * Quote message
@@ -2116,6 +4202,70 @@ typedef struct lb_update_watchlist_group_t {
 } lb_update_watchlist_group_t;
 
 /**
+ * A leg of a multi-leg combination order
+ */
+typedef struct CMultiLegOrderLeg {
+  /**
+   * Option symbol, in `ticker.region` format
+   */
+  const char *symbol;
+  /**
+   * Order side
+   */
+  enum lb_order_side_t side;
+  /**
+   * Position direction
+   */
+  enum CMultiLegPosition position;
+  /**
+   * Leg ratio quantity
+   */
+  const struct lb_decimal_t *ratio_quantity;
+  /**
+   * Strike price (maybe null)
+   */
+  const struct lb_decimal_t *strike_price;
+  /**
+   * Option expiry date (maybe null)
+   */
+  const struct lb_date_t *expire_date;
+  /**
+   * Contract type
+   */
+  enum CContractDirection contract_direction;
+} CMultiLegOrderLeg;
+
+/**
+ * Multi-leg strategy information
+ */
+typedef struct CMultiLegInfo {
+  /**
+   * Multi-leg strategy
+   */
+  enum CMultiLegStrategy strategy;
+  /**
+   * Strategy name
+   */
+  const char *strategy_name;
+  /**
+   * Multi-leg combination ID
+   */
+  const char *multileg_id;
+  /**
+   * Multi-leg combination code
+   */
+  const char *code;
+  /**
+   * Legs of the combination order
+   */
+  const struct CMultiLegOrderLeg *legs;
+  /**
+   * Number of legs
+   */
+  uintptr_t num_legs;
+} CMultiLegInfo;
+
+/**
  * Order changed message
  */
 typedef struct lb_push_order_changed_t {
@@ -2219,10 +4369,89 @@ typedef struct lb_push_order_changed_t {
    * Remark message
    */
   const char *remark;
+  /**
+   * Whether multi_leg is valid (true only for multi-leg option combination
+   * orders)
+   */
+  bool has_multi_leg;
+  /**
+   * Multi-leg strategy information (only valid when has_multi_leg is true)
+   */
+  struct CMultiLegInfo multi_leg;
 } lb_push_order_changed_t;
 
 typedef void (*lb_order_changed_callback_t)(const struct lb_trade_context_t*,
                                             const struct lb_push_order_changed_t*,
+                                            void*);
+
+/**
+ * Grid trading master-order changed message.
+ */
+typedef struct lb_push_grid_order_changed_t {
+  /**
+   * Grid master order ID
+   */
+  const char *order_id;
+  /**
+   * Order status
+   */
+  const char *status;
+  /**
+   * Security symbol (e.g. `700.HK`)
+   */
+  const char *symbol;
+  /**
+   * Suspend reason, if any
+   */
+  const char *suspend_reason;
+  /**
+   * Submitted base price
+   */
+  const char *submitted_base_price;
+  /**
+   * Current base price
+   */
+  const char *current_base_price;
+  /**
+   * Upper price bound
+   */
+  const char *upper_limit_price;
+  /**
+   * Lower price bound
+   */
+  const char *lower_limit_price;
+  /**
+   * Trigger price type
+   */
+  int32_t trigger_price_type;
+  /**
+   * Quantity per trigger
+   */
+  const char *trigger_quantity;
+  /**
+   * Settlement currency
+   */
+  const char *settlement_currency;
+  /**
+   * Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+   */
+  int32_t time_in_force;
+  /**
+   * Regular trading hours flag
+   */
+  int32_t rth;
+  /**
+   * Sell-side order type when depth is 0
+   */
+  const char *grid_order_type_up;
+  /**
+   * Buy-side order type when depth is 0
+   */
+  const char *grid_order_type_down;
+} lb_push_grid_order_changed_t;
+
+typedef void (*COnGridOrderChangedCallback)(const struct lb_trade_context_t*,
+                                            const struct lb_push_grid_order_changed_t*,
                                             void*);
 
 /**
@@ -2256,6 +4485,32 @@ typedef struct lb_get_today_executions_options_t {
    */
   const char *order_id;
 } lb_get_today_executions_options_t;
+
+/**
+ * Options for get all executions request
+ */
+typedef struct lb_get_all_executions_options_t {
+  /**
+   * Security code (can be null)
+   */
+  const char *symbol;
+  /**
+   * Order id (can be null)
+   */
+  const char *order_id;
+  /**
+   * Start time (can be null)
+   */
+  const int64_t *start_at;
+  /**
+   * End time (can be null)
+   */
+  const int64_t *end_at;
+  /**
+   * Page number (can be null)
+   */
+  const uint64_t *page;
+} lb_get_all_executions_options_t;
 
 /**
  * Options for get history orders request
@@ -2319,7 +4574,87 @@ typedef struct lb_get_today_orders_options_t {
    * Order id (can be null)
    */
   const char *order_id;
+  /**
+   * Filter by attached order (can be null)
+   */
+  const bool *is_attached;
 } lb_get_today_orders_options_t;
+
+/**
+ * Options for replace attached order params
+ */
+typedef struct CReplaceAttachedParams {
+  /**
+   * Attached order type
+   */
+  enum CAttachedOrderType attached_order_type;
+  /**
+   * Take-profit trigger price (can be null)
+   */
+  const struct lb_decimal_t *profit_taker_price;
+  /**
+   * Stop-loss trigger price (can be null)
+   */
+  const struct lb_decimal_t *stop_loss_price;
+  /**
+   * Time in force type (can be null)
+   */
+  const enum lb_time_in_force_type_t *time_in_force;
+  /**
+   * Expiry time unix timestamp (can be null)
+   */
+  const int64_t *expire_time;
+  /**
+   * Order type to submit after trigger (can be null)
+   */
+  const enum lb_order_type_t *activate_order_type;
+  /**
+   * Take-profit limit price (can be null)
+   */
+  const struct lb_decimal_t *profit_taker_submit_price;
+  /**
+   * Stop-loss limit price (can be null)
+   */
+  const struct lb_decimal_t *stop_loss_submit_price;
+  /**
+   * RTH setting for activated order (can be null)
+   */
+  const enum lb_outside_rth_t *activate_rth;
+  /**
+   * Take-profit order ID (can be null)
+   */
+  const int64_t *profit_taker_id;
+  /**
+   * Stop-loss order ID (can be null)
+   */
+  const int64_t *stop_loss_id;
+  /**
+   * Cancel all attached orders flag (can be null)
+   */
+  const bool *cancel_all_attached;
+  /**
+   * Main order ID (can be null)
+   */
+  const int64_t *main_id;
+  /**
+   * Quantity (can be null)
+   */
+  const struct lb_decimal_t *quantity;
+  /**
+   * Market price (can be null)
+   */
+  const struct lb_decimal_t *market_price;
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *profit_taker_depth_level;
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *stop_loss_depth_level;
+} CReplaceAttachedParams;
 
 /**
  * Options for replace order request
@@ -2369,7 +4704,74 @@ typedef struct lb_replace_order_options_t {
    * Remark (can be null)
    */
   const char *remark;
+  /**
+   * Attached order parameters (can be null)
+   */
+  const struct CReplaceAttachedParams *attached_params;
+  /**
+   * New time-condition submit time, Unix timestamp in seconds; must be
+   * later than now and no more than 90 days ahead (can be null to keep the
+   * current time condition)
+   */
+  const int64_t *delayed_until;
+  /**
+   * Clear the time condition, turning the order into a regular order
+   * (takes precedence over `delayed_until`)
+   */
+  bool clear_delayed_until;
 } lb_replace_order_options_t;
+
+/**
+ * Options for submit attached order params
+ */
+typedef struct CSubmitAttachedParams {
+  /**
+   * Attached order type
+   */
+  enum CAttachedOrderType attached_order_type;
+  /**
+   * Take-profit trigger price (can be null)
+   */
+  const struct lb_decimal_t *profit_taker_price;
+  /**
+   * Stop-loss trigger price (can be null)
+   */
+  const struct lb_decimal_t *stop_loss_price;
+  /**
+   * Time in force type (can be null)
+   */
+  const enum lb_time_in_force_type_t *time_in_force;
+  /**
+   * Expiry time unix timestamp (can be null)
+   */
+  const int64_t *expire_time;
+  /**
+   * Order type to submit after trigger (can be null)
+   */
+  const enum lb_order_type_t *activate_order_type;
+  /**
+   * Take-profit limit price (can be null)
+   */
+  const struct lb_decimal_t *profit_taker_submit_price;
+  /**
+   * Stop-loss limit price (can be null)
+   */
+  const struct lb_decimal_t *stop_loss_submit_price;
+  /**
+   * RTH setting for activated order (can be null)
+   */
+  const enum lb_outside_rth_t *activate_rth;
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *profit_taker_depth_level;
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *stop_loss_depth_level;
+} CSubmitAttachedParams;
 
 /**
  * Options for submit order request
@@ -2440,7 +4842,91 @@ typedef struct lb_submit_order_options_t {
    * Remark (Maximum 64 characters) (can be null)
    */
   const char *remark;
+  /**
+   * Idempotent request ID for preventing duplicate orders (can be null).
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  const char *client_request_id;
+  /**
+   * Attached order parameters (can be null)
+   */
+  const struct CSubmitAttachedParams *attached_params;
+  /**
+   * Time-condition submit time, Unix timestamp in seconds (can be null).
+   * The order is held in `DelayedNotReported` status and only submitted at
+   * this time, which must be later than now and no more than 90 days ahead.
+   */
+  const int64_t *delayed_until;
 } lb_submit_order_options_t;
+
+/**
+ * A leg of a multi-leg combination order to submit
+ */
+typedef struct CSubmitMultiLegOrderLeg {
+  /**
+   * Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
+   */
+  const char *symbol;
+  /**
+   * Leg ratio quantity — must be a positive number.  The direction of each
+   * leg is implied by the strategy together with the order side, not by the
+   * sign of this value; a negative or zero ratio is rejected by the server
+   * with `602001`.
+   */
+  const struct lb_decimal_t *ratio_quantity;
+} CSubmitMultiLegOrderLeg;
+
+/**
+ * Options for submit multi-leg order request
+ */
+typedef struct CSubmitMultiLegOrderOptions {
+  /**
+   * Order side
+   */
+  enum lb_order_side_t side;
+  /**
+   * Order type
+   */
+  enum lb_order_type_t order_type;
+  /**
+   * Submitted quantity (number of combinations)
+   */
+  const struct lb_decimal_t *submitted_quantity;
+  /**
+   * Multi-leg strategy
+   */
+  enum CMultiLegStrategy strategy;
+  /**
+   * Legs of the combination order
+   */
+  const struct CSubmitMultiLegOrderLeg *legs;
+  /**
+   * Number of legs
+   */
+  uintptr_t num_legs;
+  /**
+   * Submitted price (required for limit order types such as `LO`) (can be
+   * null)
+   */
+  const struct lb_decimal_t *submitted_price;
+  /**
+   * Remark (Maximum 255 characters) (can be null)
+   */
+  const char *remark;
+  /**
+   * Idempotent request ID for preventing duplicate orders (can be null).
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  const char *client_request_id;
+  /**
+   * Time-condition submit time, Unix timestamp in seconds (can be null);
+   * must be later than now and no more than 90 days ahead. Only `LO` / `MO`
+   * support time conditions.
+   */
+  const int64_t *delayed_until;
+} CSubmitMultiLegOrderOptions;
 
 /**
  * Options for get cash flow request
@@ -3018,26 +5504,40 @@ typedef struct lb_intraday_line_t {
 } lb_intraday_line_t;
 
 /**
- * Strike price info
+ * A single option contract of an option chain
  */
-typedef struct lb_strike_price_info_t {
+typedef struct lb_option_chain_contract_t {
+  /**
+   * Option contract code, in `ticker.region` format
+   */
+  const char *symbol;
+  /**
+   * Expiry date, in US Eastern time
+   */
+  struct lb_date_t expiry_date;
   /**
    * Strike price
    */
-  const struct lb_decimal_t *price;
+  const struct lb_decimal_t *strike_price;
   /**
-   * Security code of call option
+   * Contract direction
    */
-  const char *call_symbol;
+  enum lb_option_direction_t direction;
   /**
-   * Security code of put option
+   * Special expiration cycle of the contract
    */
-  const char *put_symbol;
+  enum lb_option_expiry_cycle_type_t option_type;
   /**
-   * Is standard
+   * Whether the contract is a legacy contract left over from a corporate
+   * action
    */
-  bool standard;
-} lb_strike_price_info_t;
+  enum lb_option_standard_attr_t standard_attr;
+  /**
+   * Number of days remaining until the option expires, `0` on the expiry
+   * day and negative once expired
+   */
+  int32_t days_to_expiry;
+} lb_option_chain_contract_t;
 
 /**
  * Issuer info
@@ -3239,7 +5739,124 @@ typedef struct lb_execution_t {
    * Executed price
    */
   const struct lb_decimal_t *price;
+  /**
+   * Order side. `Unknown` when the response omits it (Longbridge US
+   * `/v1/trade/execution/history`)
+   */
+  enum lb_order_side_t side;
 } lb_execution_t;
+
+/**
+ * All executions response
+ */
+typedef struct lb_all_executions_response_t {
+  /**
+   * Has more records
+   */
+  bool has_more;
+  /**
+   * Executions
+   */
+  const struct lb_execution_t *trades;
+  /**
+   * Number of executions
+   */
+  uintptr_t num_trades;
+} lb_all_executions_response_t;
+
+/**
+ * Attached order detail
+ */
+typedef struct CAttachedOrderDetail {
+  /**
+   * Attached order ID
+   */
+  const char *order_id;
+  /**
+   * Attached order type
+   */
+  enum CAttachedOrderType attached_type_display;
+  /**
+   * Trigger price (maybe null)
+   */
+  const struct lb_decimal_t *trigger_price;
+  /**
+   * Quantity
+   */
+  const struct lb_decimal_t *quantity;
+  /**
+   * Executed quantity
+   */
+  const struct lb_decimal_t *executed_qty;
+  /**
+   * Order status
+   */
+  enum lb_order_status_t status;
+  /**
+   * Last updated time (unix timestamp)
+   */
+  int64_t updated_at;
+  /**
+   * Whether withdrawn
+   */
+  bool withdrawn;
+  /**
+   * GTD date (maybe null)
+   */
+  const struct lb_date_t *gtd;
+  /**
+   * Time in force type
+   */
+  enum lb_time_in_force_type_t time_in_force;
+  /**
+   * Counter order ID
+   */
+  const char *counter_id;
+  /**
+   * Trigger status (maybe null)
+   */
+  const enum lb_trigger_status_t *trigger_status;
+  /**
+   * Executed amount
+   */
+  const struct lb_decimal_t *executed_amount;
+  /**
+   * Tag
+   */
+  enum lb_order_tag_t tag;
+  /**
+   * Submitted time (unix timestamp)
+   */
+  int64_t submitted_at;
+  /**
+   * Executed price
+   */
+  const struct lb_decimal_t *executed_price;
+  /**
+   * Force RTH only (maybe null)
+   */
+  const enum lb_outside_rth_t *force_only_rth;
+  /**
+   * Whether reviewed
+   */
+  bool reviewed;
+  /**
+   * Order type to submit after trigger
+   */
+  enum lb_order_type_t activate_order_type;
+  /**
+   * RTH setting for activated order (maybe null)
+   */
+  const enum lb_outside_rth_t *activate_rth;
+  /**
+   * Submit price (maybe null)
+   */
+  const struct lb_decimal_t *submit_price;
+  /**
+   * Bid/ask depth level of the limit order submitted price (maybe null)
+   */
+  const int32_t *limit_depth_level;
+} CAttachedOrderDetail;
 
 /**
  * Order
@@ -3361,6 +5978,27 @@ typedef struct lb_order_t {
    * Remark
    */
   const char *remark;
+  /**
+   * Attached orders
+   */
+  const struct CAttachedOrderDetail *attached_orders;
+  /**
+   * Number of attached orders
+   */
+  uintptr_t num_attached_orders;
+  /**
+   * Whether multi_leg is valid (true only for multi-leg option combination
+   * orders)
+   */
+  bool has_multi_leg;
+  /**
+   * Multi-leg strategy information (only valid when has_multi_leg is true)
+   */
+  struct CMultiLegInfo multi_leg;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
 } lb_order_t;
 
 /**
@@ -3508,9 +6146,9 @@ typedef struct lb_cash_flow_t {
  */
 typedef struct lb_fund_position_t {
   /**
-   * Fund ISIN code
+   * Fund counter id (the ISIN is the last `/`-separated segment)
    */
-  const char *symbol;
+  const char *counter_id;
   /**
    * Current equity
    */
@@ -3973,10 +6611,2525 @@ typedef struct lb_order_detail_t {
    */
   uintptr_t num_history;
   /**
-   * Order charges
+   * Whether charge_detail is valid (false when the order has no charge info)
+   */
+  bool has_charge_detail;
+  /**
+   * Order charges (only valid when has_charge_detail is true)
    */
   struct lb_order_charge_detail_t charge_detail;
+  /**
+   * Attached orders
+   */
+  const struct CAttachedOrderDetail *attached_orders;
+  /**
+   * Number of attached orders
+   */
+  uintptr_t num_attached_orders;
+  /**
+   * Whether multi_leg is valid (true only for multi-leg option combination
+   * orders)
+   */
+  bool has_multi_leg;
+  /**
+   * Multi-leg strategy information (only valid when has_multi_leg is true)
+   */
+  struct CMultiLegInfo multi_leg;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
 } lb_order_detail_t;
+
+/**
+ * Statement item
+ */
+typedef struct lb_statement_item_t {
+  /**
+   * Statement date (integer, e.g. 20250301)
+   */
+  int32_t dt;
+  /**
+   * File key
+   */
+  const char *file_key;
+} lb_statement_item_t;
+
+/**
+ * Response for submit grid trading order request
+ */
+typedef struct lb_submit_grid_order_response_t {
+  /**
+   * Grid master order id
+   */
+  const char *order_id;
+} lb_submit_grid_order_response_t;
+
+/**
+ * A grid trading order (element of the list / by-ids responses).
+ */
+typedef struct lb_grid_order_t {
+  /**
+   * Grid master order ID
+   */
+  const char *order_id;
+  /**
+   * Security symbol (e.g. `700.HK`)
+   */
+  const char *symbol;
+  /**
+   * Stock name
+   */
+  const char *stock_name;
+  /**
+   * Market
+   */
+  const char *market;
+  /**
+   * Order status
+   */
+  const char *status;
+  /**
+   * Grid running status
+   */
+  const char *grid_status;
+  /**
+   * Submitted base price (can be null)
+   */
+  const struct lb_decimal_t *submitted_base_price;
+  /**
+   * Current base price (can be null)
+   */
+  const struct lb_decimal_t *current_base_price;
+  /**
+   * Base price before the last trigger (can be null)
+   */
+  const struct lb_decimal_t *pre_trigger_base_price;
+  /**
+   * Base price after the last trigger (can be null)
+   */
+  const struct lb_decimal_t *post_trigger_base_price;
+  /**
+   * Upper price bound (can be null)
+   */
+  const struct lb_decimal_t *upper_limit_price;
+  /**
+   * Lower price bound (can be null)
+   */
+  const struct lb_decimal_t *lower_limit_price;
+  /**
+   * Trigger price type (`1` = spread, `2` = percent)
+   */
+  int32_t trigger_price_type;
+  /**
+   * Upward trigger spread (can be null)
+   */
+  const struct lb_decimal_t *trigger_spread_up;
+  /**
+   * Downward trigger spread (can be null)
+   */
+  const struct lb_decimal_t *trigger_spread_down;
+  /**
+   * Upward trigger percent (can be null)
+   */
+  const struct lb_decimal_t *trigger_percent_up;
+  /**
+   * Downward trigger percent (can be null)
+   */
+  const struct lb_decimal_t *trigger_percent_down;
+  /**
+   * Pullback percent (can be null)
+   */
+  const struct lb_decimal_t *pullback_percent;
+  /**
+   * Pullback spread (can be null)
+   */
+  const struct lb_decimal_t *pullback_spread;
+  /**
+   * Rebound percent (can be null)
+   */
+  const struct lb_decimal_t *rebound_percent;
+  /**
+   * Rebound spread (can be null)
+   */
+  const struct lb_decimal_t *rebound_spread;
+  /**
+   * Sell-side execution order type (e.g. `MO`)
+   */
+  const char *trigger_sell_order_type;
+  /**
+   * Buy-side execution order type (e.g. `MO`)
+   */
+  const char *trigger_buy_order_type;
+  /**
+   * Sell-side order-book depth
+   */
+  int32_t trigger_sell_depth;
+  /**
+   * Buy-side order-book depth
+   */
+  int32_t trigger_buy_depth;
+  /**
+   * Quantity per trigger (can be null)
+   */
+  const struct lb_decimal_t *trigger_quantity;
+  /**
+   * Quantity per sell trigger (can be null)
+   */
+  const struct lb_decimal_t *trigger_sell_quantity;
+  /**
+   * Quantity per buy trigger (can be null)
+   */
+  const struct lb_decimal_t *trigger_buy_quantity;
+  /**
+   * Quantity handled at the upper bound (can be null)
+   */
+  const struct lb_decimal_t *upper_limit_quantity;
+  /**
+   * Quantity handled at the lower bound (can be null)
+   */
+  const struct lb_decimal_t *lower_limit_quantity;
+  /**
+   * Action at the upper bound
+   */
+  int32_t upper_limit_event;
+  /**
+   * Action at the lower bound
+   */
+  int32_t lower_limit_event;
+  /**
+   * Whether a single grid level may trigger multiple times
+   */
+  bool multiple_trigger;
+  /**
+   * Number of times the grid has triggered
+   */
+  int32_t trigger_times;
+  /**
+   * Accumulated bought quantity (can be null)
+   */
+  const struct lb_decimal_t *total_buy_quantity;
+  /**
+   * Accumulated sold quantity (can be null)
+   */
+  const struct lb_decimal_t *total_sell_quantity;
+  /**
+   * Accumulated profit balance (can be null)
+   */
+  const struct lb_decimal_t *total_profit_balance;
+  /**
+   * Settlement currency
+   */
+  const char *settlement_currency;
+  /**
+   * Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+   */
+  int32_t time_in_force;
+  /**
+   * Expiry date (`YYYY-MM-DD`, GTD)
+   */
+  const char *gtd;
+  /**
+   * Created time (unix timestamp, maybe null)
+   */
+  const int64_t *created_at;
+  /**
+   * Regular trading hours flag
+   */
+  int32_t rth;
+  /**
+   * Whether short selling is allowed
+   */
+  bool support_shortsell;
+  /**
+   * Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+   */
+  const char *grid_order_type_up;
+  /**
+   * Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+   */
+  const char *grid_order_type_down;
+} lb_grid_order_t;
+
+/**
+ * A triggered sub-order carried in the grid order detail.
+ */
+typedef struct lb_grid_order_sub_order_t {
+  /**
+   * Sub-order ID
+   */
+  const char *id;
+  /**
+   * Order price (can be null)
+   */
+  const struct lb_decimal_t *price;
+  /**
+   * Order type
+   */
+  const char *order_type;
+  /**
+   * Order quantity (can be null)
+   */
+  const struct lb_decimal_t *quantity;
+  /**
+   * Executed quantity (can be null)
+   */
+  const struct lb_decimal_t *executed_qty;
+  /**
+   * Buy / sell direction
+   */
+  int32_t action;
+  /**
+   * Order status
+   */
+  const char *status;
+  /**
+   * Submitted time (unix timestamp, maybe null)
+   */
+  const int64_t *submitted_at;
+  /**
+   * Regular trading hours flag
+   */
+  int32_t rth;
+} lb_grid_order_sub_order_t;
+
+/**
+ * A grid order lifecycle-history entry carried in the grid order detail.
+ */
+typedef struct lb_grid_order_history_t {
+  /**
+   * History entry ID (paging cursor)
+   */
+  const char *history_id;
+  /**
+   * Created time (unix timestamp, maybe null)
+   */
+  const int64_t *created_at;
+  /**
+   * Status at this point
+   */
+  const char *status;
+  /**
+   * Suspend reason, if any
+   */
+  const char *suspend_reason;
+  /**
+   * Additional reason detail, if any
+   */
+  const char *reason;
+} lb_grid_order_history_t;
+
+/**
+ * Detail of a grid trading order.
+ */
+typedef struct lb_grid_order_detail_t {
+  /**
+   * Grid master order ID
+   */
+  const char *order_id;
+  /**
+   * Security symbol (e.g. `700.HK`)
+   */
+  const char *symbol;
+  /**
+   * Stock name
+   */
+  const char *stock_name;
+  /**
+   * Order status
+   */
+  const char *status;
+  /**
+   * Grid running status
+   */
+  const char *grid_status;
+  /**
+   * Suspend reason, if any
+   */
+  const char *suspend_reason;
+  /**
+   * Sleeping reason, if any
+   */
+  const char *sleeping_reason;
+  /**
+   * Submitted base price (can be null)
+   */
+  const struct lb_decimal_t *submitted_base_price;
+  /**
+   * Current base price (can be null)
+   */
+  const struct lb_decimal_t *current_base_price;
+  /**
+   * Upper price bound (can be null)
+   */
+  const struct lb_decimal_t *upper_limit_price;
+  /**
+   * Lower price bound (can be null)
+   */
+  const struct lb_decimal_t *lower_limit_price;
+  /**
+   * Trigger price type (`1` = spread, `2` = percent)
+   */
+  int32_t trigger_price_type;
+  /**
+   * Upward trigger spread (can be null)
+   */
+  const struct lb_decimal_t *trigger_spread_up;
+  /**
+   * Downward trigger spread (can be null)
+   */
+  const struct lb_decimal_t *trigger_spread_down;
+  /**
+   * Upward trigger percent (can be null)
+   */
+  const struct lb_decimal_t *trigger_percent_up;
+  /**
+   * Downward trigger percent (can be null)
+   */
+  const struct lb_decimal_t *trigger_percent_down;
+  /**
+   * Pullback percent (can be null)
+   */
+  const struct lb_decimal_t *pullback_percent;
+  /**
+   * Pullback spread (can be null)
+   */
+  const struct lb_decimal_t *pullback_spread;
+  /**
+   * Rebound percent (can be null)
+   */
+  const struct lb_decimal_t *rebound_percent;
+  /**
+   * Rebound spread (can be null)
+   */
+  const struct lb_decimal_t *rebound_spread;
+  /**
+   * Whether a single grid level may trigger multiple times
+   */
+  bool multiple_trigger;
+  /**
+   * Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+   */
+  int32_t time_in_force;
+  /**
+   * Quantity per trigger (can be null)
+   */
+  const struct lb_decimal_t *trigger_quantity;
+  /**
+   * Quantity per sell trigger (can be null)
+   */
+  const struct lb_decimal_t *trigger_sell_quantity;
+  /**
+   * Quantity per buy trigger (can be null)
+   */
+  const struct lb_decimal_t *trigger_buy_quantity;
+  /**
+   * Quantity handled at the upper bound (can be null)
+   */
+  const struct lb_decimal_t *upper_limit_quantity;
+  /**
+   * Quantity handled at the lower bound (can be null)
+   */
+  const struct lb_decimal_t *lower_limit_quantity;
+  /**
+   * Action at the upper bound
+   */
+  int32_t upper_limit_event;
+  /**
+   * Action at the lower bound
+   */
+  int32_t lower_limit_event;
+  /**
+   * Sell-side order-book depth
+   */
+  int32_t trigger_sell_depth;
+  /**
+   * Buy-side order-book depth
+   */
+  int32_t trigger_buy_depth;
+  /**
+   * Created time (unix timestamp, maybe null)
+   */
+  const int64_t *created_at;
+  /**
+   * Last updated time (unix timestamp, maybe null)
+   */
+  const int64_t *updated_at;
+  /**
+   * Settlement currency
+   */
+  const char *settlement_currency;
+  /**
+   * Expiry time (unix timestamp, maybe null)
+   */
+  const int64_t *expire_time;
+  /**
+   * Expiry date (`YYYY-MM-DD`, GTD)
+   */
+  const char *gtd;
+  /**
+   * Triggered sub-orders
+   */
+  const struct lb_grid_order_sub_order_t *grid_sub_orders;
+  /**
+   * Number of triggered sub-orders
+   */
+  uintptr_t num_grid_sub_orders;
+  /**
+   * Whether there are more sub-orders to page
+   */
+  bool sub_has_more;
+  /**
+   * Lifecycle history entries
+   */
+  const struct lb_grid_order_history_t *grid_order_history;
+  /**
+   * Number of lifecycle history entries
+   */
+  uintptr_t num_grid_order_history;
+  /**
+   * Whether there are more history entries to page
+   */
+  bool history_has_more;
+  /**
+   * Whether short selling is allowed
+   */
+  bool support_shortsell;
+  /**
+   * Regular trading hours flag
+   */
+  int32_t rth;
+  /**
+   * Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+   */
+  const char *grid_order_type_up;
+  /**
+   * Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+   */
+  const char *grid_order_type_down;
+} lb_grid_order_detail_t;
+
+/**
+ * A grid trigger-history entry (one triggered order).
+ */
+typedef struct lb_trigger_order_t {
+  /**
+   * Triggered order ID
+   */
+  const char *id;
+  /**
+   * Order status
+   */
+  const char *status;
+  /**
+   * Stock name
+   */
+  const char *name;
+  /**
+   * Security symbol (e.g. `700.HK`)
+   */
+  const char *symbol;
+  /**
+   * Order price (can be null)
+   */
+  const struct lb_decimal_t *price;
+  /**
+   * Order quantity (can be null)
+   */
+  const struct lb_decimal_t *quantity;
+  /**
+   * Executed average price (can be null)
+   */
+  const struct lb_decimal_t *executed_price;
+  /**
+   * Executed total quantity (can be null)
+   */
+  const struct lb_decimal_t *executed_qty;
+  /**
+   * Submitted time (unix timestamp, maybe null)
+   */
+  const int64_t *submitted_at;
+  /**
+   * Buy / sell direction
+   */
+  int32_t action;
+  /**
+   * Order type
+   */
+  const char *order_type;
+  /**
+   * Trigger price (can be null)
+   */
+  const struct lb_decimal_t *trigger_price;
+  /**
+   * Rejection reason, if any
+   */
+  const char *msg;
+  /**
+   * Settlement currency
+   */
+  const char *currency;
+  /**
+   * Latest quote price (can be null)
+   */
+  const struct lb_decimal_t *last_done;
+  /**
+   * Last updated time (unix timestamp, maybe null)
+   */
+  const int64_t *updated_at;
+  /**
+   * Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+   */
+  int32_t time_in_force;
+  /**
+   * Expiry date (`YYYY-MM-DD`, GTD)
+   */
+  const char *gtd;
+  /**
+   * Trigger time (unix timestamp, maybe null)
+   */
+  const int64_t *trigger_at;
+  /**
+   * Conditional trigger status
+   */
+  int32_t trigger_status;
+} lb_trigger_order_t;
+
+/**
+ * A price-step (bid-size) rule entry from the symbol-info response.
+ */
+typedef struct lb_grid_bid_size_t {
+  /**
+   * Range start price (inclusive) (can be null)
+   */
+  const struct lb_decimal_t *str_proceed;
+  /**
+   * Range end price (can be null)
+   */
+  const struct lb_decimal_t *end_proceed;
+  /**
+   * Price step within the range (can be null)
+   */
+  const struct lb_decimal_t *bid_size;
+} lb_grid_bid_size_t;
+
+/**
+ * Channel / authorization info nested in the symbol-info response.
+ */
+typedef struct lb_grid_channel_info_t {
+  /**
+   * Whether the strategy compliance authorization has been granted
+   */
+  bool strategy_granted;
+  /**
+   * Whether the RTH toggle is supported
+   */
+  bool support_rth;
+  /**
+   * Trading currency
+   */
+  const char *currency;
+  /**
+   * Supported settlement currencies
+   */
+  const char *const *settlement_currency;
+  /**
+   * Number of supported settlement currencies
+   */
+  uintptr_t num_settlement_currency;
+} lb_grid_channel_info_t;
+
+/**
+ * Security (symbol) info used to build a grid order.
+ */
+typedef struct lb_grid_symbol_info_t {
+  /**
+   * Security name
+   */
+  const char *name;
+  /**
+   * Latest quote price (can be null)
+   */
+  const struct lb_decimal_t *last_done;
+  /**
+   * Board lot size (can be null)
+   */
+  const struct lb_decimal_t *lot_size;
+  /**
+   * Buy-side board lot size (can be null)
+   */
+  const struct lb_decimal_t *buy_lot_size;
+  /**
+   * Sell-side board lot size (can be null)
+   */
+  const struct lb_decimal_t *sell_lot_size;
+  /**
+   * Price-step (bid-size) rule table
+   */
+  const struct lb_grid_bid_size_t *bid_sizes;
+  /**
+   * Number of bid-size entries
+   */
+  uintptr_t num_bid_sizes;
+  /**
+   * Channel / authorization info (strategy grant, RTH, currencies)
+   */
+  struct lb_grid_channel_info_t channel_info;
+} lb_grid_symbol_info_t;
+
+/**
+ * Response for get grid trading orders (list) request
+ */
+typedef struct lb_grid_orders_response_t {
+  /**
+   * Grid orders
+   */
+  const struct lb_grid_order_t *grid_order;
+  /**
+   * Number of grid orders
+   */
+  uintptr_t num_grid_order;
+  /**
+   * Whether there are more pages
+   */
+  bool has_more;
+} lb_grid_orders_response_t;
+
+/**
+ * Response for get grid trading trigger history request
+ */
+typedef struct lb_grid_trigger_history_response_t {
+  /**
+   * Trigger history entries
+   */
+  const struct lb_trigger_order_t *trigger_orders;
+  /**
+   * Number of trigger history entries
+   */
+  uintptr_t num_trigger_orders;
+  /**
+   * Whether there are more pages
+   */
+  bool has_more;
+} lb_grid_trigger_history_response_t;
+
+/**
+ * Fund analysis (level 1).
+ */
+typedef struct lb_fund_analysis_t {
+  /**
+   * Actual period
+   */
+  int32_t actual_period;
+  /**
+   * Cost level (JSON string)
+   */
+  const char *cost_level;
+  /**
+   * Return ability (JSON string)
+   */
+  const char *return_ability;
+  /**
+   * Risk ability (JSON string)
+   */
+  const char *risk_ability;
+  /**
+   * Updated at
+   */
+  const char *updated_at;
+  /**
+   * Value for money (JSON string)
+   */
+  const char *value_for_money;
+  /**
+   * Whether visible
+   */
+  bool visible;
+} lb_fund_analysis_t;
+
+/**
+ * Fund analysis detail (level 2).
+ */
+typedef struct lb_fund_analysis_detail_t {
+  /**
+   * Actual period
+   */
+  int32_t actual_period;
+  /**
+   * Available periods
+   */
+  const int32_t *available_periods;
+  /**
+   * Number of available periods
+   */
+  uintptr_t num_available_periods;
+  /**
+   * Cost level (JSON string)
+   */
+  const char *cost_level;
+  /**
+   * Return ability (JSON string)
+   */
+  const char *return_ability;
+  /**
+   * Risk ability (JSON string)
+   */
+  const char *risk_ability;
+  /**
+   * Updated at
+   */
+  const char *updated_at;
+  /**
+   * Value for money (JSON string)
+   */
+  const char *value_for_money;
+  /**
+   * Whether visible
+   */
+  bool visible;
+} lb_fund_analysis_detail_t;
+
+/**
+ * A fund annual return entry.
+ */
+typedef struct lb_fund_annual_return_t {
+  /**
+   * Change percent
+   */
+  const char *change_percent;
+  /**
+   * Year
+   */
+  int32_t year;
+} lb_fund_annual_return_t;
+
+/**
+ * A single holding entry inside a fund's asset allocation.
+ */
+typedef struct lb_fund_asset_allocation_item_t {
+  /**
+   * Security code
+   */
+  const char *code;
+  /**
+   * Security counter id
+   */
+  const char *counter_id;
+  /**
+   * Name
+   */
+  const char *name;
+  /**
+   * Position ratio
+   */
+  const char *position_ratio;
+} lb_fund_asset_allocation_item_t;
+
+/**
+ * A fund's asset allocation.
+ */
+typedef struct lb_fund_asset_allocation_t {
+  /**
+   * Asset type
+   */
+  int32_t asset_type;
+  /**
+   * Allocation entries
+   */
+  const struct lb_fund_asset_allocation_item_t *lists;
+  /**
+   * Number of allocation entries
+   */
+  uintptr_t num_lists;
+  /**
+   * Report date
+   */
+  const char *report_date;
+} lb_fund_asset_allocation_t;
+
+/**
+ * A fund entry in the fund list.
+ */
+typedef struct lb_fund_brief_t {
+  /**
+   * Asset class
+   */
+  int32_t asset_class;
+  /**
+   * Asset class name
+   */
+  const char *asset_class_name;
+  /**
+   * Fund code
+   */
+  const char *code;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Description
+   */
+  const char *description;
+  /**
+   * Earning rate
+   */
+  const char *earning_rate;
+  /**
+   * Whether the user is holding this fund
+   */
+  bool holding;
+  /**
+   * ISIN
+   */
+  const char *isin;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Product
+   */
+  const char *product;
+  /**
+   * Minimum purchase amount
+   */
+  const char *purchase_amount;
+  /**
+   * Recommendation text
+   */
+  const char *recommendation_text;
+  /**
+   * Risk level
+   */
+  int32_t risk_level;
+  /**
+   * Risk level name
+   */
+  const char *risk_level_name;
+  /**
+   * Time interval of the earning rate
+   */
+  const char *time_interval;
+  /**
+   * Unit value
+   */
+  const char *unit_value;
+} lb_fund_brief_t;
+
+/**
+ * A dated value point.
+ */
+typedef struct lb_fund_dated_value_t {
+  /**
+   * Date (unix seconds)
+   */
+  int64_t date;
+  /**
+   * Value
+   */
+  const char *value;
+} lb_fund_dated_value_t;
+
+/**
+ * Fund detail.
+ */
+typedef struct lb_fund_detail_t {
+  /**
+   * Additional purchase amount
+   */
+  const char *additional_purchase_amount;
+  /**
+   * Affirm day
+   */
+  int32_t affirm_day;
+  /**
+   * Amount affirm day
+   */
+  const char *amount_affirm_day;
+  /**
+   * Asset allocation, or null if unavailable
+   */
+  const struct lb_fund_asset_allocation_t *asset_allocation;
+  /**
+   * Asset class
+   */
+  int32_t asset_class;
+  /**
+   * Asset class name
+   */
+  const char *asset_class_name;
+  /**
+   * Bill purchase rate
+   */
+  const char *bill_purchase_rate;
+  /**
+   * Channel
+   */
+  const char *channel;
+  /**
+   * Close period
+   */
+  const char *close_period;
+  /**
+   * Fund code
+   */
+  const char *code;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Cut off time
+   */
+  const char *cut_off_time;
+  /**
+   * Whether it is a derivative
+   */
+  bool derivatives;
+  /**
+   * Done day
+   */
+  int32_t done_day;
+  /**
+   * Excess return fee
+   */
+  const char *excess_return_fee;
+  /**
+   * GST rate
+   */
+  const char *gst_rate;
+  /**
+   * Introduction
+   */
+  const char *introduce;
+  /**
+   * Whether it is a cash-plus fund
+   */
+  bool is_cash_plus;
+  /**
+   * Whether it is a complex product
+   */
+  bool is_complex;
+  /**
+   * Whether it is a new cash-plus fund
+   */
+  bool is_new_cash_plus;
+  /**
+   * Whether it is a Yinghebao fund
+   */
+  bool is_yinghebao;
+  /**
+   * ISIN
+   */
+  const char *isin;
+  /**
+   * Management rate
+   */
+  const char *manage_rate;
+  /**
+   * Manager
+   */
+  const char *manager;
+  /**
+   * Minimum holding cash
+   */
+  const char *min_hold_cash;
+  /**
+   * Minimum holding share
+   */
+  const char *min_hold_share;
+  /**
+   * Minimum sell share
+   */
+  const char *min_sell_share;
+  /**
+   * Month raise day
+   */
+  const char *month_raise_day;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Net value deadline
+   */
+  const char *nav_deadline;
+  /**
+   * Whether it is no-load
+   */
+  bool no_load;
+  /**
+   * Open date
+   */
+  const char *open_date;
+  /**
+   * Open period
+   */
+  const char *open_period;
+  /**
+   * Product
+   */
+  const char *product;
+  /**
+   * Product information locals
+   */
+  const char *product_information_locals;
+  /**
+   * Profile
+   */
+  const char *profile;
+  /**
+   * Whether purchasable
+   */
+  int32_t purchasable;
+  /**
+   * Purchase affirm day
+   */
+  const char *purchase_affirm_day;
+  /**
+   * Minimum purchase amount
+   */
+  const char *purchase_amount;
+  /**
+   * Purchase rate
+   */
+  const char *purchase_rate;
+  /**
+   * Rating
+   */
+  int32_t rating;
+  /**
+   * Whether redeemable
+   */
+  int32_t redeemable;
+  /**
+   * Redemption advance day
+   */
+  const char *redemption_advance_day;
+  /**
+   * Redemption amount
+   */
+  const char *redemption_amount;
+  /**
+   * Redemption close period text
+   */
+  const char *redemption_close_period_shows;
+  /**
+   * Redemption done day
+   */
+  const char *redemption_done_day;
+  /**
+   * Redemption open day text
+   */
+  const char *redemption_open_day_shows;
+  /**
+   * Risk level
+   */
+  int32_t risk_level;
+  /**
+   * Risk level name
+   */
+  const char *risk_level_name;
+  /**
+   * Verify status
+   */
+  int32_t verify_status;
+  /**
+   * Whether it is a virtual currency fund
+   */
+  bool virtual_currency;
+  /**
+   * Year to date yield
+   */
+  const char *year_to_date_yield;
+  /**
+   * Year to date yield type
+   */
+  int32_t ytd_yield_type;
+} lb_fund_detail_t;
+
+/**
+ * A cash dividend record for a held fund.
+ */
+typedef struct lb_fund_dividend_t {
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Date (unix seconds)
+   */
+  int64_t date;
+  /**
+   * Dividend method
+   */
+  const char *div_method;
+  /**
+   * Fund name
+   */
+  const char *name;
+} lb_fund_dividend_t;
+
+/**
+ * The user's dividend records for a held fund.
+ */
+typedef struct lb_fund_dividends_t {
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Dividend records
+   */
+  const struct lb_fund_dividend_t *div_cash_infos;
+  /**
+   * Number of dividend records
+   */
+  uintptr_t num_div_cash_infos;
+  /**
+   * Latest dividend date (unix seconds)
+   */
+  int64_t lastest_date;
+  /**
+   * Total cash dividend
+   */
+  const char *total_div_cash;
+} lb_fund_dividends_t;
+
+/**
+ * Fund list filter options. Each list holds JSON-encoded option objects.
+ */
+typedef struct lb_fund_filters_t {
+  /**
+   * Asset class options (JSON strings)
+   */
+  const char *const *asset_class;
+  /**
+   * Number of asset class options
+   */
+  uintptr_t num_asset_class;
+  /**
+   * Company options (JSON strings)
+   */
+  const char *const *company;
+  /**
+   * Number of company options
+   */
+  uintptr_t num_company;
+  /**
+   * Currency options (JSON strings)
+   */
+  const char *const *currency;
+  /**
+   * Number of currency options
+   */
+  uintptr_t num_currency;
+  /**
+   * Industry category options (JSON strings)
+   */
+  const char *const *industry_category_name;
+  /**
+   * Number of industry category options
+   */
+  uintptr_t num_industry_category_name;
+  /**
+   * Risk level options (JSON strings)
+   */
+  const char *const *risk_level;
+  /**
+   * Number of risk level options
+   */
+  uintptr_t num_risk_level;
+} lb_fund_filters_t;
+
+/**
+ * A single fund holding (top-10 holdings).
+ */
+typedef struct lb_fund_holding_t {
+  /**
+   * Bond type
+   */
+  const char *bond_type;
+  /**
+   * Bond type name
+   */
+  const char *bond_type_name;
+  /**
+   * Country name
+   */
+  const char *country_name;
+  /**
+   * Holding type
+   */
+  const char *holding_type;
+  /**
+   * Industry name
+   */
+  const char *industry_name;
+  /**
+   * Market value
+   */
+  const char *market_value;
+  /**
+   * Maturity date
+   */
+  const char *maturity_date;
+  /**
+   * Name
+   */
+  const char *name;
+  /**
+   * Share change
+   */
+  const char *share_change;
+  /**
+   * Share change percent
+   */
+  const char *share_change_percent;
+  /**
+   * Shares
+   */
+  const char *shares;
+  /**
+   * Weighting
+   */
+  const char *weighting;
+} lb_fund_holding_t;
+
+/**
+ * A fund's top-10 holdings.
+ */
+typedef struct lb_fund_holdings_t {
+  /**
+   * Holding entries
+   */
+  const struct lb_fund_holding_t *holdings;
+  /**
+   * Number of holding entries
+   */
+  uintptr_t num_holdings;
+  /**
+   * Report date
+   */
+  const char *report_date;
+  /**
+   * Total weighting
+   */
+  const char *weighting;
+} lb_fund_holdings_t;
+
+/**
+ * A named contrast performance series.
+ */
+typedef struct lb_fund_named_contrast_t {
+  /**
+   * Series name
+   */
+  const char *name;
+  /**
+   * Performance points (JSON strings)
+   */
+  const char *const *performances;
+  /**
+   * Number of performance points
+   */
+  uintptr_t num_performances;
+} lb_fund_named_contrast_t;
+
+/**
+ * A fund net-asset-value data point (latest / historical).
+ */
+typedef struct lb_fund_nav_value_t {
+  /**
+   * Net value change
+   */
+  const char *change;
+  /**
+   * Net value change percent
+   */
+  const char *change_percent;
+  /**
+   * Formatted change percent
+   */
+  const char *change_percent_format;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Fund name
+   */
+  const char *counter_name;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Formatted date
+   */
+  const char *date_format;
+  /**
+   * ISIN
+   */
+  const char *isin;
+  /**
+   * Last update time (unix seconds)
+   */
+  int64_t last_update_time;
+  /**
+   * Net value
+   */
+  const char *value;
+  /**
+   * Formatted net value
+   */
+  const char *value_format;
+} lb_fund_nav_value_t;
+
+/**
+ * A fund order (list view).
+ */
+typedef struct lb_fund_order_t {
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Created at (unix seconds)
+   */
+  int64_t created_at;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Order id
+   */
+  int64_t id;
+  /**
+   * Whether it is an auto (DCA) order
+   */
+  bool is_auto;
+  /**
+   * Net worth
+   */
+  const char *net_worth;
+  /**
+   * Product type
+   */
+  const char *product_type;
+  /**
+   * State
+   */
+  const char *state;
+  /**
+   * State description
+   */
+  const char *state_desc;
+  /**
+   * Units
+   */
+  const char *units;
+} lb_fund_order_t;
+
+/**
+ * A keyword block in a fund order detail.
+ */
+typedef struct lb_fund_order_keyword_t {
+  /**
+   * Content
+   */
+  const char *content;
+  /**
+   * Group
+   */
+  const char *group;
+  /**
+   * Key
+   */
+  const char *key;
+  /**
+   * Line strategy
+   */
+  const char *line_strategy;
+  /**
+   * Title
+   */
+  const char *title;
+} lb_fund_order_keyword_t;
+
+/**
+ * The full information of a fund order.
+ */
+typedef struct lb_fund_order_info_t {
+  /**
+   * Account id
+   */
+  int64_t aaid;
+  /**
+   * Account channel
+   */
+  const char *account_channel;
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Channel
+   */
+  const char *channel;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Created at (unix seconds)
+   */
+  int64_t created_at;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Dividend option
+   */
+  const char *dividend_option;
+  /**
+   * Equity time (unix seconds)
+   */
+  int64_t eq_at;
+  /**
+   * Fee
+   */
+  const char *fee;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Fund source
+   */
+  const char *fund_source;
+  /**
+   * Histories
+   */
+  const char *histories;
+  /**
+   * Order id
+   */
+  int64_t id;
+  /**
+   * Message
+   */
+  const char *message;
+  /**
+   * Net worth
+   */
+  const char *net_worth;
+  /**
+   * Price time (unix seconds)
+   */
+  int64_t price_at;
+  /**
+   * Processed at (unix seconds)
+   */
+  int64_t processed_at;
+  /**
+   * Product type
+   */
+  const char *product_type;
+  /**
+   * Whether repurchaseable
+   */
+  bool repurchaseable;
+  /**
+   * Sale proceeds
+   */
+  const char *sale_proceeds;
+  /**
+   * Sales charge
+   */
+  const char *sales_charge;
+  /**
+   * Sales price
+   */
+  const char *sales_price;
+  /**
+   * Sales unit
+   */
+  const char *sales_unit;
+  /**
+   * State
+   */
+  const char *state;
+  /**
+   * State description
+   */
+  const char *state_desc;
+  /**
+   * Status
+   */
+  int32_t status;
+  /**
+   * Extended status
+   */
+  int32_t status_ex;
+  /**
+   * T+ description
+   */
+  const char *t_description;
+  /**
+   * Time partition
+   */
+  const char *time_partition;
+  /**
+   * Total amount
+   */
+  const char *total_amount;
+  /**
+   * Transaction at (unix seconds)
+   */
+  int64_t transaction_at;
+  /**
+   * Units
+   */
+  const char *units;
+  /**
+   * Withdraw at (unix seconds)
+   */
+  int64_t withdraw_at;
+  /**
+   * Whether withdrawable
+   */
+  bool withdrawable;
+} lb_fund_order_info_t;
+
+/**
+ * A processing stage in a fund order detail.
+ */
+typedef struct lb_fund_order_stage_t {
+  /**
+   * Description
+   */
+  const char *desc;
+  /**
+   * Key
+   */
+  const char *key;
+  /**
+   * Link
+   */
+  const char *link;
+  /**
+   * Link text
+   */
+  const char *link_text;
+  /**
+   * Progress
+   */
+  const char *progress;
+  /**
+   * Stage
+   */
+  const char *stage;
+} lb_fund_order_stage_t;
+
+/**
+ * Fund order detail.
+ */
+typedef struct lb_fund_order_detail_t {
+  /**
+   * Keyword blocks
+   */
+  const struct lb_fund_order_keyword_t *keywords;
+  /**
+   * Number of keyword blocks
+   */
+  uintptr_t num_keywords;
+  /**
+   * The order
+   */
+  const struct lb_fund_order_info_t *order;
+  /**
+   * Processing stages
+   */
+  const struct lb_fund_order_stage_t *stages;
+  /**
+   * Number of processing stages
+   */
+  uintptr_t num_stages;
+} lb_fund_order_detail_t;
+
+/**
+ * The result of submitting a fund order.
+ */
+typedef struct lb_fund_order_submit_response_t {
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Created at (unix seconds)
+   */
+  int64_t created_at;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Order id
+   */
+  int64_t id;
+  /**
+   * Message
+   */
+  const char *msg;
+  /**
+   * Status
+   */
+  int32_t status;
+  /**
+   * Units
+   */
+  const char *units;
+} lb_fund_order_submit_response_t;
+
+/**
+ * The result of validating a fund order.
+ */
+typedef struct lb_fund_order_validation_t {
+  /**
+   * Auth token to carry into submit
+   */
+  const char *auth_token;
+  /**
+   * Risk-assessment eval address
+   */
+  const char *eval_address;
+  /**
+   * Fund risk level
+   */
+  int32_t fund_risk_level;
+  /**
+   * Message
+   */
+  const char *msg;
+  /**
+   * User PI status
+   */
+  int32_t user_pi;
+  /**
+   * User risk level
+   */
+  int32_t user_risk_level;
+} lb_fund_order_validation_t;
+
+/**
+ * A fund's detailed performance figures.
+ */
+typedef struct lb_fund_performance_t {
+  /**
+   * Annualized return (5y)
+   */
+  const char *annualized_return_five;
+  /**
+   * Annualized return (1y)
+   */
+  const char *annualized_return_one;
+  /**
+   * Annualized return (10y)
+   */
+  const char *annualized_return_ten;
+  /**
+   * Annualized return (3y)
+   */
+  const char *annualized_return_three;
+  /**
+   * Annualized return (2y)
+   */
+  const char *annualized_return_two;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Rank (5y)
+   */
+  int32_t performance_rank_five_years;
+  /**
+   * Rank (1d)
+   */
+  int32_t performance_rank_one_day;
+  /**
+   * Rank (1m)
+   */
+  int32_t performance_rank_one_month;
+  /**
+   * Rank (1w)
+   */
+  int32_t performance_rank_one_week;
+  /**
+   * Rank (1y)
+   */
+  int32_t performance_rank_one_year;
+  /**
+   * Rank (6m)
+   */
+  int32_t performance_rank_six_months;
+  /**
+   * Rank (10y)
+   */
+  int32_t performance_rank_ten_years;
+  /**
+   * Rank (3m)
+   */
+  int32_t performance_rank_three_months;
+  /**
+   * Rank (3y)
+   */
+  int32_t performance_rank_three_years;
+  /**
+   * Rank (2y)
+   */
+  int32_t performance_rank_two_years;
+  /**
+   * Rank (ytd)
+   */
+  int32_t performance_rank_ytd;
+  /**
+   * Return (5y)
+   */
+  const char *performance_return_five_years;
+  /**
+   * Return (1d)
+   */
+  const char *performance_return_one_day;
+  /**
+   * Return (1m)
+   */
+  const char *performance_return_one_month;
+  /**
+   * Return (1w)
+   */
+  const char *performance_return_one_week;
+  /**
+   * Return (1y)
+   */
+  const char *performance_return_one_year;
+  /**
+   * Return (6m)
+   */
+  const char *performance_return_six_months;
+  /**
+   * Return (10y)
+   */
+  const char *performance_return_ten_years;
+  /**
+   * Return (3m)
+   */
+  const char *performance_return_three_months;
+  /**
+   * Return (3y)
+   */
+  const char *performance_return_three_years;
+  /**
+   * Return (2y)
+   */
+  const char *performance_return_two_years;
+  /**
+   * Return (ytd)
+   */
+  const char *performance_return_ytd;
+  /**
+   * Total peers (5y)
+   */
+  int32_t performance_total_five_years;
+  /**
+   * Total peers (1d)
+   */
+  int32_t performance_total_one_day;
+  /**
+   * Total peers (1m)
+   */
+  int32_t performance_total_one_month;
+  /**
+   * Total peers (1w)
+   */
+  int32_t performance_total_one_week;
+  /**
+   * Total peers (1y)
+   */
+  int32_t performance_total_one_year;
+  /**
+   * Total peers (6m)
+   */
+  int32_t performance_total_six_months;
+  /**
+   * Total peers (10y)
+   */
+  int32_t performance_total_ten_years;
+  /**
+   * Total peers (3m)
+   */
+  int32_t performance_total_three_months;
+  /**
+   * Total peers (3y)
+   */
+  int32_t performance_total_three_years;
+  /**
+   * Total peers (2y)
+   */
+  int32_t performance_total_two_years;
+  /**
+   * Total peers (ytd)
+   */
+  int32_t performance_total_ytd;
+  /**
+   * Seven days annualized
+   */
+  const char *seven_days_annualized;
+  /**
+   * Ten thousand price
+   */
+  const char *ten_thousand_price;
+  /**
+   * Update time (unix seconds)
+   */
+  int64_t update_time;
+} lb_fund_performance_t;
+
+/**
+ * Fund performance comparison.
+ */
+typedef struct lb_fund_performance_comparison_t {
+  /**
+   * Contrast performance series
+   */
+  const struct lb_fund_named_contrast_t *contrast_performances;
+  /**
+   * Number of contrast performance series
+   */
+  uintptr_t num_contrast_performances;
+  /**
+   * Fund performances (JSON strings)
+   */
+  const char *const *fund_performances;
+  /**
+   * Number of fund performances
+   */
+  uintptr_t num_fund_performances;
+} lb_fund_performance_comparison_t;
+
+/**
+ * A recent performance point used by the hot-fund list.
+ */
+typedef struct lb_fund_performance_point_t {
+  /**
+   * Date
+   */
+  const char *date;
+  /**
+   * Last done value
+   */
+  const char *last_done;
+} lb_fund_performance_point_t;
+
+/**
+ * Detail values of a single fund position.
+ */
+typedef struct lb_fund_position_detail_values_t {
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Holding cost
+   */
+  const char *holding_cost;
+  /**
+   * Holding profit
+   */
+  const char *holding_profit;
+  /**
+   * Holding profit rate
+   */
+  const char *holding_profit_rate;
+  /**
+   * Holding units
+   */
+  const char *holding_units;
+  /**
+   * Holding value
+   */
+  const char *holding_value;
+  /**
+   * Pending buy value
+   */
+  const char *pending_buy_value;
+  /**
+   * Pending sell value
+   */
+  const char *pending_sell_value;
+  /**
+   * Accumulated profit (to date)
+   */
+  const char *profit_amount_accum_td;
+  /**
+   * Accumulated profit rate (to date)
+   */
+  const char *profit_amount_accum_td_rate;
+  /**
+   * Recent profit
+   */
+  const char *recent_profit;
+  /**
+   * Recent trading day (unix seconds)
+   */
+  int64_t recent_tradingday;
+  /**
+   * Recent unit value
+   */
+  const char *recent_unit_value;
+  /**
+   * Sold pending-confirm units
+   */
+  const char *sold_pending_confirm_units;
+} lb_fund_position_detail_values_t;
+
+/**
+ * A fund unit-value point (position view).
+ */
+typedef struct lb_fund_unit_value_t {
+  /**
+   * Date (unix seconds)
+   */
+  int64_t date;
+  /**
+   * Day increase rate
+   */
+  const char *day_increase_rate;
+  /**
+   * Total value
+   */
+  const char *total_value;
+  /**
+   * Unit value
+   */
+  const char *unit_value;
+} lb_fund_unit_value_t;
+
+/**
+ * Detail of a single fund position.
+ */
+typedef struct lb_fund_position_detail_t {
+  /**
+   * Detail values
+   */
+  const struct lb_fund_position_detail_values_t *detail_values;
+  /**
+   * Accumulated profit series
+   */
+  const struct lb_fund_dated_value_t *sum_profit;
+  /**
+   * Number of accumulated-profit points
+   */
+  uintptr_t num_sum_profit;
+  /**
+   * Unit value series
+   */
+  const struct lb_fund_unit_value_t *ut_value;
+  /**
+   * Number of unit-value points
+   */
+  uintptr_t num_ut_value;
+} lb_fund_position_detail_t;
+
+/**
+ * A single fund position held by the user.
+ */
+typedef struct lb_fund_position_item_t {
+  /**
+   * Holding amount
+   */
+  const char *amount;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Frozen units
+   */
+  const char *freeze_units;
+  /**
+   * Holding profit
+   */
+  const char *holding_profit;
+  /**
+   * Holding units
+   */
+  const char *holding_units;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Recent profit
+   */
+  const char *recent_profit;
+  /**
+   * Recent trading day (unix seconds)
+   */
+  int64_t recent_trading_day;
+  /**
+   * Accumulated recent profit
+   */
+  const char *sum_recent_profit;
+} lb_fund_position_item_t;
+
+/**
+ * A held-fund net-value point (position view).
+ */
+typedef struct lb_fund_position_nav_t {
+  /**
+   * Net value change
+   */
+  const char *change;
+  /**
+   * Net value change percent
+   */
+  const char *change_percent;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Fund name
+   */
+  const char *counter_name;
+  /**
+   * Last update time (unix seconds)
+   */
+  int64_t last_update_time;
+  /**
+   * Net value
+   */
+  const char *value;
+} lb_fund_position_nav_t;
+
+/**
+ * Performance figures for a held fund.
+ */
+typedef struct lb_fund_position_performance_t {
+  /**
+   * Annualized return (5y)
+   */
+  const char *annualized_return_five;
+  /**
+   * Annualized return (1y)
+   */
+  const char *annualized_return_one;
+  /**
+   * Annualized return (10y)
+   */
+  const char *annualized_return_ten;
+  /**
+   * Annualized return (3y)
+   */
+  const char *annualized_return_three;
+  /**
+   * Annualized return (2y)
+   */
+  const char *annualized_return_two;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Return (5y)
+   */
+  const char *performance_return_five_years;
+  /**
+   * Return (1d)
+   */
+  const char *performance_return_one_day;
+  /**
+   * Return (1m)
+   */
+  const char *performance_return_one_month;
+  /**
+   * Return (1w)
+   */
+  const char *performance_return_one_week;
+  /**
+   * Return (1y)
+   */
+  const char *performance_return_one_year;
+  /**
+   * Return (6m)
+   */
+  const char *performance_return_six_months;
+  /**
+   * Return (10y)
+   */
+  const char *performance_return_ten_years;
+  /**
+   * Return (3m)
+   */
+  const char *performance_return_three_months;
+  /**
+   * Return (3y)
+   */
+  const char *performance_return_three_years;
+  /**
+   * Return (2y)
+   */
+  const char *performance_return_two_years;
+  /**
+   * Return (ytd)
+   */
+  const char *performance_return_ytd;
+  /**
+   * Update time (unix seconds)
+   */
+  int64_t update_time;
+} lb_fund_position_performance_t;
+
+/**
+ * The user's cumulative profit for a held fund.
+ */
+typedef struct lb_fund_position_profits_t {
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Profit series
+   */
+  const struct lb_fund_dated_value_t *history_value;
+  /**
+   * Number of profit points
+   */
+  uintptr_t num_history_value;
+  /**
+   * Last update time (unix seconds)
+   */
+  int64_t last_update_time;
+  /**
+   * Total profit
+   */
+  const char *sum_profit;
+} lb_fund_position_profits_t;
+
+/**
+ * The user's fund positions overview.
+ */
+typedef struct lb_fund_positions_t {
+  /**
+   * Account channel
+   */
+  const char *account_channel;
+  /**
+   * Position entries
+   */
+  const struct lb_fund_position_item_t *list;
+  /**
+   * Number of position entries
+   */
+  uintptr_t num_list;
+  /**
+   * Pending buy orders amount
+   */
+  const char *pending_buy_orders;
+  /**
+   * Recent trading day (unix seconds)
+   */
+  int64_t recent_trading_day;
+  /**
+   * Sold pending credit orders amount
+   */
+  const char *sold_pending_credit_orders;
+} lb_fund_positions_t;
+
+/**
+ * A fund quarterly return entry.
+ */
+typedef struct lb_fund_quarterly_return_t {
+  /**
+   * Change percent
+   */
+  const char *change_percent;
+  /**
+   * Quarter
+   */
+  int32_t quarter;
+  /**
+   * Year
+   */
+  int32_t year;
+} lb_fund_quarterly_return_t;
+
+/**
+ * A stock held by the fund (reverse lookup).
+ */
+typedef struct lb_fund_stock_holding_t {
+  /**
+   * Stock code
+   */
+  const char *code;
+  /**
+   * Stock counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Stock name
+   */
+  const char *name;
+  /**
+   * Position ratio
+   */
+  const char *position_ratio;
+  /**
+   * Report date
+   */
+  const char *report_date;
+} lb_fund_stock_holding_t;
+
+/**
+ * A fund transaction / cash-flow record.
+ */
+typedef struct lb_fund_transaction_t {
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Category
+   */
+  const char *category;
+  /**
+   * Created at (unix seconds)
+   */
+  int64_t created_at;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Description
+   */
+  const char *description;
+  /**
+   * Detail created at (unix seconds)
+   */
+  int64_t detail_created_at;
+  /**
+   * Detail type
+   */
+  const char *detail_type;
+  /**
+   * Done at (unix seconds)
+   */
+  int64_t done_at;
+  /**
+   * Quantity description
+   */
+  const char *quantity_description;
+  /**
+   * Redirect page
+   */
+  const char *redirect_page;
+  /**
+   * Redirect page (v2)
+   */
+  const char *redirect_page_v2;
+  /**
+   * Reference number
+   */
+  const char *ref_no;
+  /**
+   * Stock quantity
+   */
+  const char *stock_quantity;
+  /**
+   * Transaction type
+   */
+  const char *tx_type;
+  /**
+   * Type name
+   */
+  const char *type_name;
+} lb_fund_transaction_t;
+
+/**
+ * A benchmark contrast series in a fund trend chart.
+ */
+typedef struct lb_fund_trend_contrast_t {
+  /**
+   * Benchmark name
+   */
+  const char *benchmark_name;
+  /**
+   * Performance points (JSON strings)
+   */
+  const char *const *performances;
+  /**
+   * Number of performance points
+   */
+  uintptr_t num_performances;
+} lb_fund_trend_contrast_t;
+
+/**
+ * Fund trend chart.
+ */
+typedef struct lb_fund_trend_t {
+  /**
+   * Actual period
+   */
+  int32_t actual_period;
+  /**
+   * Available periods
+   */
+  const int32_t *available_periods;
+  /**
+   * Number of available periods
+   */
+  uintptr_t num_available_periods;
+  /**
+   * Category average performances (JSON strings)
+   */
+  const char *const *category_average_performances;
+  /**
+   * Number of category average performances
+   */
+  uintptr_t num_category_average_performances;
+  /**
+   * Benchmark contrast performances, or null if unavailable
+   */
+  const struct lb_fund_trend_contrast_t *contrast_performances;
+  /**
+   * Fund performances (JSON strings)
+   */
+  const char *const *fund_performances;
+  /**
+   * Number of fund performances
+   */
+  uintptr_t num_fund_performances;
+} lb_fund_trend_t;
+
+/**
+ * A hot-selling fund entry.
+ */
+typedef struct lb_hot_fund_t {
+  /**
+   * Asset class
+   */
+  int32_t asset_class;
+  /**
+   * Asset class name
+   */
+  const char *asset_class_name;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Earning rate
+   */
+  const char *earning_rate;
+  /**
+   * Recent performance points
+   */
+  const struct lb_fund_performance_point_t *fund_performances;
+  /**
+   * Number of recent performance points
+   */
+  uintptr_t num_fund_performances;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Minimum purchase amount
+   */
+  const char *purchase_amount;
+  /**
+   * Recommendation text
+   */
+  const char *recommendation_text;
+  /**
+   * Risk level
+   */
+  int32_t risk_level;
+  /**
+   * Risk level name
+   */
+  const char *risk_level_name;
+  /**
+   * Time interval of the earning rate
+   */
+  const char *time_interval;
+} lb_hot_fund_t;
 
 /**
  * Options for estimate maximum purchase quantity
@@ -4141,23 +9294,31 @@ typedef struct lb_security_calc_index_t {
    */
   const int64_t *open_interest;
   /**
-   * Delta
+   * Delta. Measures the expected change in option price for a $1 move in the
+   * underlying asset price.
    */
   const struct lb_decimal_t *delta;
   /**
-   * Gamma
+   * Gamma. Measures the expected change in Delta for a $1 move in the
+   * underlying asset price.
    */
   const struct lb_decimal_t *gamma;
   /**
-   * Theta
+   * Theta. Measures the expected change in option price as one day passes;
+   * the raw value has been divided by 365 to convert to a daily value,
+   * representing the impact of one day's time decay on the option price.
    */
   const struct lb_decimal_t *theta;
   /**
-   * Vega
+   * Vega. Measures the expected change in option price when implied
+   * volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+   * get the expected price change per 1% move in IV.
    */
   const struct lb_decimal_t *vega;
   /**
-   * Rho
+   * Rho. Measures the expected change in option price when the risk-free
+   * interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+   * the expected price change per 1% move in the interest rate.
    */
   const struct lb_decimal_t *rho;
 } lb_security_calc_index_t;
@@ -4201,7 +9362,7 @@ typedef struct lb_warrant_info_t {
   /**
    * Expiry date
    */
-  struct lb_date_t expiry_date;
+  const struct lb_date_t *expiry_date;
   /**
    * Strike price
    */
@@ -6758,9 +11919,9 @@ typedef struct lb_industry_rank_item_t {
    */
   const char *name;
   /**
-   * Counter ID of the industry.
+   * Industry symbol.
    */
-  const char *counter_id;
+  const char *symbol;
   /**
    * Change percentage.
    */
@@ -6838,9 +11999,9 @@ typedef struct lb_industry_peer_node_t {
    */
   const char *name;
   /**
-   * Counter ID.
+   * Node symbol.
    */
-  const char *counter_id;
+  const char *symbol;
   /**
    * Number of stocks in this node.
    */
@@ -6864,9 +12025,9 @@ typedef struct lb_industry_peer_node_t {
  */
 typedef struct lb_industry_peers_response_t {
   /**
-   * Top-level industry node info.
+   * Top-level industry node info (NULL if absent).
    */
-  struct lb_industry_peers_top_t top;
+  const struct lb_industry_peers_top_t *top;
   /**
    * Root peer chain node (NULL if absent).
    */
@@ -8273,75 +13434,83 @@ typedef struct lb_short_trades_response_t {
 } lb_short_trades_response_t;
 
 /**
- * Option volume statistics (call and put totals)
+ * Option volume statistics
  */
 typedef struct lb_option_volume_stats_t {
   /**
-   * Call option volume (formatted string)
-   */
-  const char *c;
-  /**
-   * Put option volume (formatted string)
-   */
-  const char *p;
-} lb_option_volume_stats_t;
-
-/**
- * Daily option volume statistics for a single security
- */
-typedef struct lb_option_volume_daily_stat_t {
-  /**
-   * Security code
+   * Underlying security symbol
    */
   const char *symbol;
   /**
-   * Date of the record (formatted string)
+   * Total call volume
    */
-  const char *timestamp;
+  int64_t call_volume;
   /**
-   * Total option volume (calls + puts, formatted string)
+   * Total put volume
    */
-  const char *total_volume;
+  int64_t put_volume;
+} lb_option_volume_stats_t;
+
+/**
+ * One day's option volume statistics
+ */
+typedef struct lb_option_volume_daily_stat_t {
   /**
-   * Total put option volume (formatted string)
+   * Underlying security symbol
    */
-  const char *total_put_volume;
+  const char *symbol;
   /**
-   * Total call option volume (formatted string)
+   * Trading date
    */
-  const char *total_call_volume;
+  struct lb_date_t date;
   /**
-   * Put-to-call volume ratio (formatted string)
+   * Call volume
    */
-  const char *put_call_volume_ratio;
+  int64_t call_volume;
   /**
-   * Total open interest across all options (formatted string)
+   * Put volume
    */
-  const char *total_open_interest;
+  int64_t put_volume;
   /**
-   * Total put open interest (formatted string)
+   * Call open interest
    */
-  const char *total_put_open_interest;
+  int64_t call_open_interest;
   /**
-   * Total call open interest (formatted string)
+   * Put open interest
    */
-  const char *total_call_open_interest;
+  int64_t put_open_interest;
   /**
-   * Put-to-call open interest ratio (formatted string)
+   * Total options volume (calls + puts)
    */
-  const char *put_call_open_interest_ratio;
+  int64_t total_volume;
+  /**
+   * Total open interest (calls + puts)
+   */
+  int64_t total_open_interest;
+  /**
+   * Put/call volume ratio
+   */
+  double pc_vol;
+  /**
+   * Put/call open interest ratio
+   */
+  double pc_oi;
 } lb_option_volume_daily_stat_t;
 
 /**
- * Collection of daily option volume statistics
+ * Daily option volume response
  */
 typedef struct lb_option_volume_daily_t {
+  /**
+   * Underlying security symbol
+   */
+  const char *symbol;
   /**
    * Pointer to array of daily option volume stat records
    */
   const struct lb_option_volume_daily_stat_t *stats;
   /**
-   * Number of elements in the array.
+   * Number of elements in the array
    */
   uintptr_t num_stats;
 } lb_option_volume_daily_t;
@@ -8671,19 +13840,64 @@ typedef struct lb_top_movers_response_t {
    */
   uintptr_t num_events;
   /**
-   * Pagination cursor as a JSON string
+   * Pagination cursor (empty string means no more pages)
    */
   const char *next_params;
 } lb_top_movers_response_t;
 
 /**
- * Rank categories response. `data` is a NUL-terminated JSON string.
+ * One leaf rank sub-category.
+ */
+typedef struct lb_rank_sub_category_t {
+  /**
+   * Sub-category key (e.g. `"hot_all-us"`). Pass to
+   * `lb_market_context_rank_list`.
+   */
+  const char *key;
+  /**
+   * Display name
+   */
+  const char *name;
+  /**
+   * Market code (e.g. `"US"`, `"HK"`)
+   */
+  const char *market;
+} lb_rank_sub_category_t;
+
+/**
+ * A top-level rank category.
+ */
+typedef struct lb_rank_category_t {
+  /**
+   * Top-level key (e.g. `"hot"`)
+   */
+  const char *key;
+  /**
+   * Display name
+   */
+  const char *name;
+  /**
+   * Sub-categories pointer
+   */
+  const struct lb_rank_sub_category_t *sub_categories;
+  /**
+   * Number of sub-categories
+   */
+  uintptr_t num_sub_categories;
+} lb_rank_category_t;
+
+/**
+ * Rank categories response.
  */
 typedef struct lb_rank_categories_response_t {
   /**
-   * Raw rank categories data as a JSON string
+   * Top-level categories pointer
    */
-  const char *data;
+  const struct lb_rank_category_t *categories;
+  /**
+   * Number of categories
+   */
+  uintptr_t num_categories;
 } lb_rank_categories_response_t;
 
 /**
@@ -8809,9 +14023,252 @@ typedef struct lb_screener_indicators_response_t {
   const char *data;
 } lb_screener_indicators_response_t;
 
+/**
+ * A Workspace the current account belongs to
+ */
+typedef struct lb_workspace_t {
+  /**
+   * Workspace ID
+   */
+  const char *id;
+  /**
+   * Workspace name
+   */
+  const char *name;
+  /**
+   * Creation time, Unix timestamp in seconds
+   */
+  int64_t created_at;
+  /**
+   * Last updated time, Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_workspace_t;
+
+/**
+ * Response for `lb_agent_context_workspaces`
+ */
+typedef struct lb_workspaces_response_t {
+  /**
+   * Workspaces the current account belongs to
+   */
+  const struct lb_workspace_t *workspaces;
+  /**
+   * Number of workspaces
+   */
+  uintptr_t num_workspaces;
+} lb_workspaces_response_t;
+
+/**
+ * An Agent in a Workspace
+ */
+typedef struct lb_agent_t {
+  /**
+   * Agent UID, used as the path parameter of
+   * `lb_agent_context_conversation`
+   */
+  const char *uid;
+  /**
+   * Agent name
+   */
+  const char *name;
+  /**
+   * Agent description
+   */
+  const char *description;
+  /**
+   * Agent mode, e.g. `chat`
+   */
+  const char *mode;
+  /**
+   * Icon URL
+   */
+  const char *icon;
+  /**
+   * Whether published; only published Agents can start conversations
+   */
+  bool is_published;
+  /**
+   * Publish time, Unix timestamp in seconds; 0 if unpublished
+   */
+  int64_t published_at;
+  /**
+   * Creation time, Unix timestamp in seconds
+   */
+  int64_t created_at;
+  /**
+   * Last updated time, Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_agent_t;
+
+/**
+ * Response for `lb_agent_context_agents`
+ */
+typedef struct lb_agents_response_t {
+  /**
+   * Agent list
+   */
+  const struct lb_agent_t *agents;
+  /**
+   * Number of agents in the array
+   */
+  uintptr_t num_agents;
+  /**
+   * Total number of matching Agents
+   */
+  int32_t total;
+} lb_agents_response_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+
+const struct lb_agent_context_t *lb_agent_context_new(const struct lb_config_t *config);
+
+void lb_agent_context_retain(const struct lb_agent_context_t *ctx);
+
+void lb_agent_context_release(const struct lb_agent_context_t *ctx);
+
+uintptr_t lb_agent_context_ref_count(const struct lb_agent_context_t *ctx);
+
+/**
+ * List the Workspaces the current account belongs to. Returns
+ * `CWorkspacesResponse`.
+ */
+void lb_agent_context_workspaces(const struct lb_agent_context_t *ctx,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * List the Agents in the specified Workspace. Returns `CAgentsResponse`.
+ *
+ * @param[in] opts Options for get agents request (can be null)
+ */
+void lb_agent_context_agents(const struct lb_agent_context_t *ctx,
+                             const char *workspace_id,
+                             const struct lb_get_agents_options_t *opts,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * List all publicly available Agents on the platform (the Explore catalog).
+ * Not scoped to a Workspace. Returns `CAgentsResponse`.
+ *
+ * @param[in] opts Options for the request (can be null)
+ */
+void lb_agent_context_public_agents(const struct lb_agent_context_t *ctx,
+                                    const struct lb_get_agents_options_t *opts,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Start a conversation with the specified Agent, blocking until the run
+ * succeeds, is interrupted, or fails. Returns `CConversationResponse`.
+ *
+ * @param[in] chat_uid          Existing conversation identifier to continue
+ *                              within (can be null to start a brand-new
+ *                              conversation)
+ * @param[in] parent_message_id `message_id` from a previous response. Pass it
+ *                              when asking a follow-up in an existing
+ *                              conversation to attach the new message after
+ *                              the specified one, keeping the message stream
+ *                              in order. Only valid together with `chat_uid`,
+ *                              the parent message must belong to that
+ *                              conversation, and it must be null for a new
+ *                              conversation (can be null)
+ */
+void lb_agent_context_conversation(const struct lb_agent_context_t *ctx,
+                                   const char *agent_id,
+                                   const char *query,
+                                   const char *chat_uid,
+                                   const char *parent_message_id,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
+
+/**
+ * Resume an interrupted conversation, blocking until the run succeeds, is
+ * interrupted again, or fails. Returns `CConversationResponse`.
+ *
+ * @param[in] answers      Answers keyed by `tool_call_id`, see
+ *                         `CAnswersByToolCallEntry` (can be null if
+ *                         `num_answers` is 0)
+ * @param[in] num_answers  Number of entries in `answers`
+ */
+void lb_agent_context_continue_conversation(const struct lb_agent_context_t *ctx,
+                                            const char *agent_id,
+                                            const char *chat_uid,
+                                            const char *message_id,
+                                            const struct lb_answers_by_tool_call_entry_t *answers,
+                                            uintptr_t num_answers,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Start a conversation with the specified Agent, calling `event_callback`
+ * for every run-progress event observed over SSE. A `WorkflowFinished`
+ * event carries the run's outcome, but isn't necessarily the last one seen —
+ * the server may still emit a few more housekeeping events (e.g. a
+ * `ChatTitleUpdated`) before actually closing the connection. Once the
+ * stream truly ends, `callback` is invoked with the final
+ * `CConversationResponse` — same as `lb_agent_context_conversation`, just
+ * arrived at via the streamed path.
+ *
+ * @param[in] chat_uid            Existing conversation identifier to
+ *                                continue within (can be null to start a
+ *                                brand-new conversation)
+ * @param[in] parent_message_id   `message_id` from a previous response, to
+ *                                attach a follow-up after that message. Only
+ *                                valid together with `chat_uid` and must be
+ *                                null for a new conversation (can be null)
+ * @param[in] event_callback      Called once per stream event, on an
+ *                                internal worker thread
+ * @param[in] event_userdata      Opaque pointer forwarded to
+ *                                `event_callback`
+ * @param[in] event_free_userdata Called exactly once, after the stream ends
+ *                                (successfully or not), to free
+ *                                `event_userdata` (can be null)
+ */
+void lb_agent_context_conversation_streamed(const struct lb_agent_context_t *ctx,
+                                            const char *agent_id,
+                                            const char *query,
+                                            const char *chat_uid,
+                                            const char *parent_message_id,
+                                            lb_conversation_event_callback_t event_callback,
+                                            void *event_userdata,
+                                            lb_free_userdata_func_t event_free_userdata,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Resume an interrupted conversation, calling `event_callback` for every
+ * run-progress event observed over SSE, then `callback` with the final
+ * `CConversationResponse` once the stream ends — same shape as
+ * `lb_agent_context_conversation_streamed`.
+ *
+ * @param[in] answers             Answers keyed by `tool_call_id`, see
+ *                                `CAnswersByToolCallEntry` (can be null if
+ *                                `num_answers` is 0)
+ * @param[in] num_answers         Number of entries in `answers`
+ * @param[in] event_callback      Called once per stream event, on an
+ *                                internal worker thread
+ * @param[in] event_userdata      Opaque pointer forwarded to
+ *                                `event_callback`
+ * @param[in] event_free_userdata Called exactly once, after the stream ends
+ *                                (successfully or not), to free
+ *                                `event_userdata` (can be null)
+ */
+void lb_agent_context_continue_conversation_streamed(const struct lb_agent_context_t *ctx,
+                                                     const char *agent_id,
+                                                     const char *chat_uid,
+                                                     const char *message_id,
+                                                     const struct lb_answers_by_tool_call_entry_t *answers,
+                                                     uintptr_t num_answers,
+                                                     lb_conversation_event_callback_t event_callback,
+                                                     void *event_userdata,
+                                                     lb_free_userdata_func_t event_free_userdata,
+                                                     lb_async_callback_t callback,
+                                                     void *userdata);
 
 const struct lb_alert_context_t *lb_alert_context_new(const struct lb_config_t *config);
 
@@ -8866,17 +14323,17 @@ void lb_alert_context_delete(const struct lb_alert_context_t *ctx,
  * @param config  Config object
  * @return A new asset context
  */
-const struct CAssetContext *lb_asset_context_new(const struct lb_config_t *config);
+const struct lb_asset_context_t *lb_asset_context_new(const struct lb_config_t *config);
 
 /**
  * Retain the asset context (increment reference count)
  */
-void lb_asset_context_retain(const struct CAssetContext *ctx);
+void lb_asset_context_retain(const struct lb_asset_context_t *ctx);
 
 /**
  * Release the asset context (decrement reference count)
  */
-void lb_asset_context_release(const struct CAssetContext *ctx);
+void lb_asset_context_release(const struct lb_asset_context_t *ctx);
 
 /**
  * Get statement data list
@@ -8888,7 +14345,7 @@ void lb_asset_context_release(const struct CAssetContext *ctx);
  * @param callback        Async callback
  * @param userdata        User data passed to the callback
  */
-void lb_asset_context_statements(const struct CAssetContext *ctx,
+void lb_asset_context_statements(const struct lb_asset_context_t *ctx,
                                  int32_t statement_type,
                                  int32_t start_date,
                                  int32_t limit,
@@ -8903,7 +14360,7 @@ void lb_asset_context_statements(const struct CAssetContext *ctx,
  * @param callback  Async callback
  * @param userdata  User data passed to the callback
  */
-void lb_asset_context_download_url(const struct CAssetContext *ctx,
+void lb_asset_context_download_url(const struct lb_asset_context_t *ctx,
                                    const char *file_key,
                                    lb_async_callback_t callback,
                                    void *userdata);
@@ -8916,12 +14373,18 @@ void lb_calendar_context_release(const struct lb_calendar_context_t *ctx);
 
 /**
  * Get financial calendar events.
+ *
+ * `count`, `offset` and `next` are optional pagination controls; pass `NULL`
+ * to omit any of them and use the server default.
  */
 void lb_calendar_context_finance_calendar(const struct lb_calendar_context_t *ctx,
                                           enum lb_calendar_category_t category,
                                           const char *start,
                                           const char *end,
                                           const char *market,
+                                          const int32_t *count,
+                                          const int32_t *offset,
+                                          const enum lb_calendar_page_direction_t *next,
                                           lb_async_callback_t callback,
                                           void *userdata);
 
@@ -8931,9 +14394,10 @@ void lb_calendar_context_finance_calendar(const struct lb_calendar_context_t *ct
  * Optional environment variables are read automatically:
  * `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
- * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
- * `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
- * to override any of these values after construction.
+ * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+ * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`.  Use the
+ * corresponding `lb_config_set_*` functions to override any of these values
+ * after construction.
  *
  * @param app_key       App key
  * @param app_secret    App secret
@@ -8952,7 +14416,8 @@ struct lb_config_t *lb_config_from_apikey(const char *app_key,
  * `LONGBRIDGE_ACCESS_TOKEN`, `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_LANGUAGE`,
  * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
- * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`
+ * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+ * `LONGBRIDGE_LOG_PATH`
  */
 struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
 
@@ -8962,9 +14427,10 @@ struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
  * Optional environment variables are read automatically:
  * `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
- * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
- * `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
- * to override any of these values after construction.
+ * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+ * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`.  Use the
+ * corresponding `lb_config_set_*` functions to override any of these values
+ * after construction.
  *
  * Does **not** take ownership of `oauth`. The caller must free `oauth` with
  * `lb_oauth_free` after this call returns.
@@ -9022,11 +14488,38 @@ void lb_config_set_push_candlestick_mode(struct lb_config_t *config,
                                          enum lb_push_candlestick_mode_t mode);
 
 /**
+ * Set the transport used by the quote pull APIs
+ *
+ * Default: `QuoteTransport_WebSocket` (or `LONGBRIDGE_QUOTE_TRANSPORT` =
+ * `ws` / `http`)
+ *
+ * @param config     Config object
+ * @param transport  Quote transport
+ */
+void lb_config_set_quote_transport(struct lb_config_t *config, enum lb_quote_transport_t transport);
+
+/**
  * Disable printing of quote packages on connection
  *
  * @param config  Config object
  */
 void lb_config_disable_print_quote_packages(struct lb_config_t *config);
+
+/**
+ * Enable paper trading mode.
+ *
+ * When enabled, all API calls target the paper trading (simulation)
+ * environment.  The server validates the token: if it belongs to a real-money
+ * account the server returns an error.
+ *
+ * When disabled (the default) the server imposes no restrictions — both
+ * paper trading and real-money accounts are accepted.
+ *
+ * Paper trading users should call this function as a safety guard.
+ *
+ * @param config  Config object
+ */
+void lb_config_enable_papertrading(struct lb_config_t *config);
 
 /**
  * Set the log file path
@@ -9269,9 +14762,322 @@ void lb_error_free(struct lb_error_t *error);
 
 const char *lb_error_message(const struct lb_error_t *error);
 
+/**
+ * Returns the error code.
+ *
+ * For `ErrorKindHttp` it is the HTTP status, for
+ * `ErrorKindOpenApi` the OpenAPI error code. For `ErrorKindOAuth`
+ * it is a stable code identifying the failure:
+ *
+ * | Code | Meaning |
+ * |------|---------|
+ * | 0 | other (e.g. NULL OAuth handle) |
+ * | 1 | no token available |
+ * | 2 | no refresh token |
+ * | 3 | token refresh failed |
+ * | 4 | token revocation failed |
+ * | 5 | authorization failed |
+ * | 6 | authorization timeout |
+ * | 7 | authorization code exchange failed |
+ * | 8 | CSRF token mismatch |
+ * | 9 | failed to bind the callback server |
+ * | 10 | failed to get the local address |
+ * | 11 | callback channel closed |
+ * | 12 | cannot determine the home directory |
+ * | 13 | failed to read the token file |
+ * | 14 | failed to parse the token file |
+ * | 15 | failed to write the token file |
+ * | 16 | failed to delete the token file |
+ * | 17 | failed to create the token directory |
+ * | 18 | failed to serialize the token |
+ *
+ * It is 0 when the error carries no code; check `lb_error_kind` first.
+ */
 int64_t lb_error_code(const struct lb_error_t *error);
 
 enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
+
+const struct lb_fund_context_t *lb_fund_context_new(const struct lb_config_t *config);
+
+void lb_fund_context_retain(const struct lb_fund_context_t *ctx);
+
+void lb_fund_context_release(const struct lb_fund_context_t *ctx);
+
+/**
+ * Get the hot-selling fund list
+ */
+void lb_fund_context_hot_funds(const struct lb_fund_context_t *ctx,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get the fund list
+ *
+ * @param[in] opts Options for get funds request (can be null)
+ */
+void lb_fund_context_funds(const struct lb_fund_context_t *ctx,
+                           const struct lb_get_funds_options_t *opts,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Get the fund list filter options
+ */
+void lb_fund_context_filters(const struct lb_fund_context_t *ctx,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Get fund detail
+ */
+void lb_fund_context_detail(const struct lb_fund_context_t *ctx,
+                            const char *counter_id,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Get fund analysis (level 1)
+ *
+ * @param[in] opts Options for the analysis request (can be null)
+ */
+void lb_fund_context_analysis(const struct lb_fund_context_t *ctx,
+                              const char *counter_id,
+                              const struct lb_get_fund_analysis_options_t *opts,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Get fund analysis detail (level 2)
+ *
+ * @param[in] opts Options for the analysis request (can be null)
+ */
+void lb_fund_context_analysis_detail(const struct lb_fund_context_t *ctx,
+                                     const char *counter_id,
+                                     const struct lb_get_fund_analysis_options_t *opts,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
+
+/**
+ * Get fund trend chart
+ *
+ * @param[in] opts Options for the trend request (can be null)
+ */
+void lb_fund_context_trend(const struct lb_fund_context_t *ctx,
+                           const char *counter_id,
+                           const struct lb_get_fund_analysis_options_t *opts,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Get fund annual returns
+ *
+ * @param[in] opts Paging options (can be null)
+ */
+void lb_fund_context_annual_returns(const struct lb_fund_context_t *ctx,
+                                    const char *counter_id,
+                                    const struct lb_fund_page_options_t *opts,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Get fund quarterly returns
+ *
+ * @param[in] opts Paging options (can be null)
+ */
+void lb_fund_context_quarterly_returns(const struct lb_fund_context_t *ctx,
+                                       const char *counter_id,
+                                       const struct lb_fund_page_options_t *opts,
+                                       lb_async_callback_t callback,
+                                       void *userdata);
+
+/**
+ * Get fund performance figures
+ */
+void lb_fund_context_performance(const struct lb_fund_context_t *ctx,
+                                 const char *counter_id,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get fund performance comparison
+ *
+ * @param[in] opts Options for the comparison request (can be null)
+ */
+void lb_fund_context_performance_comparison(const struct lb_fund_context_t *ctx,
+                                            const char *counter_id,
+                                            const struct lb_get_fund_analysis_options_t *opts,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Get fund latest net value
+ */
+void lb_fund_context_nav(const struct lb_fund_context_t *ctx,
+                         const char *counter_id,
+                         lb_async_callback_t callback,
+                         void *userdata);
+
+/**
+ * Get fund historical net value (paged)
+ *
+ * @param[in] opts Paging options (can be null)
+ */
+void lb_fund_context_nav_history(const struct lb_fund_context_t *ctx,
+                                 const char *counter_id,
+                                 const struct lb_fund_page_options_t *opts,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get fund historical net value by relative time range
+ *
+ * @param[in] opts Net-value range options (can be null)
+ */
+void lb_fund_context_nav_range(const struct lb_fund_context_t *ctx,
+                               const char *counter_id,
+                               const struct lb_fund_nav_range_options_t *opts,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get a fund's top-10 holdings
+ *
+ * @param[in] opts Options for the holdings request (can be null)
+ */
+void lb_fund_context_holdings(const struct lb_fund_context_t *ctx,
+                              const char *counter_id,
+                              const struct lb_get_fund_holdings_options_t *opts,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Get the stocks held by a fund (reverse lookup)
+ *
+ * @param[in] opts Options for the stock-holdings request (can be null)
+ */
+void lb_fund_context_stock_holdings(const struct lb_fund_context_t *ctx,
+                                    const char *counter_id,
+                                    const struct lb_get_fund_stock_holdings_options_t *opts,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Get the user's fund positions overview
+ *
+ * @param[in] opts Options for the positions request (can be null)
+ */
+void lb_fund_context_positions(const struct lb_fund_context_t *ctx,
+                               const struct lb_fund_positions_options_t *opts,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get the user's single fund position detail
+ *
+ * @param[in] opts Options for the position request (can be null)
+ */
+void lb_fund_context_position(const struct lb_fund_context_t *ctx,
+                              const char *counter_id,
+                              const struct lb_get_fund_position_options_t *opts,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Get the performance figures of a held fund
+ */
+void lb_fund_context_position_performance(const struct lb_fund_context_t *ctx,
+                                          const char *counter_id,
+                                          lb_async_callback_t callback,
+                                          void *userdata);
+
+/**
+ * Get the cumulative-profit series of a held fund
+ *
+ * @param[in] opts Options for the profits request (can be null)
+ */
+void lb_fund_context_position_profits(const struct lb_fund_context_t *ctx,
+                                      const char *counter_id,
+                                      const struct lb_get_fund_position_profits_options_t *opts,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
+ * Get the net-value history of a held fund
+ *
+ * @param[in] opts Net-value range options (can be null)
+ */
+void lb_fund_context_position_nav(const struct lb_fund_context_t *ctx,
+                                  const char *counter_id,
+                                  const struct lb_fund_nav_range_options_t *opts,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Get the dividend records of a held fund
+ *
+ * @param[in] opts Options for the dividends request (can be null)
+ */
+void lb_fund_context_position_dividends(const struct lb_fund_context_t *ctx,
+                                        const char *counter_id,
+                                        const struct lb_get_fund_position_dividends_options_t *opts,
+                                        lb_async_callback_t callback,
+                                        void *userdata);
+
+/**
+ * Get the user's fund orders
+ *
+ * @param[in] opts Options for the orders request (can be null)
+ */
+void lb_fund_context_orders(const struct lb_fund_context_t *ctx,
+                            const struct lb_get_fund_orders_options_t *opts,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Get a fund order detail
+ */
+void lb_fund_context_order(const struct lb_fund_context_t *ctx,
+                           int64_t order_id,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Get the user's fund transactions (cash-flow records)
+ *
+ * @param[in] opts Options for the transactions request (can be null)
+ */
+void lb_fund_context_transactions(const struct lb_fund_context_t *ctx,
+                                  const struct lb_get_fund_transactions_options_t *opts,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Validate a fund order before submitting
+ *
+ * @param[in] opts Options for the validate request
+ */
+void lb_fund_context_validate_order(const struct lb_fund_context_t *ctx,
+                                    const struct lb_validate_fund_order_options_t *opts,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Submit a fund order (buy / sell)
+ *
+ * @param[in] opts Options for the submit request
+ */
+void lb_fund_context_submit_order(const struct lb_fund_context_t *ctx,
+                                  const struct lb_submit_fund_order_options_t *opts,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Cancel (withdraw) a fund order
+ */
+void lb_fund_context_cancel_order(const struct lb_fund_context_t *ctx,
+                                  int64_t order_id,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
 
 const struct lb_fundamental_context_t *lb_fundamental_context_new(const struct lb_config_t *config);
 
@@ -9438,14 +15244,6 @@ void lb_fundamental_context_buyback(const struct lb_fundamental_context_t *ctx,
                                     void *userdata);
 
 /**
- * Get stock ratings. Returns `CStockRatings`.
- */
-void lb_fundamental_context_ratings(const struct lb_fundamental_context_t *ctx,
-                                    const char *symbol,
-                                    lb_async_callback_t callback,
-                                    void *userdata);
-
-/**
  * Get ranked list of top shareholders. Returns `CShareholderTopResponse`.
  */
 void lb_fundamental_context_shareholder_top(const struct lb_fundamental_context_t *ctx,
@@ -9498,9 +15296,9 @@ void lb_fundamental_context_institution_rating_views(const struct lb_fundamental
  * Returns `CIndustryRankResponse`.
  */
 void lb_fundamental_context_industry_rank(const struct lb_fundamental_context_t *ctx,
-                                          const char *market,
-                                          const char *indicator,
-                                          const char *sort_type,
+                                          enum lb_market_t market,
+                                          enum lb_industry_rank_indicator_t indicator,
+                                          enum lb_industry_rank_sort_type_t sort_type,
                                           uint32_t limit,
                                           lb_async_callback_t callback,
                                           void *userdata);
@@ -9511,7 +15309,7 @@ void lb_fundamental_context_industry_rank(const struct lb_fundamental_context_t 
  * Pass NULL for `industry_id` to omit it.
  */
 void lb_fundamental_context_industry_peers(const struct lb_fundamental_context_t *ctx,
-                                           const char *counter_id,
+                                           const char *symbol,
                                            const char *market,
                                            const char *industry_id,
                                            lb_async_callback_t callback,
@@ -9552,6 +15350,105 @@ void lb_fundamental_context_etf_asset_allocation(const struct lb_fundamental_con
                                                  const char *symbol,
                                                  lb_async_callback_t callback,
                                                  void *userdata);
+
+const struct lb_grid_context_t *lb_grid_context_new(const struct lb_config_t *config);
+
+void lb_grid_context_retain(const struct lb_grid_context_t *ctx);
+
+void lb_grid_context_release(const struct lb_grid_context_t *ctx);
+
+/**
+ * Submit a grid trading order
+ *
+ * @param[in] opts Options for submit grid order request
+ */
+void lb_grid_context_submit(const struct lb_grid_context_t *ctx,
+                            const struct lb_submit_grid_order_options_t *opts,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Replace (modify) a grid trading order
+ *
+ * @param[in] opts Options for replace grid order request
+ */
+void lb_grid_context_replace(const struct lb_grid_context_t *ctx,
+                             const struct lb_replace_grid_order_options_t *opts,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Get grid trading orders (paged list)
+ *
+ * @param[in] opts Options for get grid orders request (can be null)
+ */
+void lb_grid_context_list(const struct lb_grid_context_t *ctx,
+                          const struct lb_get_grid_orders_options_t *opts,
+                          lb_async_callback_t callback,
+                          void *userdata);
+
+/**
+ * Query grid trading orders by IDs
+ *
+ * @param[in] opts Options for get grid orders by ids request
+ */
+void lb_grid_context_list_by_ids(const struct lb_grid_context_t *ctx,
+                                 const struct lb_get_grid_orders_by_ids_options_t *opts,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get grid trading order detail (and paged history)
+ *
+ * @param[in] opts Options for get grid order detail request
+ */
+void lb_grid_context_detail(const struct lb_grid_context_t *ctx,
+                            const struct lb_get_grid_order_detail_options_t *opts,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Get grid trading trigger history
+ *
+ * @param[in] opts Options for get grid trigger history request
+ */
+void lb_grid_context_trigger_history(const struct lb_grid_context_t *ctx,
+                                     const struct lb_get_grid_trigger_history_options_t *opts,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
+
+/**
+ * Cancel a grid trading order
+ */
+void lb_grid_context_cancel(const struct lb_grid_context_t *ctx,
+                            const char *order_id,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Suspend a grid trading order
+ */
+void lb_grid_context_suspend(const struct lb_grid_context_t *ctx,
+                             const char *order_id,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Restart a grid trading order
+ */
+void lb_grid_context_restart(const struct lb_grid_context_t *ctx,
+                             const char *order_id,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Get the security (symbol) info used to build a grid order (lot size,
+ * authorization flag, settlement currency, etc.).
+ */
+void lb_grid_context_symbol_info(const struct lb_grid_context_t *ctx,
+                                 const char *symbol,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
 
 /**
  * Create a HTTP client using API Key authentication
@@ -9786,6 +15683,32 @@ struct lb_oauth_t *lb_oauth_clone(const struct lb_oauth_t *oauth);
  */
 void lb_oauth_free(struct lb_oauth_t *oauth);
 
+/**
+ * Asynchronously revoke the current token on the server (RFC 7009)
+ *
+ * The refresh token is revoked when present, otherwise the access token.
+ * Only the server is contacted; the cached token on disk is left untouched
+ * (use `lb_oauth_clear` to remove it).
+ *
+ * @param oauth     OAuth 2.0 client; if NULL, `callback` receives an error
+ * @param callback  Async completion callback; `error` is set on failure
+ * @param userdata  Opaque pointer forwarded to `callback`
+ */
+void lb_oauth_revoke(const struct lb_oauth_t *oauth, lb_async_callback_t callback, void *userdata);
+
+/**
+ * Asynchronously clear the token locally
+ *
+ * Drops the in-memory token and deletes the cached token file
+ * (`~/.longbridge/openapi/tokens/<client_id>`). The server is not contacted
+ * (use `lb_oauth_revoke` for that).
+ *
+ * @param oauth     OAuth 2.0 client; if NULL, `callback` receives an error
+ * @param callback  Async completion callback; `error` is set on failure
+ * @param userdata  Opaque pointer forwarded to `callback`
+ */
+void lb_oauth_clear(const struct lb_oauth_t *oauth, lb_async_callback_t callback, void *userdata);
+
 const struct lb_portfolio_context_t *lb_portfolio_context_new(const struct lb_config_t *config);
 
 void lb_portfolio_context_retain(const struct lb_portfolio_context_t *ctx);
@@ -9794,6 +15717,8 @@ void lb_portfolio_context_release(const struct lb_portfolio_context_t *ctx);
 
 /**
  * Get exchange rates. Returns CExchangeRates.
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_portfolio_context_exchange_rate(const struct lb_portfolio_context_t *ctx,
                                         lb_async_callback_t callback,
@@ -10084,11 +16009,20 @@ void lb_quote_context_option_chain_expiry_date_list(const struct lb_quote_contex
                                                     void *userdata);
 
 /**
- * Get option chain info by date
+ * Get the option contract list of an underlying security for a given expiry
+ * date
+ *
+ * Every contract is an independent entry: calls and puts are not paired, so a
+ * strike price that is listed on one side only yields a single entry.
+ *
+ * `standard_only` filters out the legacy contracts produced by corporate
+ * actions. `true` returns standard contracts only; `false` returns everything,
+ * including the contracts carrying `OptionStandardAttrOld`.
  */
 void lb_quote_context_option_chain_info_by_date(const struct lb_quote_context_t *ctx,
                                                 const char *symbol,
                                                 const struct lb_date_t *expiry_date,
+                                                bool standard_only,
                                                 lb_async_callback_t callback,
                                                 void *userdata);
 
@@ -10492,6 +16426,15 @@ void lb_trade_context_set_on_order_changed(const struct lb_trade_context_t *ctx,
                                            void *userdata,
                                            lb_free_userdata_func_t free_userdata);
 
+/**
+ * Set grid order changed callback, after receiving the grid order changed
+ * event, it will call back to this function.
+ */
+void lb_trade_context_set_on_grid_order_changed(const struct lb_trade_context_t *ctx,
+                                                COnGridOrderChangedCallback callback,
+                                                void *userdata,
+                                                lb_free_userdata_func_t free_userdata);
+
 void lb_trade_context_subscribe(const struct lb_trade_context_t *ctx,
                                 const enum lb_topic_type_t *topics,
                                 uintptr_t num_topics,
@@ -10506,6 +16449,8 @@ void lb_trade_context_unsubscribe(const struct lb_trade_context_t *ctx,
 
 /**
  * Get history executions
+ *
+ * `side` may be `Unknown` on Longbridge US accounts.
  *
  * @param[in] opts Options for get history executions request (can be null)
  */
@@ -10523,6 +16468,19 @@ void lb_trade_context_today_executions(const struct lb_trade_context_t *ctx,
                                        const struct lb_get_today_executions_options_t *opts,
                                        lb_async_callback_t callback,
                                        void *userdata);
+
+/**
+ * Get all executions
+ *
+ * AP accounts only: US data-center accounts get a region error; use
+ * `lb_trade_context_history_executions` instead.
+ *
+ * @param[in] opts Options for get all executions request (can be null)
+ */
+void lb_trade_context_all_executions(const struct lb_trade_context_t *ctx,
+                                     const struct lb_get_all_executions_options_t *opts,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
 
 /**
  * Get history orders
@@ -10565,6 +16523,18 @@ void lb_trade_context_submit_order(const struct lb_trade_context_t *ctx,
                                    void *userdata);
 
 /**
+ * Submit a multi-leg option combination order (such as vertical spreads,
+ * straddles, strangles, collars, etc.). All legs are submitted together as a
+ * single strategy order.
+ *
+ * @param[in] opts Options for submit multi-leg order request
+ */
+void lb_trade_context_submit_multileg(const struct lb_trade_context_t *ctx,
+                                      const struct CSubmitMultiLegOrderOptions *opts,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
  * Cancel order
  */
 void lb_trade_context_cancel_order(const struct lb_trade_context_t *ctx,
@@ -10573,7 +16543,17 @@ void lb_trade_context_cancel_order(const struct lb_trade_context_t *ctx,
                                    void *userdata);
 
 /**
+ * Cancel attached order
+ */
+void lb_trade_context_cancel_order_attached(const struct lb_trade_context_t *ctx,
+                                            const char *order_id,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
  * Get account balance
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_trade_context_account_balance(const struct lb_trade_context_t *ctx,
                                       const char *currency,
@@ -10582,6 +16562,8 @@ void lb_trade_context_account_balance(const struct lb_trade_context_t *ctx,
 
 /**
  * Get cash flow
+ *
+ * AP accounts only: US data-center accounts get a region error.
  *
  * @param[in] opts Options for get cash flow request
  */
@@ -10593,6 +16575,9 @@ void lb_trade_context_cash_flow(const struct lb_trade_context_t *ctx,
 /**
  * Get fund positions
  *
+ * AP accounts only: US data-center accounts have no fund holdings and get a
+ * region error. No US equivalent.
+ *
  * @param[in] opts Options for get fund positions request
  */
 void lb_trade_context_fund_positions(const struct lb_trade_context_t *ctx,
@@ -10603,6 +16588,8 @@ void lb_trade_context_fund_positions(const struct lb_trade_context_t *ctx,
 /**
  * Get stock positions
  *
+ * AP accounts only: US data-center accounts get a region error.
+ *
  * @param[in] opts Options for get stock positions request
  */
 void lb_trade_context_stock_positions(const struct lb_trade_context_t *ctx,
@@ -10612,6 +16599,9 @@ void lb_trade_context_stock_positions(const struct lb_trade_context_t *ctx,
 
 /**
  * Get margin ratio
+ *
+ * AP accounts only: US data-center accounts get a region error. No US
+ * equivalent.
  */
 void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
                                    const char *symbol,
@@ -10620,11 +16610,21 @@ void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
 
 /**
  * Get order detail
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_trade_context_order_detail(const struct lb_trade_context_t *ctx,
                                    const char *order_id,
                                    lb_async_callback_t callback,
                                    void *userdata);
+
+/**
+ * Get order detail for attached order
+ */
+void lb_trade_context_order_detail_attached(const struct lb_trade_context_t *ctx,
+                                            const char *order_id,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
 
 /**
  * Get order detail

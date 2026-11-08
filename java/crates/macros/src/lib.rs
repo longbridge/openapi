@@ -129,8 +129,8 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
         let java_field = ident.to_string().to_camel_case();
 
         if let Some(set_type) = args.set_as_opt.as_ref() {
-            // Option<T> field: pass ident.map(set_type::from) as Option<set_type>, which
-            // implements IntoJValue
+            // Option<T> field: pass ident.map(set_type::from) as
+            // Option<set_type>, which implements IntoJValue
             set_fields.push(quote! {
                 crate::types::set_field(env, &obj, #java_field, #ident.map(#set_type::from))?;
             });
@@ -317,8 +317,19 @@ pub fn impl_java_enum(input: TokenStream) -> TokenStream {
                 use #type_path::*;
                 let cls = <Self as crate::types::ClassLoader>::class_ref();
                 let value = value.l()?;
+                if value.is_null() {
+                    crate::error::throw_illegal_argument(
+                        env,
+                        concat!("argument of enum type ", #classname, " must not be null"),
+                    );
+                    return Err(jni::errors::Error::JavaException);
+                }
                 #(#from_jsvalue)*
-                panic!("invalid enum value")
+                crate::error::throw_illegal_argument(
+                    env,
+                    concat!("unrecognized enum value for ", #classname),
+                );
+                Err(jni::errors::Error::JavaException)
             }
         }
 

@@ -1,23 +1,33 @@
 use longbridge::alert::types as lb;
-use pyo3::{exceptions::PyRuntimeError, prelude::*};
+use pyo3::prelude::*;
 
-#[derive(Debug, Clone)]
-pub(crate) struct JsonValue(pub(crate) serde_json::Value);
+use crate::decimal::PyDecimal;
 
-impl<'py> IntoPyObject<'py> for JsonValue {
-    type Target = PyAny;
-    type Output = Bound<'py, PyAny>;
-    type Error = PyErr;
-    fn into_pyobject(self, py: Python<'py>) -> PyResult<Self::Output> {
-        pythonize::pythonize(py, &self.0).map_err(|e| PyRuntimeError::new_err(e.to_string()))
+/// Trigger value of a price alert (exactly one field is populated).
+#[pyclass(get_all, from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct AlertValueMap {
+    /// Absolute price threshold, e.g. `500`.
+    pub price: Option<PyDecimal>,
+    /// Percentage-change threshold, e.g. `5`.
+    pub chg: Option<f64>,
+}
+
+impl From<lb::AlertValueMap> for AlertValueMap {
+    fn from(v: lb::AlertValueMap) -> Self {
+        Self {
+            price: v.price.map(Into::into),
+            chg: v.chg,
+        }
     }
 }
-impl<'py> IntoPyObject<'py> for &JsonValue {
-    type Target = PyAny;
-    type Output = Bound<'py, PyAny>;
-    type Error = PyErr;
-    fn into_pyobject(self, py: Python<'py>) -> PyResult<Self::Output> {
-        pythonize::pythonize(py, &self.0).map_err(|e| PyRuntimeError::new_err(e.to_string()))
+
+impl From<AlertValueMap> for lb::AlertValueMap {
+    fn from(v: AlertValueMap) -> Self {
+        Self {
+            price: v.price.map(Into::into),
+            chg: v.chg,
+        }
     }
 }
 
@@ -32,7 +42,7 @@ pub(crate) struct AlertItem {
     pub scope: i32,
     pub text: String,
     pub state: Vec<i32>,
-    pub value_map: JsonValue,
+    pub value_map: AlertValueMap,
 }
 
 impl From<lb::AlertItem> for AlertItem {
@@ -45,7 +55,7 @@ impl From<lb::AlertItem> for AlertItem {
             scope: v.scope,
             text: v.text,
             state: v.state,
-            value_map: JsonValue(v.value_map),
+            value_map: v.value_map.into(),
         }
     }
 }
@@ -60,7 +70,7 @@ impl From<AlertItem> for lb::AlertItem {
             scope: v.scope,
             text: v.text,
             state: v.state,
-            value_map: v.value_map.0,
+            value_map: v.value_map.into(),
         }
     }
 }
@@ -72,8 +82,8 @@ impl<'a, 'py> FromPyObject<'a, 'py> for AlertItem {
         let value_map = ob
             .getattr("value_map")
             .ok()
-            .and_then(|v| pythonize::depythonize::<serde_json::Value>(&v).ok())
-            .unwrap_or(serde_json::Value::Null);
+            .and_then(|v| v.extract().ok())
+            .unwrap_or_default();
         Ok(AlertItem {
             id: ob.getattr("id")?.extract()?,
             indicator_id: ob.getattr("indicator_id")?.extract()?,
@@ -82,7 +92,7 @@ impl<'a, 'py> FromPyObject<'a, 'py> for AlertItem {
             scope: ob.getattr("scope")?.extract()?,
             text: ob.getattr("text")?.extract()?,
             state: ob.getattr("state")?.extract()?,
-            value_map: JsonValue(value_map),
+            value_map,
         })
     }
 }

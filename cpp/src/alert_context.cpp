@@ -62,7 +62,8 @@ void AlertContext::update(const AlertItem& item,
     c_item.text          = item.text.c_str();
     c_item.state         = state_copy.data();
     c_item.num_state     = state_copy.size();
-    c_item.value_map     = item.value_map.c_str();
+    c_item.value_map.price = item.value_map.price.c_str();
+    c_item.value_map.chg   = item.value_map.chg ? &*item.value_map.chg : nullptr;
     lb_alert_context_update(ctx_, &c_item,
         [](auto res) {
             auto cb = callback::get_async_callback<AlertContext, void>(res->userdata);

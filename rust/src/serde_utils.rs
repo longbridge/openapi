@@ -5,6 +5,22 @@ use std::str::FromStr;
 use serde::{Deserialize, Deserializer, Serializer, de::Error as _, ser::Error as _};
 use time::{Date, OffsetDateTime};
 
+pub(crate) mod date {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Date, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Date::parse(
+            &s,
+            time::macros::format_description!("[year]-[month]-[day]"),
+        )
+        .map_err(D::Error::custom)
+    }
+}
+
 pub(crate) mod date_opt {
     use super::*;
 
@@ -40,6 +56,41 @@ pub(crate) mod date_opt {
     }
 }
 
+pub(crate) mod date_ymd_opt {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<Date>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        if !value.is_empty() {
+            let date = Date::parse(
+                &value,
+                time::macros::format_description!("[year][month][day]"),
+            )
+            .map_err(D::Error::custom)?;
+            Ok(Some(date))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub(crate) fn serialize<S>(date: &Option<Date>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match date {
+            Some(date) => serializer.serialize_str(
+                &date
+                    .format(time::macros::format_description!("[year][month][day]"))
+                    .unwrap(),
+            ),
+            None => serializer.serialize_none(),
+        }
+    }
+}
+
 pub(crate) mod timestamp {
     use super::*;
 
@@ -57,6 +108,27 @@ pub(crate) mod timestamp {
         S: Serializer,
     {
         serializer.collect_str(&datetime.unix_timestamp())
+    }
+}
+
+pub(crate) mod timestamp_ms {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<OffsetDateTime, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        let value = value.parse::<i64>().map_err(D::Error::custom)?;
+        OffsetDateTime::from_unix_timestamp_nanos(i128::from(value) * 1_000_000)
+            .map_err(D::Error::custom)
+    }
+
+    pub(crate) fn serialize<S>(datetime: &OffsetDateTime, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_str(&(datetime.unix_timestamp_nanos() / 1_000_000))
     }
 }
 
@@ -94,6 +166,34 @@ pub(crate) mod timestamp_opt {
             Some(datetime) => serializer.collect_str(&datetime.unix_timestamp()),
             None => serializer.serialize_none(),
         }
+    }
+}
+
+/// Lenient optional Unix-seconds timestamp for newly added response fields:
+/// accepts a string or an integer; `null`, empty, `0`, a negative value, or a
+/// value that cannot be parsed or is out of range all become `None` instead of
+/// failing the whole response.
+pub(crate) mod timestamp_opt_lenient {
+    use serde_json::Value;
+
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<OffsetDateTime>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let seconds = match Option::<Value>::deserialize(deserializer)? {
+            Some(Value::String(value)) => value.trim().parse::<i64>().ok(),
+            Some(Value::Number(value)) => value.as_i64(),
+            _ => None,
+        };
+        let seconds = seconds.filter(|seconds| *seconds > 0);
+        let datetime =
+            seconds.and_then(|seconds| OffsetDateTime::from_unix_timestamp(seconds).ok());
+        if seconds.is_some() && datetime.is_none() {
+            tracing::warn!(?seconds, "ignoring out-of-range timestamp");
+        }
+        Ok(datetime)
     }
 }
 
@@ -364,8 +464,19 @@ pub(crate) mod int64_str {
     where
         D: Deserializer<'de>,
     {
-        let value = String::deserialize(deserializer)?;
-        Ok(value.parse::<i64>().unwrap_or_default())
+        // The backend may send an int64 as either a JSON string or a JSON
+        // number; accept both so a numeric value never fails the whole
+        // response.
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum StringOrInt {
+            String(String),
+            Int(i64),
+        }
+        match StringOrInt::deserialize(deserializer)? {
+            StringOrInt::Int(n) => Ok(n),
+            StringOrInt::String(s) => Ok(s.parse::<i64>().unwrap_or_default()),
+        }
     }
 }
 
@@ -396,6 +507,29 @@ where
     D: Deserializer<'de>,
 {
     timestamp::deserialize(deserializer)
+}
+
+/// Lenient variant of `int32_opt_0_is_none` for newly added response fields:
+/// accepts an integer or a numeric string; `null`, `0`, or a value that is not
+/// a valid `i32` becomes `None` instead of failing the whole response.
+pub(crate) mod int32_opt_null_or_0_is_none {
+    use serde_json::Value;
+
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<i32>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = match Option::<Value>::deserialize(deserializer)? {
+            Some(Value::Number(value)) => value.as_i64(),
+            Some(Value::String(value)) => value.trim().parse::<i64>().ok(),
+            _ => None,
+        };
+        Ok(value
+            .and_then(|value| i32::try_from(value).ok())
+            .filter(|value| *value != 0))
+    }
 }
 
 pub(crate) mod int32_opt_0_is_none {
@@ -463,6 +597,46 @@ where
     }
 }
 
+pub(crate) mod f64_str {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<f64, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        s.parse::<f64>().map_err(D::Error::custom)
+    }
+}
+
+/// Deserializes a stringly-typed `f64` into `Option<f64>`.  An empty or
+/// non-parseable string (e.g. `"--"`) yields `None`.  Serializes back to a
+/// string form for symmetry with the API's request format.
+pub(crate) mod f64_opt_str {
+    use super::*;
+
+    pub(crate) fn serialize<S>(value: &Option<f64>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serializer.collect_str(value),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        if value.is_empty() {
+            return Ok(None);
+        }
+        Ok(value.parse::<f64>().ok())
+    }
+}
+
 /// Deserializer that maps a JSON `null` to the type's `Default` value.
 pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
 where
@@ -470,4 +644,77 @@ where
     T: Deserialize<'de> + Default,
 {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
+}
+
+/// Deserializes a field that may be a JSON number, string, or null into
+/// `Option<String>`.  Null and missing fields produce `None`; numbers are
+/// converted to their decimal string representation.
+pub(crate) mod value_as_opt_string {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(d: D) -> Result<Option<String>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let v = serde_json::Value::deserialize(d)?;
+        Ok(match v {
+            serde_json::Value::Null => None,
+            serde_json::Value::String(s) if s.is_empty() => None,
+            serde_json::Value::String(s) => Some(s),
+            serde_json::Value::Number(n) => Some(n.to_string()),
+            other => Some(other.to_string()),
+        })
+    }
+
+    pub(crate) fn serialize<S>(v: &Option<String>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match v {
+            Some(val) => s.serialize_str(val),
+            None => s.serialize_none(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde::Deserialize;
+
+    #[derive(Deserialize)]
+    struct Wrap {
+        #[serde(with = "super::int64_str")]
+        value: i64,
+    }
+
+    #[test]
+    fn int64_str_accepts_string_and_number() {
+        // The backend may send an int64 as a quoted string or a bare number;
+        // both must deserialize to the same value.
+        assert_eq!(
+            serde_json::from_str::<Wrap>(r#"{"value":"123"}"#)
+                .unwrap()
+                .value,
+            123
+        );
+        assert_eq!(
+            serde_json::from_str::<Wrap>(r#"{"value":123}"#)
+                .unwrap()
+                .value,
+            123
+        );
+        // Negative values pass through; an unparseable string falls back to 0.
+        assert_eq!(
+            serde_json::from_str::<Wrap>(r#"{"value":-9}"#)
+                .unwrap()
+                .value,
+            -9
+        );
+        assert_eq!(
+            serde_json::from_str::<Wrap>(r#"{"value":""}"#)
+                .unwrap()
+                .value,
+            0
+        );
+    }
 }

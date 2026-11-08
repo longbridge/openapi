@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use serde::{Deserialize, Serialize};
 
 // ── screener_recommend_strategies ─────────────────────────────────
@@ -53,14 +51,14 @@ pub struct ScreenerCondition {
     /// `"macd_day"`
     pub key: String,
     /// Lower bound (empty string = no lower bound)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub min: String,
     /// Upper bound (empty string = no upper bound)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub max: String,
     /// Technical indicator parameters (empty map for fundamental indicators).
     /// Example: `{"category": "goldenfork", "period": "day"}`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tech_values: serde_json::Value,
 }
 

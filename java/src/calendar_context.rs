@@ -6,7 +6,11 @@ use jni::{
 };
 use longbridge::{CalendarContext, Config, calendar::types::*};
 
-use crate::{async_util, error::jni_result, types::get_field};
+use crate::{
+    async_util,
+    error::jni_result,
+    types::{JavaInteger, get_field},
+};
 
 struct ContextObj {
     ctx: CalendarContext,
@@ -45,15 +49,18 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_calendarContextFinan
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let category: Option<CalendarCategory> = get_field(env, &opts, "category")?;
         let category = category.unwrap_or(CalendarCategory::Report);
         let start: String = get_field(env, &opts, "start")?;
         let end: String = get_field(env, &opts, "end")?;
         let market: Option<String> = get_field(env, &opts, "market")?;
+        let count = get_field::<_, _, Option<JavaInteger>>(env, &opts, "count")?.map(i32::from);
+        let offset = get_field::<_, _, Option<JavaInteger>>(env, &opts, "offset")?.map(i32::from);
+        let next: Option<CalendarPageDirection> = get_field(env, &opts, "next")?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
-                .finance_calendar(category, start, end, market)
+            Ok(__owned_ctx
+                .finance_calendar(category, start, end, market, count, offset, next)
                 .await?)
         })?;
         Ok(())

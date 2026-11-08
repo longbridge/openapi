@@ -19,6 +19,11 @@ impl AsyncPortfolioContext {
             ctx: Arc::new(PortfolioContext::new(Arc::new(config.0.clone()))),
         }
     }
+
+    /// Get exchange rates. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `TradeContext.us_exchange_rates` instead.
     fn exchange_rate(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {

@@ -9,14 +9,16 @@ use crate::{
     error::ErrorNewType,
     trade::{
         requests::{
-            EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetHistoryExecutionsOptions,
-            GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-            ReplaceOrderOptions, SubmitOrderOptions,
+            EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
+            GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions,
+            GetTodayOrdersOptions, GetUSTransactionHistoryOptions, ReplaceOrderOptions,
+            SubmitMultiLegOrderOptions, SubmitOrderOptions,
         },
         types::{
-            AccountBalance, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
-            FundPositionsResponse, MarginRatio, Order, OrderDetail, PushOrderChanged,
-            StockPositionsResponse, SubmitOrderResponse, TopicType,
+            AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityResponse,
+            Execution, FundPositionsResponse, MarginRatio, Order, OrderDetail,
+            PushGridOrderChanged, PushOrderChanged, StockPositionsResponse, SubmitOrderResponse,
+            TopicType,
         },
     },
     utils::JsCallback,
@@ -25,6 +27,7 @@ use crate::{
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<JsCallback<PushOrderChanged>>,
+    grid_order_changed: Option<JsCallback<PushGridOrderChanged>>,
 }
 
 /// Trade context
@@ -64,6 +67,24 @@ impl TradeContext {
                                 );
                             }
                         },
+                        PushEvent::GridOrderChanged(grid_order_changed) => {
+                            match grid_order_changed.try_into() {
+                                Ok(grid_order_changed) => {
+                                    if let Some(callback) = &callbacks.grid_order_changed {
+                                        callback.call(
+                                            Ok(grid_order_changed),
+                                            ThreadsafeFunctionCallMode::Blocking,
+                                        );
+                                    }
+                                }
+                                Err(e) => {
+                                    tracing::warn!(
+                                        error = %e,
+                                        "grid order changed push event conversion failed"
+                                    );
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -77,6 +98,22 @@ impl TradeContext {
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void")]
     pub fn set_on_order_changed(&self, callback: Function<PushOrderChanged, ()>) -> Result<()> {
         self.callbacks.lock().order_changed = Some(
+            callback
+                .build_threadsafe_function()
+                .callee_handled::<true>()
+                .build()?,
+        );
+        Ok(())
+    }
+
+    /// Set grid order changed callback, after receiving the grid order changed
+    /// event, it will call back to this function.
+    #[napi(ts_args_type = "callback: (err: null | Error, event: PushGridOrderChanged) => void")]
+    pub fn set_on_grid_order_changed(
+        &self,
+        callback: Function<PushGridOrderChanged, ()>,
+    ) -> Result<()> {
+        self.callbacks.lock().grid_order_changed = Some(
             callback
                 .build_threadsafe_function()
                 .callee_handled::<true>()
@@ -135,6 +172,8 @@ impl TradeContext {
 
     /// Get history executions
     ///
+    /// `side` may be `Unknown` on Longbridge US accounts.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -191,6 +230,22 @@ impl TradeContext {
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Get all executions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `historyExecutions` instead.
+    #[napi]
+    pub async fn all_executions(
+        &self,
+        opts: Option<GetAllExecutionsOptions>,
+    ) -> Result<AllExecutionsResponse> {
+        self.ctx
+            .all_executions(opts.map(Into::into))
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Get history orders
@@ -292,7 +347,7 @@ impl TradeContext {
         opts: ReplaceOrderOptions<'env>,
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = self.ctx.clone();
-        let opts = longbridge::trade::ReplaceOrderOptions::from(opts);
+        let opts = longbridge::trade::ReplaceOrderOptions::try_from(opts)?;
         env.spawn_future(async move {
             ctx.replace_order(opts).await.map_err(ErrorNewType)?;
             Ok(())
@@ -332,9 +387,54 @@ impl TradeContext {
         opts: SubmitOrderOptions<'env>,
     ) -> Result<PromiseRaw<'env, SubmitOrderResponse>> {
         let ctx = self.ctx.clone();
-        let opts = longbridge::trade::SubmitOrderOptions::from(opts);
+        let opts = longbridge::trade::SubmitOrderOptions::try_from(opts)?;
         env.spawn_future(async move {
             let res = ctx.submit_order(opts).await.map_err(ErrorNewType)?;
+            SubmitOrderResponse::try_from(res)
+        })
+    }
+
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const {
+    ///   OAuth, Config,
+    ///   TradeContext,
+    ///   OrderType,
+    ///   OrderSide,
+    ///   Decimal,
+    ///   MultiLegStrategy,
+    /// } = require('longbridge');
+    ///
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.submitMultileg({
+    ///   side: OrderSide.Buy,
+    ///   orderType: OrderType.LO,
+    ///   submittedQuantity: new Decimal("1"),
+    ///   strategy: MultiLegStrategy.VerticalCallSpread,
+    ///   submittedPrice: new Decimal("1.5"),
+    ///   legs: [
+    ///     { symbol: "QQQ260731C764000.US", ratioQuantity: new Decimal("1") },
+    ///     { symbol: "QQQ260731C767000.US", ratioQuantity: new Decimal("1") },
+    ///   ],
+    /// });
+    /// console.log(resp.toString());
+    /// ```
+    #[napi]
+    pub fn submit_multileg<'env>(
+        &self,
+        env: &'env Env,
+        opts: SubmitMultiLegOrderOptions<'env>,
+    ) -> Result<PromiseRaw<'env, SubmitOrderResponse>> {
+        let ctx = self.ctx.clone();
+        let opts = longbridge::trade::SubmitMultiLegOrderOptions::try_from(opts)?;
+        env.spawn_future(async move {
+            let res = ctx.submit_multileg(opts).await.map_err(ErrorNewType)?;
             SubmitOrderResponse::try_from(res)
         })
     }
@@ -351,15 +451,19 @@ impl TradeContext {
     /// await ctx.cancelOrder("709043056541253632");
     /// ```
     #[napi]
-    pub async fn cancel_order(&self, order_id: String) -> Result<()> {
-        self.ctx
-            .cancel_order(order_id)
-            .await
-            .map_err(ErrorNewType)?;
+    pub async fn cancel_order(&self, order_id: String, is_attached: Option<bool>) -> Result<()> {
+        let mut opts = longbridge::trade::CancelOrderOptions::new(order_id);
+        if is_attached.unwrap_or(false) {
+            opts = opts.is_attached();
+        }
+        self.ctx.cancel_order(opts).await.map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Get account balance
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usCashAndBuyPower` (or `usAssetOverview`) instead.
     ///
     /// #### Example
     ///
@@ -385,6 +489,9 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usTransactionHistory` instead.
     ///
     /// #### Example
     ///
@@ -414,6 +521,9 @@ impl TradeContext {
 
     /// Get fund positions
     ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -437,6 +547,9 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usAssetOverview` (`stockList`) instead.
     ///
     /// #### Example
     ///
@@ -462,6 +575,10 @@ impl TradeContext {
 
     /// Get margin ratio
     ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `usCashAndBuyPower`
+    /// (`marginStatus`).
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -483,6 +600,9 @@ impl TradeContext {
 
     /// Get order detail
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usOrderDetail` instead.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -497,6 +617,179 @@ impl TradeContext {
     pub async fn order_detail(&self, order_id: String) -> Result<OrderDetail> {
         self.ctx
             .order_detail(order_id)
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    // ── US-market methods ─────────────────────────────────────────────────
+
+    /// Query US order list. Returns JSON string. US token required.
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+    #[napi]
+    pub fn us_query_orders<'env>(
+        &self,
+        env: &'env Env,
+        symbol: Option<String>,
+        action: i32,
+        start_at: i64,
+        end_at: i64,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+    ) -> Result<PromiseRaw<'env, String>> {
+        let ctx = self.ctx.clone();
+        let opts = longbridge::trade::GetUSHistoryOrders {
+            symbol,
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
+        env.spawn_future(async move {
+            let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
+            serde_json::to_string(&resp).map_err(|e| napi::Error::from_reason(e.to_string()))
+        })
+    }
+
+    /// Get US order detail. US token required.
+    #[napi]
+    pub fn us_order_detail<'env>(
+        &self,
+        env: &'env Env,
+        order_id: String,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USOrderDetailResponse>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_order_detail(order_id)
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get US account asset overview. US token required.
+    #[napi]
+    pub fn us_asset_overview<'env>(
+        &self,
+        env: &'env Env,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USAssetOverview>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(
+            async move { Ok(ctx.us_asset_overview().await.map_err(ErrorNewType)?.into()) },
+        )
+    }
+
+    /// Get US realized P&L. US token required.
+    #[napi]
+    pub fn us_realized_pl<'env>(
+        &self,
+        env: &'env Env,
+        currency: String,
+        category: Option<String>,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USRealizedPL>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get cash, buying power and margin status for the US account. US token
+    /// required.
+    ///
+    /// `currency`: optional, e.g. `"USD"`.
+    #[napi]
+    pub fn us_cash_and_buy_power<'env>(
+        &self,
+        env: &'env Env,
+        currency: Option<String>,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USCashAndBuyPower>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_cash_and_buy_power(currency.as_deref())
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get the quantity of a US holding that is available to trade. US token
+    /// required.
+    ///
+    /// `equityType`: `"STOCK"` (default), `"OPTION"` or `"CRYPTO"`;
+    /// `positionSide`: `"LONG"` (default) or `"SHORT"`.
+    #[napi]
+    pub fn us_available_holding<'env>(
+        &self,
+        env: &'env Env,
+        symbol: String,
+        equity_type: Option<String>,
+        position_side: Option<String>,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USAvailableHolding>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_available_holding(longbridge::trade::GetUSAvailableHoldingOptions {
+                    symbol,
+                    equity_type: equity_type.unwrap_or_default(),
+                    position_side: position_side.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get the US account transaction history, one page at a time. US token
+    /// required.
+    #[napi]
+    pub fn us_transaction_history<'env>(
+        &self,
+        env: &'env Env,
+        opts: GetUSTransactionHistoryOptions,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USTransactionHistory>> {
+        let ctx = self.ctx.clone();
+        let opts = opts.into();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_transaction_history(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get the exchange rates used by the US account. US token required.
+    #[napi]
+    pub fn us_exchange_rates<'env>(
+        &self,
+        env: &'env Env,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USExchangeRates>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(
+            async move { Ok(ctx.us_exchange_rates().await.map_err(ErrorNewType)?.into()) },
+        )
+    }
+
+    #[napi]
+    pub async fn order_detail_attached(&self, order_id: String) -> Result<OrderDetail> {
+        self.ctx
+            .order_detail(longbridge::trade::GetOrderDetailOptions::new(order_id).is_attached())
             .await
             .map_err(ErrorNewType)?
             .try_into()

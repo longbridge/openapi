@@ -77,36 +77,77 @@ impl From<lb::TopMoversEvent> for TopMoversEvent {
 pub(crate) struct TopMoversResponse {
     /// Top-mover events
     pub events: Vec<TopMoversEvent>,
-    /// Pagination cursor for next page (raw JSON object)
-    pub next_params: crate::fundamental::types::JsonValue,
+    /// Pagination cursor for next page (empty string means no more pages)
+    pub next_params: String,
 }
 
 impl From<lb::TopMoversResponse> for TopMoversResponse {
     fn from(v: lb::TopMoversResponse) -> Self {
         Self {
             events: v.events.into_iter().map(Into::into).collect(),
-            next_params: crate::fundamental::types::JsonValue(v.next_params),
+            next_params: v.next_params,
         }
     }
 }
 
 // ── RankCategoriesResponse ────────────────────────────────────────
 
+/// One leaf rank sub-category.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct RankSubCategory {
+    /// Sub-category key (e.g. `"hot_all-us"`). Pass to `rank_list`.
+    pub key: String,
+    /// Display name (e.g. `"美股总热度"`)
+    pub name: String,
+    /// Market code (e.g. `"US"`, `"HK"`)
+    pub market: String,
+}
+
+impl From<lb::RankSubCategory> for RankSubCategory {
+    fn from(v: lb::RankSubCategory) -> Self {
+        Self {
+            key: v.key,
+            name: v.name,
+            market: v.market,
+        }
+    }
+}
+
+/// A top-level rank category grouping sub-categories.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct RankCategory {
+    /// Top-level key (e.g. `"hot"`)
+    pub key: String,
+    /// Display name (e.g. `"热度排行"`)
+    pub name: String,
+    /// Sub-categories
+    pub sub_categories: Vec<RankSubCategory>,
+}
+
+impl From<lb::RankCategory> for RankCategory {
+    fn from(v: lb::RankCategory) -> Self {
+        Self {
+            key: v.key,
+            name: v.name,
+            sub_categories: v.sub_categories.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 /// Rank categories response.
-///
-/// `data` is the raw JSON returned by the API preserved as a Python
-/// object (dict / list / etc.).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct RankCategoriesResponse {
-    /// Raw rank categories data (JSON object)
-    pub data: crate::fundamental::types::JsonValue,
+    /// All top-level rank categories
+    pub categories: Vec<RankCategory>,
 }
 
 impl From<lb::RankCategoriesResponse> for RankCategoriesResponse {
     fn from(v: lb::RankCategoriesResponse) -> Self {
         Self {
-            data: crate::fundamental::types::JsonValue(v.data),
+            categories: v.categories.into_iter().map(Into::into).collect(),
         }
     }
 }

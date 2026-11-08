@@ -30,6 +30,115 @@ export declare class AccountBalance {
   get frozenTransactionFees(): Array<FrozenTransactionFee>
 }
 
+/**
+ * AI Agent conversation context.
+ *
+ * Reference: <https://open.longbridge.com/en/docs/ai/chat/conversation>
+ */
+export declare class AgentContext {
+  /** Create a new AgentContext. */
+  static new(config: Config): AgentContext
+  /**
+   * List the Workspaces the current account belongs to.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.workspaces();
+   * console.log(resp);
+   * ```
+   */
+  workspaces(): Promise<WorkspacesResponse>
+  /**
+   * List the Agents in the specified Workspace.
+   *
+   * `page`/`limit` control pagination; `name` fuzzy-searches by Agent name.
+   * All three are optional.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.agents(workspaceId);
+   * console.log(resp);
+   * ```
+   */
+  agents(workspaceId: string, page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
+   * List all publicly available Agents on the platform (the Explore
+   * catalog). Not scoped to a Workspace.
+   */
+  publicAgents(page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
+   * Start a conversation with the specified Agent, blocking until the run
+   * succeeds, is interrupted, or fails.
+   *
+   * `parentMessageId` is the `messageId` from a previous response. Pass it
+   * when asking a follow-up in an existing conversation to attach the new
+   * message after the specified one, keeping the message stream in order. It
+   * is only valid together with `chatUid`, the parent message must belong to
+   * that conversation, and it must not be set for a new conversation.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversation(agentId, "How has Tesla stock performed recently?");
+   * console.log(resp);
+   * ```
+   */
+  conversation(agentId: string, query: string, chatUid?: string | undefined | null, parentMessageId?: string | undefined | null): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, blocking until the run succeeds, is
+   * interrupted again, or fails.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversation(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>): Promise<ConversationResponse>
+  /**
+   * Start a conversation with the specified Agent, invoking `callback` for
+   * every progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes (this is the same shape
+   * `conversation` returns).
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversationStreamed(
+   *   agentId,
+   *   "How has Tesla stock performed recently?",
+   *   undefined,
+   *   undefined,
+   *   (err, event) => console.log(event),
+   * );
+   * console.log(resp);
+   * ```
+   *
+   * `parentMessageId` behaves as in `conversation`.
+   */
+  conversationStreamed(agentId: string, query: string, chatUid: string | undefined | null, parentMessageId: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, invoking `callback` for every
+   * progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversationStreamed(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+}
+
 /** Price alert management context. */
 export declare class AlertContext {
   /** Create a new AlertContext. */
@@ -54,6 +163,16 @@ export declare class AlertContext {
   delete(alertIds: Array<string>): Promise<void>
 }
 
+/** Response for get all executions request */
+export declare class AllExecutionsResponse {
+  toString(): string
+  toJSON(): any
+  /** Has more records */
+  get hasMore(): boolean
+  /** Execution list */
+  get trades(): Array<Execution>
+}
+
 /** Asset context */
 export declare class AssetContext {
   /** Create a new `AssetContext` */
@@ -62,6 +181,56 @@ export declare class AssetContext {
   statements(req?: GetStatementListRequest | undefined | null): Promise<GetStatementListResponse>
   /** Get statement data download URL */
   statementDownloadUrl(req: GetStatementDownloadUrlRequest): Promise<GetStatementDownloadUrlResponse>
+}
+
+/** Attached order detail */
+export declare class AttachedOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Order ID */
+  get orderId(): string
+  /** Attached order type */
+  get attachedTypeDisplay(): AttachedOrderType
+  /** Trigger price */
+  get triggerPrice(): Decimal | null
+  /** Submitted quantity */
+  get quantity(): Decimal
+  /** Executed quantity */
+  get executedQty(): Decimal
+  /** Order status */
+  get status(): OrderStatus
+  /** Last updated time */
+  get updatedAt(): Date
+  /** Whether withdrawn */
+  get withdrawn(): boolean
+  /** Good till date */
+  get gtd(): NaiveDate | null
+  /** Time in force type */
+  get timeInForce(): TimeInForceType
+  /** Counter ID */
+  get counterId(): string
+  /** Trigger status */
+  get triggerStatus(): TriggerStatus | null
+  /** Executed amount */
+  get executedAmount(): Decimal
+  /** Tag */
+  get tag(): OrderTag
+  /** Submitted time */
+  get submittedAt(): Date
+  /** Executed price */
+  get executedPrice(): Decimal | null
+  /** Force only RTH */
+  get forceOnlyRth(): OutsideRTH | null
+  /** Reviewed */
+  get reviewed(): boolean
+  /** Activate order type */
+  get activateOrderType(): OrderType
+  /** Activate RTH */
+  get activateRth(): OutsideRTH | null
+  /** Submit price */
+  get submitPrice(): Decimal | null
+  /** Bid/ask depth level of the limit order submitted price */
+  get limitDepthLevel(): number | null
 }
 
 /** Brokers */
@@ -83,8 +252,18 @@ export declare class CalendarContext {
    *
    * `start` and `end` are date strings in `YYYY-MM-DD` format.
    * `market` is an optional market filter (e.g. `"HK"` or `"US"`).
+   *
+   * The endpoint paginates: the server caps each response (historically 10
+   * events per page unless a larger `count` is requested) and returns a
+   * `nextDate` cursor. To page through the full window, request a larger
+   * `count`, or re-call with the returned `nextDate` as `start`.
+   *
+   * - `count` — maximum number of events per page (server default when
+   *   omitted).
+   * - `offset` — number of events to skip from the start of the window.
+   * - `next` — direction to page from the cursor.
    */
-  financeCalendar(category: CalendarCategory, start: string, end: string, market?: string | undefined | null): Promise<CalendarEventsResponse>
+  financeCalendar(category: CalendarCategory, start: string, end: string, market?: string | undefined | null, count?: number | undefined | null, offset?: number | undefined | null, next?: CalendarPageDirection | undefined | null): Promise<CalendarEventsResponse>
 }
 
 /** Candlestick */
@@ -190,7 +369,8 @@ export declare class Config {
    * (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
    * `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
    * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-   * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+   * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+   * `LONGBRIDGE_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
    * @param appKey       Application key
@@ -230,6 +410,8 @@ export declare class Config {
    *   `false` (Default: `false`)
    * - `LONGBRIDGE_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
    *   (Default: `realtime`)
+   * - `LONGBRIDGE_QUOTE_TRANSPORT` - Transport for quote pull APIs, `ws` or
+   *   `http` (Default: `ws`)
    * - `LONGBRIDGE_PRINT_QUOTE_PACKAGES` - Print quote packages when
    *   connected, `true` or `false` (Default: `true`)
    * - `LONGBRIDGE_LOG_PATH` - Log file directory (Default: no logs)
@@ -245,7 +427,8 @@ export declare class Config {
    * (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
    * `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
    * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-   * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+   * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+   * `LONGBRIDGE_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
    * @param oauth  OAuth handle obtained from `OAuth.build(...)`
@@ -533,6 +716,11 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
+  /**
+   * Order side. `Unknown` when the response omits it (Longbridge US
+   * `/v1/trade/execution/history`)
+   */
+  get side(): OrderSide
 }
 
 /** Filing item */
@@ -605,8 +793,6 @@ export declare class FundamentalContext {
   operating(symbol: string): Promise<OperatingList>
   /** Get buyback data for a security */
   buyback(symbol: string): Promise<BuybackData>
-  /** Get stock ratings for a security */
-  ratings(symbol: string): Promise<StockRatings>
   /** Get ranked list of top shareholders */
   shareholderTop(symbol: string): Promise<ShareholderTopResponse>
   /** Get holding history and detail for one shareholder */
@@ -622,14 +808,821 @@ export declare class FundamentalContext {
   macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
   macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
+  /** Get US company overview. US token required. */
+  usCompanyOverview(symbol: string): Promise<USCompanyOverview>
+  /** Get US valuation overview. US token required. */
+  usValuationOverview(symbol: string): Promise<USValuationOverview>
+  /** Get US financial overview. US token required. */
+  usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
+  /**
+   * Get US financial statement v3. `kind` selects one statement (there is
+   * no "all" mode). US token required.
+   */
+  usFinancialStatement(symbol: string, kind: FinancialStatementKind, report: string): Promise<USFinancialStatement>
+  /** Get US key financial metrics. US token required. */
+  usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
+  /** Get US analyst consensus estimates. US token required. */
+  usAnalystConsensus(symbol: string, report: string): Promise<USAnalystConsensus>
+  /** Get US ETF dividend history. US token required. */
+  usEtfDividendInfo(symbol: string): Promise<USETFDividendInfo>
+  /** Get US company dividends. US token required. */
+  usCompanyDividends(symbol: string): Promise<USCompanyDividends>
+  /** Get US ETF document list. size=None returns all. US token required. */
+  usEtfFiles(symbol: string, size?: number | undefined | null): Promise<USETFFilesResponse>
+}
+
+/**
+ * Fund analysis (level 1). The ability/cost breakdowns are server-defined
+ * structures exposed as raw JSON strings.
+ */
+export declare class FundAnalysis {
+  toString(): string
+  toJSON(): any
+  /** Actual period */
+  get actualPeriod(): number
+  /** Cost level (raw JSON string) */
+  get costLevel(): string
+  /** Return ability (raw JSON string) */
+  get returnAbility(): string
+  /** Risk ability (raw JSON string) */
+  get riskAbility(): string
+  /** Updated at */
+  get updatedAt(): string
+  /** Value for money (raw JSON string) */
+  get valueForMoney(): string
+  /** Whether visible */
+  get visible(): boolean
+}
+
+/**
+ * Fund analysis detail (level 2). The ability/cost breakdowns are
+ * server-defined structures exposed as raw JSON strings.
+ */
+export declare class FundAnalysisDetail {
+  toString(): string
+  toJSON(): any
+  /** Actual period */
+  get actualPeriod(): number
+  /** Available periods */
+  get availablePeriods(): Array<number>
+  /** Cost level (raw JSON string) */
+  get costLevel(): string
+  /** Return ability (raw JSON string) */
+  get returnAbility(): string
+  /** Risk ability (raw JSON string) */
+  get riskAbility(): string
+  /** Updated at */
+  get updatedAt(): string
+  /** Value for money (raw JSON string) */
+  get valueForMoney(): string
+  /** Whether visible */
+  get visible(): boolean
+}
+
+/** A fund annual return entry. */
+export declare class FundAnnualReturn {
+  toString(): string
+  toJSON(): any
+  /** Change percent */
+  get changePercent(): string
+  /** Year */
+  get year(): number
+}
+
+/** A fund's asset allocation. */
+export declare class FundAssetAllocation {
+  toString(): string
+  toJSON(): any
+  /** Asset type */
+  get assetType(): number
+  /** Allocation entries */
+  get lists(): Array<FundAssetAllocationItem>
+  /** Report date */
+  get reportDate(): string
+}
+
+/** A single holding entry inside a fund's asset allocation. */
+export declare class FundAssetAllocationItem {
+  toString(): string
+  toJSON(): any
+  /** Security code */
+  get code(): string
+  /** Security counter id */
+  get counterId(): string
+  /** Name */
+  get name(): string
+  /** Position ratio */
+  get positionRatio(): string
+}
+
+/** A fund entry in the fund list. */
+export declare class FundBrief {
+  toString(): string
+  toJSON(): any
+  /** Asset class */
+  get assetClass(): number
+  /** Asset class name */
+  get assetClassName(): string
+  /** Fund code */
+  get code(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Description */
+  get description(): string
+  /** Earning rate */
+  get earningRate(): string
+  /** Whether the user is holding this fund */
+  get holding(): boolean
+  /** ISIN */
+  get isin(): string
+  /** Fund name */
+  get name(): string
+  /** Product */
+  get product(): string
+  /** Minimum purchase amount */
+  get purchaseAmount(): string
+  /** Recommendation text */
+  get recommendationText(): string
+  /** Risk level */
+  get riskLevel(): number
+  /** Risk level name */
+  get riskLevelName(): string
+  /** Time interval of the earning rate */
+  get timeInterval(): string
+  /** Unit value */
+  get unitValue(): string
+}
+
+/** Fund (mutual fund) channel context. */
+export declare class FundContext {
+  /** Create a new `FundContext`. */
+  static new(config: Config): FundContext
+  /** Get the hot-selling fund list. */
+  hotFunds(): Promise<Array<HotFund>>
+  /** Get the fund list. */
+  funds(opts?: GetFundsOptions | undefined | null): Promise<Array<FundBrief>>
+  /** Get the fund list filter options. */
+  filters(): Promise<FundFilters>
+  /** Get fund detail. */
+  detail(counterId: string): Promise<FundDetail>
+  /** Get fund analysis (level 1). */
+  analysis(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundAnalysis>
+  /** Get fund analysis detail (level 2). */
+  analysisDetail(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundAnalysisDetail>
+  /** Get fund trend chart. */
+  trend(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundTrend>
+  /** Get fund annual returns. */
+  annualReturns(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundAnnualReturn>>
+  /** Get fund quarterly returns. */
+  quarterlyReturns(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundQuarterlyReturn>>
+  /** Get fund performance figures. */
+  performance(counterId: string): Promise<Array<FundPerformance>>
+  /** Get fund performance comparison. */
+  performanceComparison(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundPerformanceComparison>
+  /** Get fund latest net value. */
+  nav(counterId: string): Promise<Array<FundNavValue>>
+  /** Get fund historical net value (paged). */
+  navHistory(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundNavValue>>
+  /** Get fund historical net value by relative time range. */
+  navRange(counterId: string, opts?: FundNavRangeOptions | undefined | null): Promise<Array<FundNavValue>>
+  /** Get a fund's top-10 holdings. */
+  holdings(counterId: string, opts?: GetFundHoldingsOptions | undefined | null): Promise<FundHoldings>
+  /** Get the stocks held by a fund (reverse lookup). */
+  stockHoldings(counterId: string, opts?: GetFundStockHoldingsOptions | undefined | null): Promise<Array<FundStockHolding>>
+  /** Get the user's fund positions overview. */
+  positions(opts?: GetFundPositionsOptions | undefined | null): Promise<FundPositions>
+  /** Get the user's single fund position detail. */
+  position(counterId: string, opts?: GetFundPositionOptions | undefined | null): Promise<FundPositionDetail>
+  /** Get the performance figures of a held fund. */
+  positionPerformance(counterId: string): Promise<Array<FundPositionPerformance>>
+  /** Get the cumulative-profit series of a held fund. */
+  positionProfits(counterId: string, opts?: GetFundPositionProfitsOptions | undefined | null): Promise<FundPositionProfits>
+  /** Get the net-value history of a held fund. */
+  positionNav(counterId: string, opts?: FundNavRangeOptions | undefined | null): Promise<Array<FundPositionNav>>
+  /** Get the dividend records of a held fund. */
+  positionDividends(counterId: string, opts?: GetFundPositionDividendsOptions | undefined | null): Promise<FundDividends>
+  /** Get the user's fund orders (also serves as the trade/execution record). */
+  orders(opts?: GetFundOrdersOptions | undefined | null): Promise<Array<FundOrder>>
+  /** Get a fund order detail. */
+  order(orderId: number): Promise<FundOrderDetail>
+  /** Get the user's fund transactions (cash-flow records). */
+  transactions(opts?: GetFundTransactionsOptions | undefined | null): Promise<Array<FundTransaction>>
+  /** Validate a fund order before submitting. */
+  validateOrder(opts: ValidateFundOrderOptions): Promise<FundOrderValidation>
+  /** Submit a fund order (buy / sell). */
+  submitOrder(opts: SubmitFundOrderOptions): Promise<FundOrderSubmitResponse>
+  /** Cancel (withdraw) a fund order. */
+  cancelOrder(orderId: number): Promise<void>
+}
+
+/** A dated value point. */
+export declare class FundDatedValue {
+  toString(): string
+  toJSON(): any
+  /** Date (unix seconds) */
+  get date(): number
+  /** Value */
+  get value(): string
+}
+
+/** Fund detail. */
+export declare class FundDetail {
+  toString(): string
+  toJSON(): any
+  /** Additional purchase amount */
+  get additionalPurchaseAmount(): string
+  /** Affirm day */
+  get affirmDay(): number
+  /** Amount affirm day */
+  get amountAffirmDay(): string
+  /** Asset allocation */
+  get assetAllocation(): FundAssetAllocation | null
+  /** Asset class */
+  get assetClass(): number
+  /** Asset class name */
+  get assetClassName(): string
+  /** Bill purchase rate */
+  get billPurchaseRate(): string
+  /** Channel */
+  get channel(): string
+  /** Close period */
+  get closePeriod(): string
+  /** Fund code */
+  get code(): string
+  /** Currency */
+  get currency(): string
+  /** Cut off time */
+  get cutOffTime(): string
+  /** Whether it is a derivative */
+  get derivatives(): boolean
+  /** Done day */
+  get doneDay(): number
+  /** Excess return fee */
+  get excessReturnFee(): string
+  /** GST rate */
+  get gstRate(): string
+  /** Introduction */
+  get introduce(): string
+  /** Whether it is a cash-plus fund */
+  get isCashPlus(): boolean
+  /** Whether it is a complex product */
+  get isComplex(): boolean
+  /** Whether it is a new cash-plus fund */
+  get isNewCashPlus(): boolean
+  /** Whether it is a Yinghebao fund */
+  get isYinghebao(): boolean
+  /** ISIN */
+  get isin(): string
+  /** Management rate */
+  get manageRate(): string
+  /** Manager */
+  get manager(): string
+  /** Minimum holding cash */
+  get minHoldCash(): string
+  /** Minimum holding share */
+  get minHoldShare(): string
+  /** Minimum sell share */
+  get minSellShare(): string
+  /** Month raise day */
+  get monthRaiseDay(): string
+  /** Fund name */
+  get name(): string
+  /** Net value deadline */
+  get navDeadline(): string
+  /** Whether it is no-load */
+  get noLoad(): boolean
+  /** Open date */
+  get openDate(): string
+  /** Open period */
+  get openPeriod(): string
+  /** Product */
+  get product(): string
+  /** Product information locals */
+  get productInformationLocals(): string
+  /** Profile */
+  get profile(): string
+  /** Whether purchasable */
+  get purchasable(): number
+  /** Purchase affirm day */
+  get purchaseAffirmDay(): string
+  /** Minimum purchase amount */
+  get purchaseAmount(): string
+  /** Purchase rate */
+  get purchaseRate(): string
+  /** Rating */
+  get rating(): number
+  /** Whether redeemable */
+  get redeemable(): number
+  /** Redemption advance day */
+  get redemptionAdvanceDay(): string
+  /** Redemption amount */
+  get redemptionAmount(): string
+  /** Redemption close period text */
+  get redemptionClosePeriodShows(): string
+  /** Redemption done day */
+  get redemptionDoneDay(): string
+  /** Redemption open day text */
+  get redemptionOpenDayShows(): string
+  /** Risk level */
+  get riskLevel(): number
+  /** Risk level name */
+  get riskLevelName(): string
+  /** Verify status */
+  get verifyStatus(): number
+  /** Whether it is a virtual currency fund */
+  get virtualCurrency(): boolean
+  /** Year to date yield */
+  get yearToDateYield(): string
+  /** Year to date yield type */
+  get ytdYieldType(): number
+}
+
+/** A cash dividend record for a held fund. */
+export declare class FundDividend {
+  toString(): string
+  toJSON(): any
+  /** Amount */
+  get amount(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Date (unix seconds) */
+  get date(): number
+  /** Dividend method */
+  get divMethod(): string
+  /** Fund name */
+  get name(): string
+}
+
+/** The user's dividend records for a held fund. */
+export declare class FundDividends {
+  toString(): string
+  toJSON(): any
+  /** Currency */
+  get currency(): string
+  /** Dividend records */
+  get divCashInfos(): Array<FundDividend>
+  /** Latest dividend date (unix seconds) */
+  get lastestDate(): number
+  /** Total cash dividend */
+  get totalDivCash(): string
+}
+
+/**
+ * Fund list filter options. Each list holds server-defined option objects
+ * serialized as raw JSON strings.
+ */
+export declare class FundFilters {
+  toString(): string
+  toJSON(): any
+  /** Asset class options (each a raw JSON string) */
+  get assetClass(): Array<string>
+  /** Company options (each a raw JSON string) */
+  get company(): Array<string>
+  /** Currency options (each a raw JSON string) */
+  get currency(): Array<string>
+  /** Industry category options (each a raw JSON string) */
+  get industryCategoryName(): Array<string>
+  /** Risk level options (each a raw JSON string) */
+  get riskLevel(): Array<string>
+}
+
+/** A single fund holding (top-10 holdings). */
+export declare class FundHolding {
+  toString(): string
+  toJSON(): any
+  /** Bond type */
+  get bondType(): string
+  /** Bond type name */
+  get bondTypeName(): string
+  /** Country name */
+  get countryName(): string
+  /** Holding type */
+  get holdingType(): string
+  /** Industry name */
+  get industryName(): string
+  /** Market value */
+  get marketValue(): string
+  /** Maturity date */
+  get maturityDate(): string
+  /** Name */
+  get name(): string
+  /** Share change */
+  get shareChange(): string
+  /** Share change percent */
+  get shareChangePercent(): string
+  /** Shares */
+  get shares(): string
+  /** Weighting */
+  get weighting(): string
+}
+
+/**
+ * A single fund position held by the user.
+ *
+ * Named `FundHoldingPosition` to avoid a name clash with the trade channel's
+ * existing `FundPosition` class.
+ */
+export declare class FundHoldingPosition {
+  toString(): string
+  toJSON(): any
+  /** Holding amount */
+  get amount(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Frozen units */
+  get freezeUnits(): string
+  /** Holding profit */
+  get holdingProfit(): string
+  /** Holding units */
+  get holdingUnits(): string
+  /** Fund name */
+  get name(): string
+  /** Recent profit */
+  get recentProfit(): string
+  /** Recent trading day (unix seconds) */
+  get recentTradingDay(): number
+  /** Accumulated recent profit */
+  get sumRecentProfit(): string
+}
+
+/** A fund's top-10 holdings. */
+export declare class FundHoldings {
+  toString(): string
+  toJSON(): any
+  /** Holding entries */
+  get holdings(): Array<FundHolding>
+  /** Report date */
+  get reportDate(): string
+  /** Total weighting */
+  get weighting(): string
+}
+
+/**
+ * A named contrast performance series. The performance points are
+ * server-defined structures exposed as raw JSON strings.
+ */
+export declare class FundNamedContrast {
+  toString(): string
+  toJSON(): any
+  /** Series name */
+  get name(): string
+  /** Performance points (each a raw JSON string) */
+  get performances(): Array<string>
+}
+
+/** A fund net-asset-value data point (latest / historical). */
+export declare class FundNavValue {
+  toString(): string
+  toJSON(): any
+  /** Net value change */
+  get change(): string
+  /** Net value change percent */
+  get changePercent(): string
+  /** Formatted change percent */
+  get changePercentFormat(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Fund name */
+  get counterName(): string
+  /** Currency */
+  get currency(): string
+  /** Formatted date */
+  get dateFormat(): string
+  /** ISIN */
+  get isin(): string
+  /** Last update time (unix seconds) */
+  get lastUpdateTime(): number
+  /** Net value */
+  get value(): string
+  /** Formatted net value */
+  get valueFormat(): string
+}
+
+/** A fund order (list view). */
+export declare class FundOrder {
+  toString(): string
+  toJSON(): any
+  /** Action (buy/sell) */
+  get action(): string
+  /** Amount */
+  get amount(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Created at (unix seconds) */
+  get createdAt(): number
+  /** Currency */
+  get currency(): string
+  /** Fund name */
+  get fundName(): string
+  /** Order id */
+  get id(): number
+  /** Whether it is an auto (DCA) order */
+  get isAuto(): boolean
+  /** Net worth */
+  get netWorth(): string
+  /** Product type */
+  get productType(): string
+  /** State */
+  get state(): string
+  /** State description */
+  get stateDesc(): string
+  /** Units */
+  get units(): string
+}
+
+/** Fund order detail. */
+export declare class FundOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Keyword blocks */
+  get keywords(): Array<FundOrderKeyword>
+  /** The order */
+  get order(): FundOrderInfo | null
+  /** Processing stages */
+  get stages(): Array<FundOrderStage>
+}
+
+/** The full information of a fund order. */
+export declare class FundOrderInfo {
+  toString(): string
+  toJSON(): any
+  /** Account id */
+  get aaid(): number
+  /** Account channel */
+  get accountChannel(): string
+  /** Action (buy/sell) */
+  get action(): string
+  /** Amount */
+  get amount(): string
+  /** Channel */
+  get channel(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Created at (unix seconds) */
+  get createdAt(): number
+  /** Currency */
+  get currency(): string
+  /** Dividend option */
+  get dividendOption(): string
+  /** Equity time (unix seconds) */
+  get eqAt(): number
+  /** Fee */
+  get fee(): string
+  /** Fund name */
+  get fundName(): string
+  /** Fund source */
+  get fundSource(): string
+  /** Histories */
+  get histories(): string
+  /** Order id */
+  get id(): number
+  /** Message */
+  get message(): string
+  /** Net worth */
+  get netWorth(): string
+  /** Price time (unix seconds) */
+  get priceAt(): number
+  /** Processed at (unix seconds) */
+  get processedAt(): number
+  /** Product type */
+  get productType(): string
+  /** Whether repurchaseable */
+  get repurchaseable(): boolean
+  /** Sale proceeds */
+  get saleProceeds(): string
+  /** Sales charge */
+  get salesCharge(): string
+  /** Sales price */
+  get salesPrice(): string
+  /** Sales unit */
+  get salesUnit(): string
+  /** State */
+  get state(): string
+  /** State description */
+  get stateDesc(): string
+  /** Status */
+  get status(): number
+  /** Extended status */
+  get statusEx(): number
+  /** T+ description */
+  get tDescription(): string
+  /** Time partition */
+  get timePartition(): string
+  /** Total amount */
+  get totalAmount(): string
+  /** Transaction at (unix seconds) */
+  get transactionAt(): number
+  /** Units */
+  get units(): string
+  /** Withdraw at (unix seconds) */
+  get withdrawAt(): number
+  /** Whether withdrawable */
+  get withdrawable(): boolean
+}
+
+/** A keyword block in a fund order detail. */
+export declare class FundOrderKeyword {
+  toString(): string
+  toJSON(): any
+  /** Content */
+  get content(): string
+  /** Group */
+  get group(): string
+  /** Key */
+  get key(): string
+  /** Line strategy */
+  get lineStrategy(): string
+  /** Title */
+  get title(): string
+}
+
+/** A processing stage in a fund order detail. */
+export declare class FundOrderStage {
+  toString(): string
+  toJSON(): any
+  /** Description */
+  get desc(): string
+  /** Key */
+  get key(): string
+  /** Link */
+  get link(): string
+  /** Link text */
+  get linkText(): string
+  /** Progress */
+  get progress(): string
+  /** Stage */
+  get stage(): string
+}
+
+/** The result of submitting a fund order. */
+export declare class FundOrderSubmitResponse {
+  toString(): string
+  toJSON(): any
+  /** Action (buy/sell) */
+  get action(): string
+  /** Amount */
+  get amount(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Created at (unix seconds) */
+  get createdAt(): number
+  /** Fund name */
+  get fundName(): string
+  /** Order id */
+  get id(): number
+  /** Message */
+  get msg(): string
+  /** Status */
+  get status(): number
+  /** Units */
+  get units(): string
+}
+
+/** The result of validating a fund order. */
+export declare class FundOrderValidation {
+  toString(): string
+  toJSON(): any
+  /** Auth token to carry into submit */
+  get authToken(): string
+  /** Risk-assessment eval address */
+  get evalAddress(): string
+  /** Fund risk level */
+  get fundRiskLevel(): number
+  /** Message */
+  get msg(): string
+  /** User PI status */
+  get userPi(): number
+  /** User risk level */
+  get userRiskLevel(): number
+}
+
+/** A fund's detailed performance figures. */
+export declare class FundPerformance {
+  toString(): string
+  toJSON(): any
+  /** Annualized return (5y) */
+  get annualizedReturnFive(): string
+  /** Annualized return (1y) */
+  get annualizedReturnOne(): string
+  /** Annualized return (10y) */
+  get annualizedReturnTen(): string
+  /** Annualized return (3y) */
+  get annualizedReturnThree(): string
+  /** Annualized return (2y) */
+  get annualizedReturnTwo(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Fund name */
+  get fundName(): string
+  /** Rank (5y) */
+  get performanceRankFiveYears(): number
+  /** Rank (1d) */
+  get performanceRankOneDay(): number
+  /** Rank (1m) */
+  get performanceRankOneMonth(): number
+  /** Rank (1w) */
+  get performanceRankOneWeek(): number
+  /** Rank (1y) */
+  get performanceRankOneYear(): number
+  /** Rank (6m) */
+  get performanceRankSixMonths(): number
+  /** Rank (10y) */
+  get performanceRankTenYears(): number
+  /** Rank (3m) */
+  get performanceRankThreeMonths(): number
+  /** Rank (3y) */
+  get performanceRankThreeYears(): number
+  /** Rank (2y) */
+  get performanceRankTwoYears(): number
+  /** Rank (ytd) */
+  get performanceRankYtd(): number
+  /** Return (5y) */
+  get performanceReturnFiveYears(): string
+  /** Return (1d) */
+  get performanceReturnOneDay(): string
+  /** Return (1m) */
+  get performanceReturnOneMonth(): string
+  /** Return (1w) */
+  get performanceReturnOneWeek(): string
+  /** Return (1y) */
+  get performanceReturnOneYear(): string
+  /** Return (6m) */
+  get performanceReturnSixMonths(): string
+  /** Return (10y) */
+  get performanceReturnTenYears(): string
+  /** Return (3m) */
+  get performanceReturnThreeMonths(): string
+  /** Return (3y) */
+  get performanceReturnThreeYears(): string
+  /** Return (2y) */
+  get performanceReturnTwoYears(): string
+  /** Return (ytd) */
+  get performanceReturnYtd(): string
+  /** Total peers (5y) */
+  get performanceTotalFiveYears(): number
+  /** Total peers (1d) */
+  get performanceTotalOneDay(): number
+  /** Total peers (1m) */
+  get performanceTotalOneMonth(): number
+  /** Total peers (1w) */
+  get performanceTotalOneWeek(): number
+  /** Total peers (1y) */
+  get performanceTotalOneYear(): number
+  /** Total peers (6m) */
+  get performanceTotalSixMonths(): number
+  /** Total peers (10y) */
+  get performanceTotalTenYears(): number
+  /** Total peers (3m) */
+  get performanceTotalThreeMonths(): number
+  /** Total peers (3y) */
+  get performanceTotalThreeYears(): number
+  /** Total peers (2y) */
+  get performanceTotalTwoYears(): number
+  /** Total peers (ytd) */
+  get performanceTotalYtd(): number
+  /** Seven days annualized */
+  get sevenDaysAnnualized(): string
+  /** Ten thousand price */
+  get tenThousandPrice(): string
+  /** Update time (unix seconds) */
+  get updateTime(): number
+}
+
+/**
+ * Fund performance comparison. The fund performance series is a
+ * server-defined structure exposed as raw JSON strings.
+ */
+export declare class FundPerformanceComparison {
+  toString(): string
+  toJSON(): any
+  /** Contrast performance series */
+  get contrastPerformances(): Array<FundNamedContrast>
+  /** Fund performances (each a raw JSON string) */
+  get fundPerformances(): Array<string>
+}
+
+/** A recent performance point used by the hot-fund list. */
+export declare class FundPerformancePoint {
+  toString(): string
+  toJSON(): any
+  /** Date */
+  get date(): string
+  /** Last done value */
+  get lastDone(): string
 }
 
 /** Fund position */
 export declare class FundPosition {
   toString(): string
   toJSON(): any
-  /** Fund ISIN code */
-  get symbol(): string
+  /** Fund counter id (the ISIN is the last `/`-separated segment) */
+  get counterId(): string
   /** Current equity */
   get currentNetAssetValue(): Decimal
   /** Current equity time */
@@ -654,12 +1647,601 @@ export declare class FundPositionChannel {
   get positions(): Array<FundPosition>
 }
 
+/** Detail of a single fund position. */
+export declare class FundPositionDetail {
+  toString(): string
+  toJSON(): any
+  /** Detail values */
+  get detailValues(): FundPositionDetailValues | null
+  /** Accumulated profit series */
+  get sumProfit(): Array<FundDatedValue>
+  /** Unit value series */
+  get utValue(): Array<FundUnitValue>
+}
+
+/** Detail values of a single fund position. */
+export declare class FundPositionDetailValues {
+  toString(): string
+  toJSON(): any
+  /** Amount */
+  get amount(): string
+  /** Currency */
+  get currency(): string
+  /** Holding cost */
+  get holdingCost(): string
+  /** Holding profit */
+  get holdingProfit(): string
+  /** Holding profit rate */
+  get holdingProfitRate(): string
+  /** Holding units */
+  get holdingUnits(): string
+  /** Holding value */
+  get holdingValue(): string
+  /** Pending buy value */
+  get pendingBuyValue(): string
+  /** Pending sell value */
+  get pendingSellValue(): string
+  /** Accumulated profit (to date) */
+  get profitAmountAccumTd(): string
+  /** Accumulated profit rate (to date) */
+  get profitAmountAccumTdRate(): string
+  /** Recent profit */
+  get recentProfit(): string
+  /** Recent trading day (unix seconds) */
+  get recentTradingday(): number
+  /** Recent unit value */
+  get recentUnitValue(): string
+  /** Sold pending-confirm units */
+  get soldPendingConfirmUnits(): string
+}
+
+/** A held-fund net-value point (position view). */
+export declare class FundPositionNav {
+  toString(): string
+  toJSON(): any
+  /** Net value change */
+  get change(): string
+  /** Net value change percent */
+  get changePercent(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Fund name */
+  get counterName(): string
+  /** Last update time (unix seconds) */
+  get lastUpdateTime(): number
+  /** Net value */
+  get value(): string
+}
+
+/** Performance figures for a held fund. */
+export declare class FundPositionPerformance {
+  toString(): string
+  toJSON(): any
+  /** Annualized return (5y) */
+  get annualizedReturnFive(): string
+  /** Annualized return (1y) */
+  get annualizedReturnOne(): string
+  /** Annualized return (10y) */
+  get annualizedReturnTen(): string
+  /** Annualized return (3y) */
+  get annualizedReturnThree(): string
+  /** Annualized return (2y) */
+  get annualizedReturnTwo(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Fund name */
+  get fundName(): string
+  /** Return (5y) */
+  get performanceReturnFiveYears(): string
+  /** Return (1d) */
+  get performanceReturnOneDay(): string
+  /** Return (1m) */
+  get performanceReturnOneMonth(): string
+  /** Return (1w) */
+  get performanceReturnOneWeek(): string
+  /** Return (1y) */
+  get performanceReturnOneYear(): string
+  /** Return (6m) */
+  get performanceReturnSixMonths(): string
+  /** Return (10y) */
+  get performanceReturnTenYears(): string
+  /** Return (3m) */
+  get performanceReturnThreeMonths(): string
+  /** Return (3y) */
+  get performanceReturnThreeYears(): string
+  /** Return (2y) */
+  get performanceReturnTwoYears(): string
+  /** Return (ytd) */
+  get performanceReturnYtd(): string
+  /** Update time (unix seconds) */
+  get updateTime(): number
+}
+
+/** The user's cumulative profit for a held fund. */
+export declare class FundPositionProfits {
+  toString(): string
+  toJSON(): any
+  /** Currency */
+  get currency(): string
+  /** Profit series */
+  get historyValue(): Array<FundDatedValue>
+  /** Last update time (unix seconds) */
+  get lastUpdateTime(): number
+  /** Total profit */
+  get sumProfit(): string
+}
+
+/** The user's fund positions overview. */
+export declare class FundPositions {
+  toString(): string
+  toJSON(): any
+  /** Account channel */
+  get accountChannel(): string
+  /** Position entries */
+  get list(): Array<FundHoldingPosition>
+  /** Pending buy orders amount */
+  get pendingBuyOrders(): string
+  /** Recent trading day (unix seconds) */
+  get recentTradingDay(): number
+  /** Sold pending credit orders amount */
+  get soldPendingCreditOrders(): string
+}
+
 /** Fund positions response */
 export declare class FundPositionsResponse {
   toString(): string
   toJSON(): any
   /** Channels */
   get channels(): Array<FundPositionChannel>
+}
+
+/** A fund quarterly return entry. */
+export declare class FundQuarterlyReturn {
+  toString(): string
+  toJSON(): any
+  /** Change percent */
+  get changePercent(): string
+  /** Quarter */
+  get quarter(): number
+  /** Year */
+  get year(): number
+}
+
+/** A stock held by the fund (reverse lookup). */
+export declare class FundStockHolding {
+  toString(): string
+  toJSON(): any
+  /** Stock code */
+  get code(): string
+  /** Stock counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Stock name */
+  get name(): string
+  /** Position ratio */
+  get positionRatio(): string
+  /** Report date */
+  get reportDate(): string
+}
+
+/** A fund transaction / cash-flow record. */
+export declare class FundTransaction {
+  toString(): string
+  toJSON(): any
+  /** Amount */
+  get amount(): string
+  /** Category */
+  get category(): string
+  /** Created at (unix seconds) */
+  get createdAt(): number
+  /** Currency */
+  get currency(): string
+  /** Description */
+  get description(): string
+  /** Detail created at (unix seconds) */
+  get detailCreatedAt(): number
+  /** Detail type */
+  get detailType(): string
+  /** Done at (unix seconds) */
+  get doneAt(): number
+  /** Quantity description */
+  get quantityDescription(): string
+  /** Redirect page */
+  get redirectPage(): string
+  /** Redirect page (v2) */
+  get redirectPageV2(): string
+  /** Reference number */
+  get refNo(): string
+  /** Stock quantity */
+  get stockQuantity(): string
+  /** Transaction type */
+  get txType(): string
+  /** Type name */
+  get typeName(): string
+}
+
+/**
+ * Fund trend chart. The performance series are server-defined structures
+ * exposed as raw JSON strings.
+ */
+export declare class FundTrend {
+  toString(): string
+  toJSON(): any
+  /** Actual period */
+  get actualPeriod(): number
+  /** Available periods */
+  get availablePeriods(): Array<number>
+  /** Category average performances (each a raw JSON string) */
+  get categoryAveragePerformances(): Array<string>
+  /** Benchmark contrast performances */
+  get contrastPerformances(): FundTrendContrast | null
+  /** Fund performances (each a raw JSON string) */
+  get fundPerformances(): Array<string>
+}
+
+/**
+ * A benchmark contrast series in a fund trend chart. The performance points
+ * are server-defined structures exposed as raw JSON strings.
+ */
+export declare class FundTrendContrast {
+  toString(): string
+  toJSON(): any
+  /** Benchmark name */
+  get benchmarkName(): string
+  /** Performance points (each a raw JSON string) */
+  get performances(): Array<string>
+}
+
+/** A fund unit-value point (position view). */
+export declare class FundUnitValue {
+  toString(): string
+  toJSON(): any
+  /** Date (unix seconds) */
+  get date(): number
+  /** Day increase rate */
+  get dayIncreaseRate(): string
+  /** Total value */
+  get totalValue(): string
+  /** Unit value */
+  get unitValue(): string
+}
+
+/** A price-step (bid-size) rule entry from the symbol-info response. */
+export declare class GridBidSize {
+  toString(): string
+  toJSON(): any
+  /** Range start price (inclusive) */
+  get strProceed(): Decimal | null
+  /** Range end price */
+  get endProceed(): Decimal | null
+  /** Price step within the range */
+  get bidSize(): Decimal | null
+}
+
+/** Channel / authorization info nested in the symbol-info response. */
+export declare class GridChannelInfo {
+  toString(): string
+  toJSON(): any
+  /** Whether the strategy compliance authorization has been granted */
+  get strategyGranted(): boolean
+  /** Whether the RTH toggle is supported */
+  get supportRth(): boolean
+  /** Trading currency */
+  get currency(): string
+  /** Supported settlement currencies */
+  get settlementCurrency(): Array<string>
+}
+
+/** Grid trading context. */
+export declare class GridContext {
+  /** Create a new `GridContext`. */
+  static new(config: Config): GridContext
+  /** Submit a grid trading order */
+  submit(opts: SubmitGridOrderOptions): Promise<SubmitGridOrderResponse>
+  /** Replace (modify) a grid trading order */
+  replace(opts: ReplaceGridOrderOptions): Promise<undefined>
+  /** Get grid trading orders (paged list) */
+  list(opts?: GetGridOrdersOptions | undefined | null): Promise<GridOrdersResponse>
+  /** Query grid trading orders by IDs */
+  listByIds(opts: GetGridOrdersByIdsOptions): Promise<Array<GridOrder>>
+  /** Get grid trading order detail (and paged history) */
+  detail(opts: GetGridOrderDetailOptions): Promise<GridOrderDetail>
+  /** Get grid trading trigger history */
+  triggerHistory(opts: GetGridTriggerHistoryOptions): Promise<GridTriggerHistoryResponse>
+  /** Cancel a grid trading order */
+  cancel(orderId: string): Promise<void>
+  /** Suspend a grid trading order */
+  suspend(orderId: string): Promise<void>
+  /** Restart a grid trading order */
+  restart(orderId: string): Promise<void>
+  /**
+   * Get the security (symbol) info used to build a grid order (lot size,
+   * authorization flag, settlement currency, etc.).
+   */
+  symbolInfo(symbol: string): Promise<GridSymbolInfo>
+}
+
+/** A grid trading order (element of the list / by-ids responses). */
+export declare class GridOrder {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Stock name */
+  get stockName(): string
+  /** Market */
+  get market(): string
+  /** Order status */
+  get status(): string
+  /** Grid running status */
+  get gridStatus(): string
+  /** Submitted base price */
+  get submittedBasePrice(): Decimal | null
+  /** Current base price */
+  get currentBasePrice(): Decimal | null
+  /** Base price before the last trigger */
+  get preTriggerBasePrice(): Decimal | null
+  /** Base price after the last trigger */
+  get postTriggerBasePrice(): Decimal | null
+  /** Upper price bound */
+  get upperLimitPrice(): Decimal | null
+  /** Lower price bound */
+  get lowerLimitPrice(): Decimal | null
+  /** Trigger price type */
+  get triggerPriceType(): TriggerPriceType
+  /** Upward trigger spread */
+  get triggerSpreadUp(): Decimal | null
+  /** Downward trigger spread */
+  get triggerSpreadDown(): Decimal | null
+  /** Upward trigger percent */
+  get triggerPercentUp(): Decimal | null
+  /** Downward trigger percent */
+  get triggerPercentDown(): Decimal | null
+  /** Pullback percent */
+  get pullbackPercent(): Decimal | null
+  /** Pullback spread */
+  get pullbackSpread(): Decimal | null
+  /** Rebound percent */
+  get reboundPercent(): Decimal | null
+  /** Rebound spread */
+  get reboundSpread(): Decimal | null
+  /** Sell-side execution order type (e.g. `MO`) */
+  get triggerSellOrderType(): string
+  /** Buy-side execution order type (e.g. `MO`) */
+  get triggerBuyOrderType(): string
+  /** Sell-side order-book depth */
+  get triggerSellDepth(): number
+  /** Buy-side order-book depth */
+  get triggerBuyDepth(): number
+  /** Quantity per trigger */
+  get triggerQuantity(): Decimal | null
+  /** Quantity per sell trigger */
+  get triggerSellQuantity(): Decimal | null
+  /** Quantity per buy trigger */
+  get triggerBuyQuantity(): Decimal | null
+  /** Quantity handled at the upper bound */
+  get upperLimitQuantity(): Decimal | null
+  /** Quantity handled at the lower bound */
+  get lowerLimitQuantity(): Decimal | null
+  /** Action at the upper bound */
+  get upperLimitEvent(): GridLimitEvent
+  /** Action at the lower bound */
+  get lowerLimitEvent(): GridLimitEvent
+  /** Whether a single grid level may trigger multiple times */
+  get multipleTrigger(): boolean
+  /** Number of times the grid has triggered */
+  get triggerTimes(): number
+  /** Accumulated bought quantity */
+  get totalBuyQuantity(): Decimal | null
+  /** Accumulated sold quantity */
+  get totalSellQuantity(): Decimal | null
+  /** Accumulated profit balance */
+  get totalProfitBalance(): Decimal | null
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Whether short selling is allowed */
+  get supportShortsell(): boolean
+  /** Sell-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeUp(): string
+  /** Buy-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeDown(): string
+}
+
+/** Detail of a grid trading order. */
+export declare class GridOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Stock name */
+  get stockName(): string
+  /** Order status */
+  get status(): string
+  /** Grid running status */
+  get gridStatus(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Sleeping reason, if any */
+  get sleepingReason(): string
+  /** Submitted base price */
+  get submittedBasePrice(): Decimal | null
+  /** Current base price */
+  get currentBasePrice(): Decimal | null
+  /** Upper price bound */
+  get upperLimitPrice(): Decimal | null
+  /** Lower price bound */
+  get lowerLimitPrice(): Decimal | null
+  /** Trigger price type */
+  get triggerPriceType(): TriggerPriceType
+  /** Upward trigger spread */
+  get triggerSpreadUp(): Decimal | null
+  /** Downward trigger spread */
+  get triggerSpreadDown(): Decimal | null
+  /** Upward trigger percent */
+  get triggerPercentUp(): Decimal | null
+  /** Downward trigger percent */
+  get triggerPercentDown(): Decimal | null
+  /** Pullback percent */
+  get pullbackPercent(): Decimal | null
+  /** Pullback spread */
+  get pullbackSpread(): Decimal | null
+  /** Rebound percent */
+  get reboundPercent(): Decimal | null
+  /** Rebound spread */
+  get reboundSpread(): Decimal | null
+  /** Whether a single grid level may trigger multiple times */
+  get multipleTrigger(): boolean
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Quantity per trigger */
+  get triggerQuantity(): Decimal | null
+  /** Quantity per sell trigger */
+  get triggerSellQuantity(): Decimal | null
+  /** Quantity per buy trigger */
+  get triggerBuyQuantity(): Decimal | null
+  /** Quantity handled at the upper bound */
+  get upperLimitQuantity(): Decimal | null
+  /** Quantity handled at the lower bound */
+  get lowerLimitQuantity(): Decimal | null
+  /** Action at the upper bound */
+  get upperLimitEvent(): GridLimitEvent
+  /** Action at the lower bound */
+  get lowerLimitEvent(): GridLimitEvent
+  /** Sell-side order-book depth */
+  get triggerSellDepth(): number
+  /** Buy-side order-book depth */
+  get triggerBuyDepth(): number
+  /** Created time */
+  get createdAt(): Date | null
+  /** Last updated time */
+  get updatedAt(): Date | null
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Expiry time */
+  get expireTime(): Date | null
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Triggered sub-orders */
+  get gridSubOrders(): Array<GridOrderSubOrder>
+  /** Whether there are more sub-orders to page */
+  get subHasMore(): boolean
+  /** Lifecycle history entries */
+  get gridOrderHistory(): Array<GridOrderHistory>
+  /** Whether there are more history entries to page */
+  get historyHasMore(): boolean
+  /** Whether short selling is allowed */
+  get supportShortsell(): boolean
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Sell-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeUp(): string
+  /** Buy-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeDown(): string
+}
+
+/** A grid order lifecycle-history entry carried in the grid order detail. */
+export declare class GridOrderHistory {
+  toString(): string
+  toJSON(): any
+  /** History entry ID (paging cursor) */
+  get historyId(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Status at this point */
+  get status(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Additional reason detail, if any */
+  get reason(): string
+}
+
+/**
+ * Response for get grid trading orders (list) request.
+ *
+ * Hand-written because the underlying `longbridge::grid::GridOrdersResponse`
+ * is not re-exported from the SDK; the wrapper is built directly in the
+ * context method.
+ */
+export declare class GridOrdersResponse {
+  toString(): string
+  toJSON(): any
+  /** Grid orders */
+  get gridOrder(): Array<GridOrder>
+  /** Whether there are more pages */
+  get hasMore(): boolean
+}
+
+/** A triggered sub-order carried in the grid order detail. */
+export declare class GridOrderSubOrder {
+  toString(): string
+  toJSON(): any
+  /** Sub-order ID */
+  get id(): string
+  /** Order price */
+  get price(): Decimal | null
+  /** Order type */
+  get orderType(): string
+  /** Order quantity */
+  get quantity(): Decimal | null
+  /** Executed quantity */
+  get executedQty(): Decimal | null
+  /** Buy / sell direction */
+  get action(): number
+  /** Order status */
+  get status(): string
+  /** Submitted time */
+  get submittedAt(): Date | null
+  /** Regular trading hours flag */
+  get rth(): number
+}
+
+/** Security (symbol) info used to build a grid order. */
+export declare class GridSymbolInfo {
+  toString(): string
+  toJSON(): any
+  /** Security name */
+  get name(): string
+  /** Latest quote price */
+  get lastDone(): Decimal | null
+  /** Board lot size */
+  get lotSize(): Decimal | null
+  /** Buy-side board lot size */
+  get buyLotSize(): Decimal | null
+  /** Sell-side board lot size */
+  get sellLotSize(): Decimal | null
+  /** Price-step (bid-size) rule table */
+  get bidSizes(): Array<GridBidSize>
+  /** Channel / authorization info (strategy grant, RTH, currencies) */
+  get channelInfo(): GridChannelInfo
+}
+
+/**
+ * Response for get grid trading trigger history request.
+ *
+ * Hand-written because the underlying
+ * `longbridge::grid::GridTriggerHistoryResponse` is not re-exported from the
+ * SDK; the wrapper is built directly in the context method.
+ */
+export declare class GridTriggerHistoryResponse {
+  toString(): string
+  toJSON(): any
+  /** Trigger history entries */
+  get triggerOrders(): Array<TriggerOrder>
+  /** Whether there are more pages */
+  get hasMore(): boolean
 }
 
 /** History market temperature response */
@@ -670,6 +2252,36 @@ export declare class HistoryMarketTemperatureResponse {
   get granularity(): Granularity
   /** Records */
   get records(): Array<MarketTemperature>
+}
+
+/** A hot-selling fund entry. */
+export declare class HotFund {
+  toString(): string
+  toJSON(): any
+  /** Asset class */
+  get assetClass(): number
+  /** Asset class name */
+  get assetClassName(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Earning rate */
+  get earningRate(): string
+  /** Recent performance points */
+  get fundPerformances(): Array<FundPerformancePoint>
+  /** Fund name */
+  get name(): string
+  /** Minimum purchase amount */
+  get purchaseAmount(): string
+  /** Recommendation text */
+  get recommendationText(): string
+  /** Risk level */
+  get riskLevel(): number
+  /** Risk level name */
+  get riskLevelName(): string
+  /** Time interval of the earning rate */
+  get timeInterval(): string
 }
 
 export declare class HttpClient {
@@ -827,6 +2439,42 @@ export declare class MarketTradingSession {
   get tradeSessions(): Array<TradingSessionInfo>
 }
 
+/** Multi-leg strategy information */
+export declare class MultiLegInfo {
+  toString(): string
+  toJSON(): any
+  /** Multi-leg strategy */
+  get strategy(): MultiLegStrategy
+  /** Strategy name */
+  get strategyName(): string
+  /** Multi-leg combination ID */
+  get multilegId(): string
+  /** Multi-leg combination code */
+  get code(): string
+  /** Legs of the combination order */
+  get legs(): Array<MultiLegOrderLeg>
+}
+
+/** A leg of a multi-leg combination order */
+export declare class MultiLegOrderLeg {
+  toString(): string
+  toJSON(): any
+  /** Option symbol, in `ticker.region` format */
+  get symbol(): string
+  /** Order side */
+  get side(): OrderSide
+  /** Position direction */
+  get position(): MultiLegPosition
+  /** Leg ratio quantity */
+  get ratioQuantity(): Decimal
+  /** Strike price */
+  get strikePrice(): Decimal | null
+  /** Option expiry date */
+  get expireDate(): NaiveDate | null
+  /** Contract type */
+  get contractDirection(): ContractDirection
+}
+
 /** Naive date type */
 export declare class NaiveDate {
   constructor(year: number, month: number, day: number)
@@ -903,6 +2551,64 @@ export declare class OAuth {
    *          `HttpClient.fromOAuth`
    */
   static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
+  /**
+   * Revoke the current token on the server (RFC 7009).
+   *
+   * The refresh token is revoked when present, otherwise the access token.
+   * Only the server is contacted; the cached token on disk is left
+   * untouched (see `clear`).
+   *
+   * @example
+   * ```javascript
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Open:', url));
+   * await oauth.revoke();
+   * ```
+   */
+  revoke(): Promise<void>
+  /**
+   * Clear the token locally.
+   *
+   * Drops the in-memory token and deletes the cached token file
+   * (`~/.longbridge/openapi/tokens/<clientId>`). The server is not
+   * contacted (see `revoke`).
+   *
+   * @example
+   * ```javascript
+   * await oauth.clear();
+   * ```
+   */
+  clear(): Promise<void>
+}
+
+/**
+ * A single option contract of an option chain
+ *
+ * Every contract is an independent entry: calls and puts are not paired, so a
+ * strike price that is listed on one side only yields a single entry.
+ */
+export declare class OptionChainContract {
+  toString(): string
+  toJSON(): any
+  /** Option contract code, in `ticker.region` format */
+  get symbol(): string
+  /** Expiry date, in US Eastern time */
+  get expiryDate(): NaiveDate
+  /** Strike price */
+  get strikePrice(): Decimal
+  /** Contract direction */
+  get direction(): OptionDirection
+  /** Special expiration cycle of the contract */
+  get optionType(): OptionExpiryCycleType
+  /**
+   * Whether the contract is a legacy contract left over from a corporate
+   * action
+   */
+  get standardAttr(): OptionStandardAttr
+  /**
+   * Number of days remaining until the option expires, `0` on the expiry
+   * day and negative once expired
+   */
+  get daysToExpiry(): number
 }
 
 /** Quote of option */
@@ -949,6 +2655,42 @@ export declare class OptionQuote {
   get historicalVolatility(): Decimal
   /** Underlying security symbol of the option */
   get underlyingSymbol(): string
+}
+
+/** Daily option volume response */
+export declare class OptionVolumeDaily {
+  toString(): string
+  toJSON(): any
+  /** Underlying security symbol */
+  get symbol(): string
+  /** Daily stats */
+  get stats(): Array<OptionVolumeDailyStat>
+}
+
+/** One day's option volume stat */
+export declare class OptionVolumeDailyStat {
+  toString(): string
+  toJSON(): any
+  /** Underlying security symbol */
+  get symbol(): string
+  /** Trading date */
+  get date(): NaiveDate
+  /** Call volume */
+  get callVolume(): number
+  /** Put volume */
+  get putVolume(): number
+  /** Call open interest */
+  get callOpenInterest(): number
+  /** Put open interest */
+  get putOpenInterest(): number
+  /** Total options volume (calls + puts) */
+  get totalVolume(): number
+  /** Total open interest (calls + puts) */
+  get totalOpenInterest(): number
+  /** Put/call volume ratio */
+  get pcVol(): number
+  /** Put/call OI ratio */
+  get pcOi(): number
 }
 
 /** Order */
@@ -1013,6 +2755,18 @@ export declare class Order {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /**
+   * Time-condition submit time (not set when the order is not a
+   * time-condition order)
+   */
+  get delayedUntil(): Date | null
+  /** Attached orders */
+  get attachedOrders(): Array<AttachedOrderDetail>
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Order charge detail */
@@ -1115,6 +2869,11 @@ export declare class OrderDetail {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /**
+   * Time-condition submit time (not set when the order is not a
+   * time-condition order)
+   */
+  get delayedUntil(): Date | null
   /** Commission-free Status */
   get freeStatus(): CommissionFreeStatus
   /** Commission-free amount */
@@ -1136,7 +2895,14 @@ export declare class OrderDetail {
   /** Order history details */
   get history(): Array<OrderHistoryDetail>
   /** Order charges */
-  get chargeDetail(): OrderChargeDetail
+  get chargeDetail(): OrderChargeDetail | null
+  /** Attached orders */
+  get attachedOrders(): Array<AttachedOrderDetail>
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Order history detail */
@@ -1217,7 +2983,12 @@ export declare class ParticipantInfo {
 export declare class PortfolioContext {
   /** Create a new PortfolioContext. */
   static new(config: Config): PortfolioContext
-  /** Get exchange rates for supported currencies. */
+  /**
+   * Get exchange rates for supported currencies.
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `TradeContext.usExchangeRates` instead.
+   */
   exchangeRate(): Promise<ExchangeRates>
   /**
    * Get portfolio P&L analysis (summary + per-security breakdown).
@@ -1317,6 +3088,42 @@ export declare class PushDepthEvent {
   toString(): string
 }
 
+/** Grid trading master-order changed message. */
+export declare class PushGridOrderChanged {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Order status */
+  get status(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Submitted base price */
+  get submittedBasePrice(): string
+  /** Current base price */
+  get currentBasePrice(): string
+  /** Upper price bound */
+  get upperLimitPrice(): string
+  /** Lower price bound */
+  get lowerLimitPrice(): string
+  /** Trigger price type */
+  get triggerPriceType(): number
+  /** Quantity per trigger */
+  get triggerQuantity(): string
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Time in force (`0` = Day, `1` = GTC, `6` = GTD) */
+  get timeInForce(): number
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Sell-side order type when depth is 0 */
+  get gridOrderTypeUp(): string
+  /** Buy-side order type when depth is 0 */
+  get gridOrderTypeDown(): string
+}
+
 /** Order changed message */
 export declare class PushOrderChanged {
   toString(): string
@@ -1371,6 +3178,11 @@ export declare class PushOrderChanged {
   get lastPrice(): Decimal | null
   /** Remark message */
   get remark(): string
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Push real-time quote */
@@ -1693,7 +3505,16 @@ export declare class QuoteContext {
    */
   optionChainExpiryDateList(symbol: string): Promise<Array<NaiveDate>>
   /**
-   * Get option chain info by date
+   * Get the option contract list of an underlying security for a given
+   * expiry date
+   *
+   * Every contract is an independent entry: calls and puts are not paired,
+   * so a strike price that is listed on one side only yields a single entry.
+   *
+   * `standardOnly` filters out the legacy contracts produced by corporate
+   * actions. `true` returns standard contracts only; omitted or `false`
+   * returns everything, including the contracts carrying a `standardAttr`
+   * of `Old`.
    *
    * #### Example
    *
@@ -1708,7 +3529,7 @@ export declare class QuoteContext {
    * }
    * ```
    */
-  optionChainInfoByDate(symbol: string, expiryDate: NaiveDate): Promise<Array<StrikePriceInfo>>
+  optionChainInfoByDate(symbol: string, expiryDate: NaiveDate, standardOnly?: boolean | undefined | null): Promise<Array<OptionChainContract>>
   /**
    * Get warrant issuers
    *
@@ -2030,6 +3851,8 @@ export declare class QuoteContext {
   optionVolume(symbol: string): Promise<OptionVolumeStats>
   /** Get daily historical option volume */
   optionVolumeDaily(symbol: string, timestamp: number, count: number): Promise<OptionVolumeDaily>
+  /** Get US cryptocurrency market overview. US token required. */
+  usCryptoOverview(symbol: string): Promise<USCryptoOverview>
 }
 
 export declare class QuotePackageDetail {
@@ -2199,34 +4022,32 @@ export declare class SecurityCalcIndex {
   get balancePoint(): Decimal | null
   /** Open interest */
   get openInterest(): number | null
-  /** Delta */
+  /**
+   * Delta. Measures the expected change in option price for a $1 move in the
+   * underlying asset price.
+   */
   get delta(): Decimal | null
-  /** Gamma */
+  /**
+   * Gamma. Measures the expected change in Delta for a $1 move in the
+   * underlying asset price.
+   */
   get gamma(): Decimal | null
   /**
-   * Theta
-   *
-   * The raw value returned by the API is annualized (scaled by 252 trading
-   * days per year). To obtain the standard per-calendar-day theta, divide
-   * by 252: `theta / 252`.
+   * Theta. Measures the expected change in option price as one day passes;
+   * the raw value has been divided by 365 to convert to a daily value,
+   * representing the impact of one day's time decay on the option price.
    */
   get theta(): Decimal | null
   /**
-   * Vega
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in implied volatility (i.e. the value has been multiplied by
-   * 100). To obtain the standard vega (per unit change in IV), divide by
-   * 100: `vega / 100`.
+   * Vega. Measures the expected change in option price when implied
+   * volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+   * get the expected price change per 1% move in IV.
    */
   get vega(): Decimal | null
   /**
-   * Rho
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in the risk-free rate (i.e. the value has been multiplied by
-   * 100). To obtain the standard rho (per unit change in rate), divide by
-   * 100: `rho / 100`.
+   * Rho. Measures the expected change in option price when the risk-free
+   * interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+   * the expected price change per 1% move in the interest rate.
    */
   get rho(): Decimal | null
 }
@@ -2380,18 +4201,12 @@ export declare class StockPositionsResponse {
   get channels(): Array<StockPositionChannel>
 }
 
-/** Strike price info */
-export declare class StrikePriceInfo {
+/** Response for submit grid trading order request */
+export declare class SubmitGridOrderResponse {
   toString(): string
   toJSON(): any
-  /** Strike price */
-  get price(): Decimal
-  /** Security code of call option */
-  get callSymbol(): string
-  /** Security code of put option */
-  get putSymbol(): string
-  /** Is standard */
-  get standard(): boolean
+  /** Grid master order id */
+  get orderId(): string
 }
 
 /** Response for submit order request */
@@ -2493,6 +4308,11 @@ export declare class TradeContext {
    */
   setOnOrderChanged(callback: (err: null | Error, event: PushOrderChanged) => void): void
   /**
+   * Set grid order changed callback, after receiving the grid order changed
+   * event, it will call back to this function.
+   */
+  setOnGridOrderChanged(callback: (err: null | Error, event: PushGridOrderChanged) => void): void
+  /**
    * Subscribe
    *
    * #### Example
@@ -2529,6 +4349,8 @@ export declare class TradeContext {
   /**
    * Get history executions
    *
+   * `side` may be `Unknown` on Longbridge US accounts.
+   *
    * #### Example
    *
    * ```javascript
@@ -2564,6 +4386,13 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
+  /**
+   * Get all executions
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `historyExecutions` instead.
+   */
+  allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
    *
@@ -2670,6 +4499,40 @@ export declare class TradeContext {
    */
   submitOrder(opts: SubmitOrderOptions): Promise<SubmitOrderResponse>
   /**
+   * Submit a multi-leg option combination order (such as vertical spreads,
+   * straddles, strangles, collars, etc.). All legs are submitted together
+   * as a single strategy order.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const {
+   *   OAuth, Config,
+   *   TradeContext,
+   *   OrderType,
+   *   OrderSide,
+   *   Decimal,
+   *   MultiLegStrategy,
+   * } = require('longbridge');
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.submitMultileg({
+   *   side: OrderSide.Buy,
+   *   orderType: OrderType.LO,
+   *   submittedQuantity: new Decimal("1"),
+   *   strategy: MultiLegStrategy.VerticalCallSpread,
+   *   submittedPrice: new Decimal("1.5"),
+   *   legs: [
+   *     { symbol: "QQQ260731C764000.US", ratioQuantity: new Decimal("1") },
+   *     { symbol: "QQQ260731C767000.US", ratioQuantity: new Decimal("1") },
+   *   ],
+   * });
+   * console.log(resp.toString());
+   * ```
+   */
+  submitMultileg(opts: SubmitMultiLegOrderOptions): Promise<SubmitOrderResponse>
+  /**
    * Cancel order
    *
    * #### Example
@@ -2682,9 +4545,12 @@ export declare class TradeContext {
    * await ctx.cancelOrder("709043056541253632");
    * ```
    */
-  cancelOrder(orderId: string): Promise<void>
+  cancelOrder(orderId: string, isAttached?: boolean | undefined | null): Promise<void>
   /**
    * Get account balance
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usCashAndBuyPower` (or `usAssetOverview`) instead.
    *
    * #### Example
    *
@@ -2702,6 +4568,9 @@ export declare class TradeContext {
   accountBalance(currency?: string | undefined | null): Promise<Array<AccountBalance>>
   /**
    * Get cash flow
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usTransactionHistory` instead.
    *
    * #### Example
    *
@@ -2723,6 +4592,9 @@ export declare class TradeContext {
   /**
    * Get fund positions
    *
+   * AP accounts only: US data-center accounts have no fund holdings and
+   * get a region error. No US equivalent.
+   *
    * #### Example
    *
    * ```javascript
@@ -2737,6 +4609,9 @@ export declare class TradeContext {
   fundPositions(symbols?: Array<string> | undefined | null): Promise<FundPositionsResponse>
   /**
    * Get stock positions
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usAssetOverview` (`stockList`) instead.
    *
    * #### Example
    *
@@ -2753,6 +4628,10 @@ export declare class TradeContext {
   /**
    * Get margin ratio
    *
+   * AP accounts only: US data-center accounts get a region error. No US
+   * equivalent; for US margin info see `usCashAndBuyPower`
+   * (`marginStatus`).
+   *
    * #### Example
    *
    * ```javascript
@@ -2768,6 +4647,9 @@ export declare class TradeContext {
   /**
    * Get order detail
    *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usOrderDetail` instead.
+   *
    * #### Example
    *
    * ```javascript
@@ -2780,6 +4662,40 @@ export declare class TradeContext {
    * ```
    */
   orderDetail(orderId: string): Promise<OrderDetail>
+  /**
+   * Query US order list. Returns JSON string. US token required.
+   * symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+   */
+  usQueryOrders(symbol: string | undefined | null, action: number, startAt: number, endAt: number, queryType: number, page: number, limit: number): Promise<string>
+  /** Get US order detail. US token required. */
+  usOrderDetail(orderId: string): Promise<USOrderDetailResponse>
+  /** Get US account asset overview. US token required. */
+  usAssetOverview(): Promise<USAssetOverview>
+  /** Get US realized P&L. US token required. */
+  usRealizedPl(currency: string, category?: string | undefined | null): Promise<USRealizedPL>
+  /**
+   * Get cash, buying power and margin status for the US account. US token
+   * required.
+   *
+   * `currency`: optional, e.g. `"USD"`.
+   */
+  usCashAndBuyPower(currency?: string | undefined | null): Promise<USCashAndBuyPower>
+  /**
+   * Get the quantity of a US holding that is available to trade. US token
+   * required.
+   *
+   * `equityType`: `"STOCK"` (default), `"OPTION"` or `"CRYPTO"`;
+   * `positionSide`: `"LONG"` (default) or `"SHORT"`.
+   */
+  usAvailableHolding(symbol: string, equityType?: string | undefined | null, positionSide?: string | undefined | null): Promise<USAvailableHolding>
+  /**
+   * Get the US account transaction history, one page at a time. US token
+   * required.
+   */
+  usTransactionHistory(opts: GetUSTransactionHistoryOptions): Promise<USTransactionHistory>
+  /** Get the exchange rates used by the US account. US token required. */
+  usExchangeRates(): Promise<USExchangeRates>
+  orderDetailAttached(orderId: string): Promise<OrderDetail>
   /**
    * Estimating the maximum purchase quantity for Hong Kong and US stocks,
    * warrants, and options
@@ -2814,6 +4730,52 @@ export declare class TradingSessionInfo {
   get tradeSession(): TradeSession
 }
 
+/** A grid trigger-history entry (one triggered order). */
+export declare class TriggerOrder {
+  toString(): string
+  toJSON(): any
+  /** Triggered order ID */
+  get id(): string
+  /** Order status */
+  get status(): string
+  /** Stock name */
+  get name(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Order price */
+  get price(): Decimal | null
+  /** Order quantity */
+  get quantity(): Decimal | null
+  /** Executed average price */
+  get executedPrice(): Decimal | null
+  /** Executed total quantity */
+  get executedQty(): Decimal | null
+  /** Submitted time */
+  get submittedAt(): Date | null
+  /** Buy / sell direction */
+  get action(): number
+  /** Order type */
+  get orderType(): string
+  /** Trigger price */
+  get triggerPrice(): Decimal | null
+  /** Rejection reason, if any */
+  get msg(): string
+  /** Settlement currency */
+  get currency(): string
+  /** Latest quote price */
+  get lastDone(): Decimal | null
+  /** Last updated time */
+  get updatedAt(): Date | null
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Trigger time */
+  get triggerAt(): Date | null
+  /** Conditional trigger status */
+  get triggerStatus(): number
+}
+
 /** Warrant info */
 export declare class WarrantInfo {
   toString(): string
@@ -2835,7 +4797,7 @@ export declare class WarrantInfo {
   /** Turnover */
   get turnover(): Decimal
   /** Expiry date */
-  get expiryDate(): NaiveDate
+  get expiryDate(): NaiveDate | null
   /** Strike price */
   get strikePrice(): Decimal | null
   /** Upper strike price */
@@ -2958,6 +4920,127 @@ export declare const enum AdjustType {
   ForwardAdjust = 1
 }
 
+/** An Agent in a Workspace */
+export interface Agent {
+  /** Agent UID, used as the path parameter of `AgentContext.conversation` */
+  uid: string
+  /** Agent name */
+  name: string
+  /** Agent description */
+  description: string
+  /** Agent mode, e.g. `chat` */
+  mode: string
+  /** Icon URL */
+  icon: string
+  /** Whether published; only published Agents can start conversations */
+  isPublished: boolean
+  /** Publish time, Unix timestamp in seconds; 0 if unpublished */
+  publishedAt: number
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Present when a conversation run failed */
+export interface AgentError {
+  /** Error code */
+  code: number
+  /** Error message */
+  message: string
+}
+
+/** Response for `AgentContext.agents` */
+export interface AgentsResponse {
+  /** Agent list */
+  agents: Array<Agent>
+  /** Total number of matching Agents */
+  total: number
+}
+
+/** Payload of an `agent_tool_finished` stream event */
+export interface AgentToolFinishedPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** Matches the `toolUseId` of `AgentToolStarted` */
+  toolUseId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Total duration in seconds */
+  elapsedTime: number
+  /** Error description on failure */
+  error: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Result of the delegated Agent */
+  outputs?: any
+  /** Tool category */
+  toolType: string
+  /** Progress text; may be omitted */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** `true` if during the thinking phase */
+  isThinking: boolean
+}
+
+/**
+ * Payload of an `agent_tool_progress` stream event, emitted for each inner
+ * tool call the delegated Agent makes.
+ */
+export interface AgentToolProgressPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** `toolUseId` of the owning `AgentToolStarted` event */
+  parentToolCallId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** Name of the inner tool the delegated Agent called */
+  innerToolName: string
+  /** Arguments of that inner call, as a JSON string */
+  innerToolArgs: string
+  /** Status of the inner call: `running` / `succeeded` / `failed` */
+  status: string
+  /** Duration of the inner call in milliseconds */
+  durationMs: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** `true` if during the thinking phase */
+  isThinking: boolean
+}
+
+/**
+ * Payload of an `agent_tool_started` stream event. When the Agent delegates
+ * to another Agent as a tool, that inner run is reported with the
+ * `agentTool*` family — the shape mirrors the subagent events.
+ */
+export interface AgentToolStartedPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** Unique ID of this call; matches the finished event */
+  toolUseId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** Display title; may be omitted */
+  title: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Localized display name */
+  toolName: string
+  /** Progress text; may be omitted */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** `true` if called during the thinking phase */
+  isThinking: boolean
+}
+
 /** A/H premium intraday response */
 export interface AhPremiumIntraday {
   /** Intraday data points */
@@ -3050,8 +5133,8 @@ export interface AlertItem {
   text: string
   /** Trigger state flags */
   state: Array<number>
-  /** Trigger value: `{"price":"500"}` or `{"chg":"5"}` */
-  valueMap: any
+  /** Trigger value, e.g. `{"price":"500"}` or `{"chg":"5"}` */
+  valueMap: AlertValueMap
 }
 
 /** Alert list response */
@@ -3080,6 +5163,14 @@ export interface AlertSymbolGroup {
   product: string
   /** Alert items */
   indicators: Array<AlertItem>
+}
+
+/** Trigger value of a price alert (exactly one field is populated). */
+export interface AlertValueMap {
+  /** Absolute price threshold as a decimal string, e.g. `"500"`. */
+  price?: string
+  /** Percentage-change threshold, e.g. `5`. */
+  chg?: number
 }
 
 /** One market anomaly event (e.g. large block trade, margin buying surge) */
@@ -3147,6 +5238,18 @@ export declare const enum AssetType {
   Fund = 2,
   /** Crypto */
   Crypto = 3
+}
+
+/** Attached order type */
+export declare const enum AttachedOrderType {
+  /** Unknown */
+  Unknown = 0,
+  /** Profit taker */
+  ProfitTaker = 1,
+  /** Stop loss */
+  StopLoss = 2,
+  /** Bracket */
+  Bracket = 3
 }
 
 export declare const enum BalanceType {
@@ -3440,6 +5543,14 @@ export interface CalendarEventsResponse {
   list: Array<CalendarDateGroup>
 }
 
+/** Pagination direction for `financeCalendar` (the `next` query parameter). */
+export declare const enum CalendarPageDirection {
+  /** Page towards later dates */
+  Later = 0,
+  /** Page towards earlier dates */
+  Earlier = 1
+}
+
 export declare const enum CashFlowDirection {
   /** Unknown */
   Unknown = 0,
@@ -3457,6 +5568,55 @@ export declare const enum ChargeCategoryCode {
   Broker = 1,
   /** Third */
   Third = 2
+}
+
+/**
+ * Payload of a `chat_finished` stream event, observed once all `message`
+ * events for this round have been sent, shortly before `workflow_finished`
+ */
+export interface ChatFinishedPayload {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Empty string in every run observed so far */
+  error: string
+  /** Empty string in every run observed so far */
+  errorMessage: string
+}
+
+/** Payload of a `chat_started` stream event */
+export interface ChatStartedPayload {
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** ID of the owning conversation */
+  chatId: number
+  /** Error detail; empty at start */
+  error: string
+  /** User-facing error message; empty at start */
+  errorMessage: string
+}
+
+/**
+ * Payload of a `chat_title_updated` stream event — the server auto-generates
+ * a short title for the conversation as a UI convenience. Can arrive before
+ * *or* after `workflow_finished`; not tied to the run's outcome.
+ */
+export interface ChatTitleUpdatedPayload {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Where the title came from, e.g. `"ai_generated"` */
+  source: string
+  /** The new (possibly truncated) title */
+  title: string
+  /** Unix timestamp in seconds */
+  updatedAt: number
 }
 
 /** Commission-free Status */
@@ -3507,7 +5667,7 @@ export interface CompanyOverview {
   category: string
   /** Fiscal year end */
   yearEnd: string
-  /** Number of employees */
+  /** Number of employees (returned as a string by the API, e.g. `"10000"`) */
   employees: string
   /** Phone number */
   phone: string
@@ -3607,6 +5767,191 @@ export interface ConstituentStock {
   chg?: string
   /** Raw trade status code */
   tradeStatus: number
+}
+
+/**
+ * Payload of a `context_compress_finished` stream event. Unlike other
+ * events, the timestamp here is an RFC 3339 string.
+ */
+export interface ContextCompressFinishedPayload {
+  /** Finish time, RFC 3339 */
+  createdAt: string
+  /** Compression input summary */
+  inputs?: any
+  /** Compression result summary */
+  outputs?: any
+}
+
+/**
+ * Payload of a `context_compress_started` stream event, marking the start
+ * of a context-compression pass triggered by a long conversation. Unlike
+ * other events, the timestamp here is an RFC 3339 string.
+ */
+export interface ContextCompressStartedPayload {
+  /** Start time, RFC 3339 */
+  startedAt: string
+  /** Compression input summary */
+  inputs?: any
+}
+
+/** Option contract type */
+export declare const enum ContractDirection {
+  /** Unknown */
+  Unknown = 0,
+  /** Call */
+  Call = 1,
+  /** Put */
+  Put = 2
+}
+
+/**
+ * Response for `AgentContext.conversation`,
+ * `AgentContext.continueConversation`, and the final result of the streamed
+ * counterparts
+ */
+export interface ConversationResponse {
+  /**
+   * Conversation identifier, used for follow-up questions and
+   * troubleshooting
+   */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Final run status */
+  status: ConversationStatus
+  /** Final answer text; valid when `status` is `succeeded` */
+  answer: string
+  /** Sources referenced by the answer */
+  references?: Array<Reference>
+  /** Suggested follow-up questions */
+  furtherQuestions?: Array<string>
+  /** Run duration in seconds */
+  elapsedTime: number
+  /** Present only when `status` is `interrupted` */
+  interrupt?: Interrupt
+  /** Present only when the run failed */
+  error?: AgentError
+}
+
+/** Final run status of a conversation */
+export declare const enum ConversationStatus {
+  /** The run completed successfully */
+  Succeeded = 0,
+  /** The run is paused, waiting for `AgentContext.continueConversation` */
+  Interrupted = 1,
+  /** The run failed */
+  Failed = 2,
+  /** The run was stopped */
+  Stopped = 3
+}
+
+/**
+ * One event observed while streaming `AgentContext.conversationStreamed` or
+ * `AgentContext.continueConversationStreamed`.
+ *
+ * Design note: the Rust core models this as an enum with a per-variant
+ * payload (`longbridge::agent::ConversationStreamEvent`), but napi-rs has no
+ * ergonomic equivalent of a Rust/Serde "enum with data" for a plain
+ * `#[napi(object)]` value, and there's no existing precedent for reifying one
+ * as a single JS value in this codebase (the closest analogue,
+ * `trade::PushEvent`, is dispatched to separate per-variant JS callbacks
+ * instead). We instead mirror the common "discriminant + optional per-kind
+ * fields" shape used for tagged unions in plain JS/JSON: `kind` is one of
+ * `"chat_started" | "workflow_started" | "message" | "ping" |
+ * "thinking_started" | "thinking_finished" | "node_tool_use_started" |
+ * "node_tool_use_finished" | "subagent_started" | "subagent_progress" |
+ * "subagent_finished" | "agent_tool_started" | "agent_tool_progress" |
+ * "agent_tool_finished" | "human_interaction_required" | "query_masked" |
+ * "plan_changed" | "context_compress_started" | "context_compress_finished" |
+ * "chat_finished" | "workflow_finished" | "chat_title_updated" | "other"`,
+ * and exactly one of `chatStarted` / `workflowStarted` / `message` /
+ * `thinkingStarted` / `thinkingFinished` / `nodeToolUseStarted` /
+ * `nodeToolUseFinished` / `subagentStarted` / `subagentProgress` /
+ * `subagentFinished` / `agentToolStarted` / `agentToolProgress` /
+ * `agentToolFinished` / `humanInteractionRequired` / `queryMasked` /
+ * `planChanged` / `contextCompressStarted` / `contextCompressFinished` /
+ * `chatFinished` / `workflowFinished` / `chatTitleUpdated` / `other` is set,
+ * matching `kind` — except `"ping"`, a heartbeat with no payload, for which
+ * every payload field is `None`. When `kind` is `"other"`, `otherEvent`
+ * additionally carries the SSE envelope's `event` field (the event type
+ * name).
+ */
+export interface ConversationStreamEvent {
+  /**
+   * Discriminant: one of `"chat_started"`, `"workflow_started"`,
+   * `"message"`, `"ping"`, `"thinking_started"`, `"thinking_finished"`,
+   * `"node_tool_use_started"`, `"node_tool_use_finished"`,
+   * `"subagent_started"`, `"subagent_progress"`, `"subagent_finished"`,
+   * `"agent_tool_started"`, `"agent_tool_progress"`,
+   * `"agent_tool_finished"`, `"human_interaction_required"`,
+   * `"query_masked"`, `"plan_changed"`, `"context_compress_started"`,
+   * `"context_compress_finished"`, `"chat_finished"`,
+   * `"workflow_finished"`, `"chat_title_updated"`, or `"other"`
+   */
+  kind: string
+  /** Set when `kind` is `"chat_started"` */
+  chatStarted?: ChatStartedPayload
+  /** Set when `kind` is `"workflow_started"` */
+  workflowStarted?: WorkflowStartedPayload
+  /** Set when `kind` is `"message"` */
+  message?: MessagePayload
+  /** Set when `kind` is `"thinking_started"` */
+  thinkingStarted?: ThinkingStartedPayload
+  /** Set when `kind` is `"thinking_finished"` */
+  thinkingFinished?: ThinkingFinishedPayload
+  /** Set when `kind` is `"node_tool_use_started"` */
+  nodeToolUseStarted?: NodeToolUseStartedPayload
+  /** Set when `kind` is `"node_tool_use_finished"` */
+  nodeToolUseFinished?: NodeToolUseFinishedPayload
+  /** Set when `kind` is `"subagent_started"` */
+  subagentStarted?: SubagentStartedPayload
+  /** Set when `kind` is `"subagent_progress"` */
+  subagentProgress?: SubagentProgressPayload
+  /** Set when `kind` is `"subagent_finished"` */
+  subagentFinished?: SubagentFinishedPayload
+  /** Set when `kind` is `"agent_tool_started"` */
+  agentToolStarted?: AgentToolStartedPayload
+  /** Set when `kind` is `"agent_tool_progress"` */
+  agentToolProgress?: AgentToolProgressPayload
+  /** Set when `kind` is `"agent_tool_finished"` */
+  agentToolFinished?: AgentToolFinishedPayload
+  /**
+   * Set when `kind` is `"human_interaction_required"`, carrying the run's
+   * outcome for an interrupted run — the same `ConversationResponse` shape
+   * `workflowFinished` carries for the other outcomes. Unlike
+   * `workflowFinished`, this is set instead of (never alongside)
+   * `workflowFinished` for the same run.
+   */
+  humanInteractionRequired?: ConversationResponse
+  /** Set when `kind` is `"query_masked"` */
+  queryMasked?: QueryMaskedPayload
+  /** Set when `kind` is `"plan_changed"` */
+  planChanged?: PlanChangedPayload
+  /** Set when `kind` is `"context_compress_started"` */
+  contextCompressStarted?: ContextCompressStartedPayload
+  /** Set when `kind` is `"context_compress_finished"` */
+  contextCompressFinished?: ContextCompressFinishedPayload
+  /** Set when `kind` is `"chat_finished"` */
+  chatFinished?: ChatFinishedPayload
+  /**
+   * Set when `kind` is `"workflow_finished"`, carrying the run's outcome
+   * — not necessarily the last event of the stream, since the server may
+   * still emit a few more housekeeping events (`kind` `"other"`) before
+   * actually closing the connection
+   */
+  workflowFinished?: ConversationResponse
+  /** Set when `kind` is `"chat_title_updated"` */
+  chatTitleUpdated?: ChatTitleUpdatedPayload
+  /**
+   * Set when `kind` is `"other"` — the SSE envelope's `event` field (the
+   * event type name)
+   */
+  otherEvent?: string
+  /**
+   * Set when `kind` is `"other"` — raw JSON of an event type not
+   * recognized by this SDK version
+   */
+  other?: any
 }
 
 /** One corporate action event */
@@ -3930,8 +6275,8 @@ export interface ExchangeRates {
 
 /** Executives for one security */
 export interface ExecutiveGroup {
-  /** Security symbol */
-  symbol: string
+  /** Security symbol (`null` when the server omits it) */
+  symbol?: string
   /** Company wiki URL */
   forwardUrl: string
   /** Total executives */
@@ -3970,12 +6315,33 @@ export interface ExtraConfigParams {
   /** Push candlesticks mode (default: PushCandlestickMode.Realtime) */
   pushCandlestickMode?: PushCandlestickMode
   /**
+   * Transport for quote pull (request/response) APIs (default:
+   * QuoteTransport.WebSocket)
+   *
+   * Subscriptions and push events always use the WebSocket connection; this
+   * only selects how request/response quote APIs reach the server.
+   */
+  quoteTransport?: QuoteTransport
+  /**
    * Enable printing the opened quote packages when connected to the server
    * (default: true).  Set to `false` to suppress the output.
    */
   enablePrintQuotePackages?: boolean
   /** Set the path of the log files (Default: `no logs`) */
   logPath?: string
+  /**
+   * Enable paper trading mode (default: `false`).
+   *
+   * When `true`, all API calls target the paper trading (simulation)
+   * environment.  The server validates the token: if it belongs to a
+   * real-money account the server returns an error.
+   *
+   * When `false` (the default) the server imposes no restrictions — both
+   * paper trading and real-money accounts are accepted.
+   *
+   * Paper trading users should set this to `true` as a safety guard.
+   */
+  enablePapertrading?: boolean
 }
 
 /** Filter warrant expiry date type */
@@ -4051,6 +6417,21 @@ export interface FinancialReports {
   list: any
 }
 
+/**
+ * Financial statement kind
+ *
+ * Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+ * needs one specific statement per request.
+ */
+export declare const enum FinancialStatementKind {
+  /** Income statement */
+  IncomeStatement = 0,
+  /** Balance sheet */
+  BalanceSheet = 1,
+  /** Cash flow statement */
+  CashFlow = 2
+}
+
 export declare const enum FlowDirection {
   /** Unknown */
   Unknown = 0,
@@ -4063,8 +6444,11 @@ export declare const enum FlowDirection {
 /** One profit-analysis flow record */
 export interface FlowItem {
   executedDate: string
-  /** Execution timestamp as a JSON value string */
-  executedTimestamp: string
+  /**
+   * Execution timestamp as a Unix-seconds string (absent when not yet
+   * executed)
+   */
+  executedTimestamp?: string
   code: string
   direction: FlowDirection
   executedQuantity?: string
@@ -4123,6 +6507,36 @@ export interface FundHolders {
   lists: Array<FundHolder>
 }
 
+/** Net-value range options (relative months / years before now). */
+export interface FundNavRangeOptions {
+  /** Number of months before now */
+  monthBefore?: number
+  /** Number of years before now */
+  yearBefore?: number
+}
+
+/** Paging options (page / size). */
+export interface FundPageOptions {
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for get all executions request */
+export interface GetAllExecutionsOptions {
+  /** Security symbol */
+  symbol?: string
+  /** Order id */
+  orderId?: string
+  /** Start time */
+  startAt?: Date
+  /** End time */
+  endAt?: Date
+  /** Page number */
+  page?: number
+}
+
 /** Options for get cash flow request */
 export interface GetCashFlowOptions {
   /** Start time */
@@ -4137,6 +6551,172 @@ export interface GetCashFlowOptions {
   page?: number
   /** Page size */
   size?: number
+}
+
+/** Options for the fund analysis / trend / comparison endpoints. */
+export interface GetFundAnalysisOptions {
+  /** Analysis period */
+  period?: number
+}
+
+/** Options for the fund holdings endpoint. */
+export interface GetFundHoldingsOptions {
+  /** Scene */
+  scene?: number
+}
+
+/** Options for the fund orders list. */
+export interface GetFundOrdersOptions {
+  /** Filter by fund counter ids */
+  counterIds?: Array<string>
+  /** Filter by actions (comma-separated) */
+  actions?: string
+  /** Filter by states (comma-separated) */
+  states?: string
+  /** Filter by currency */
+  currency?: string
+  /** Range start (unix seconds) */
+  start?: number
+  /** Range end (unix seconds) */
+  end?: number
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for a single fund position dividend list. */
+export interface GetFundPositionDividendsOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Account id */
+  aaid?: number
+  /** Currency */
+  currency?: string
+  /** Range start (unix seconds) */
+  start?: number
+  /** Range end (unix seconds) */
+  end?: number
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for a single fund position detail. */
+export interface GetFundPositionOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Account id */
+  aaid?: number
+  /** Range start */
+  start?: string
+  /** Range end */
+  end?: string
+}
+
+/** Options for a single fund position cumulative-profit list. */
+export interface GetFundPositionProfitsOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Account id */
+  aaid?: number
+  /** Range start */
+  start?: string
+  /** Range end */
+  end?: string
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for the fund positions overview endpoint. */
+export interface GetFundPositionsOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Account id */
+  aaid?: number
+}
+
+/** Options for the fund list. */
+export interface GetFundsOptions {
+  /** Server-defined filter object, as a raw JSON string */
+  filter?: string
+  /** Quick-filter ids */
+  quickIds?: Array<number>
+  /** Earning-rate time intervals */
+  timeInterval?: Array<string>
+}
+
+/** Options for the fund stock-holdings (reverse) endpoint. */
+export interface GetFundStockHoldingsOptions {
+  /** Maximum number of stocks to return */
+  limit?: number
+}
+
+/** Options for the fund transactions (cash-flow) list. */
+export interface GetFundTransactionsOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Business type */
+  businessType?: string
+  /** Category */
+  category?: string
+  /** Currencies (comma-separated) */
+  currencies?: string
+  /** Range start (unix seconds) */
+  start?: number
+  /** Range end (unix seconds) */
+  end?: number
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for get grid trading order detail request */
+export interface GetGridOrderDetailOptions {
+  /** Grid master order id */
+  orderId: string
+  /** History cursor for paging through the trigger history */
+  historyId?: string
+  /** Page size */
+  limit?: number
+}
+
+/** Options for query grid trading orders by IDs request */
+export interface GetGridOrdersByIdsOptions {
+  /** Grid master order IDs */
+  orderIds: Array<string>
+}
+
+/** Options for get grid trading orders (list) request */
+export interface GetGridOrdersOptions {
+  /** Page number */
+  page?: number
+  /** Page size */
+  limit?: number
+  /** Market */
+  market?: Market
+  /** Comma-joined status filter (e.g. `Performing,Suspended`) */
+  status?: string
+  /** Security symbol filter (e.g. `700.HK`) */
+  symbol?: string
+  /** Sort field */
+  sortBy?: string
+  /** Sort order */
+  sortOrder?: string
+}
+
+/** Options for get grid trading trigger history request */
+export interface GetGridTriggerHistoryOptions {
+  /** Grid master order id */
+  gridOrderId: string
+  /** Page number */
+  page?: number
+  /** Page size */
+  limit?: number
 }
 
 /** Options for get history executions request */
@@ -4213,6 +6793,34 @@ export interface GetTodayOrdersOptions {
   market?: Market
   /** Order id */
   orderId?: string
+  /**
+   * When set together with order_id, indicates that order_id is an attached
+   * sub-order ID. The server returns the attached sub-order itself as an
+   * Order entry (not the parent order). Has no effect without order_id.
+   */
+  isAttached?: boolean
+}
+
+/** Options for the US transaction history request */
+export interface GetUSTransactionHistoryOptions {
+  /** Start time (inclusive) */
+  startAt: Date
+  /** End time (inclusive) */
+  endAt: Date
+  /** Page number, starting at 1 (default 1) */
+  page?: number
+  /** Page size (default 20) */
+  size?: number
+  /**
+   * Transaction types to include; empty means all. Values:
+   * `TT_DEPOSIT_AND_WITHDRAWAL`, `TT_STOCKS_AND_ETFS_TRADING`,
+   * `TT_OPTIONS_TRADING`, `TT_CRYPTO_TRADING`, `TT_CORPORATE_ACTION`,
+   * `TT_TRANSFER_IN_AND_OUT`, `TT_CRYPTO_TRANSFER`, `TT_MARGIN_FINANCING`,
+   * `TT_OTHER`
+   */
+  types?: Array<string>
+  /** Currency filter, e.g. `USD`; empty means all */
+  currency?: string
 }
 
 /** Data granularity */
@@ -4225,6 +6833,93 @@ export declare const enum Granularity {
   Weekly = 2,
   /** Monthly */
   Monthly = 3
+}
+
+/**
+ * Action taken when a grid boundary is reached.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum GridLimitEvent {
+  /** Unknown / unset */
+  Unknown = 0,
+  /** Ignore — keep the grid running */
+  Ignore = 1,
+  /** Close the position at the last price */
+  CloseAtLast = 2
+}
+
+/**
+ * Time in force for a grid order.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum GridTimeInForce {
+  /** Day order */
+  Day = 0,
+  /** Good-til-canceled */
+  GoodTilCanceled = 1,
+  /** Good-til-date */
+  GoodTilDate = 2,
+  /** Unknown value */
+  Unknown = 3
+}
+
+/**
+ * Grid trading rule — parameters for submit / replace.
+ *
+ * Prices and quantities are decimals; trigger price type, time in force and
+ * limit events are named enums.
+ */
+export interface GridTradeRule {
+  /** Base price the grid is anchored to */
+  submittedBasePrice?: Decimal
+  /** Upper price bound */
+  upperLimitPrice?: Decimal
+  /** Lower price bound */
+  lowerLimitPrice?: Decimal
+  /** Trigger price type (`Spread` / `Percent`) */
+  triggerPriceType?: TriggerPriceType
+  /** Upward trigger spread (absolute) */
+  triggerSpreadUp?: Decimal
+  /** Downward trigger spread (absolute) */
+  triggerSpreadDown?: Decimal
+  /** Upward trigger percent */
+  triggerPercentUp?: Decimal
+  /** Downward trigger percent */
+  triggerPercentDown?: Decimal
+  /** Whether a single grid level may trigger multiple times */
+  multipleTrigger?: boolean
+  /** Time in force (`Day` / `GoodTilCanceled` / `GoodTilDate`) */
+  timeInForce?: GridTimeInForce
+  /** Quantity handled when the upper bound is reached */
+  upperLimitQuantity?: Decimal
+  /** Quantity handled when the lower bound is reached */
+  lowerLimitQuantity?: Decimal
+  /** Expiry time (unix seconds), used with GTD */
+  expireTime?: number
+  /** Action when the upper bound is reached (`Ignore` / `CloseAtLast`) */
+  upperLimitEvent?: GridLimitEvent
+  /** Action when the lower bound is reached (`Ignore` / `CloseAtLast`) */
+  lowerLimitEvent?: GridLimitEvent
+  /** Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`) */
+  triggerSellDepth?: number
+  /** Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`) */
+  triggerBuyDepth?: number
+  /** Quantity per trigger */
+  triggerQuantity?: Decimal
+  /** Whether short selling is allowed */
+  supportShortsell?: boolean
+  /** Regular trading hours flag (`0` / `1` / `2`) */
+  rth?: number
+  /** Sell-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) */
+  gridOrderTypeUp?: string
+  /** Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) */
+  gridOrderTypeDown?: string
 }
 
 /** Holding detail of an ETF asset allocation element (holdings only) */
@@ -4241,6 +6936,22 @@ export interface HoldingDetail {
   holdingType: string
   /** Holding type name */
   holdingTypeName: string
+}
+
+/** A single interaction requested while an Agent workflow is paused */
+export interface HumanInteraction {
+  /** Tool call that requested the interaction */
+  toolCallId: string
+  /** Stable key expected by `answersByToolCall` */
+  interruptId: string
+  /** Interaction type such as `ask_human` or `trade_password` */
+  interactionType: string
+  /** Human-readable tool name */
+  toolName: string
+  /** Questions and answer options presented to the user */
+  questions: Array<Question>
+  /** Original tool arguments, retained for host-specific UI rendering */
+  toolArgs: any
 }
 
 /** Index constituents response */
@@ -4438,6 +7149,25 @@ export declare const enum InstitutionRecommend {
   NoOpinion = 7
 }
 
+/**
+ * Present when a conversation run is interrupted, waiting for
+ * `AgentContext.continueConversation`
+ */
+export interface Interrupt {
+  /** ID of the node that triggered the interrupt */
+  nodeId: string
+  /** Tool call ID of this inquiry; used as the answer key when continuing */
+  toolCallId: string
+  /** Questions you need to answer */
+  questions: Array<Question>
+  /** Full interaction descriptors used to render and answer the pause */
+  interactions: Array<HumanInteraction>
+  /** ID of the paused message */
+  messageId: number
+  /** ID of the owning conversation */
+  chatId: number
+}
+
 /** Investor relations response */
 export interface InvestRelations {
   /** Link to IR page */
@@ -4578,11 +7308,82 @@ export interface MarketTimeItem {
   delaySubStatus: number
 }
 
+/**
+ * Payload of a `message` stream event — an incremental text chunk. This is
+ * the highest-frequency event; concatenate `text` fragments in arrival
+ * order.
+ */
+export interface MessagePayload {
+  /** Incremental text fragment */
+  text: string
+  /**
+   * `answer` — final answer text; `think` — reasoning process; `process`
+   * — stage progress description
+   */
+  messageType: string
+  /**
+   * Identifier of the stream segment this fragment belongs to. Fragments
+   * with the same `key` form one continuous block — group by `key` when
+   * rendering
+   */
+  key: string
+  /** Time this segment started, Unix timestamp in seconds */
+  startedAt: number
+  /** Stage identifier; only present when `messageType` is `"process"` */
+  stage: string
+  /**
+   * Stage title while running; only present when `messageType` is
+   * `"process"`
+   */
+  stageTitle: string
+  /**
+   * Stage title after it finishes; only present when `messageType` is
+   * `"process"`
+   */
+  stageFinishedTitle: string
+  /** Extra payload attached to the fragment; usually absent */
+  outputs?: any
+}
+
 /** Localized text in simplified Chinese, traditional Chinese, and English */
 export interface MultiLanguageText {
   english: string
   simplifiedChinese: string
   traditionalChinese: string
+}
+
+/** Multi-leg position direction */
+export declare const enum MultiLegPosition {
+  /** Unknown */
+  Unknown = 0,
+  /** Long */
+  Long = 1,
+  /** Short */
+  Short = 2
+}
+
+/** Multi-leg strategy */
+export declare const enum MultiLegStrategy {
+  /** Unknown */
+  Unknown = 0,
+  /** Covered call (covered stock) */
+  CoveredCall = 1,
+  /** Covered put (covered stock) */
+  CoveredPut = 2,
+  /** Vertical call spread */
+  VerticalCallSpread = 3,
+  /** Vertical put spread */
+  VerticalPutSpread = 4,
+  /** Collar */
+  Collar = 5,
+  /** Straddle */
+  Straddle = 6,
+  /** Strangle */
+  Strangle = 7,
+  /** Calendar call spread */
+  CalendarCallSpread = 8,
+  /** Calendar put spread */
+  CalendarPutSpread = 9
 }
 
 /** Options for listing topics created by the current authenticated user */
@@ -4593,6 +7394,93 @@ export interface MyTopicsRequest {
   size?: number
   /** Filter by topic type: "article" or "post"; empty returns all */
   topicType?: string
+}
+
+/**
+ * Payload of a `node_tool_use_finished` stream event — the tool call has
+ * ended.
+ */
+export interface NodeToolUseFinishedPayload {
+  /** Matches the `toolUseId` of the started event */
+  toolUseId: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Error description on failure */
+  error: string
+  /** Call duration in seconds */
+  elapsedTime: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Localized display name */
+  toolName: string
+  /** Locale-stable tool identifier */
+  toolFuncName: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Tool category */
+  toolType: string
+  /** Progress text */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** Round number */
+  iteration: number
+  /** `true` if the call happened during the thinking phase */
+  isThinking: boolean
+  /** Filtered call results, for display */
+  outputs: NodeToolUseOutputs
+}
+
+/**
+ * `outputs` of a `NodeToolUseFinishedPayload` — only carries fields meant
+ * for display
+ */
+export interface NodeToolUseOutputs {
+  /** Sources referenced by the tool result */
+  references?: Array<Reference>
+  /** Domains of the referenced sources */
+  referenceDomains?: Array<string>
+  /** The query the tool executed */
+  query?: string
+  /** Raw response text of the tool */
+  text?: string
+  /** Parsed request arguments */
+  toolArgs?: any
+  /** Structured result; present only for selected tools */
+  data?: any
+}
+
+/**
+ * Payload of a `node_tool_use_started` stream event — an ordinary tool call
+ * has started. Match it to its `NodeToolUseFinished` counterpart by
+ * `toolUseId`.
+ */
+export interface NodeToolUseStartedPayload {
+  /** Unique ID of this call; matches the finished event */
+  toolUseId: string
+  /** Localized display name of the tool */
+  toolName: string
+  /**
+   * Locale-stable tool identifier; use this for logic keyed on the tool
+   * kind
+   */
+  toolFuncName: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /**
+   * Progress text suitable for direct display, e.g. `"Searching the
+   * web…"`
+   */
+  tips: string
+  /** Short tags accompanying `tips`; may be omitted */
+  tipChips: Array<string>
+  /**
+   * Round number. Calls in the same round (same `iteration`) run in
+   * parallel
+   */
+  iteration: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
 }
 
 /** Key financial metrics from an operating report */
@@ -4657,6 +7545,31 @@ export declare const enum OptionDirection {
   Call = 2
 }
 
+/** Special expiration cycle of an option contract */
+export declare const enum OptionExpiryCycleType {
+  /** Unknown */
+  Unknown = 0,
+  /** Standard monthly option */
+  Monthly = 1,
+  /** Weekly option, expires weekly */
+  Weekly = 2,
+  /** Quarterly option, expires quarterly */
+  Quarterly = 3
+}
+
+/**
+ * Whether an option contract is a legacy contract left over from a corporate
+ * action (e.g. a stock split or a merger)
+ */
+export declare const enum OptionStandardAttr {
+  /** Unknown */
+  Unknown = 0,
+  /** A normal, active contract */
+  Normal = 1,
+  /** A legacy contract produced by a corporate action */
+  Old = 2
+}
+
 /** Option type */
 export declare const enum OptionType {
   /** Unknown */
@@ -4667,42 +7580,14 @@ export declare const enum OptionType {
   Europe = 2
 }
 
-/** Daily option volume response */
-export interface OptionVolumeDaily {
-  /** Daily stats */
-  stats: Array<OptionVolumeDailyStat>
-}
-
-/** One day's option volume stat */
-export interface OptionVolumeDailyStat {
-  /** Symbol */
-  symbol: string
-  /** Timestamp string */
-  timestamp: string
-  /** Total volume */
-  totalVolume: string
-  /** Put volume */
-  totalPutVolume: string
-  /** Call volume */
-  totalCallVolume: string
-  /** Put/call volume ratio */
-  putCallVolumeRatio: string
-  /** Total OI */
-  totalOpenInterest: string
-  /** Put OI */
-  totalPutOpenInterest: string
-  /** Call OI */
-  totalCallOpenInterest: string
-  /** Put/call OI ratio */
-  putCallOpenInterestRatio: string
-}
-
 /** Option volume stats response */
 export interface OptionVolumeStats {
-  /** Call volume */
-  c: string
-  /** Put volume */
-  p: string
+  /** Underlying security symbol */
+  symbol: string
+  /** Total call volume */
+  callVolume: number
+  /** Total put volume */
+  putVolume: number
 }
 
 export declare const enum OrderSide {
@@ -4750,7 +7635,9 @@ export declare const enum OrderStatus {
   /** Expired */
   Expired = 16,
   /** Partial Withdrawal */
-  PartialWithdrawal = 17
+  PartialWithdrawal = 17,
+  /** Monitoring (Time-Conditional Order) */
+  DelayedNotReported = 18
 }
 
 /** Order tag */
@@ -4762,19 +7649,7 @@ export declare const enum OrderTag {
   /** Long term Order */
   LongTerm = 2,
   /** Grey Order */
-  Grey = 3,
-  /** Force Selling */
-  MarginCall = 4,
-  /** OTC */
-  Offline = 5,
-  /** Option Exercise Long */
-  Creditor = 6,
-  /** Option Exercise Short */
-  Debtor = 7,
-  /** Wavier Of Option Exercise */
-  NonExercise = 8,
-  /** Trade Allocation */
-  AllocatedSub = 9
+  Grey = 3
 }
 
 export declare const enum OrderType {
@@ -4817,7 +7692,9 @@ export declare const enum OutsideRTH {
   /** Any time */
   AnyTime = 2,
   /** Overnight */
-  Overnight = 3
+  Overnight = 3,
+  /** Overnight option */
+  OptionPreMarket = 4
 }
 
 /** Candlestick period */
@@ -4868,6 +7745,21 @@ export declare const enum PinnedMode {
   Add = 0,
   /** Unpin (remove) securities from the top */
   Remove = 1
+}
+
+/**
+ * Payload of a `plan_changed` stream event — the Agent created or updated
+ * its task plan.
+ */
+export interface PlanChangedPayload {
+  /** ID of the planning node */
+  nodeId: string
+  /** Time of the change, Unix timestamp in seconds */
+  startedAt: number
+  /** The current plan content */
+  outputs?: any
+  /** Identifies the planning tool */
+  toolName: string
 }
 
 /** One executive / board member */
@@ -5121,10 +8013,61 @@ export declare const enum PushCandlestickMode {
   Confirmed = 1
 }
 
-/** Rank categories response. `data` is a JSON string. */
+/**
+ * Payload of a `query_masked` stream event — sensitive content in the user
+ * query was masked before processing. Display `maskedQuery` instead of the
+ * original query.
+ */
+export interface QueryMaskedPayload {
+  /** The original user query */
+  rawQuery: string
+  /** The masked query */
+  maskedQuery: string
+}
+
+/** One question the Agent needs you to answer */
+export interface Question {
+  /** Question text */
+  question: string
+  /** Options; empty means free-form answer */
+  options: Array<QuestionOption>
+  /** Whether multiple options may be selected */
+  multiSelect: boolean
+}
+
+/** One option of a `Question` */
+export interface QuestionOption {
+  /** Short UI label for the option */
+  label: string
+  /** Option text */
+  description: string
+}
+
+export declare const enum QuoteTransport {
+  /** Send pull requests over the quote WebSocket connection (default) */
+  WebSocket = 0,
+  /**
+   * Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+   * equivalent, falling back to the WebSocket for the rest. Using only
+   * HTTP-backed APIs never opens a WebSocket connection.
+   */
+  Http = 1
+}
+
+/** Rank categories response. */
 export interface RankCategoriesResponse {
-  /** Raw rank categories data (JSON string) */
-  data: string
+  /** All top-level rank categories */
+  categories: Array<RankCategory>
+}
+
+/** A top-level rank category grouping sub-categories. */
+export interface RankCategory {
+  /** Top-level key (e.g. `"hot"`) */
+  key: string
+  /** Display name (e.g. `"热度排行"`) */
+  name: string
+  /** Sub-categories */
+  subCategories: Array<RankSubCategory>
 }
 
 /** One ranked security item. */
@@ -5169,6 +8112,16 @@ export interface RankListResponse {
   bmp: boolean
   /** Ranked security items */
   lists: Array<RankListItem>
+}
+
+/** One leaf rank sub-category. */
+export interface RankSubCategory {
+  /** Sub-category key (e.g. `"hot_all-us"`). Pass to `rank_list`. */
+  key: string
+  /** Display name (e.g. `"美股总热度"`) */
+  name: string
+  /** Market code (e.g. `"US"`, `"HK"`) */
+  market: string
 }
 
 /** Analyst rating distribution counts */
@@ -5230,6 +8183,79 @@ export interface RecentBuybacks {
   netBuybackYieldTtm: string
 }
 
+/** A source referenced by the answer */
+export interface Reference {
+  /** Reference index */
+  index: number
+  /** Original index in the source list, before any reranking */
+  originalIndex: number
+  /** Reference kind, e.g. `"NewsArticle"` */
+  refType: string
+  /** Reference id */
+  id: string
+  /** Reference title */
+  title: string
+  /** Reference URL */
+  url: string
+  /**
+   * Full reference payload as sent by the server; kept as raw JSON
+   * because the field set varies by reference `ref_type`
+   */
+  content?: any
+}
+
+/** Parameters for replacing an attached order */
+export interface ReplaceAttachedParams {
+  /** Attached order type */
+  attachedOrderType: AttachedOrderType
+  /** Profit taker price */
+  profitTakerPrice?: Decimal
+  /** Stop loss price */
+  stopLossPrice?: Decimal
+  /** Time in force type */
+  timeInForce?: TimeInForceType
+  /** Expire time (unix timestamp) */
+  expireTime?: number
+  /** Activate order type */
+  activateOrderType?: OrderType
+  /** Profit taker submit price */
+  profitTakerSubmitPrice?: Decimal
+  /** Stop loss submit price */
+  stopLossSubmitPrice?: Decimal
+  /** Activate RTH */
+  activateRth?: OutsideRTH
+  /** Profit taker order ID */
+  profitTakerId?: number
+  /** Stop loss order ID */
+  stopLossId?: number
+  /** Cancel all attached orders */
+  cancelAllAttached?: boolean
+  /** Main order ID */
+  mainId?: number
+  /** Quantity */
+  quantity?: Decimal
+  /** Market price */
+  marketPrice?: Decimal
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  profitTakerDepthLevel?: number
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  stopLossDepthLevel?: number
+}
+
+/** Options for replace grid trading order request */
+export interface ReplaceGridOrderOptions {
+  /** Grid master order id */
+  orderId: string
+  /** Grid trading rule */
+  gridTradingRule: GridTradeRule
+}
+
 /** Options for replace order request */
 export interface ReplaceOrderOptions {
   /** Order id */
@@ -5254,6 +8280,18 @@ export interface ReplaceOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+  /** Attached order parameters */
+  attachedParams?: ReplaceAttachedParams
+  /**
+   * New time-condition submit time, which must be later than now and no
+   * more than 90 days ahead. Leave unset to keep the current time condition.
+   */
+  delayedUntil?: Date
+  /**
+   * Clear the time condition, turning the order into a regular order (takes
+   * precedence over `delayedUntil`)
+   */
+  clearDelayedUntil?: boolean
 }
 
 /** A filter condition for screener_search Mode B. */
@@ -5596,14 +8634,201 @@ export interface StockRatings {
   styleTxtName: string
   scaleTxtName: string
   reportPeriodTxt: string
-  /** Composite score as a JSON string */
-  multiScore: string
+  /** Composite score (`null` when not rated) */
+  multiScore?: number
   multiLetter: string
   multiScoreChange: number
   industryName: string
-  industryRank: number
+  industryRank?: number
   /** Full ratings array as a JSON string */
   ratingsJson: string
+}
+
+/** Payload of a `subagent_finished` stream event */
+export interface SubagentFinishedPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** Matches the `toolUseId` of `SubagentStarted` */
+  toolUseId: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Total subagent duration in seconds */
+  elapsedTime: number
+  /** Error description on failure */
+  error: string
+  /**
+   * Subagent result: `goal`, `result`, and the timeline of tool calls it
+   * made
+   */
+  outputs: SubagentOutputs
+}
+
+/** `outputs` of a `SubagentFinishedPayload` */
+export interface SubagentOutputs {
+  /** The goal that was assigned to the subagent */
+  goal?: string
+  /** The subagent's result */
+  result?: string
+  /** Timeline of tool calls the subagent made */
+  subagentTools?: Array<any>
+}
+
+/**
+ * Payload of a `subagent_progress` stream event, emitted every time the
+ * subagent calls one of its own tools. Use it to render a live timeline
+ * inside the subagent card.
+ */
+export interface SubagentProgressPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** `toolUseId` of the owning `SubagentStarted` event */
+  parentToolCallId: string
+  /** Name of the tool the subagent called */
+  subagentToolName: string
+  /** Arguments of that call, as a JSON string */
+  subagentToolArgs: string
+  /** Status of that call: `running` / `succeeded` / `failed` */
+  subagentStatus: string
+  /** Duration of that call in milliseconds */
+  subagentDurationMs: number
+  /** The subagent's internal round number */
+  subagentIteration: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+}
+
+/**
+ * Payload of a `subagent_started` stream event. When the Agent spawns a
+ * subagent to work on a sub-task, the subagent's lifecycle is reported with
+ * this dedicated event family instead of `nodeToolUse*`.
+ */
+export interface SubagentStartedPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** Unique ID of this spawn; matches the finished event */
+  toolUseId: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Goal assigned to the subagent */
+  goal: string
+  /** Full task prompt given to the subagent */
+  prompt: string
+  /** Subagent identifier; may be omitted */
+  subagentId: string
+  /** Tools granted to the subagent; may be omitted */
+  tools: Array<any>
+}
+
+/** Parameters for submitting an attached order */
+export interface SubmitAttachedParams {
+  /** Attached order type */
+  attachedOrderType: AttachedOrderType
+  /** Profit taker price */
+  profitTakerPrice?: Decimal
+  /** Stop loss price */
+  stopLossPrice?: Decimal
+  /** Time in force type */
+  timeInForce?: TimeInForceType
+  /** Expire time (unix timestamp) */
+  expireTime?: number
+  /** Activate order type */
+  activateOrderType?: OrderType
+  /** Profit taker submit price */
+  profitTakerSubmitPrice?: Decimal
+  /** Stop loss submit price */
+  stopLossSubmitPrice?: Decimal
+  /** Activate RTH */
+  activateRth?: OutsideRTH
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  profitTakerDepthLevel?: number
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  stopLossDepthLevel?: number
+}
+
+/** Options for submitting a fund order. */
+export interface SubmitFundOrderOptions {
+  /** Fund counter id */
+  counterId: string
+  /** Action (buy/sell) */
+  action: string
+  /** Currency */
+  currency: string
+  /** Amount (for amount-based orders) */
+  amount?: string
+  /** Units (for unit-based orders) */
+  units?: string
+  /** Dividend option */
+  dividendOption?: number
+  /** Fee */
+  fee?: string
+  /** Whether to sell all */
+  isSellAll?: boolean
+  /** Remark */
+  remark?: string
+  /** Trade method */
+  tradeMethod?: number
+}
+
+/** Options for submit grid trading order request */
+export interface SubmitGridOrderOptions {
+  /** Security code */
+  symbol: string
+  /** Settlement currency */
+  settlementCurrency: string
+  /** Grid trading rule */
+  gridTradingRule: GridTradeRule
+}
+
+/** A leg of a multi-leg combination order to submit */
+export interface SubmitMultiLegOrderLeg {
+  /** Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`) */
+  symbol: string
+  /**
+   * Leg ratio quantity — must be a positive number.  The direction of each
+   * leg is implied by `strategy` together with the order `side`, not by the
+   * sign of this value; a negative or zero ratio is rejected by the server
+   * with `602001`.
+   */
+  ratioQuantity: Decimal
+}
+
+/** Options for submit multi-leg order request */
+export interface SubmitMultiLegOrderOptions {
+  /** Order side */
+  side: OrderSide
+  /** Order type */
+  orderType: OrderType
+  /** Submitted quantity (number of combinations) */
+  submittedQuantity: Decimal
+  /** Multi-leg strategy */
+  strategy: MultiLegStrategy
+  /** Legs of the combination order */
+  legs: Array<SubmitMultiLegOrderLeg>
+  /** Submitted price (required for limit order types such as `LO`) */
+  submittedPrice?: Decimal
+  /** Remark (Maximum 255 characters) */
+  remark?: string
+  /**
+   * Client request ID for idempotency control.
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  clientRequestId?: string
+  /**
+   * Time-condition submit time. The order is held in `DelayedNotReported`
+   * status and only submitted at this time, which must be later than now
+   * and no more than 90 days ahead. Only `LO` / `MO` support time
+   * conditions.
+   */
+  delayedUntil?: Date
 }
 
 /** Options for submit order request */
@@ -5643,6 +8868,20 @@ export interface SubmitOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+  /**
+   * Client request ID for idempotency control.
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  clientRequestId?: string
+  /** Attached order parameters */
+  attachedParams?: SubmitAttachedParams
+  /**
+   * Time-condition submit time. The order is held in `DelayedNotReported`
+   * status and only submitted at this time, which must be later than now
+   * and no more than 90 days ahead.
+   */
+  delayedUntil?: Date
 }
 
 /** Quote type of subscription */
@@ -5655,6 +8894,28 @@ export declare const enum SubType {
   Brokers = 2,
   /** Trade */
   Trade = 3
+}
+
+/**
+ * Payload of a `thinking_finished` stream event — the reasoning phase is
+ * over; answer text (`Message` with `messageType == "answer"`) follows.
+ */
+export interface ThinkingFinishedPayload {
+  /** Finish time, Unix timestamp in seconds */
+  finishedAt: number
+  /** Reasoning duration in seconds */
+  elapsedTime: number
+}
+
+/**
+ * Payload of a `thinking_started` stream event — the Agent has entered the
+ * reasoning phase (analyzing the question, planning tool calls). Between
+ * this and `ThinkingFinished`, `Message` events with `messageType ==
+ * "think"` and tool-call events may arrive.
+ */
+export interface ThinkingStartedPayload {
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
 }
 
 /** Time in force type */
@@ -5693,7 +8954,7 @@ export interface TopMoversEvent {
 export interface TopMoversResponse {
   /** Top-mover events */
   events: Array<TopMoversEvent>
-  /** Pagination cursor for next page (JSON string) */
+  /** Pagination cursor for next page (empty string means no more pages) */
   nextParams: string
 }
 
@@ -5816,6 +9077,22 @@ export declare const enum TradeStatus {
   Suspend = 10
 }
 
+/**
+ * How grid trigger thresholds are interpreted.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum TriggerPriceType {
+  /** Unknown / unset */
+  Unknown = 0,
+  /** Trigger by absolute price spread */
+  Spread = 1,
+  /** Trigger by percent */
+  Percent = 2
+}
+
 /** Trigger status */
 export declare const enum TriggerStatus {
   /** Unknown */
@@ -5838,6 +9115,638 @@ export interface UpdateWatchlistGroup {
   securities?: Array<string>
   /** Securities Update mode */
   mode: SecuritiesUpdateMode
+}
+
+/** AI chat context embedded in USAnalystConsensus. */
+export interface USAIChatData {
+  agentId: string
+  handoffAgentId: string
+  symbol: string
+  text: string
+  chatType: string
+  workflowType: string
+}
+
+/** US analyst consensus estimates and AI analysis. */
+export interface USAnalystConsensus {
+  aiSummary: string
+  aichatData: USAIChatData
+  currency: string
+  report: string
+  list: Array<USConsensusItem>
+  optReports: Array<string>
+  h5Data: any
+}
+
+/** US account asset snapshot */
+export interface USAssetOverview {
+  accountType: string
+  assetTimestamp: number
+  cashBuyPower: string
+  overnightBuyPower: string
+  currency: string
+  cashList: Array<USCashEntry>
+  stockList: Array<USStockEntry>
+  optionList: Array<any>
+  cryptoList: Array<USCryptoEntry>
+  multiLeg: any
+}
+
+/** One bracket/conditional sub-order attached to a main order. */
+export interface USAttachedOrder {
+  attachedTypeDisplay: number
+  executedQty: string
+  quantity: string
+  status: string
+  triggerPrice: string
+  orderId: string
+  gtd: string
+  timeInForce: number
+  tag: number
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  symbol: string
+  withdrawn: boolean
+}
+
+/** Quantity of a US holding that is available to trade */
+export interface USAvailableHolding {
+  availableQty: string
+}
+
+/** Action-button state for an order. */
+export interface USButtonControl {
+  withdraw: number
+  replace: number
+  exceptionable: Array<string>
+}
+
+/** Buying power in USCashAndBuyPower */
+export interface USBuyLimitInfo {
+  currency: string
+  cashBuyPower: string
+  overnightBuyPower: string
+  dayTradeBuyPower: string
+  instantBuyPower: string
+  intradayMarginBuyPower: string
+  optionBuyPower: string
+  cryptoBuyPower: string
+  mme: string
+}
+
+/** Cash, buying power and margin status of a US account */
+export interface USCashAndBuyPower {
+  buyLimitInfo: USBuyLimitInfo
+  cashList: Array<USCashDetail>
+  marginStatus: USMarginStatus
+}
+
+/** One cash currency entry in USCashAndBuyPower */
+export interface USCashDetail {
+  currency: string
+  totalAmount: string
+  availableCash: string
+  withdrawCash: string
+  frozenCash: string
+  settledCash: string
+  outstanding: string
+  externalAmount: string
+}
+
+/** One cash currency entry in USAssetOverview */
+export interface USCashEntry {
+  currency: string
+  frozenBuyCash: string
+  outstanding: string
+  settledCash: string
+  totalAmount: string
+  totalCash: string
+}
+
+/** Fee breakdown for an order. */
+export interface USChargeDetail {
+  currency: string
+  totalAmount: string
+  items: Array<USChargeItem>
+}
+
+/** One fee category within USChargeDetail. */
+export interface USChargeItem {
+  code: number
+  name: string
+  fees: Array<string>
+}
+
+/** US company dividends */
+export interface USCompanyDividends {
+  recentDividends: USRecentDividend
+  dividendHistory: Array<USDividendHistoryItem>
+  payoutRatios: Array<USDividendHistoryItem>
+  dividendPayoutHistory: Array<USDividendPayoutRecord>
+}
+
+/** US company overview */
+export interface USCompanyOverview {
+  intro: string
+  marketCap: string
+  ccySymbol: string
+  topRankTags: Array<USRankTag>
+  detailUrl: string
+  shareList: Array<USSharelistItem>
+}
+
+/** Actual vs estimated value for one consensus metric. */
+export interface USConsensusEstimate {
+  actual: string
+  estimate: string
+}
+
+/** One fiscal-year entry in USAnalystConsensus.list. */
+export interface USConsensusItem {
+  ebit: USConsensusEstimate
+  eps: USConsensusEstimate
+  fiscalYear: number
+  reportTxt: string
+  revenue: USConsensusEstimate
+}
+
+/** One cryptocurrency holding in USAssetOverview */
+export interface USCryptoEntry {
+  assetType: string
+  symbol: string
+  quantity: string
+  currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
+  industryName: string
+}
+
+/** US cryptocurrency market overview */
+export interface USCryptoOverview {
+  name: string
+  ticker: string
+  currency: string
+  allTimeHigh: string
+  allTimeHighDate: string
+  allTimeLow: string
+  allTimeLowDate: string
+  ipoDate: string
+  issuePrice: string
+  shares: string
+  officialWebAddress: string
+  /** User-facing symbol (e.g. "BTCUSD.BKKT") */
+  symbol: string
+  baseAsset: string
+  logo: string
+  wikiUrl: string
+  /** Profile serialized as JSON string */
+  profile: string
+}
+
+/** One fiscal-year row in dividend_history or payout_ratios. */
+export interface USDividendHistoryItem {
+  fiscalYear: string
+  fiscalYearRange: string
+  totalShareholderYield: string
+  dividend: string
+  dividendYield: string
+  dividendGrowthRate: string
+  dividendPayoutRatio: string
+  dividendToCashflowRatio: string
+  netBuyback: string
+  netBuybackYield: string
+  netBuybackGrowthRate: string
+  netBuybackPayoutRatio: string
+  netBuybackToCashflowRatio: string
+  currency: string
+}
+
+/** US dividend item */
+export interface USDividendItem {
+  dividend: string
+  dividendType: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+}
+
+/** One actual dividend payment event. */
+export interface USDividendPayoutRecord {
+  dividend: string
+  dividendType: string
+  currency: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+  title: string
+  startTimeUnix: string
+}
+
+/** US ETF dividend info */
+export interface USETFDividendInfo {
+  dividendTtm: string
+  dividendYieldTtm: string
+  dividendFrequency: string
+  currency: string
+  fiscalYearInfo: Array<USFiscalYearDividend>
+}
+
+/** US ETF file */
+export interface USETFFile {
+  fileName: string
+  filePath: string
+  updateDate: string
+  code: string
+  format: string
+}
+
+/** US ETF files response */
+export interface USETFFilesResponse {
+  files: Array<USETFFile>
+}
+
+/** One exchange rate in USExchangeRates */
+export interface USExchangeRate {
+  universalKey: string
+  specKey: string
+  baseCurrency: string
+  otherCurrency: string
+  bidRate: string
+  offerRate: string
+  averageRate: string
+}
+
+/** Exchange rates of a US account */
+export interface USExchangeRates {
+  exchanges: Array<USExchangeRate>
+}
+
+/** One balance-sheet entry in USFinancialOverview. */
+export interface USFinancialBSItem {
+  debtAssetsRatio: string
+  totalAssets: string
+  totalLiabilities: string
+  report: USReportPeriod
+}
+
+/** One cash-flow entry in USFinancialOverview. */
+export interface USFinancialCFItem {
+  operating: string
+  investing: string
+  financing: string
+  report: USReportPeriod
+}
+
+/** One income-statement entry in USFinancialOverview. */
+export interface USFinancialISItem {
+  revenue: string
+  netIncome: string
+  netMargin: string
+  report: USReportPeriod
+}
+
+/** US financial overview — income statement, balance sheet, and cash flow. */
+export interface USFinancialOverview {
+  ccySymbol: string
+  reportType: string
+  isList: Array<USFinancialISItem>
+  bsList: Array<USFinancialBSItem>
+  cfList: Array<USFinancialCFItem>
+}
+
+/** US financial statement */
+export interface USFinancialStatement {
+  currency: string
+  report: string
+  list: Array<USFinancialStatementPeriod>
+  emptyFields: Array<string>
+}
+
+/** One financial field within a USFinancialStatementPeriod. */
+export interface USFinancialStatementField {
+  displayOrder: number
+  field: string
+  id: string
+  level: number
+  name: string
+  value: string
+  valueType: string
+  yoy: string
+}
+
+/** One reporting period in USFinancialStatement. */
+export interface USFinancialStatementPeriod {
+  ffPeriod: string
+  ffYear: number
+  fields: Array<USFinancialStatementField>
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+}
+
+/** Per-fiscal-year dividend row for a US ETF. */
+export interface USFiscalYearDividend {
+  dividend: string
+  dividendYield: string
+  fiscalYear: string
+  currency: string
+  fiscalYearRange: string
+}
+
+/** US key financial metrics — ratios and indicators per reporting period. */
+export interface USKeyFinancialMetrics {
+  currency: string
+  report: string
+  emptyFields: Array<string>
+  list: Array<USKeyMetricItem>
+}
+
+/** One period entry in USKeyFinancialMetrics. */
+export interface USKeyMetricItem {
+  ffPeriod: string
+  ffYear: number
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+  fields: Array<any>
+}
+
+/** Margin account status in USCashAndBuyPower */
+export interface USMarginStatus {
+  currency: string
+  nlv: string
+  marginEquity: string
+  marginMaintenanceExcess: string
+  mmr: string
+  regTExcess: string
+  sma: string
+}
+
+/** Full typed order object within USOrderDetailResponse. */
+export interface USOrderDetail {
+  id: string
+  aaid: string
+  accountChannel: string
+  action: number
+  symbol: string
+  underlyingSymbol: string
+  securityType: string
+  name: string
+  currency: string
+  tradeCurrency: string
+  orderType: string
+  status: string
+  price: string
+  quantity: string
+  executedQty: string
+  executedPrice: string
+  executedAmount: string
+  operateDirection: string
+  timeInForce: number
+  gtd: string
+  tag: number
+  msg: string
+  forceOnlyRth: number
+  submittedAt: string
+  doneAt: string
+  triggerPrice: string
+  triggerAt: string
+  triggerStatus: number
+  triggerExchange: string
+  triggerLastDone: string
+  triggerCount: number
+  tailingAmount: string
+  tailingPercent: string
+  limitOffset: string
+  limitDepthLevel: number
+  marketPrice: string
+  submittedAmount: string
+  estimatedFee: string
+  freeStatus: number
+  freeAmount: string
+  freeCurrency: string
+  deductionsStatus: number
+  deductionsAmount: string
+  deductionsCurrency: string
+  platformDeductionsStatus: number
+  platformDeductionsAmount: string
+  platformDeductionsCurrency: string
+  displayAccount: string
+  settlementAccount: string
+  settlementChannel: string
+  customerName: string
+  realName: string
+  enName: string
+  jointRealName: string
+  jointEnName: string
+  orgId: string
+  bcan: string
+  opEntrustWay: number
+  opEntrustWayName: string
+  remark: string
+  notice: string
+  shortSellType: number
+  ployType: string
+  ployId: string
+  ployStatus: string
+  trend: number
+  withdrawalReason: string
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  contractDirection: string
+  strikePrice: string
+  contractSize: string
+  monitorPrice: string
+  buttonControl: USButtonControl
+  chargeDetail?: USChargeDetail
+  attachedOrders: Array<USAttachedOrder>
+  orderHistories: Array<USOrderHistory>
+}
+
+/** Response for us_order_detail. */
+export interface USOrderDetailResponse {
+  order?: USOrderDetail
+  currentAttachedOrder?: USOrderDetail
+  currentMillisecond: string
+}
+
+/** One order state-transition entry within USOrderDetail. */
+export interface USOrderHistory {
+  execType: number
+  status: string
+  price: string
+  qty: string
+  time: string
+  msg: string
+  isManually: boolean
+  oppPartyId: string
+  trdMatchId: string
+  operator: string
+  opEntrustWay: string
+  cxlRejResponseTo: number
+  withdrawalReason: string
+  oppName: string
+  execId: string
+}
+
+/** Industry rank tag */
+export interface USRankTag {
+  key: string
+  location: number
+  title: string
+  text: string
+  rankType: number
+  highlightText: string
+}
+
+/** Realized P&L response for a US account */
+export interface USRealizedPL {
+  realizedPlList: Array<USRealizedPLEntry>
+}
+
+/** One asset-category entry in USRealizedPL */
+export interface USRealizedPLEntry {
+  category: number
+  currency: string
+  metrics: Array<USRealizedPLMetric>
+}
+
+/** One time-period metric in USRealizedPLEntry */
+export interface USRealizedPLMetric {
+  amount: string
+  period: number
+  rate: string
+}
+
+/** TTM dividend summary within USCompanyDividends. */
+export interface USRecentDividend {
+  dividendTtm: string
+  dividendYieldTtm: string
+  payouts: string
+  currency: string
+}
+
+/** One reporting-period window shared by IS/BS/CF entries. */
+export interface USReportPeriod {
+  startDate: string
+  endDate: string
+  reportTxt: string
+}
+
+/** One entry in USCompanyOverview.share_list. */
+export interface USSharelistItem {
+  chg: string
+  id: string
+  name: string
+}
+
+/** One stock/equity position in USAssetOverview */
+export interface USStockEntry {
+  symbol: string
+  fullSymbol: string
+  assetType: string
+  quantity: string
+  currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
+  industryName: string
+}
+
+/** One record in USTransactionHistory */
+export interface USTransaction {
+  title: string
+  bizCode: string
+  bizCodeName: string
+  amount: string
+  currency: string
+  symbol: string
+  market: string
+  equityType: string
+  positionSide: string
+  quantity: string
+  quantityDescription: string
+  refNo: string
+  remark: string
+  createAt?: Date
+  doneAt?: Date
+}
+
+/** One page of US account transaction history */
+export interface USTransactionHistory {
+  currentPage: number
+  items: Array<USTransaction>
+}
+
+/** One valuation metric entry in USValuationOverview.metrics */
+export interface USValuationMetric {
+  circle: string
+  part: string
+  metric: string
+  desc: string
+  industryMedian: string
+}
+
+/** US valuation overview */
+export interface USValuationOverview {
+  metrics: Record<string, USValuationMetric>
+  indicator: string
+  range: number
+  date: string
+  ccySymbol: string
+  aichatData: USAIChatData
+  aiSummary: string
+}
+
+/** Options for validating a fund order. */
+export interface ValidateFundOrderOptions {
+  /** Fund counter id */
+  counterId: string
+  /** Action (buy/sell) */
+  action: string
+  /** Currency */
+  currency: string
+  /** Amount (for amount-based orders) */
+  amount?: string
+  /** Units (for unit-based orders) */
+  units?: string
+  /** Dividend option */
+  dividendOption?: number
+  /** Fund source */
+  fundSource?: number
+  /** Account channel */
+  accountChannel?: string
 }
 
 /** One security's valuation comparison item. */
@@ -6036,12 +9945,14 @@ export declare const enum WarrantSortBy {
 
 /** Warrant status */
 export declare const enum WarrantStatus {
+  /** Unknown */
+  Unknown = 0,
   /** Suspend */
-  Suspend = 0,
+  Suspend = 1,
   /** Prepare List */
-  PrepareList = 1,
+  PrepareList = 2,
   /** Normal */
-  Normal = 2
+  Normal = 3
 }
 
 /** Warrant type */
@@ -6058,4 +9969,49 @@ export declare const enum WarrantType {
   Bear = 4,
   /** Inline */
   Inline = 5
+}
+
+/** `inputs` of a `workflow_started` stream event */
+export interface WorkflowStartedInputs {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** The question that was asked */
+  query: string
+}
+
+/**
+ * Payload of a `workflow_started` stream event, observed right after
+ * `chat_started`
+ */
+export interface WorkflowStartedPayload {
+  /** Whether this run's answer was served from a cache */
+  hitCache: boolean
+  /** Echoes the run's inputs */
+  inputs: WorkflowStartedInputs
+  /** Unix timestamp in seconds */
+  startedAt: number
+  /** Internal workflow run ID */
+  workflowId: number
+}
+
+/** A Workspace the current account belongs to */
+export interface Workspace {
+  /** Workspace ID */
+  id: string
+  /** Workspace name */
+  name: string
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Response for `AgentContext.workspaces` */
+export interface WorkspacesResponse {
+  /** Workspaces the current account belongs to */
+  workspaces: Array<Workspace>
 }

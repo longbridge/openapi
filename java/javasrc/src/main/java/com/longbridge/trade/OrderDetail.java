@@ -38,6 +38,7 @@ public class OrderDetail {
     private Integer triggerCount;
     private BigDecimal monitorPrice;
     private String remark;
+    private OffsetDateTime delayedUntil;
     private CommissionFreeStatus freeStatus;
     private BigDecimal freeAmount;
     private String freeCurrency;
@@ -49,6 +50,8 @@ public class OrderDetail {
     private String platformDeductedCurrency;
     private OrderHistoryDetail[] history;
     private OrderChargeDetail chargeDetail;
+    private AttachedOrderDetail[] attachedOrders = new AttachedOrderDetail[0];
+    private MultiLegInfo multiLeg;
 
     /**
      * Returns the order ID.
@@ -312,6 +315,16 @@ public class OrderDetail {
     }
 
     /**
+     * Returns the time-condition submit time.
+     *
+     * @return time-condition submit time, or {@code null} when the order is not
+     *         a time-condition order
+     */
+    public OffsetDateTime getDelayedUntil() {
+        return delayedUntil;
+    }
+
+    /**
      * Returns the commission-free status.
      *
      * @return commission-free status
@@ -410,6 +423,25 @@ public class OrderDetail {
         return chargeDetail;
     }
 
+    /**
+     * Returns the attached orders.
+     *
+     * @return attached orders
+     */
+    public AttachedOrderDetail[] getAttachedOrders() {
+        return attachedOrders;
+    }
+
+    /**
+     * Returns the multi-leg strategy information (only present for multi-leg
+     * option combination orders).
+     *
+     * @return multi-leg strategy information, or {@code null}
+     */
+    public MultiLegInfo getMultiLeg() {
+        return multiLeg;
+    }
+
     @Override
     public String toString() {
         return "OrderDetail [orderId=" + orderId + ", status=" + status + ", stockName=" + stockName + ", quantity="
@@ -420,13 +452,13 @@ public class OrderDetail {
                 + updatedAt + ", triggerAt=" + triggerAt + ", trailingAmount=" + trailingAmount + ", trailingPercent="
                 + trailingPercent + ", limitOffset=" + limitOffset + ", triggerStatus=" + triggerStatus + ", currency="
                 + currency + ", outsideRth=" + outsideRth + ", limitDepthLevel=" + limitDepthLevel + ", triggerCount="
-                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + ", freeStatus=" + freeStatus
+                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + ", delayedUntil=" + delayedUntil + ", freeStatus=" + freeStatus
                 + ", freeAmount=" + freeAmount + ", freeCurrency=" + freeCurrency + ", deductionsStatus="
                 + deductionsStatus + ", deductionsAmount=" + deductionsAmount + ", deductionsCurrency="
                 + deductionsCurrency + ", platformDeductedStatus=" + platformDeductedStatus
                 + ", platformDeductedAmount=" + platformDeductedAmount + ", platformDeductedCurrency="
                 + platformDeductedCurrency + ", history=" + Arrays.toString(history) + ", chargeDetail=" + chargeDetail
-                + "]";
+                + ", multiLeg=" + multiLeg + "]";
     }
 
 }

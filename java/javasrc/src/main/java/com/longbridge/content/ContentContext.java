@@ -10,6 +10,15 @@ import com.longbridge.*;
 public class ContentContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create a ContentContext object
      *
@@ -18,13 +27,17 @@ public class ContentContext implements AutoCloseable {
      */
     public static ContentContext create(Config config) {
         ContentContext ctx = new ContentContext();
-        ctx.raw = SdkNative.newContentContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newContentContext(config.getRaw()); }
         return ctx;
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeContentContext(raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeContentContext(h);
+        }
     }
 
     /**
@@ -34,10 +47,10 @@ public class ContentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OwnedTopic[]> getMyTopics(MyTopicsOptions opts)
+    public synchronized CompletableFuture<OwnedTopic[]> getMyTopics(MyTopicsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.contentContextMyTopics(raw, opts, callback);
+            SdkNative.contentContextMyTopics(raw(), opts, callback);
         });
     }
 
@@ -48,10 +61,10 @@ public class ContentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<String> createTopic(CreateTopicOptions opts)
+    public synchronized CompletableFuture<String> createTopic(CreateTopicOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.contentContextCreateTopic(raw, opts, callback);
+            SdkNative.contentContextCreateTopic(raw(), opts, callback);
         });
     }
 
@@ -62,10 +75,10 @@ public class ContentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<TopicItem[]> getTopics(String symbol)
+    public synchronized CompletableFuture<TopicItem[]> getTopics(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.contentContextTopics(raw, symbol, callback);
+            SdkNative.contentContextTopics(raw(), symbol, callback);
         });
     }
 
@@ -76,10 +89,10 @@ public class ContentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<NewsItem[]> getNews(String symbol)
+    public synchronized CompletableFuture<NewsItem[]> getNews(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.contentContextNews(raw, symbol, callback);
+            SdkNative.contentContextNews(raw(), symbol, callback);
         });
     }
 }

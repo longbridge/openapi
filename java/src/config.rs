@@ -3,7 +3,7 @@ use jni::{
     objects::{JClass, JObject, JString},
     sys::{jboolean, jlong},
 };
-use longbridge::{Config, Language, PushCandlestickMode};
+use longbridge::{Config, Language, PushCandlestickMode, QuoteTransport};
 use time::OffsetDateTime;
 
 use crate::{async_util, error::jni_result, types::FromJValue};
@@ -138,6 +138,20 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetPushCandles
 }
 
 #[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetQuoteTransport(
+    mut env: JNIEnv,
+    _class: JClass,
+    config: jlong,
+    transport: JObject,
+) -> jlong {
+    jni_result(&mut env, config, |env| {
+        let transport = QuoteTransport::from_jvalue(env, transport.into())?;
+        (*(config as *mut Config)).set_quote_transport(transport);
+        Ok(config)
+    })
+}
+
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetEnablePrintQuotePackages(
     mut env: JNIEnv,
     _class: JClass,
@@ -166,6 +180,18 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetLogPath(
     })
 }
 
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetEnablePapertrading(
+    mut env: JNIEnv,
+    _class: JClass,
+    config: jlong,
+) -> jlong {
+    jni_result(&mut env, config, |_env| {
+        (*(config as *mut Config)).set_enable_papertrading();
+        Ok(config)
+    })
+}
+
 // ── Async operations
 // ──────────────────────────────────────────────────────────
 
@@ -178,7 +204,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configRefreshAccessT
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let config = &*(config as *const Config);
+        // Clone the (Arc-backed) config so the spawned future owns it: the Java
+        // `Config` may be close()d while this refresh is still in flight.
+        let config = (*(config as *const Config)).clone();
         let expired_at: Option<OffsetDateTime> = FromJValue::from_jvalue(env, expired_at.into())?;
         async_util::execute(env, callback, async move {
             let token = config.refresh_access_token(expired_at).await?;

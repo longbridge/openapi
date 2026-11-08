@@ -51,6 +51,30 @@ OAuth::~OAuth()
     lb_oauth_free(oauth_);
 }
 
+void
+OAuth::revoke(AsyncCallback<NoContext, void> callback) const
+{
+  lb_oauth_revoke(
+    oauth_,
+    [](const lb_async_result_t* res) {
+      auto callback_ptr = callback::get_async_callback<NoContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<NoContext, void>(NoContext{}, Status(res->error), nullptr));
+    },
+    new AsyncCallback<NoContext, void>(callback));
+}
+
+void
+OAuth::clear(AsyncCallback<NoContext, void> callback) const
+{
+  lb_oauth_clear(
+    oauth_,
+    [](const lb_async_result_t* res) {
+      auto callback_ptr = callback::get_async_callback<NoContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<NoContext, void>(NoContext{}, Status(res->error), nullptr));
+    },
+    new AsyncCallback<NoContext, void>(callback));
+}
+
 // ── OAuthBuilder ─────────────────────────────────────────────────────────────
 
 OAuthBuilder::OAuthBuilder(const std::string& client_id, uint16_t callback_port)

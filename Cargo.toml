@@ -3,20 +3,20 @@ resolver = "3"
 members = ["rust", "python", "nodejs", "java", "c"]
 
 [workspace.package]
-version = "4.3.2"
+version = "5.3.0"
 edition = "2024"
 
 [profile.release]
 lto = true
 
 [workspace.dependencies]
-longbridge-geo = { path = "rust/crates/geo", version = "4.1.0" }
-longbridge-wscli = { path = "rust/crates/wsclient", version = "4.1.0" }
-longbridge-httpcli = { path = "rust/crates/httpclient", version = "4.1.0" }
-longbridge-proto = { path = "rust/crates/proto", version = "4.1.0" }
-longbridge-candlesticks = { path = "rust/crates/candlesticks", version = "4.1.0" }
-longbridge-oauth = { path = "rust/crates/oauth", version = "4.1.0" }
-longbridge = { path = "rust", version = "4.1.0" }
+longbridge-geo = { path = "rust/crates/geo", version = "5.3.0" }
+longbridge-wscli = { path = "rust/crates/wsclient", version = "5.3.0" }
+longbridge-httpcli = { path = "rust/crates/httpclient", version = "5.3.0" }
+longbridge-proto = { path = "rust/crates/proto", version = "5.3.0" }
+longbridge-candlesticks = { path = "rust/crates/candlesticks", version = "5.3.0" }
+longbridge-oauth = { path = "rust/crates/oauth", version = "5.3.0" }
+longbridge = { path = "rust", version = "5.3.0" }
 
 tokio = "1.47.1"
 tokio-tungstenite = "0.27.0"
@@ -43,6 +43,7 @@ tracing-appender = "0.2.3"
 time-tz = "2.0.0"
 num-traits = "0.2.19"
 reqwest = { version = "0.12.23", default-features = false }
+eventsource-stream = "0.2.3"
 parking_lot = "0.12.4"
 hmac = "0.12.1"
 sha1 = "0.10.6"
@@ -69,6 +70,6 @@ darling = "0.21.2"
 convert_case = "0.8.0"
 Inflector = "0.11.4"
 cbindgen = "0.29.2"
-oauth2 = "4.4"
+oauth2 = "5"
 open = "5"
 dirs = "6"

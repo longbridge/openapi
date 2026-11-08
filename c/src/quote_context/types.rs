@@ -3,20 +3,21 @@ use std::os::raw::c_char;
 use longbridge::quote::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
     FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-    MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote, OptionType,
-    OptionVolumeDaily, OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo, Period,
-    PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades,
+    MarketTradingDays, MarketTradingSession, OptionChainContract, OptionDirection, OptionQuote,
+    OptionType, OptionVolumeDaily, OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo,
+    Period, PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades,
     QuotePackageDetail, RealtimeQuote, Security, SecurityBoard, SecurityBrokers, SecurityCalcIndex,
     SecurityDepth, SecurityQuote, SecurityStaticInfo, ShortPositionsItem, ShortPositionsResponse,
-    ShortTradesItem, ShortTradesResponse, StrikePriceInfo, Subscription, Trade, TradeDirection,
-    TradeSession, TradeStatus, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantType,
-    WatchlistGroup, WatchlistSecurity,
+    ShortTradesItem, ShortTradesResponse, Subscription, Trade, TradeDirection, TradeSession,
+    TradeStatus, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
+    WatchlistSecurity,
 };
 
 use crate::{
     quote_context::enum_types::{
-        CGranularity, COptionDirection, COptionType, CPeriod, CSecuritiesUpdateMode,
-        CSecurityBoard, CTradeDirection, CTradeSession, CTradeStatus, CWarrantStatus, CWarrantType,
+        CGranularity, COptionDirection, COptionExpiryCycleType, COptionStandardAttr, COptionType,
+        CPeriod, CSecuritiesUpdateMode, CSecurityBoard, CTradeDirection, CTradeSession,
+        CTradeStatus, CWarrantStatus, CWarrantType,
     },
     types::{CDate, CDecimal, CMarket, COption, CString, CTime, CVec, ToFFI},
 };
@@ -1559,59 +1560,82 @@ impl ToFFI for CIntradayLineOwned {
     }
 }
 
-/// Strike price info
+/// A single option contract of an option chain
 #[repr(C)]
-pub struct CStrikePriceInfo {
+pub struct COptionChainContract {
+    /// Option contract code, in `ticker.region` format
+    pub symbol: *const c_char,
+    /// Expiry date, in US Eastern time
+    pub expiry_date: CDate,
     /// Strike price
-    pub price: *const CDecimal,
-    /// Security code of call option
-    pub call_symbol: *const c_char,
-    /// Security code of put option
-    pub put_symbol: *const c_char,
-    /// Is standard
-    pub standard: bool,
+    pub strike_price: *const CDecimal,
+    /// Contract direction
+    pub direction: COptionDirection,
+    /// Special expiration cycle of the contract
+    pub option_type: COptionExpiryCycleType,
+    /// Whether the contract is a legacy contract left over from a corporate
+    /// action
+    pub standard_attr: COptionStandardAttr,
+    /// Number of days remaining until the option expires, `0` on the expiry
+    /// day and negative once expired
+    pub days_to_expiry: i32,
 }
 
 #[derive(Debug)]
-pub(crate) struct CStrikePriceInfoOwned {
-    price: CDecimal,
-    call_symbol: CString,
-    put_symbol: CString,
-    standard: bool,
+pub(crate) struct COptionChainContractOwned {
+    symbol: CString,
+    expiry_date: CDate,
+    strike_price: CDecimal,
+    direction: COptionDirection,
+    option_type: COptionExpiryCycleType,
+    standard_attr: COptionStandardAttr,
+    days_to_expiry: i32,
 }
 
-impl From<StrikePriceInfo> for CStrikePriceInfoOwned {
-    fn from(info: StrikePriceInfo) -> Self {
-        let StrikePriceInfo {
-            price,
-            call_symbol,
-            put_symbol,
-            standard,
+impl From<OptionChainContract> for COptionChainContractOwned {
+    fn from(info: OptionChainContract) -> Self {
+        let OptionChainContract {
+            symbol,
+            expiry_date,
+            strike_price,
+            direction,
+            option_type,
+            standard_attr,
+            days_to_expiry,
         } = info;
-        CStrikePriceInfoOwned {
-            price: price.into(),
-            call_symbol: call_symbol.into(),
-            put_symbol: put_symbol.into(),
-            standard,
+        COptionChainContractOwned {
+            symbol: symbol.into(),
+            expiry_date: expiry_date.into(),
+            strike_price: strike_price.into(),
+            direction: direction.into(),
+            option_type: option_type.into(),
+            standard_attr: standard_attr.into(),
+            days_to_expiry,
         }
     }
 }
 
-impl ToFFI for CStrikePriceInfoOwned {
-    type FFIType = CStrikePriceInfo;
+impl ToFFI for COptionChainContractOwned {
+    type FFIType = COptionChainContract;
 
     fn to_ffi_type(&self) -> Self::FFIType {
-        let CStrikePriceInfoOwned {
-            price,
-            call_symbol,
-            put_symbol,
-            standard,
+        let COptionChainContractOwned {
+            symbol,
+            expiry_date,
+            strike_price,
+            direction,
+            option_type,
+            standard_attr,
+            days_to_expiry,
         } = self;
-        CStrikePriceInfo {
-            price,
-            call_symbol: call_symbol.to_ffi_type(),
-            put_symbol: put_symbol.to_ffi_type(),
-            standard: *standard,
+        COptionChainContract {
+            symbol: symbol.to_ffi_type(),
+            expiry_date: *expiry_date,
+            strike_price,
+            direction: *direction,
+            option_type: *option_type,
+            standard_attr: *standard_attr,
+            days_to_expiry: *days_to_expiry,
         }
     }
 }
@@ -2258,15 +2282,23 @@ pub struct CSecurityCalcIndex {
     pub balance_point: *const CDecimal,
     /// Open interest
     pub open_interest: *const i64,
-    /// Delta
+    /// Delta. Measures the expected change in option price for a $1 move in the
+    /// underlying asset price.
     pub delta: *const CDecimal,
-    /// Gamma
+    /// Gamma. Measures the expected change in Delta for a $1 move in the
+    /// underlying asset price.
     pub gamma: *const CDecimal,
-    /// Theta
+    /// Theta. Measures the expected change in option price as one day passes;
+    /// the raw value has been divided by 365 to convert to a daily value,
+    /// representing the impact of one day's time decay on the option price.
     pub theta: *const CDecimal,
-    /// Vega
+    /// Vega. Measures the expected change in option price when implied
+    /// volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+    /// get the expected price change per 1% move in IV.
     pub vega: *const CDecimal,
-    /// Rho
+    /// Rho. Measures the expected change in option price when the risk-free
+    /// interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+    /// the expected price change per 1% move in the interest rate.
     pub rho: *const CDecimal,
 }
 
@@ -2559,7 +2591,7 @@ pub struct CWarrantInfo {
     /// Turnover
     pub turnover: *const CDecimal,
     /// Expiry date
-    pub expiry_date: CDate,
+    pub expiry_date: *const CDate,
     /// Strike price
     pub strike_price: *const CDecimal,
     /// Upper strike price
@@ -2612,7 +2644,7 @@ pub(crate) struct CWarrantInfoOwned {
     /// Turnover
     pub turnover: CDecimal,
     /// Expiry date
-    pub expiry_date: CDate,
+    pub expiry_date: COption<CDate>,
     /// Strike price
     pub strike_price: Option<CDecimal>,
     /// Upper strike price
@@ -3304,25 +3336,29 @@ impl ToFFI for CShortTradesResponseOwned {
 
 // ── OptionVolumeStats ─────────────────────────────────────────────
 
-/// Option volume statistics (call and put totals)
+/// Option volume statistics
 #[repr(C)]
 pub struct COptionVolumeStats {
-    /// Call option volume (formatted string)
-    pub c: *const c_char,
-    /// Put option volume (formatted string)
-    pub p: *const c_char,
+    /// Underlying security symbol
+    pub symbol: *const c_char,
+    /// Total call volume
+    pub call_volume: i64,
+    /// Total put volume
+    pub put_volume: i64,
 }
 
 pub(crate) struct COptionVolumeStatsOwned {
-    c: CString,
-    p: CString,
+    symbol: CString,
+    call_volume: i64,
+    put_volume: i64,
 }
 
 impl From<OptionVolumeStats> for COptionVolumeStatsOwned {
     fn from(v: OptionVolumeStats) -> Self {
         Self {
-            c: v.c.into(),
-            p: v.p.into(),
+            symbol: v.symbol.into(),
+            call_volume: v.call_volume,
+            put_volume: v.put_volume,
         }
     }
 }
@@ -3331,65 +3367,66 @@ impl ToFFI for COptionVolumeStatsOwned {
     type FFIType = COptionVolumeStats;
     fn to_ffi_type(&self) -> Self::FFIType {
         COptionVolumeStats {
-            c: self.c.to_ffi_type(),
-            p: self.p.to_ffi_type(),
+            symbol: self.symbol.to_ffi_type(),
+            call_volume: self.call_volume,
+            put_volume: self.put_volume,
         }
     }
 }
 
 // ── OptionVolumeDaily ─────────────────────────────────────────────
 
-/// Daily option volume statistics for a single security
+/// One day's option volume statistics
 #[repr(C)]
 pub struct COptionVolumeDailyStat {
-    /// Security code
+    /// Underlying security symbol
     pub symbol: *const c_char,
-    /// Date of the record (formatted string)
-    pub timestamp: *const c_char,
-    /// Total option volume (calls + puts, formatted string)
-    pub total_volume: *const c_char,
-    /// Total put option volume (formatted string)
-    pub total_put_volume: *const c_char,
-    /// Total call option volume (formatted string)
-    pub total_call_volume: *const c_char,
-    /// Put-to-call volume ratio (formatted string)
-    pub put_call_volume_ratio: *const c_char,
-    /// Total open interest across all options (formatted string)
-    pub total_open_interest: *const c_char,
-    /// Total put open interest (formatted string)
-    pub total_put_open_interest: *const c_char,
-    /// Total call open interest (formatted string)
-    pub total_call_open_interest: *const c_char,
-    /// Put-to-call open interest ratio (formatted string)
-    pub put_call_open_interest_ratio: *const c_char,
+    /// Trading date
+    pub date: CDate,
+    /// Call volume
+    pub call_volume: i64,
+    /// Put volume
+    pub put_volume: i64,
+    /// Call open interest
+    pub call_open_interest: i64,
+    /// Put open interest
+    pub put_open_interest: i64,
+    /// Total options volume (calls + puts)
+    pub total_volume: i64,
+    /// Total open interest (calls + puts)
+    pub total_open_interest: i64,
+    /// Put/call volume ratio
+    pub pc_vol: f64,
+    /// Put/call open interest ratio
+    pub pc_oi: f64,
 }
 
 pub(crate) struct COptionVolumeDailyStatOwned {
     symbol: CString,
-    timestamp: CString,
-    total_volume: CString,
-    total_put_volume: CString,
-    total_call_volume: CString,
-    put_call_volume_ratio: CString,
-    total_open_interest: CString,
-    total_put_open_interest: CString,
-    total_call_open_interest: CString,
-    put_call_open_interest_ratio: CString,
+    date: CDate,
+    call_volume: i64,
+    put_volume: i64,
+    call_open_interest: i64,
+    put_open_interest: i64,
+    total_volume: i64,
+    total_open_interest: i64,
+    pc_vol: f64,
+    pc_oi: f64,
 }
 
 impl From<OptionVolumeDailyStat> for COptionVolumeDailyStatOwned {
     fn from(v: OptionVolumeDailyStat) -> Self {
         Self {
             symbol: v.symbol.into(),
-            timestamp: v.timestamp.into(),
-            total_volume: v.total_volume.into(),
-            total_put_volume: v.total_put_volume.into(),
-            total_call_volume: v.total_call_volume.into(),
-            put_call_volume_ratio: v.put_call_volume_ratio.into(),
-            total_open_interest: v.total_open_interest.into(),
-            total_put_open_interest: v.total_put_open_interest.into(),
-            total_call_open_interest: v.total_call_open_interest.into(),
-            put_call_open_interest_ratio: v.put_call_open_interest_ratio.into(),
+            date: v.date.into(),
+            call_volume: v.call_volume,
+            put_volume: v.put_volume,
+            call_open_interest: v.call_open_interest,
+            put_open_interest: v.put_open_interest,
+            total_volume: v.total_volume,
+            total_open_interest: v.total_open_interest,
+            pc_vol: v.pc_vol,
+            pc_oi: v.pc_oi,
         }
     }
 }
@@ -3399,36 +3436,49 @@ impl ToFFI for COptionVolumeDailyStatOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         COptionVolumeDailyStat {
             symbol: self.symbol.to_ffi_type(),
-            timestamp: self.timestamp.to_ffi_type(),
-            total_volume: self.total_volume.to_ffi_type(),
-            total_put_volume: self.total_put_volume.to_ffi_type(),
-            total_call_volume: self.total_call_volume.to_ffi_type(),
-            put_call_volume_ratio: self.put_call_volume_ratio.to_ffi_type(),
-            total_open_interest: self.total_open_interest.to_ffi_type(),
-            total_put_open_interest: self.total_put_open_interest.to_ffi_type(),
-            total_call_open_interest: self.total_call_open_interest.to_ffi_type(),
-            put_call_open_interest_ratio: self.put_call_open_interest_ratio.to_ffi_type(),
+            date: self.date,
+            call_volume: self.call_volume,
+            put_volume: self.put_volume,
+            call_open_interest: self.call_open_interest,
+            put_open_interest: self.put_open_interest,
+            total_volume: self.total_volume,
+            total_open_interest: self.total_open_interest,
+            pc_vol: self.pc_vol,
+            pc_oi: self.pc_oi,
         }
     }
 }
 
-/// Collection of daily option volume statistics
+/// Daily option volume response
 #[repr(C)]
 pub struct COptionVolumeDaily {
+    /// Underlying security symbol
+    pub symbol: *const c_char,
     /// Pointer to array of daily option volume stat records
     pub stats: *const COptionVolumeDailyStat,
-    /// Number of elements in the array.
+    /// Number of elements in the array
     pub num_stats: usize,
 }
 
 pub(crate) struct COptionVolumeDailyOwned {
-    stats: CVec<COptionVolumeDailyStatOwned>,
+    symbol: CString,
+    stats: Vec<COptionVolumeDailyStatOwned>,
+    stats_ffi: Vec<COptionVolumeDailyStat>,
 }
 
 impl From<OptionVolumeDaily> for COptionVolumeDailyOwned {
     fn from(v: OptionVolumeDaily) -> Self {
+        let stats: Vec<COptionVolumeDailyStatOwned> = v
+            .stats
+            .into_iter()
+            .map(COptionVolumeDailyStatOwned::from)
+            .collect();
+        let stats_ffi: Vec<COptionVolumeDailyStat> =
+            stats.iter().map(|s| s.to_ffi_type()).collect();
         Self {
-            stats: v.stats.into(),
+            symbol: v.symbol.into(),
+            stats,
+            stats_ffi,
         }
     }
 }
@@ -3437,8 +3487,13 @@ impl ToFFI for COptionVolumeDailyOwned {
     type FFIType = COptionVolumeDaily;
     fn to_ffi_type(&self) -> Self::FFIType {
         COptionVolumeDaily {
-            stats: self.stats.to_ffi_type(),
-            num_stats: self.stats.len(),
+            symbol: self.symbol.to_ffi_type(),
+            stats: if self.stats_ffi.is_empty() {
+                std::ptr::null()
+            } else {
+                self.stats_ffi.as_ptr()
+            },
+            num_stats: self.stats_ffi.len(),
         }
     }
 }

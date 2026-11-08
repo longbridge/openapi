@@ -49,6 +49,17 @@ enum class PushCandlestickMode
   Confirmed,
 };
 
+/// Transport used by the quote pull APIs
+enum class QuoteTransport
+{
+  /// Send pull requests over the quote WebSocket connection (default)
+  WebSocket,
+  /// Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+  /// equivalent, falling back to the WebSocket for the rest. Using only
+  /// HTTP-backed APIs never opens a WebSocket connection.
+  Http,
+};
+
 /// Market
 enum class Market
 {
@@ -475,6 +486,31 @@ enum class OptionDirection
   Call,
 };
 
+/// Special expiration cycle of an option contract
+enum class OptionExpiryCycleType
+{
+  /// Unknown
+  Unknown,
+  /// Standard monthly option
+  Monthly,
+  /// Weekly option, expires weekly
+  Weekly,
+  /// Quarterly option, expires quarterly
+  Quarterly,
+};
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action
+enum class OptionStandardAttr
+{
+  /// Unknown
+  Unknown,
+  /// A normal, active contract
+  Normal,
+  /// A legacy contract produced by a corporate action
+  Old,
+};
+
 /// Quote of option
 struct OptionQuote
 { /// Security code
@@ -696,17 +732,28 @@ enum class AdjustType
   ForwardAdjust
 };
 
-/// Strike price info
-struct StrikePriceInfo
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
+struct OptionChainContract
 {
+  /// Option contract code, in `ticker.region` format
+  std::string symbol;
+  /// Expiry date, in US Eastern time
+  Date expiry_date;
   /// Strike price
-  Decimal price;
-  /// Security code of call option
-  std::string call_symbol;
-  /// Security code of put option
-  std::string put_symbol;
-  /// Is standard
-  bool standard;
+  Decimal strike_price;
+  /// Contract direction
+  OptionDirection direction;
+  /// Special expiration cycle of the contract
+  OptionExpiryCycleType option_type;
+  /// Whether the contract is a legacy contract left over from a corporate
+  /// action
+  OptionStandardAttr standard_attr;
+  /// Number of days remaining until the option expires, `0` on the expiry day
+  /// and negative once expired
+  int32_t days_to_expiry;
 };
 
 /// Issuer info
@@ -1023,15 +1070,23 @@ struct SecurityCalcIndex
   std::optional<Decimal> balance_point;
   /// Open interest
   std::optional<int64_t> open_interest;
-  /// Delta
+  /// Delta. Measures the expected change in option price for a $1 move in the
+  /// underlying asset price.
   std::optional<Decimal> delta;
-  /// Gamma
+  /// Gamma. Measures the expected change in Delta for a $1 move in the
+  /// underlying asset price.
   std::optional<Decimal> gamma;
-  /// Theta
+  /// Theta. Measures the expected change in option price as one day passes; the
+  /// raw value has been divided by 365 to convert to a daily value,
+  /// representing the impact of one day's time decay on the option price.
   std::optional<Decimal> theta;
-  /// Vega
+  /// Vega. Measures the expected change in option price when implied volatility
+  /// (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to get the
+  /// expected price change per 1% move in IV.
   std::optional<Decimal> vega;
-  /// Rho
+  /// Rho. Measures the expected change in option price when the risk-free
+  /// interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+  /// the expected price change per 1% move in the interest rate.
   std::optional<Decimal> rho;
 };
 
@@ -1118,6 +1173,8 @@ enum class FilterWarrantInOutBoundsType
 /// Warrant status
 enum class WarrantStatus
 {
+  /// Unknown
+  Unknown,
   /// Suspend
   Suspend,
   /// Prepare List
@@ -1146,7 +1203,10 @@ struct WarrantInfo
   /// Turnover
   Decimal turnover;
   /// Expiry date
-  Date expiry_date;
+  ///
+  /// `std::nullopt` if the server does not report an expiry date for this
+  /// warrant.
+  std::optional<Date> expiry_date;
   /// Strike price
   std::optional<Decimal> strike_price;
   /// Upper strike price
@@ -1326,26 +1386,28 @@ struct ShortTradesResponse
 
 struct OptionVolumeStats
 {
-  std::string c;
-  std::string p;
+  std::string symbol;
+  int64_t call_volume;
+  int64_t put_volume;
 };
 
 struct OptionVolumeDailyStat
 {
   std::string symbol;
-  std::string timestamp;
-  std::string total_volume;
-  std::string total_put_volume;
-  std::string total_call_volume;
-  std::string put_call_volume_ratio;
-  std::string total_open_interest;
-  std::string total_put_open_interest;
-  std::string total_call_open_interest;
-  std::string put_call_open_interest_ratio;
+  Date date;
+  int64_t call_volume;
+  int64_t put_volume;
+  int64_t call_open_interest;
+  int64_t put_open_interest;
+  int64_t total_volume;
+  int64_t total_open_interest;
+  double pc_vol;
+  double pc_oi;
 };
 
 struct OptionVolumeDaily
 {
+  std::string symbol;
   std::vector<OptionVolumeDailyStat> stats;
 };
 
@@ -1360,6 +1422,17 @@ enum class TopicType
   Private,
 };
 
+/// Order side
+enum class OrderSide
+{
+  /// Unknown
+  Unknown,
+  /// Buy
+  Buy,
+  /// Sell
+  Sell,
+};
+
 /// Exexution
 struct Execution
 {
@@ -1369,6 +1442,9 @@ struct Execution
   int64_t trade_done_at;
   Decimal quantity;
   Decimal price;
+  /// Order side. `Unknown` when the response omits it (Longbridge US
+  /// `/v1/trade/execution/history`)
+  OrderSide side;
 };
 
 /// Options for get history executions request
@@ -1389,6 +1465,30 @@ struct GetTodayExecutionsOptions
   std::optional<std::string> symbol;
   /// Order id
   std::optional<std::string> order_id;
+};
+
+/// Options for get all executions request
+struct GetAllExecutionsOptions
+{
+  /// Security code
+  std::optional<std::string> symbol;
+  /// Order id
+  std::optional<std::string> order_id;
+  /// Start time
+  std::optional<int64_t> start_at;
+  /// End time
+  std::optional<int64_t> end_at;
+  /// Page number
+  std::optional<uint64_t> page;
+};
+
+/// All executions response
+struct AllExecutionsResponse
+{
+  /// Has more records
+  bool has_more;
+  /// Executions
+  std::vector<Execution> trades;
 };
 
 /// Order status
@@ -1430,17 +1530,8 @@ enum class OrderStatus
   Expired,
   /// Partial Withdrawal
   PartialWithdrawal,
-};
-
-/// Order side
-enum class OrderSide
-{
-  /// Unknown
-  Unknown,
-  /// Buy
-  Buy,
-  /// Sell
-  Sell,
+  /// Monitoring (Time-Conditional Order)
+  DelayedNotReported,
 };
 
 /// Order type
@@ -1487,18 +1578,6 @@ enum class OrderTag
   LongTerm,
   /// Grey Order
   Grey,
-  /// Force Selling
-  MarginCall,
-  /// OTC
-  Offline,
-  /// Option Exercise Long
-  Creditor,
-  /// Option Exercise Short
-  Debtor,
-  /// Wavier Of Option Exercise
-  NonExercise,
-  /// Trade Allocation
-  AllocatedSub,
 };
 
 /// Time in force Type
@@ -1538,6 +1617,176 @@ enum class OutsideRTH
   AnyTime,
   /// Overnight
   Overnight,
+  /// Overnight option
+  OptionPreMarket,
+};
+
+/// Attached order type
+enum class AttachedOrderType
+{
+  /// Unknown
+  Unknown,
+  /// Take profit
+  ProfitTaker,
+  /// Stop loss
+  StopLoss,
+  /// Bracket order
+  Bracket,
+};
+
+/// Attached order detail
+struct AttachedOrderDetail
+{
+  std::string order_id;
+  AttachedOrderType attached_type_display;
+  std::optional<Decimal> trigger_price;
+  Decimal quantity;
+  Decimal executed_qty;
+  OrderStatus status;
+  int64_t updated_at;
+  bool withdrawn;
+  std::optional<Date> gtd;
+  TimeInForceType time_in_force;
+  std::string counter_id;
+  std::optional<TriggerStatus> trigger_status;
+  Decimal executed_amount;
+  OrderTag tag;
+  int64_t submitted_at;
+  std::optional<Decimal> executed_price;
+  std::optional<OutsideRTH> force_only_rth;
+  bool reviewed;
+  OrderType activate_order_type;
+  std::optional<OutsideRTH> activate_rth;
+  std::optional<Decimal> submit_price;
+  /// Bid/ask depth level of the limit order submitted price
+  std::optional<int32_t> limit_depth_level;
+};
+
+/// Submit attached order params
+struct SubmitAttachedParams
+{
+  AttachedOrderType attached_order_type;
+  std::optional<Decimal> profit_taker_price;
+  std::optional<Decimal> stop_loss_price;
+  std::optional<TimeInForceType> time_in_force;
+  std::optional<int64_t> expire_time;
+  std::optional<OrderType> activate_order_type;
+  std::optional<Decimal> profit_taker_submit_price;
+  std::optional<Decimal> stop_loss_submit_price;
+  std::optional<OutsideRTH> activate_rth;
+  /// Bid/ask depth level for the take-profit limit order submitted price,
+  /// valid when `activate_order_type` is `LIT`
+  std::optional<int32_t> profit_taker_depth_level;
+  /// Bid/ask depth level for the stop-loss limit order submitted price, valid
+  /// when `activate_order_type` is `LIT`
+  std::optional<int32_t> stop_loss_depth_level;
+};
+
+/// Replace attached order params
+struct ReplaceAttachedParams
+{
+  AttachedOrderType attached_order_type;
+  std::optional<Decimal> profit_taker_price;
+  std::optional<Decimal> stop_loss_price;
+  std::optional<TimeInForceType> time_in_force;
+  std::optional<int64_t> expire_time;
+  std::optional<OrderType> activate_order_type;
+  std::optional<Decimal> profit_taker_submit_price;
+  std::optional<Decimal> stop_loss_submit_price;
+  std::optional<OutsideRTH> activate_rth;
+  std::optional<int64_t> profit_taker_id;
+  std::optional<int64_t> stop_loss_id;
+  std::optional<bool> cancel_all_attached;
+  std::optional<int64_t> main_id;
+  std::optional<Decimal> quantity;
+  std::optional<Decimal> market_price;
+  /// Bid/ask depth level for the take-profit limit order submitted price,
+  /// valid when `activate_order_type` is `LIT`
+  std::optional<int32_t> profit_taker_depth_level;
+  /// Bid/ask depth level for the stop-loss limit order submitted price, valid
+  /// when `activate_order_type` is `LIT`
+  std::optional<int32_t> stop_loss_depth_level;
+};
+
+/// Multi-leg strategy
+enum class MultiLegStrategy
+{
+  /// Unknown
+  Unknown,
+  /// Covered call (covered stock)
+  CoveredCall,
+  /// Covered put (covered stock)
+  CoveredPut,
+  /// Vertical call spread
+  VerticalCallSpread,
+  /// Vertical put spread
+  VerticalPutSpread,
+  /// Collar
+  Collar,
+  /// Straddle
+  Straddle,
+  /// Strangle
+  Strangle,
+  /// Calendar call spread
+  CalendarCallSpread,
+  /// Calendar put spread
+  CalendarPutSpread,
+};
+
+/// Multi-leg position direction
+enum class MultiLegPosition
+{
+  /// Unknown
+  Unknown,
+  /// Long
+  Long,
+  /// Short
+  Short,
+};
+
+/// Option contract type
+enum class ContractDirection
+{
+  /// Unknown
+  Unknown,
+  /// Call
+  Call,
+  /// Put
+  Put,
+};
+
+/// A leg of a multi-leg combination order
+struct MultiLegOrderLeg
+{
+  /// Option symbol, in `ticker.region` format
+  std::string symbol;
+  /// Order side
+  OrderSide side;
+  /// Position direction
+  MultiLegPosition position;
+  /// Leg ratio quantity
+  Decimal ratio_quantity;
+  /// Strike price
+  std::optional<Decimal> strike_price;
+  /// Option expiry date
+  std::optional<Date> expire_date;
+  /// Contract type
+  ContractDirection contract_direction;
+};
+
+/// Multi-leg strategy information
+struct MultiLegInfo
+{
+  /// Multi-leg strategy
+  MultiLegStrategy strategy;
+  /// Strategy name
+  std::string strategy_name;
+  /// Multi-leg combination ID
+  std::string multileg_id;
+  /// Multi-leg combination code
+  std::string code;
+  /// Legs of the combination order
+  std::vector<MultiLegOrderLeg> legs;
 };
 
 /// Order
@@ -1601,6 +1850,14 @@ struct Order
   std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
+  /// Time-condition submit time (Unix timestamp in seconds, not set when
+  /// the order is not a time-condition order)
+  std::optional<int64_t> delayed_until;
+  /// Attached orders
+  std::vector<AttachedOrderDetail> attached_orders;
+  /// Multi-leg strategy information (only present for multi-leg option
+  /// combination orders)
+  std::optional<MultiLegInfo> multi_leg;
 };
 
 /// Order changed message
@@ -1656,6 +1913,9 @@ struct PushOrderChanged
   std::optional<Decimal> last_price;
   /// Remark message
   std::string remark;
+  /// Multi-leg strategy information (only present for multi-leg option
+  /// combination orders)
+  std::optional<MultiLegInfo> multi_leg;
 };
 
 /// Options for get history orders request
@@ -1688,6 +1948,8 @@ struct GetTodayOrdersOptions
   std::optional<Market> market;
   /// Order id
   std::optional<std::string> order_id;
+  /// Whether to include attached orders
+  std::optional<bool> is_attached;
 };
 
 /// Options for replace order request
@@ -1715,6 +1977,15 @@ struct ReplaceOrderOptions
   std::optional<Decimal> monitor_price;
   /// Remark
   std::optional<std::string> remark;
+  /// Attached order params
+  std::optional<ReplaceAttachedParams> attached_params;
+  /// New time-condition submit time (Unix timestamp in seconds), later than
+  /// now and no more than 90 days ahead; not set keeps the current time
+  /// condition
+  std::optional<int64_t> delayed_until;
+  /// Clear the time condition, turning the order into a regular order (takes
+  /// precedence over `delayed_until`)
+  bool clear_delayed_until = false;
 };
 
 /// Options for submit order request
@@ -1753,6 +2024,16 @@ struct SubmitOrderOptions
   std::optional<Decimal> monitor_price;
   /// Remark (Maximum 64 characters)
   std::optional<std::string> remark;
+  /// Idempotent request ID for preventing duplicate orders.
+  /// If not specified, idempotency control is skipped.
+  /// The server caches this ID for 10 minutes.
+  std::optional<std::string> client_request_id;
+  /// Attached order params
+  std::optional<SubmitAttachedParams> attached_params;
+  /// Time-condition submit time (Unix timestamp in seconds). The order is held
+  /// in `DelayedNotReported` status and only submitted at this time, which
+  /// must be later than now and no more than 90 days ahead.
+  std::optional<int64_t> delayed_until;
 };
 
 /// Response for submit order request
@@ -1760,6 +2041,44 @@ struct SubmitOrderResponse
 {
   /// Order id
   std::string order_id;
+};
+
+/// A leg of a multi-leg combination order to submit
+struct SubmitMultiLegOrderLeg
+{
+  /// Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
+  std::string symbol;
+  /// Leg ratio quantity — must be a positive number. The direction of each leg
+  /// is implied by the strategy together with the order side, not by the sign
+  /// of this value; a negative or zero ratio is rejected by the server with
+  /// `602001`.
+  Decimal ratio_quantity;
+};
+
+/// Options for submit multi-leg order request
+struct SubmitMultiLegOrderOptions
+{
+  /// Order side
+  OrderSide side;
+  /// Order type
+  OrderType order_type;
+  /// Submitted quantity (number of combinations)
+  Decimal submitted_quantity;
+  /// Multi-leg strategy
+  MultiLegStrategy strategy;
+  /// Legs of the combination order
+  std::vector<SubmitMultiLegOrderLeg> legs;
+  /// Submitted price (required for limit order types such as `LO`)
+  std::optional<Decimal> submitted_price;
+  /// Remark (Maximum 255 characters)
+  std::optional<std::string> remark;
+  /// Idempotent request ID for preventing duplicate orders.
+  /// If not specified, idempotency control is skipped.
+  /// The server caches this ID for 10 minutes.
+  std::optional<std::string> client_request_id;
+  /// Time-condition submit time (Unix timestamp in seconds), later than now
+  /// and no more than 90 days ahead. Only `LO` / `MO` support time conditions.
+  std::optional<int64_t> delayed_until;
 };
 
 /// Cash info
@@ -1892,8 +2211,8 @@ struct GetStockPositionsOptions
 /// Fund position
 struct FundPosition
 {
-  /// Fund ISIN code
-  std::string symbol;
+  /// Fund counter id (the ISIN is the last `/`-separated segment)
+  std::string counter_id;
   /// Current equity
   Decimal current_net_asset_value;
   /// Current equity time
@@ -2114,6 +2433,9 @@ struct OrderDetail
   std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
+  /// Time-condition submit time (Unix timestamp in seconds, not set when
+  /// the order is not a time-condition order)
+  std::optional<int64_t> delayed_until;
   /// Commission-free Status
   CommissionFreeStatus free_status;
   /// Commission-free amount
@@ -2134,8 +2456,13 @@ struct OrderDetail
   std::optional<std::string> platform_deducted_currency;
   /// Order history details
   std::vector<OrderHistoryDetail> history;
-  /// Order charges
-  OrderChargeDetail charge_detail;
+  /// Order charges (maybe null)
+  std::optional<OrderChargeDetail> charge_detail;
+  /// Attached orders
+  std::vector<AttachedOrderDetail> attached_orders;
+  /// Multi-leg strategy information (only present for multi-leg option
+  /// combination orders)
+  std::optional<MultiLegInfo> multi_leg;
 };
 
 /// Options for estimate maximum purchase quantity
@@ -2167,7 +2494,658 @@ struct EstimateMaxPurchaseQuantityResponse
   Decimal margin_max_qty;
 };
 
+
+/// Grid trading master-order changed message.
+struct PushGridOrderChanged
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Order status
+  std::string status;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Suspend reason, if any
+  std::string suspend_reason;
+  /// Submitted base price
+  std::string submitted_base_price;
+  /// Current base price
+  std::string current_base_price;
+  /// Upper price bound
+  std::string upper_limit_price;
+  /// Lower price bound
+  std::string lower_limit_price;
+  /// Trigger price type
+  int32_t trigger_price_type;
+  /// Quantity per trigger
+  std::string trigger_quantity;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+  int32_t time_in_force;
+  /// Regular trading hours flag
+  int32_t rth;
+  /// Sell-side order type when depth is 0
+  std::string grid_order_type_up;
+  /// Buy-side order type when depth is 0
+  std::string grid_order_type_down;
+};
+
 } // namespace trade
+
+namespace grid {
+
+/// How grid trigger thresholds are interpreted (wire: `int32_t`).
+enum class TriggerPriceType : int32_t
+{
+  /// Unknown / unset
+  Unknown = 0,
+  /// Trigger by absolute price spread
+  Spread = 1,
+  /// Trigger by percent
+  Percent = 2,
+};
+
+/// Time in force for a grid order (wire: `int32_t`). Values other than the
+/// named ones are preserved verbatim in the underlying `int32_t`.
+enum class GridTimeInForce : int32_t
+{
+  /// Day order
+  Day = 0,
+  /// Good-til-canceled
+  GoodTilCanceled = 1,
+  /// Good-til-date
+  GoodTilDate = 6,
+};
+
+/// Action taken when a grid boundary is reached (wire: `int32_t`).
+enum class GridLimitEvent : int32_t
+{
+  /// Unknown / unset
+  Unknown = 0,
+  /// Ignore — keep the grid running
+  Ignore = 1,
+  /// Close the position at the last price
+  CloseAtLast = 2,
+};
+
+/// How a grid's up/down trigger thresholds are expressed. Percent and spread
+/// are mutually exclusive; modeling them together makes the choice explicit
+/// (instead of four independent optional fields).
+struct GridTrigger
+{
+  /// Threshold interpretation kind.
+  enum class Kind
+  {
+    /// Trigger by percent
+    Percent,
+    /// Trigger by absolute price spread
+    Spread,
+  };
+  /// Which interpretation the `up` / `down` values use.
+  Kind kind;
+  /// Upward trigger threshold
+  Decimal up;
+  /// Downward trigger threshold
+  Decimal down;
+
+  /// Trigger by percent (`up`, `down`).
+  static GridTrigger percent(Decimal up, Decimal down)
+  {
+    return GridTrigger{ Kind::Percent, up, down };
+  }
+  /// Trigger by absolute price spread (`up`, `down`).
+  static GridTrigger spread(Decimal up, Decimal down)
+  {
+    return GridTrigger{ Kind::Spread, up, down };
+  }
+};
+
+/// Grid trading rule — parameters for submit / replace.
+///
+/// All fields are public and optional; use `GridTradeRule::create` to build a
+/// rule with the minimum required field set visible in the signature, then the
+/// fluent `with_*` setters for optional parameters.
+struct GridTradeRule
+{
+  /// Base price the grid is anchored to
+  std::optional<Decimal> submitted_base_price;
+  /// Upper price bound
+  std::optional<Decimal> upper_limit_price;
+  /// Lower price bound
+  std::optional<Decimal> lower_limit_price;
+  /// Trigger price type (only `Spread` / `Percent` allowed)
+  std::optional<TriggerPriceType> trigger_price_type;
+  /// Upward trigger spread (absolute)
+  std::optional<Decimal> trigger_spread_up;
+  /// Downward trigger spread (absolute)
+  std::optional<Decimal> trigger_spread_down;
+  /// Upward trigger percent
+  std::optional<Decimal> trigger_percent_up;
+  /// Downward trigger percent
+  std::optional<Decimal> trigger_percent_down;
+  /// Whether a single grid level may trigger multiple times
+  std::optional<bool> multiple_trigger;
+  /// Time in force (`Day` / `GoodTilCanceled` / `GoodTilDate`)
+  std::optional<GridTimeInForce> time_in_force;
+  /// Quantity handled when the upper bound is reached
+  std::optional<Decimal> upper_limit_quantity;
+  /// Quantity handled when the lower bound is reached
+  std::optional<Decimal> lower_limit_quantity;
+  /// Expiry time (unix seconds), used with GTD
+  std::optional<int64_t> expire_time;
+  /// Action when the upper bound is reached (only `Ignore` / `CloseAtLast`
+  /// allowed)
+  std::optional<GridLimitEvent> upper_limit_event;
+  /// Action when the lower bound is reached (only `Ignore` / `CloseAtLast`
+  /// allowed)
+  std::optional<GridLimitEvent> lower_limit_event;
+  /// Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`)
+  std::optional<int32_t> trigger_sell_depth;
+  /// Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`)
+  std::optional<int32_t> trigger_buy_depth;
+  /// Quantity per trigger
+  std::optional<Decimal> trigger_quantity;
+  /// Whether short selling is allowed
+  std::optional<bool> support_shortsell;
+  /// Regular trading hours flag (`0` / `1` / `2`)
+  std::optional<int32_t> rth;
+  /// Sell-side order type when depth is `0` (`GMO` / `GLO` / `GTG`)
+  std::optional<std::string> grid_order_type_up;
+  /// Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`)
+  std::optional<std::string> grid_order_type_down;
+
+  /// Create a rule with the fields a valid grid order requires. The gateway
+  /// still validates business rules, but this makes the minimum field set
+  /// visible in the signature instead of leaving all fields optional.
+  static GridTradeRule create(Decimal base_price,
+                              Decimal upper_price,
+                              Decimal lower_price,
+                              GridTrigger trigger,
+                              Decimal quantity,
+                              Decimal upper_quantity,
+                              Decimal lower_quantity,
+                              GridTimeInForce time_in_force)
+  {
+    GridTradeRule rule;
+    rule.submitted_base_price = base_price;
+    rule.upper_limit_price = upper_price;
+    rule.lower_limit_price = lower_price;
+    rule.trigger_quantity = quantity;
+    rule.upper_limit_quantity = upper_quantity;
+    rule.lower_limit_quantity = lower_quantity;
+    rule.time_in_force = time_in_force;
+    if (trigger.kind == GridTrigger::Kind::Percent) {
+      rule.trigger_price_type = TriggerPriceType::Percent;
+      rule.trigger_percent_up = trigger.up;
+      rule.trigger_percent_down = trigger.down;
+    } else {
+      rule.trigger_price_type = TriggerPriceType::Spread;
+      rule.trigger_spread_up = trigger.up;
+      rule.trigger_spread_down = trigger.down;
+    }
+    return rule;
+  }
+
+  /// Set the actions taken at the upper / lower bounds.
+  GridTradeRule& with_limit_events(GridLimitEvent upper, GridLimitEvent lower)
+  {
+    upper_limit_event = upper;
+    lower_limit_event = lower;
+    return *this;
+  }
+
+  /// Set the sell / buy order-book depths (`0` = use the order type).
+  GridTradeRule& with_depths(int32_t sell, int32_t buy)
+  {
+    trigger_sell_depth = sell;
+    trigger_buy_depth = buy;
+    return *this;
+  }
+
+  /// Set the sell / buy order types (`GMO` / `GLO` / `GTG`).
+  GridTradeRule& with_order_types(std::string up, std::string down)
+  {
+    grid_order_type_up = std::move(up);
+    grid_order_type_down = std::move(down);
+    return *this;
+  }
+
+  /// Allow a single grid level to trigger multiple times.
+  GridTradeRule& with_multiple_trigger(bool value)
+  {
+    multiple_trigger = value;
+    return *this;
+  }
+
+  /// Allow short selling.
+  GridTradeRule& with_support_shortsell(bool value)
+  {
+    support_shortsell = value;
+    return *this;
+  }
+
+  /// Set the regular-trading-hours flag (`0` / `1` / `2`).
+  GridTradeRule& with_rth(int32_t value)
+  {
+    rth = value;
+    return *this;
+  }
+
+  /// Set the expiry time (unix seconds), used with a GTD time-in-force.
+  GridTradeRule& with_expire_time(int64_t unix_seconds)
+  {
+    expire_time = unix_seconds;
+    return *this;
+  }
+};
+
+/// Options for submit grid trading order request
+struct SubmitGridOrderOptions
+{
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Grid trading rule
+  GridTradeRule grid_trading_rule;
+};
+
+/// Options for replace grid trading order request
+struct ReplaceGridOrderOptions
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Grid trading rule
+  GridTradeRule grid_trading_rule;
+};
+
+/// Options for get grid trading orders (list) request
+struct GetGridOrdersOptions
+{
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> limit;
+  /// Market
+  std::optional<Market> market;
+  /// Comma-joined status filter (e.g. `Performing,Suspended`)
+  std::optional<std::string> status;
+  /// Security symbol filter (e.g. `700.HK`)
+  std::optional<std::string> symbol;
+  /// Sort field
+  std::optional<std::string> sort_by;
+  /// Sort order
+  std::optional<std::string> sort_order;
+};
+
+/// Options for query grid trading orders by IDs request
+struct GetGridOrdersByIdsOptions
+{
+  /// Grid master order IDs
+  std::vector<std::string> order_ids;
+};
+
+/// Options for get grid trading order detail request
+struct GetGridOrderDetailOptions
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// History cursor for paging through the trigger history
+  std::optional<std::string> history_id;
+  /// Page size
+  std::optional<int32_t> limit;
+};
+
+/// Options for get grid trading trigger history request
+struct GetGridTriggerHistoryOptions
+{
+  /// Grid master order ID
+  std::string grid_order_id;
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> limit;
+};
+
+/// Response for submit grid trading order request
+struct SubmitGridOrderResponse
+{
+  /// Grid master order id
+  std::string order_id;
+};
+
+/// A grid trading order (element of the list / by-ids responses).
+struct GridOrder
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Stock name
+  std::string stock_name;
+  /// Market
+  std::string market;
+  /// Order status
+  std::string status;
+  /// Grid running status
+  std::string grid_status;
+  /// Submitted base price
+  std::optional<Decimal> submitted_base_price;
+  /// Current base price
+  std::optional<Decimal> current_base_price;
+  /// Base price before the last trigger
+  std::optional<Decimal> pre_trigger_base_price;
+  /// Base price after the last trigger
+  std::optional<Decimal> post_trigger_base_price;
+  /// Upper price bound
+  std::optional<Decimal> upper_limit_price;
+  /// Lower price bound
+  std::optional<Decimal> lower_limit_price;
+  /// Trigger price type
+  TriggerPriceType trigger_price_type;
+  /// Upward trigger spread
+  std::optional<Decimal> trigger_spread_up;
+  /// Downward trigger spread
+  std::optional<Decimal> trigger_spread_down;
+  /// Upward trigger percent
+  std::optional<Decimal> trigger_percent_up;
+  /// Downward trigger percent
+  std::optional<Decimal> trigger_percent_down;
+  /// Pullback percent
+  std::optional<Decimal> pullback_percent;
+  /// Pullback spread
+  std::optional<Decimal> pullback_spread;
+  /// Rebound percent
+  std::optional<Decimal> rebound_percent;
+  /// Rebound spread
+  std::optional<Decimal> rebound_spread;
+  /// Sell-side execution order type (e.g. `MO`)
+  std::string trigger_sell_order_type;
+  /// Buy-side execution order type (e.g. `MO`)
+  std::string trigger_buy_order_type;
+  /// Sell-side order-book depth
+  int32_t trigger_sell_depth;
+  /// Buy-side order-book depth
+  int32_t trigger_buy_depth;
+  /// Quantity per trigger
+  std::optional<Decimal> trigger_quantity;
+  /// Quantity per sell trigger
+  std::optional<Decimal> trigger_sell_quantity;
+  /// Quantity per buy trigger
+  std::optional<Decimal> trigger_buy_quantity;
+  /// Quantity handled at the upper bound
+  std::optional<Decimal> upper_limit_quantity;
+  /// Quantity handled at the lower bound
+  std::optional<Decimal> lower_limit_quantity;
+  /// Action at the upper bound
+  GridLimitEvent upper_limit_event;
+  /// Action at the lower bound
+  GridLimitEvent lower_limit_event;
+  /// Whether a single grid level may trigger multiple times
+  bool multiple_trigger;
+  /// Number of times the grid has triggered
+  int32_t trigger_times;
+  /// Accumulated bought quantity
+  std::optional<Decimal> total_buy_quantity;
+  /// Accumulated sold quantity
+  std::optional<Decimal> total_sell_quantity;
+  /// Accumulated profit balance
+  std::optional<Decimal> total_profit_balance;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Time in force
+  GridTimeInForce time_in_force;
+  /// Expiry date (`YYYY-MM-DD`, GTD)
+  std::string gtd;
+  /// Created time (unix timestamp)
+  std::optional<int64_t> created_at;
+  /// Regular trading hours flag
+  int32_t rth;
+  /// Whether short selling is allowed
+  bool support_shortsell;
+  /// Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+  std::string grid_order_type_up;
+  /// Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+  std::string grid_order_type_down;
+};
+
+/// A triggered sub-order carried in the grid order detail.
+struct GridOrderSubOrder
+{
+  /// Sub-order ID
+  std::string id;
+  /// Order price
+  std::optional<Decimal> price;
+  /// Order type
+  std::string order_type;
+  /// Order quantity
+  std::optional<Decimal> quantity;
+  /// Executed quantity
+  std::optional<Decimal> executed_qty;
+  /// Buy / sell direction
+  int32_t action;
+  /// Order status
+  std::string status;
+  /// Submitted time (unix timestamp)
+  std::optional<int64_t> submitted_at;
+  /// Regular trading hours flag
+  int32_t rth;
+};
+
+/// A grid order lifecycle-history entry carried in the grid order detail.
+struct GridOrderHistory
+{
+  /// History entry ID (paging cursor)
+  std::string history_id;
+  /// Created time (unix timestamp)
+  std::optional<int64_t> created_at;
+  /// Status at this point
+  std::string status;
+  /// Suspend reason, if any
+  std::string suspend_reason;
+  /// Additional reason detail, if any
+  std::string reason;
+};
+
+/// Detail of a grid trading order.
+struct GridOrderDetail
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Stock name
+  std::string stock_name;
+  /// Order status
+  std::string status;
+  /// Grid running status
+  std::string grid_status;
+  /// Suspend reason, if any
+  std::string suspend_reason;
+  /// Sleeping reason, if any
+  std::string sleeping_reason;
+  /// Submitted base price
+  std::optional<Decimal> submitted_base_price;
+  /// Current base price
+  std::optional<Decimal> current_base_price;
+  /// Upper price bound
+  std::optional<Decimal> upper_limit_price;
+  /// Lower price bound
+  std::optional<Decimal> lower_limit_price;
+  /// Trigger price type
+  TriggerPriceType trigger_price_type;
+  /// Upward trigger spread
+  std::optional<Decimal> trigger_spread_up;
+  /// Downward trigger spread
+  std::optional<Decimal> trigger_spread_down;
+  /// Upward trigger percent
+  std::optional<Decimal> trigger_percent_up;
+  /// Downward trigger percent
+  std::optional<Decimal> trigger_percent_down;
+  /// Pullback percent
+  std::optional<Decimal> pullback_percent;
+  /// Pullback spread
+  std::optional<Decimal> pullback_spread;
+  /// Rebound percent
+  std::optional<Decimal> rebound_percent;
+  /// Rebound spread
+  std::optional<Decimal> rebound_spread;
+  /// Whether a single grid level may trigger multiple times
+  bool multiple_trigger;
+  /// Time in force
+  GridTimeInForce time_in_force;
+  /// Quantity per trigger
+  std::optional<Decimal> trigger_quantity;
+  /// Quantity per sell trigger
+  std::optional<Decimal> trigger_sell_quantity;
+  /// Quantity per buy trigger
+  std::optional<Decimal> trigger_buy_quantity;
+  /// Quantity handled at the upper bound
+  std::optional<Decimal> upper_limit_quantity;
+  /// Quantity handled at the lower bound
+  std::optional<Decimal> lower_limit_quantity;
+  /// Action at the upper bound
+  GridLimitEvent upper_limit_event;
+  /// Action at the lower bound
+  GridLimitEvent lower_limit_event;
+  /// Sell-side order-book depth
+  int32_t trigger_sell_depth;
+  /// Buy-side order-book depth
+  int32_t trigger_buy_depth;
+  /// Created time (unix timestamp)
+  std::optional<int64_t> created_at;
+  /// Last updated time (unix timestamp)
+  std::optional<int64_t> updated_at;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Expiry time (unix timestamp)
+  std::optional<int64_t> expire_time;
+  /// Expiry date (`YYYY-MM-DD`, GTD)
+  std::string gtd;
+  /// Triggered sub-orders
+  std::vector<GridOrderSubOrder> grid_sub_orders;
+  /// Whether there are more sub-orders to page
+  bool sub_has_more;
+  /// Lifecycle history entries
+  std::vector<GridOrderHistory> grid_order_history;
+  /// Whether there are more history entries to page
+  bool history_has_more;
+  /// Whether short selling is allowed
+  bool support_shortsell;
+  /// Regular trading hours flag
+  int32_t rth;
+  /// Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+  std::string grid_order_type_up;
+  /// Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+  std::string grid_order_type_down;
+};
+
+/// A grid trigger-history entry (one triggered order).
+struct TriggerOrder
+{
+  /// Triggered order ID
+  std::string id;
+  /// Order status
+  std::string status;
+  /// Stock name
+  std::string name;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Order price
+  std::optional<Decimal> price;
+  /// Order quantity
+  std::optional<Decimal> quantity;
+  /// Executed average price
+  std::optional<Decimal> executed_price;
+  /// Executed total quantity
+  std::optional<Decimal> executed_qty;
+  /// Submitted time (unix timestamp)
+  std::optional<int64_t> submitted_at;
+  /// Buy / sell direction
+  int32_t action;
+  /// Order type
+  std::string order_type;
+  /// Trigger price
+  std::optional<Decimal> trigger_price;
+  /// Rejection reason, if any
+  std::string msg;
+  /// Settlement currency
+  std::string currency;
+  /// Latest quote price
+  std::optional<Decimal> last_done;
+  /// Last updated time (unix timestamp)
+  std::optional<int64_t> updated_at;
+  /// Time in force
+  GridTimeInForce time_in_force;
+  /// Expiry date (`YYYY-MM-DD`, GTD)
+  std::string gtd;
+  /// Trigger time (unix timestamp)
+  std::optional<int64_t> trigger_at;
+  /// Conditional trigger status
+  int32_t trigger_status;
+};
+
+/// A price-step (bid-size) rule entry from the symbol-info response.
+struct GridBidSize
+{
+  /// Range start price (inclusive)
+  std::optional<Decimal> str_proceed;
+  /// Range end price
+  std::optional<Decimal> end_proceed;
+  /// Price step within the range
+  std::optional<Decimal> bid_size;
+};
+
+/// Channel / authorization info nested in the symbol-info response.
+struct GridChannelInfo
+{
+  /// Whether the strategy compliance authorization has been granted
+  bool strategy_granted;
+  /// Whether the RTH toggle is supported
+  bool support_rth;
+  /// Trading currency
+  std::string currency;
+  /// Supported settlement currencies
+  std::vector<std::string> settlement_currency;
+};
+
+/// Security (symbol) info used to build a grid order.
+struct GridSymbolInfo
+{
+  /// Security name
+  std::string name;
+  /// Latest quote price
+  std::optional<Decimal> last_done;
+  /// Board lot size
+  std::optional<Decimal> lot_size;
+  /// Buy-side board lot size
+  std::optional<Decimal> buy_lot_size;
+  /// Sell-side board lot size
+  std::optional<Decimal> sell_lot_size;
+  /// Price-step (bid-size) rule table
+  std::vector<GridBidSize> bid_sizes;
+  /// Channel / authorization info (strategy grant, RTH, currencies)
+  GridChannelInfo channel_info;
+};
+
+/// Response for get grid trading orders (list) request
+struct GridOrdersResponse
+{
+  /// Grid orders
+  std::vector<GridOrder> grid_order;
+  /// Whether there are more pages
+  bool has_more;
+};
+
+/// Response for get grid trading trigger history request
+struct GridTriggerHistoryResponse
+{
+  /// Trigger history entries
+  std::vector<TriggerOrder> trigger_orders;
+  /// Whether there are more pages
+  bool has_more;
+};
+} // namespace grid
 
 namespace content {
 
@@ -2562,7 +3540,7 @@ struct TopMoversEvent
 struct TopMoversResponse
 {
   std::vector<TopMoversEvent> events;
-  /// Pagination cursor as a JSON string
+  /// Pagination cursor (empty string means no more pages)
   std::string next_params;
 };
 
@@ -2592,6 +3570,33 @@ struct RankListResponse
 {
   bool bmp;
   std::vector<RankListItem> lists;
+};
+
+/// One leaf rank sub-category.
+struct RankSubCategory
+{
+  /// Sub-category key (e.g. "hot_all-us"). Pass to rank_list.
+  std::string key;
+  /// Display name
+  std::string name;
+  /// Market code (e.g. "US", "HK")
+  std::string market;
+};
+
+/// A top-level rank category grouping sub-categories.
+struct RankCategory
+{
+  /// Top-level key (e.g. "hot")
+  std::string key;
+  /// Display name (e.g. "热度排行")
+  std::string name;
+  std::vector<RankSubCategory> sub_categories;
+};
+
+/// Response for rank_categories.
+struct RankCategoriesResponse
+{
+  std::vector<RankCategory> categories;
 };
 
 /// A single anomaly (unusual market movement) alert item.
@@ -3249,7 +4254,7 @@ struct InstitutionRatingViews
 struct IndustryRankItem
 {
   std::string name;
-  std::string counter_id;
+  std::string symbol;
   std::string chg;
   std::string leading_name;
   std::string leading_ticker;
@@ -3283,7 +4288,7 @@ struct IndustryPeersTop
 struct IndustryPeerNode
 {
   std::string name;
-  std::string counter_id;
+  std::string symbol;
   int32_t stock_num;
   std::string chg;
   std::string ytd_chg;
@@ -3293,7 +4298,7 @@ struct IndustryPeerNode
 /// Industry peers response.
 struct IndustryPeersResponse
 {
-  IndustryPeersTop top;
+  std::optional<IndustryPeersTop> top;
   std::optional<IndustryPeerNode> chain;
 };
 
@@ -3447,6 +4452,16 @@ struct AssetAllocationResponse
 namespace alert {
 
 /// One price alert rule attached to a security.
+/// Trigger threshold for a price alert. Exactly one field is populated,
+/// depending on the alert condition.
+struct AlertValueMap
+{
+  /// Absolute price threshold as a decimal string (empty if not set)
+  std::string price;
+  /// Percentage-change threshold (nullopt if not set)
+  std::optional<double> chg;
+};
+
 struct AlertItem
 {
   /// Alert ID
@@ -3463,8 +4478,8 @@ struct AlertItem
   std::string text;
   /// Trigger state flags
   std::vector<int32_t> state;
-  /// Trigger threshold, serialised as JSON: {"price":"500"} or {"chg":"5"}
-  std::string value_map;
+  /// Trigger threshold
+  AlertValueMap value_map;
 };
 
 /// All price alerts for one security.
@@ -3736,4 +4751,1914 @@ struct SharelistDetail
 
 } // namespace sharelist
 
+namespace agent {
+
+/// A Workspace the current account belongs to.
+struct Workspace
+{
+  /// Workspace ID
+  std::string id;
+  /// Workspace name
+  std::string name;
+  /// Creation time, Unix timestamp in seconds
+  int64_t created_at;
+  /// Last updated time, Unix timestamp in seconds
+  int64_t updated_at;
+};
+
+/// Response for AgentContext::workspaces.
+struct WorkspacesResponse
+{
+  /// Workspaces the current account belongs to
+  std::vector<Workspace> workspaces;
+};
+
+/// An Agent in a Workspace.
+struct Agent
+{
+  /// Agent UID, used as the path parameter of AgentContext::conversation
+  std::string uid;
+  /// Agent name
+  std::string name;
+  /// Agent description
+  std::string description;
+  /// Agent mode, e.g. "chat"
+  std::string mode;
+  /// Icon URL
+  std::string icon;
+  /// Whether published; only published Agents can start conversations
+  bool is_published;
+  /// Publish time, Unix timestamp in seconds; 0 if unpublished
+  int64_t published_at;
+  /// Creation time, Unix timestamp in seconds
+  int64_t created_at;
+  /// Last updated time, Unix timestamp in seconds
+  int64_t updated_at;
+};
+
+/// Response for AgentContext::agents.
+struct AgentsResponse
+{
+  /// Agent list
+  std::vector<Agent> agents;
+  /// Total number of matching Agents
+  int32_t total;
+};
+
+/// Options for AgentContext::agents (all fields optional).
+struct GetAgentsOptions
+{
+  /// Page number, starts at 1
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> limit;
+  /// Fuzzy search by Agent name
+  std::optional<std::string> name;
+};
+
+/// A source referenced by the answer.
+struct Reference
+{
+  /// Reference index
+  int32_t index;
+  /// Original reference index as provided by the source
+  int32_t original_index;
+  /// Reference type (wire field `type`)
+  std::string ref_type;
+  /// Reference identifier
+  std::string id;
+  /// Reference title
+  std::string title;
+  /// Reference URL
+  std::string url;
+  /// Full nested reference payload, as a JSON string; empty when absent
+  std::string content_json;
+};
+
+/// One option of a Question.
+struct QuestionOption
+{
+  /// Short UI label for the option
+  std::string label;
+  /// Option text
+  std::string description;
+};
+
+/// One question the Agent needs you to answer.
+struct Question
+{
+  /// Question text
+  std::string question;
+  /// Options; empty means free-form answer
+  std::vector<QuestionOption> options;
+  /// Whether multiple options may be selected
+  bool multi_select;
+};
+
+/// A single interaction requested while an Agent workflow is paused.
+struct HumanInteraction
+{
+  /// Tool call that requested the interaction
+  std::string tool_call_id;
+  /// Stable key expected by the answers map when continuing
+  std::string interrupt_id;
+  /// Interaction type such as `ask_human` or `trade_password`
+  std::string interaction_type;
+  /// Human-readable tool name
+  std::string tool_name;
+  /// Questions and answer options presented to the user
+  std::vector<Question> questions;
+  /// Original tool arguments as a JSON string; empty when absent
+  std::string tool_args_json;
+};
+
+/// Present when a conversation run is interrupted, waiting for
+/// AgentContext::continue_conversation.
+struct Interrupt
+{
+  /// ID of the node that triggered the interrupt
+  std::string node_id;
+  /// Tool call ID of this inquiry; used as the answer key when continuing
+  std::string tool_call_id;
+  /// Questions you need to answer
+  std::vector<Question> questions;
+  /// Full interaction descriptors used to render and answer the pause
+  std::vector<HumanInteraction> interactions;
+  /// ID of the paused message
+  int64_t message_id;
+  /// ID of the owning conversation
+  int64_t chat_id;
+};
+
+/// Present when a conversation run failed.
+struct AgentError
+{
+  /// Error code
+  int32_t code;
+  /// Error message
+  std::string message;
+};
+
+/// Final run status of a conversation.
+enum class ConversationStatus
+{
+  /// The run completed successfully
+  Succeeded,
+  /// The run is paused, waiting for AgentContext::continue_conversation
+  Interrupted,
+  /// The run failed
+  Failed,
+  /// The run was stopped
+  Stopped,
+};
+
+/// Response for AgentContext::conversation, AgentContext::continue_conversation,
+/// and the final result of the streamed counterparts.
+struct ConversationResponse
+{
+  /// Conversation identifier, used for follow-up questions and
+  /// troubleshooting
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// Final run status
+  ConversationStatus status;
+  /// Final answer text; valid when status is ConversationStatus::Succeeded
+  std::string answer;
+  /// Sources referenced by the answer
+  std::vector<Reference> references;
+  /// Suggested follow-up questions ("you might also ask"); empty when absent
+  std::vector<std::string> further_questions;
+  /// Run duration in seconds
+  double elapsed_time;
+  /// Present only when status is ConversationStatus::Interrupted
+  std::optional<Interrupt> interrupt;
+  /// Present only when the run failed
+  std::optional<AgentError> error;
+};
+
+/// Payload of a ChatStarted conversation stream event.
+struct ChatStartedPayload
+{
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Numeric conversation identifier
+  int64_t chat_id;
+  /// Message ID of this round
+  std::string message_id;
+  /// Error code; empty when absent
+  std::string error;
+  /// Error message; empty when absent
+  std::string error_message;
+};
+
+/// Payload of a Message conversation stream event — an incremental text
+/// chunk. This is the highest-frequency event; concatenate text fragments
+/// in arrival order.
+struct MessagePayload
+{
+  /// Incremental text fragment
+  std::string text;
+  /// answer — final answer text; think — reasoning process; process —
+  /// stage progress description
+  std::string message_type;
+  /// Identifier of the stream segment this fragment belongs to. Fragments
+  /// with the same key form one continuous block — group by key when
+  /// rendering
+  std::string key;
+  /// Time this segment started, Unix timestamp in seconds
+  int64_t started_at;
+  /// Stage identifier; only present when message_type is "process"
+  std::string stage;
+  /// Stage title while running; only present when message_type is
+  /// "process"
+  std::string stage_title;
+  /// Stage title after it finishes; only present when message_type is
+  /// "process"
+  std::string stage_finished_title;
+  /// Extra payload attached to the fragment, as a JSON string; empty when
+  /// absent
+  std::string outputs_json;
+};
+
+/// `inputs` of a WorkflowStarted conversation stream event.
+struct WorkflowStartedInputs
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// The question that was asked
+  std::string query;
+};
+
+/// Payload of a WorkflowStarted conversation stream event, observed right
+/// after ChatStarted on every run seen so far.
+struct WorkflowStartedPayload
+{
+  /// Whether this run's answer was served from a cache
+  bool hit_cache;
+  /// Echoes the run's inputs
+  WorkflowStartedInputs inputs;
+  /// Unix timestamp in seconds
+  int64_t started_at;
+  /// Internal workflow run ID
+  int64_t workflow_id;
+};
+
+/// Payload of a ThinkingStarted conversation stream event — the Agent has
+/// entered the reasoning phase (analyzing the question, planning tool
+/// calls). Between this and ThinkingFinished, Message events with
+/// message_type == "think" and tool-call events may arrive.
+struct ThinkingStartedPayload
+{
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+};
+
+/// Payload of a ThinkingFinished conversation stream event — the reasoning
+/// phase is over; answer text (Message with message_type == "answer")
+/// follows.
+struct ThinkingFinishedPayload
+{
+  /// Finish time, Unix timestamp in seconds
+  int64_t finished_at;
+  /// Reasoning duration in seconds
+  int32_t elapsed_time;
+};
+
+/// Payload of a NodeToolUseStarted conversation stream event — an ordinary
+/// tool call has started. Match it to its NodeToolUseFinished counterpart
+/// by tool_use_id.
+struct NodeToolUseStartedPayload
+{
+  /// Unique ID of this call; matches the finished event
+  std::string tool_use_id;
+  /// Localized display name of the tool
+  std::string tool_name;
+  /// Locale-stable tool identifier; use this for logic keyed on the tool
+  /// kind
+  std::string tool_func_name;
+  /// Call arguments as a JSON string
+  std::string tool_args;
+  /// Progress text suitable for direct display, e.g. "Searching the
+  /// web..."
+  std::string tips;
+  /// Short tags accompanying tips; may be empty
+  std::vector<std::string> tip_chips;
+  /// Round number. Calls in the same round (same iteration) run in
+  /// parallel
+  int32_t iteration;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+};
+
+/// outputs of a NodeToolUseFinished conversation stream event — only
+/// carries fields meant for display.
+struct NodeToolUseOutputs
+{
+  /// Sources referenced by the tool result
+  std::vector<Reference> references;
+  /// Domains of the referenced sources
+  std::vector<std::string> reference_domains;
+  /// The query the tool executed; empty when absent
+  std::string query;
+  /// Raw response text of the tool; empty when absent
+  std::string text;
+  /// Parsed request arguments, as a JSON string; empty when absent
+  std::string tool_args_json;
+  /// Structured result, as a JSON string; present only for selected tools,
+  /// empty when absent
+  std::string data_json;
+};
+
+/// Payload of a NodeToolUseFinished conversation stream event — the tool
+/// call has ended.
+struct NodeToolUseFinishedPayload
+{
+  /// Matches the tool_use_id of the started event
+  std::string tool_use_id;
+  /// succeeded / failed
+  std::string status;
+  /// Error description on failure
+  std::string error;
+  /// Call duration in seconds
+  double elapsed_time;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Localized display name
+  std::string tool_name;
+  /// Locale-stable tool identifier
+  std::string tool_func_name;
+  /// Call arguments as a JSON string
+  std::string tool_args;
+  /// Tool category
+  std::string tool_type;
+  /// Progress text
+  std::string tips;
+  /// Short tags; may be empty
+  std::vector<std::string> tip_chips;
+  /// Round number
+  int32_t iteration;
+  /// true if the call happened during the thinking phase
+  bool is_thinking;
+  /// Filtered call results, for display
+  NodeToolUseOutputs outputs;
+};
+
+/// Payload of a SubagentStarted conversation stream event. When the Agent
+/// spawns a subagent to work on a sub-task, the subagent's lifecycle is
+/// reported with this dedicated event family instead of NodeToolUse*.
+struct SubagentStartedPayload
+{
+  /// ID of the node that spawned the subagent
+  std::string node_id;
+  /// Unique ID of this spawn; matches the finished event
+  std::string tool_use_id;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Goal assigned to the subagent
+  std::string goal;
+  /// Full task prompt given to the subagent
+  std::string prompt;
+  /// Subagent identifier; may be empty
+  std::string subagent_id;
+  /// Tools granted to the subagent, as a JSON array string; empty when
+  /// absent
+  std::string tools_json;
+};
+
+/// Payload of a SubagentProgress conversation stream event, emitted every
+/// time the subagent calls one of its own tools. Use it to render a live
+/// timeline inside the subagent card.
+struct SubagentProgressPayload
+{
+  /// ID of the node that spawned the subagent
+  std::string node_id;
+  /// tool_use_id of the owning SubagentStarted event
+  std::string parent_tool_call_id;
+  /// Name of the tool the subagent called
+  std::string subagent_tool_name;
+  /// Arguments of that call, as a JSON string
+  std::string subagent_tool_args;
+  /// Status of that call: running / succeeded / failed
+  std::string subagent_status;
+  /// Duration of that call in milliseconds
+  int64_t subagent_duration_ms;
+  /// The subagent's internal round number
+  int32_t subagent_iteration;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+};
+
+/// outputs of a SubagentFinished conversation stream event.
+struct SubagentOutputs
+{
+  /// The goal that was assigned to the subagent; empty when absent
+  std::string goal;
+  /// The subagent's result; empty when absent
+  std::string result;
+  /// Timeline of tool calls the subagent made, as a JSON array string;
+  /// empty when absent
+  std::string subagent_tools_json;
+};
+
+/// Payload of a SubagentFinished conversation stream event.
+struct SubagentFinishedPayload
+{
+  /// ID of the node that spawned the subagent
+  std::string node_id;
+  /// Matches the tool_use_id of SubagentStarted
+  std::string tool_use_id;
+  /// succeeded / failed
+  std::string status;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Total subagent duration in seconds
+  double elapsed_time;
+  /// Error description on failure
+  std::string error;
+  /// Subagent result: goal, result, and the timeline of tool calls it made
+  SubagentOutputs outputs;
+};
+
+/// Payload of an AgentToolStarted conversation stream event. When the Agent
+/// delegates to another Agent as a tool, that inner run is reported with
+/// the AgentTool* family — the shape mirrors the subagent events.
+struct AgentToolStartedPayload
+{
+  /// ID of the calling node
+  std::string node_id;
+  /// Unique ID of this call; matches the finished event
+  std::string tool_use_id;
+  /// Identifier of the Agent being called
+  std::string agent_tool_name;
+  /// Display title; may be empty
+  std::string title;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Call arguments as a JSON string
+  std::string tool_args;
+  /// Localized display name
+  std::string tool_name;
+  /// Progress text; may be empty
+  std::string tips;
+  /// Short tags; may be empty
+  std::vector<std::string> tip_chips;
+  /// true if called during the thinking phase
+  bool is_thinking;
+};
+
+/// Payload of an AgentToolProgress conversation stream event, emitted for
+/// each inner tool call the delegated Agent makes.
+struct AgentToolProgressPayload
+{
+  /// ID of the calling node
+  std::string node_id;
+  /// tool_use_id of the owning AgentToolStarted event
+  std::string parent_tool_call_id;
+  /// Identifier of the Agent being called
+  std::string agent_tool_name;
+  /// Name of the inner tool the delegated Agent called
+  std::string inner_tool_name;
+  /// Arguments of that inner call, as a JSON string
+  std::string inner_tool_args;
+  /// Status of the inner call: running / succeeded / failed
+  std::string status;
+  /// Duration of the inner call in milliseconds
+  int64_t duration_ms;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// true if during the thinking phase
+  bool is_thinking;
+};
+
+/// Payload of an AgentToolFinished conversation stream event.
+struct AgentToolFinishedPayload
+{
+  /// ID of the calling node
+  std::string node_id;
+  /// Matches the tool_use_id of AgentToolStarted
+  std::string tool_use_id;
+  /// Identifier of the Agent being called
+  std::string agent_tool_name;
+  /// succeeded / failed
+  std::string status;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Total duration in seconds
+  double elapsed_time;
+  /// Error description on failure
+  std::string error;
+  /// Call arguments as a JSON string
+  std::string tool_args;
+  /// Result of the delegated Agent, as a JSON string; empty when absent
+  std::string outputs_json;
+  /// Tool category
+  std::string tool_type;
+  /// Progress text; may be empty
+  std::string tips;
+  /// Short tags; may be empty
+  std::vector<std::string> tip_chips;
+  /// true if during the thinking phase
+  bool is_thinking;
+};
+
+/// Payload of a QueryMasked conversation stream event — sensitive content
+/// in the user query was masked before processing. Display masked_query
+/// instead of the original query.
+struct QueryMaskedPayload
+{
+  /// The original user query
+  std::string raw_query;
+  /// The masked query
+  std::string masked_query;
+};
+
+/// Payload of a PlanChanged conversation stream event — the Agent created
+/// or updated its task plan.
+struct PlanChangedPayload
+{
+  /// ID of the planning node
+  std::string node_id;
+  /// Time of the change, Unix timestamp in seconds
+  int64_t started_at;
+  /// The current plan content, as a JSON string; empty when absent
+  std::string outputs_json;
+  /// Identifies the planning tool
+  std::string tool_name;
+};
+
+/// Payload of a ContextCompressStarted conversation stream event, marking
+/// the start of a context-compression pass triggered by a long
+/// conversation. Unlike other events, started_at here is an RFC 3339
+/// string.
+struct ContextCompressStartedPayload
+{
+  /// Start time, RFC 3339
+  std::string started_at;
+  /// Compression input summary, as a JSON string; empty when absent
+  std::string inputs_json;
+};
+
+/// Payload of a ContextCompressFinished conversation stream event. Unlike
+/// other events, created_at here is an RFC 3339 string.
+struct ContextCompressFinishedPayload
+{
+  /// Finish time, RFC 3339
+  std::string created_at;
+  /// Compression input summary, as a JSON string; empty when absent
+  std::string inputs_json;
+  /// Compression result summary, as a JSON string; empty when absent
+  std::string outputs_json;
+};
+
+/// Payload of a ChatFinished conversation stream event, observed once all
+/// Message events for this round have been sent, shortly before
+/// WorkflowFinished.
+struct ChatFinishedPayload
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// Empty string in every run observed so far
+  std::string error;
+  /// Empty string in every run observed so far
+  std::string error_message;
+};
+
+/// Payload of a ChatTitleUpdated conversation stream event — the server
+/// auto-generates a short title for the conversation as a UI convenience.
+/// Can arrive before *or* after WorkflowFinished; not tied to the run's
+/// outcome.
+struct ChatTitleUpdatedPayload
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Where the title came from, e.g. "ai_generated"
+  std::string source;
+  /// The new (possibly truncated) title
+  std::string title;
+  /// Unix timestamp in seconds
+  int64_t updated_at;
+};
+
+/// Kind of a ConversationStreamEvent. Only the field matching this kind is
+/// populated, the others are `std::nullopt`.
+enum class ConversationStreamEventKind
+{
+  /// The run has started; `chat_started` is populated
+  ChatStarted,
+  /// Observed right after `ChatStarted` on every run seen so far;
+  /// `workflow_started` is populated
+  WorkflowStarted,
+  /// An incremental piece of the answer; `message` is populated
+  Message,
+  /// A heartbeat with no payload, observed at arbitrary points in the
+  /// stream (including in between `Message` chunks); every field below is
+  /// `std::nullopt`
+  Ping,
+  /// The Agent has entered the reasoning phase; `thinking_started` is
+  /// populated
+  ThinkingStarted,
+  /// The reasoning phase is over; `thinking_finished` is populated
+  ThinkingFinished,
+  /// An ordinary tool call has started; `node_tool_use_started` is
+  /// populated
+  NodeToolUseStarted,
+  /// An ordinary tool call has ended; `node_tool_use_finished` is
+  /// populated
+  NodeToolUseFinished,
+  /// The Agent has spawned a subagent to work on a sub-task;
+  /// `subagent_started` is populated
+  SubagentStarted,
+  /// The subagent has called one of its own tools; `subagent_progress` is
+  /// populated
+  SubagentProgress,
+  /// The subagent has finished its sub-task; `subagent_finished` is
+  /// populated
+  SubagentFinished,
+  /// The Agent has delegated to another Agent as a tool;
+  /// `agent_tool_started` is populated
+  AgentToolStarted,
+  /// The delegated Agent has called one of its own tools;
+  /// `agent_tool_progress` is populated
+  AgentToolProgress,
+  /// The delegated Agent's run has finished; `agent_tool_finished` is
+  /// populated
+  AgentToolFinished,
+  /// The run is paused: the Agent needs more information or confirmation
+  /// from you; `human_interaction_required` is populated. Unlike
+  /// `WorkflowFinished`, this is emitted instead of (never alongside)
+  /// `WorkflowFinished` for the same run
+  HumanInteractionRequired,
+  /// Sensitive content in the user query was masked before processing;
+  /// `query_masked` is populated
+  QueryMasked,
+  /// The Agent created or updated its task plan; `plan_changed` is
+  /// populated
+  PlanChanged,
+  /// A context-compression pass has started; `context_compress_started`
+  /// is populated
+  ContextCompressStarted,
+  /// The context-compression pass has finished;
+  /// `context_compress_finished` is populated
+  ContextCompressFinished,
+  /// Observed once all `Message` events for this round have been sent;
+  /// `chat_finished` is populated
+  ChatFinished,
+  /// The run finished successfully, with a failure, or stopped by the
+  /// user; `workflow_finished` is populated. Never emitted for an
+  /// interrupted run — see `HumanInteractionRequired` for that case
+  WorkflowFinished,
+  /// The server auto-generating a short title for the conversation;
+  /// `chat_title_updated` is populated
+  ChatTitleUpdated,
+  /// An event type not recognized by this SDK version; `other_json` is
+  /// populated with the raw event JSON
+  Other,
+};
+
+/// One event observed while streaming AgentContext::conversation_streamed or
+/// AgentContext::continue_conversation_streamed.
+///
+/// This mirrors the C layer's tagged-union `lb_conversation_stream_event_t`:
+/// `kind` tells you which one of the payload fields below is populated (all
+/// others are `std::nullopt`; when `kind` is `Ping`, none of them are). A
+/// plain discriminated struct is used here (rather than `std::variant` or a
+/// JSON library) since neither has any precedent elsewhere in this C++
+/// binding, and this shape converts directly from the C tagged union.
+struct ConversationStreamEvent
+{
+  /// Discriminant, tells you which field below is populated
+  ConversationStreamEventKind kind;
+  /// Populated when `kind` is `ChatStarted`
+  std::optional<ChatStartedPayload> chat_started;
+  /// Populated when `kind` is `WorkflowStarted`, observed right after
+  /// `ChatStarted` on every run seen so far
+  std::optional<WorkflowStartedPayload> workflow_started;
+  /// Populated when `kind` is `Message`
+  std::optional<MessagePayload> message;
+  /// Populated when `kind` is `ThinkingStarted`, the Agent entering the
+  /// reasoning phase
+  std::optional<ThinkingStartedPayload> thinking_started;
+  /// Populated when `kind` is `ThinkingFinished`, the reasoning phase
+  /// ending
+  std::optional<ThinkingFinishedPayload> thinking_finished;
+  /// Populated when `kind` is `NodeToolUseStarted`, an ordinary tool call
+  /// starting
+  std::optional<NodeToolUseStartedPayload> node_tool_use_started;
+  /// Populated when `kind` is `NodeToolUseFinished`, an ordinary tool call
+  /// ending
+  std::optional<NodeToolUseFinishedPayload> node_tool_use_finished;
+  /// Populated when `kind` is `SubagentStarted`, the Agent spawning a
+  /// subagent to work on a sub-task
+  std::optional<SubagentStartedPayload> subagent_started;
+  /// Populated when `kind` is `SubagentProgress`, the subagent calling one
+  /// of its own tools
+  std::optional<SubagentProgressPayload> subagent_progress;
+  /// Populated when `kind` is `SubagentFinished`, the subagent finishing
+  /// its sub-task
+  std::optional<SubagentFinishedPayload> subagent_finished;
+  /// Populated when `kind` is `AgentToolStarted`, the Agent delegating to
+  /// another Agent as a tool
+  std::optional<AgentToolStartedPayload> agent_tool_started;
+  /// Populated when `kind` is `AgentToolProgress`, the delegated Agent
+  /// calling one of its own tools
+  std::optional<AgentToolProgressPayload> agent_tool_progress;
+  /// Populated when `kind` is `AgentToolFinished`, the delegated Agent's
+  /// run finishing
+  std::optional<AgentToolFinishedPayload> agent_tool_finished;
+  /// Populated when `kind` is `HumanInteractionRequired`, carrying the
+  /// run's outcome for an interrupted run. Unlike `workflow_finished`, this
+  /// is populated instead of (never alongside) `workflow_finished` for the
+  /// same run
+  std::optional<ConversationResponse> human_interaction_required;
+  /// Populated when `kind` is `QueryMasked`, sensitive content in the user
+  /// query having been masked before processing
+  std::optional<QueryMaskedPayload> query_masked;
+  /// Populated when `kind` is `PlanChanged`, the Agent creating or
+  /// updating its task plan
+  std::optional<PlanChangedPayload> plan_changed;
+  /// Populated when `kind` is `ContextCompressStarted`, a
+  /// context-compression pass starting
+  std::optional<ContextCompressStartedPayload> context_compress_started;
+  /// Populated when `kind` is `ContextCompressFinished`, a
+  /// context-compression pass finishing
+  std::optional<ContextCompressFinishedPayload> context_compress_finished;
+  /// Populated when `kind` is `ChatFinished`, observed once all `Message`
+  /// events for this round have been sent
+  std::optional<ChatFinishedPayload> chat_finished;
+  /// Populated when `kind` is `WorkflowFinished`, carrying the run's
+  /// outcome — not necessarily the last event of the stream, since the
+  /// server may still emit a few more housekeeping events before actually
+  /// closing the connection. Never populated for an interrupted run — see
+  /// `human_interaction_required` for that case
+  std::optional<ConversationResponse> workflow_finished;
+  /// Populated when `kind` is `ChatTitleUpdated`, the server auto-generating
+  /// a short title for the conversation
+  std::optional<ChatTitleUpdatedPayload> chat_title_updated;
+  /// Populated when `kind` is `Other`; the SSE envelope's `event` field (the
+  /// event type name)
+  std::optional<std::string> other_event;
+  /// Populated when `kind` is `Other`; raw JSON of an event type not
+  /// recognized by this SDK version
+  std::optional<std::string> other_json;
+};
+
+} // namespace agent
+
+namespace fund {
+
+// ── Request options ──────────────────────────────────────────────────────────
+
+/// Options for the fund list request.
+struct GetFundsOptions
+{
+  /// Server-defined filter object as a raw JSON string
+  std::optional<std::string> filter;
+  /// Quick-filter ids
+  std::vector<int64_t> quick_ids;
+  /// Earning-rate time intervals
+  std::vector<std::string> time_interval;
+};
+
+/// Options for the fund analysis / trend / comparison request.
+struct GetFundAnalysisOptions
+{
+  /// Analysis period
+  std::optional<int32_t> period;
+};
+
+/// Paging options (page / size).
+struct FundPageOptions
+{
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> size;
+};
+
+/// Net-value range options (relative months / years before now).
+struct FundNavRangeOptions
+{
+  /// Number of months before now
+  std::optional<int32_t> month_before;
+  /// Number of years before now
+  std::optional<int32_t> year_before;
+};
+
+/// Options for the fund holdings request.
+struct GetFundHoldingsOptions
+{
+  /// Scene
+  std::optional<int32_t> scene;
+};
+
+/// Options for the fund stock-holdings (reverse) request.
+struct GetFundStockHoldingsOptions
+{
+  /// Maximum number of stocks to return
+  std::optional<int32_t> limit;
+};
+
+/// Options for the fund positions overview request.
+struct GetFundPositionsOptions
+{
+  /// Account channel
+  std::optional<std::string> account_channel;
+  /// Account id
+  std::optional<int64_t> aaid;
+};
+
+/// Options for a single fund position detail request.
+struct GetFundPositionOptions
+{
+  /// Account channel
+  std::optional<std::string> account_channel;
+  /// Account id
+  std::optional<int64_t> aaid;
+  /// Range start
+  std::optional<std::string> start;
+  /// Range end
+  std::optional<std::string> end;
+};
+
+/// Options for a single fund position cumulative-profit request.
+struct GetFundPositionProfitsOptions
+{
+  /// Account channel
+  std::optional<std::string> account_channel;
+  /// Account id
+  std::optional<int64_t> aaid;
+  /// Range start
+  std::optional<std::string> start;
+  /// Range end
+  std::optional<std::string> end;
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> size;
+};
+
+/// Options for a single fund position dividend request.
+struct GetFundPositionDividendsOptions
+{
+  /// Account channel
+  std::optional<std::string> account_channel;
+  /// Account id
+  std::optional<int64_t> aaid;
+  /// Currency
+  std::optional<std::string> currency;
+  /// Range start (unix seconds)
+  std::optional<int64_t> start;
+  /// Range end (unix seconds)
+  std::optional<int64_t> end;
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> size;
+};
+
+/// Options for the fund orders list request.
+struct GetFundOrdersOptions
+{
+  /// Filter by fund counter ids
+  std::vector<std::string> counter_ids;
+  /// Filter by actions (comma-separated)
+  std::optional<std::string> actions;
+  /// Filter by states (comma-separated)
+  std::optional<std::string> states;
+  /// Filter by currency
+  std::optional<std::string> currency;
+  /// Range start (unix seconds)
+  std::optional<int64_t> start;
+  /// Range end (unix seconds)
+  std::optional<int64_t> end;
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> size;
+};
+
+/// Options for the fund transactions (cash-flow) list request.
+struct GetFundTransactionsOptions
+{
+  /// Account channel
+  std::optional<std::string> account_channel;
+  /// Business type
+  std::optional<std::string> business_type;
+  /// Category
+  std::optional<std::string> category;
+  /// Currencies (comma-separated)
+  std::optional<std::string> currencies;
+  /// Range start (unix seconds)
+  std::optional<int64_t> start;
+  /// Range end (unix seconds)
+  std::optional<int64_t> end;
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> size;
+};
+
+/// Options for validating a fund order.
+struct ValidateFundOrderOptions
+{
+  /// Fund counter id
+  std::string counter_id;
+  /// Action (buy/sell)
+  std::string action;
+  /// Currency
+  std::string currency;
+  /// Amount (for amount-based orders)
+  std::optional<std::string> amount;
+  /// Units (for unit-based orders)
+  std::optional<std::string> units;
+  /// Dividend option
+  std::optional<int32_t> dividend_option;
+  /// Fund source
+  std::optional<int32_t> fund_source;
+  /// Account channel
+  std::optional<std::string> account_channel;
+};
+
+/// Options for submitting a fund order.
+struct SubmitFundOrderOptions
+{
+  /// Fund counter id
+  std::string counter_id;
+  /// Action (buy/sell)
+  std::string action;
+  /// Currency
+  std::string currency;
+  /// Amount (for amount-based orders)
+  std::optional<std::string> amount;
+  /// Units (for unit-based orders)
+  std::optional<std::string> units;
+  /// Dividend option
+  std::optional<int32_t> dividend_option;
+  /// Fee
+  std::optional<std::string> fee;
+  /// Whether to sell all
+  std::optional<bool> is_sell_all;
+  /// Remark
+  std::optional<std::string> remark;
+  /// Trade method
+  std::optional<int32_t> trade_method;
+};
+
+// ── Response types ───────────────────────────────────────────────────────────
+
+/// A fund net-asset-value data point (latest / historical).
+struct FundNavValue
+{
+  /// Net value change
+  std::string change;
+  /// Net value change percent
+  std::string change_percent;
+  /// Formatted change percent
+  std::string change_percent_format;
+  /// Fund counter id
+  std::string counter_id;
+  /// Fund name
+  std::string counter_name;
+  /// Currency
+  std::string currency;
+  /// Formatted date
+  std::string date_format;
+  /// ISIN
+  std::string isin;
+  /// Last update time (unix seconds)
+  int64_t last_update_time;
+  /// Net value
+  std::string value;
+  /// Formatted net value
+  std::string value_format;
+};
+
+/// A recent performance point used by the hot-fund list.
+struct FundPerformancePoint
+{
+  /// Date
+  std::string date;
+  /// Last done value
+  std::string last_done;
+};
+
+/// A hot-selling fund entry.
+struct HotFund
+{
+  /// Asset class
+  int32_t asset_class;
+  /// Asset class name
+  std::string asset_class_name;
+  /// Fund counter id
+  std::string counter_id;
+  /// Currency
+  std::string currency;
+  /// Earning rate
+  std::string earning_rate;
+  /// Recent performance points
+  std::vector<FundPerformancePoint> fund_performances;
+  /// Fund name
+  std::string name;
+  /// Minimum purchase amount
+  std::string purchase_amount;
+  /// Recommendation text
+  std::string recommendation_text;
+  /// Risk level
+  int32_t risk_level;
+  /// Risk level name
+  std::string risk_level_name;
+  /// Time interval of the earning rate
+  std::string time_interval;
+};
+
+/// A fund entry in the fund list.
+struct FundBrief
+{
+  /// Asset class
+  int32_t asset_class;
+  /// Asset class name
+  std::string asset_class_name;
+  /// Fund code
+  std::string code;
+  /// Fund counter id
+  std::string counter_id;
+  /// Currency
+  std::string currency;
+  /// Description
+  std::string description;
+  /// Earning rate
+  std::string earning_rate;
+  /// Whether the user is holding this fund
+  bool holding;
+  /// ISIN
+  std::string isin;
+  /// Fund name
+  std::string name;
+  /// Product
+  std::string product;
+  /// Minimum purchase amount
+  std::string purchase_amount;
+  /// Recommendation text
+  std::string recommendation_text;
+  /// Risk level
+  int32_t risk_level;
+  /// Risk level name
+  std::string risk_level_name;
+  /// Time interval of the earning rate
+  std::string time_interval;
+  /// Unit value
+  std::string unit_value;
+};
+
+/// Fund list filter options. Each list holds raw JSON option objects.
+struct FundFilters
+{
+  /// Asset class options (raw JSON strings)
+  std::vector<std::string> asset_class;
+  /// Company options (raw JSON strings)
+  std::vector<std::string> company;
+  /// Currency options (raw JSON strings)
+  std::vector<std::string> currency;
+  /// Industry category options (raw JSON strings)
+  std::vector<std::string> industry_category_name;
+  /// Risk level options (raw JSON strings)
+  std::vector<std::string> risk_level;
+};
+
+/// A single holding entry inside a fund's asset allocation.
+struct FundAssetAllocationItem
+{
+  /// Security code
+  std::string code;
+  /// Security counter id
+  std::string counter_id;
+  /// Name
+  std::string name;
+  /// Position ratio
+  std::string position_ratio;
+};
+
+/// A fund's asset allocation.
+struct FundAssetAllocation
+{
+  /// Asset type
+  int32_t asset_type;
+  /// Allocation entries
+  std::vector<FundAssetAllocationItem> lists;
+  /// Report date
+  std::string report_date;
+};
+
+/// Fund detail.
+struct FundDetail
+{
+  /// Additional purchase amount
+  std::string additional_purchase_amount;
+  /// Affirm day
+  int32_t affirm_day;
+  /// Amount affirm day
+  std::string amount_affirm_day;
+  /// Asset allocation
+  std::optional<FundAssetAllocation> asset_allocation;
+  /// Asset class
+  int32_t asset_class;
+  /// Asset class name
+  std::string asset_class_name;
+  /// Bill purchase rate
+  std::string bill_purchase_rate;
+  /// Channel
+  std::string channel;
+  /// Close period
+  std::string close_period;
+  /// Fund code
+  std::string code;
+  /// Currency
+  std::string currency;
+  /// Cut off time
+  std::string cut_off_time;
+  /// Whether it is a derivative
+  bool derivatives;
+  /// Done day
+  int32_t done_day;
+  /// Excess return fee
+  std::string excess_return_fee;
+  /// GST rate
+  std::string gst_rate;
+  /// Introduction
+  std::string introduce;
+  /// Whether it is a cash-plus fund
+  bool is_cash_plus;
+  /// Whether it is a complex product
+  bool is_complex;
+  /// Whether it is a new cash-plus fund
+  bool is_new_cash_plus;
+  /// Whether it is a Yinghebao fund
+  bool is_yinghebao;
+  /// ISIN
+  std::string isin;
+  /// Management rate
+  std::string manage_rate;
+  /// Manager
+  std::string manager;
+  /// Minimum holding cash
+  std::string min_hold_cash;
+  /// Minimum holding share
+  std::string min_hold_share;
+  /// Minimum sell share
+  std::string min_sell_share;
+  /// Month raise day
+  std::string month_raise_day;
+  /// Fund name
+  std::string name;
+  /// Net value deadline
+  std::string nav_deadline;
+  /// Whether it is no-load
+  bool no_load;
+  /// Open date
+  std::string open_date;
+  /// Open period
+  std::string open_period;
+  /// Product
+  std::string product;
+  /// Product information locals
+  std::string product_information_locals;
+  /// Profile
+  std::string profile;
+  /// Whether purchasable
+  int32_t purchasable;
+  /// Purchase affirm day
+  std::string purchase_affirm_day;
+  /// Minimum purchase amount
+  std::string purchase_amount;
+  /// Purchase rate
+  std::string purchase_rate;
+  /// Rating
+  int32_t rating;
+  /// Whether redeemable
+  int32_t redeemable;
+  /// Redemption advance day
+  std::string redemption_advance_day;
+  /// Redemption amount
+  std::string redemption_amount;
+  /// Redemption close period text
+  std::string redemption_close_period_shows;
+  /// Redemption done day
+  std::string redemption_done_day;
+  /// Redemption open day text
+  std::string redemption_open_day_shows;
+  /// Risk level
+  int32_t risk_level;
+  /// Risk level name
+  std::string risk_level_name;
+  /// Verify status
+  int32_t verify_status;
+  /// Whether it is a virtual currency fund
+  bool virtual_currency;
+  /// Year to date yield
+  std::string year_to_date_yield;
+  /// Year to date yield type
+  int32_t ytd_yield_type;
+};
+
+/// Fund analysis (level 1).
+struct FundAnalysis
+{
+  /// Actual period
+  int32_t actual_period;
+  /// Cost level (raw JSON string)
+  std::string cost_level;
+  /// Return ability (raw JSON string)
+  std::string return_ability;
+  /// Risk ability (raw JSON string)
+  std::string risk_ability;
+  /// Updated at
+  std::string updated_at;
+  /// Value for money (raw JSON string)
+  std::string value_for_money;
+  /// Whether visible
+  bool visible;
+};
+
+/// Fund analysis detail (level 2).
+struct FundAnalysisDetail
+{
+  /// Actual period
+  int32_t actual_period;
+  /// Available periods
+  std::vector<int32_t> available_periods;
+  /// Cost level (raw JSON string)
+  std::string cost_level;
+  /// Return ability (raw JSON string)
+  std::string return_ability;
+  /// Risk ability (raw JSON string)
+  std::string risk_ability;
+  /// Updated at
+  std::string updated_at;
+  /// Value for money (raw JSON string)
+  std::string value_for_money;
+  /// Whether visible
+  bool visible;
+};
+
+/// A benchmark contrast series in a fund trend chart.
+struct FundTrendContrast
+{
+  /// Benchmark name
+  std::string benchmark_name;
+  /// Performance points (raw JSON strings)
+  std::vector<std::string> performances;
+};
+
+/// Fund trend chart.
+struct FundTrend
+{
+  /// Actual period
+  int32_t actual_period;
+  /// Available periods
+  std::vector<int32_t> available_periods;
+  /// Category average performances (raw JSON strings)
+  std::vector<std::string> category_average_performances;
+  /// Benchmark contrast performances
+  std::optional<FundTrendContrast> contrast_performances;
+  /// Fund performances (raw JSON strings)
+  std::vector<std::string> fund_performances;
+};
+
+/// A named contrast performance series.
+struct FundNamedContrast
+{
+  /// Series name
+  std::string name;
+  /// Performance points (raw JSON strings)
+  std::vector<std::string> performances;
+};
+
+/// Fund performance comparison.
+struct FundPerformanceComparison
+{
+  /// Contrast performance series
+  std::vector<FundNamedContrast> contrast_performances;
+  /// Fund performances (raw JSON strings)
+  std::vector<std::string> fund_performances;
+};
+
+/// A fund annual return entry.
+struct FundAnnualReturn
+{
+  /// Change percent
+  std::string change_percent;
+  /// Year
+  int32_t year;
+};
+
+/// A fund quarterly return entry.
+struct FundQuarterlyReturn
+{
+  /// Change percent
+  std::string change_percent;
+  /// Quarter
+  int32_t quarter;
+  /// Year
+  int32_t year;
+};
+
+/// A fund's detailed performance figures.
+struct FundPerformance
+{
+  /// Annualized return (5y)
+  std::string annualized_return_five;
+  /// Annualized return (1y)
+  std::string annualized_return_one;
+  /// Annualized return (10y)
+  std::string annualized_return_ten;
+  /// Annualized return (3y)
+  std::string annualized_return_three;
+  /// Annualized return (2y)
+  std::string annualized_return_two;
+  /// Fund counter id
+  std::string counter_id;
+  /// Fund name
+  std::string fund_name;
+  /// Rank (5y)
+  int32_t performance_rank_five_years;
+  /// Rank (1d)
+  int32_t performance_rank_one_day;
+  /// Rank (1m)
+  int32_t performance_rank_one_month;
+  /// Rank (1w)
+  int32_t performance_rank_one_week;
+  /// Rank (1y)
+  int32_t performance_rank_one_year;
+  /// Rank (6m)
+  int32_t performance_rank_six_months;
+  /// Rank (10y)
+  int32_t performance_rank_ten_years;
+  /// Rank (3m)
+  int32_t performance_rank_three_months;
+  /// Rank (3y)
+  int32_t performance_rank_three_years;
+  /// Rank (2y)
+  int32_t performance_rank_two_years;
+  /// Rank (ytd)
+  int32_t performance_rank_ytd;
+  /// Return (5y)
+  std::string performance_return_five_years;
+  /// Return (1d)
+  std::string performance_return_one_day;
+  /// Return (1m)
+  std::string performance_return_one_month;
+  /// Return (1w)
+  std::string performance_return_one_week;
+  /// Return (1y)
+  std::string performance_return_one_year;
+  /// Return (6m)
+  std::string performance_return_six_months;
+  /// Return (10y)
+  std::string performance_return_ten_years;
+  /// Return (3m)
+  std::string performance_return_three_months;
+  /// Return (3y)
+  std::string performance_return_three_years;
+  /// Return (2y)
+  std::string performance_return_two_years;
+  /// Return (ytd)
+  std::string performance_return_ytd;
+  /// Total peers (5y)
+  int32_t performance_total_five_years;
+  /// Total peers (1d)
+  int32_t performance_total_one_day;
+  /// Total peers (1m)
+  int32_t performance_total_one_month;
+  /// Total peers (1w)
+  int32_t performance_total_one_week;
+  /// Total peers (1y)
+  int32_t performance_total_one_year;
+  /// Total peers (6m)
+  int32_t performance_total_six_months;
+  /// Total peers (10y)
+  int32_t performance_total_ten_years;
+  /// Total peers (3m)
+  int32_t performance_total_three_months;
+  /// Total peers (3y)
+  int32_t performance_total_three_years;
+  /// Total peers (2y)
+  int32_t performance_total_two_years;
+  /// Total peers (ytd)
+  int32_t performance_total_ytd;
+  /// Seven days annualized
+  std::string seven_days_annualized;
+  /// Ten thousand price
+  std::string ten_thousand_price;
+  /// Update time (unix seconds)
+  int64_t update_time;
+};
+
+/// A single fund holding (top-10 holdings).
+struct FundHolding
+{
+  /// Bond type
+  std::string bond_type;
+  /// Bond type name
+  std::string bond_type_name;
+  /// Country name
+  std::string country_name;
+  /// Holding type
+  std::string holding_type;
+  /// Industry name
+  std::string industry_name;
+  /// Market value
+  std::string market_value;
+  /// Maturity date
+  std::string maturity_date;
+  /// Name
+  std::string name;
+  /// Share change
+  std::string share_change;
+  /// Share change percent
+  std::string share_change_percent;
+  /// Shares
+  std::string shares;
+  /// Weighting
+  std::string weighting;
+};
+
+/// A fund's top-10 holdings.
+struct FundHoldings
+{
+  /// Holding entries
+  std::vector<FundHolding> holdings;
+  /// Report date
+  std::string report_date;
+  /// Total weighting
+  std::string weighting;
+};
+
+/// A stock held by the fund (reverse lookup).
+struct FundStockHolding
+{
+  /// Stock code
+  std::string code;
+  /// Stock counter id
+  std::string counter_id;
+  /// Currency
+  std::string currency;
+  /// Stock name
+  std::string name;
+  /// Position ratio
+  std::string position_ratio;
+  /// Report date
+  std::string report_date;
+};
+
+/// A single fund position held by the user.
+struct FundPosition
+{
+  /// Holding amount
+  std::string amount;
+  /// Fund counter id
+  std::string counter_id;
+  /// Currency
+  std::string currency;
+  /// Frozen units
+  std::string freeze_units;
+  /// Holding profit
+  std::string holding_profit;
+  /// Holding units
+  std::string holding_units;
+  /// Fund name
+  std::string name;
+  /// Recent profit
+  std::string recent_profit;
+  /// Recent trading day (unix seconds)
+  int64_t recent_trading_day;
+  /// Accumulated recent profit
+  std::string sum_recent_profit;
+};
+
+/// The user's fund positions overview.
+struct FundPositions
+{
+  /// Account channel
+  std::string account_channel;
+  /// Position entries
+  std::vector<FundPosition> list;
+  /// Pending buy orders amount
+  std::string pending_buy_orders;
+  /// Recent trading day (unix seconds)
+  int64_t recent_trading_day;
+  /// Sold pending credit orders amount
+  std::string sold_pending_credit_orders;
+};
+
+/// A dated value point.
+struct FundDatedValue
+{
+  /// Date (unix seconds)
+  int64_t date;
+  /// Value
+  std::string value;
+};
+
+/// A fund unit-value point (position view).
+struct FundUnitValue
+{
+  /// Date (unix seconds)
+  int64_t date;
+  /// Day increase rate
+  std::string day_increase_rate;
+  /// Total value
+  std::string total_value;
+  /// Unit value
+  std::string unit_value;
+};
+
+/// Detail values of a single fund position.
+struct FundPositionDetailValues
+{
+  /// Amount
+  std::string amount;
+  /// Currency
+  std::string currency;
+  /// Holding cost
+  std::string holding_cost;
+  /// Holding profit
+  std::string holding_profit;
+  /// Holding profit rate
+  std::string holding_profit_rate;
+  /// Holding units
+  std::string holding_units;
+  /// Holding value
+  std::string holding_value;
+  /// Pending buy value
+  std::string pending_buy_value;
+  /// Pending sell value
+  std::string pending_sell_value;
+  /// Accumulated profit (to date)
+  std::string profit_amount_accum_td;
+  /// Accumulated profit rate (to date)
+  std::string profit_amount_accum_td_rate;
+  /// Recent profit
+  std::string recent_profit;
+  /// Recent trading day (unix seconds)
+  int64_t recent_tradingday;
+  /// Recent unit value
+  std::string recent_unit_value;
+  /// Sold pending-confirm units
+  std::string sold_pending_confirm_units;
+};
+
+/// Detail of a single fund position.
+struct FundPositionDetail
+{
+  /// Detail values
+  std::optional<FundPositionDetailValues> detail_values;
+  /// Accumulated profit series
+  std::vector<FundDatedValue> sum_profit;
+  /// Unit value series
+  std::vector<FundUnitValue> ut_value;
+};
+
+/// Performance figures for a held fund.
+struct FundPositionPerformance
+{
+  /// Annualized return (5y)
+  std::string annualized_return_five;
+  /// Annualized return (1y)
+  std::string annualized_return_one;
+  /// Annualized return (10y)
+  std::string annualized_return_ten;
+  /// Annualized return (3y)
+  std::string annualized_return_three;
+  /// Annualized return (2y)
+  std::string annualized_return_two;
+  /// Fund counter id
+  std::string counter_id;
+  /// Fund name
+  std::string fund_name;
+  /// Return (5y)
+  std::string performance_return_five_years;
+  /// Return (1d)
+  std::string performance_return_one_day;
+  /// Return (1m)
+  std::string performance_return_one_month;
+  /// Return (1w)
+  std::string performance_return_one_week;
+  /// Return (1y)
+  std::string performance_return_one_year;
+  /// Return (6m)
+  std::string performance_return_six_months;
+  /// Return (10y)
+  std::string performance_return_ten_years;
+  /// Return (3m)
+  std::string performance_return_three_months;
+  /// Return (3y)
+  std::string performance_return_three_years;
+  /// Return (2y)
+  std::string performance_return_two_years;
+  /// Return (ytd)
+  std::string performance_return_ytd;
+  /// Update time (unix seconds)
+  int64_t update_time;
+};
+
+/// The user's cumulative profit for a held fund.
+struct FundPositionProfits
+{
+  /// Currency
+  std::string currency;
+  /// Profit series
+  std::vector<FundDatedValue> history_value;
+  /// Last update time (unix seconds)
+  int64_t last_update_time;
+  /// Total profit
+  std::string sum_profit;
+};
+
+/// A held-fund net-value point (position view).
+struct FundPositionNav
+{
+  /// Net value change
+  std::string change;
+  /// Net value change percent
+  std::string change_percent;
+  /// Fund counter id
+  std::string counter_id;
+  /// Fund name
+  std::string counter_name;
+  /// Last update time (unix seconds)
+  int64_t last_update_time;
+  /// Net value
+  std::string value;
+};
+
+/// A cash dividend record for a held fund.
+struct FundDividend
+{
+  /// Amount
+  std::string amount;
+  /// Fund counter id
+  std::string counter_id;
+  /// Currency
+  std::string currency;
+  /// Date (unix seconds)
+  int64_t date;
+  /// Dividend method
+  std::string div_method;
+  /// Fund name
+  std::string name;
+};
+
+/// The user's dividend records for a held fund.
+struct FundDividends
+{
+  /// Currency
+  std::string currency;
+  /// Dividend records
+  std::vector<FundDividend> div_cash_infos;
+  /// Latest dividend date (unix seconds)
+  int64_t lastest_date;
+  /// Total cash dividend
+  std::string total_div_cash;
+};
+
+/// A fund order (list view).
+struct FundOrder
+{
+  /// Action (buy/sell)
+  std::string action;
+  /// Amount
+  std::string amount;
+  /// Fund counter id
+  std::string counter_id;
+  /// Created at (unix seconds)
+  int64_t created_at;
+  /// Currency
+  std::string currency;
+  /// Fund name
+  std::string fund_name;
+  /// Order id
+  int64_t id;
+  /// Whether it is an auto (DCA) order
+  bool is_auto;
+  /// Net worth
+  std::string net_worth;
+  /// Product type
+  std::string product_type;
+  /// State
+  std::string state;
+  /// State description
+  std::string state_desc;
+  /// Units
+  std::string units;
+};
+
+/// A keyword block in a fund order detail.
+struct FundOrderKeyword
+{
+  /// Content
+  std::string content;
+  /// Group
+  std::string group;
+  /// Key
+  std::string key;
+  /// Line strategy
+  std::string line_strategy;
+  /// Title
+  std::string title;
+};
+
+/// A processing stage in a fund order detail.
+struct FundOrderStage
+{
+  /// Description
+  std::string desc;
+  /// Key
+  std::string key;
+  /// Link
+  std::string link;
+  /// Link text
+  std::string link_text;
+  /// Progress
+  std::string progress;
+  /// Stage
+  std::string stage;
+};
+
+/// The full information of a fund order.
+struct FundOrderInfo
+{
+  /// Account id
+  int64_t aaid;
+  /// Account channel
+  std::string account_channel;
+  /// Action (buy/sell)
+  std::string action;
+  /// Amount
+  std::string amount;
+  /// Channel
+  std::string channel;
+  /// Fund counter id
+  std::string counter_id;
+  /// Created at (unix seconds)
+  int64_t created_at;
+  /// Currency
+  std::string currency;
+  /// Dividend option
+  std::string dividend_option;
+  /// Equity time (unix seconds)
+  int64_t eq_at;
+  /// Fee
+  std::string fee;
+  /// Fund name
+  std::string fund_name;
+  /// Fund source
+  std::string fund_source;
+  /// Histories
+  std::string histories;
+  /// Order id
+  int64_t id;
+  /// Message
+  std::string message;
+  /// Net worth
+  std::string net_worth;
+  /// Price time (unix seconds)
+  int64_t price_at;
+  /// Processed at (unix seconds)
+  int64_t processed_at;
+  /// Product type
+  std::string product_type;
+  /// Whether repurchaseable
+  bool repurchaseable;
+  /// Sale proceeds
+  std::string sale_proceeds;
+  /// Sales charge
+  std::string sales_charge;
+  /// Sales price
+  std::string sales_price;
+  /// Sales unit
+  std::string sales_unit;
+  /// State
+  std::string state;
+  /// State description
+  std::string state_desc;
+  /// Status
+  int32_t status;
+  /// Extended status
+  int32_t status_ex;
+  /// T+ description
+  std::string t_description;
+  /// Time partition
+  std::string time_partition;
+  /// Total amount
+  std::string total_amount;
+  /// Transaction at (unix seconds)
+  int64_t transaction_at;
+  /// Units
+  std::string units;
+  /// Withdraw at (unix seconds)
+  int64_t withdraw_at;
+  /// Whether withdrawable
+  bool withdrawable;
+};
+
+/// Fund order detail.
+struct FundOrderDetail
+{
+  /// Keyword blocks
+  std::vector<FundOrderKeyword> keywords;
+  /// The order
+  std::optional<FundOrderInfo> order;
+  /// Processing stages
+  std::vector<FundOrderStage> stages;
+};
+
+/// A fund transaction / cash-flow record.
+struct FundTransaction
+{
+  /// Amount
+  std::string amount;
+  /// Category
+  std::string category;
+  /// Created at (unix seconds)
+  int64_t created_at;
+  /// Currency
+  std::string currency;
+  /// Description
+  std::string description;
+  /// Detail created at (unix seconds)
+  int64_t detail_created_at;
+  /// Detail type
+  std::string detail_type;
+  /// Done at (unix seconds)
+  int64_t done_at;
+  /// Quantity description
+  std::string quantity_description;
+  /// Redirect page
+  std::string redirect_page;
+  /// Redirect page (v2)
+  std::string redirect_page_v2;
+  /// Reference number
+  std::string ref_no;
+  /// Stock quantity
+  std::string stock_quantity;
+  /// Transaction type
+  std::string tx_type;
+  /// Type name
+  std::string type_name;
+};
+
+/// The result of validating a fund order.
+struct FundOrderValidation
+{
+  /// Auth token to carry into submit
+  std::string auth_token;
+  /// Risk-assessment eval address
+  std::string eval_address;
+  /// Fund risk level
+  int32_t fund_risk_level;
+  /// Message
+  std::string msg;
+  /// User PI status
+  int32_t user_pi;
+  /// User risk level
+  int32_t user_risk_level;
+};
+
+/// The result of submitting a fund order.
+struct FundOrderSubmitResponse
+{
+  /// Action (buy/sell)
+  std::string action;
+  /// Amount
+  std::string amount;
+  /// Fund counter id
+  std::string counter_id;
+  /// Created at (unix seconds)
+  int64_t created_at;
+  /// Fund name
+  std::string fund_name;
+  /// Order id
+  int64_t id;
+  /// Message
+  std::string msg;
+  /// Status
+  int32_t status;
+  /// Units
+  std::string units;
+};
+
+} // namespace fund
+
 } // namespace longbridge
+

@@ -18,6 +18,8 @@ pub struct GetTodayOrdersOptions {
     market: Option<Market>,
     #[serde(skip_serializing_if = "Option::is_none")]
     order_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    is_attached: Option<bool>,
 }
 
 impl GetTodayOrdersOptions {
@@ -73,6 +75,17 @@ impl GetTodayOrdersOptions {
     pub fn order_id(self, order_id: String) -> Self {
         Self {
             order_id: Some(order_id),
+            ..self
+        }
+    }
+
+    /// When set together with [`order_id`], indicates that `order_id` is an
+    /// attached sub-order ID. The server returns the attached sub-order itself
+    /// as an [`Order`] entry (not the parent order). Has no effect without
+    /// [`order_id`].
+    pub fn is_attached(self) -> Self {
+        Self {
+            is_attached: Some(true),
             ..self
         }
     }

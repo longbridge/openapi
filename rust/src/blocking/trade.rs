@@ -4,12 +4,17 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
-        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
-        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
+        AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
+        EstimateMaxPurchaseQuantityOptions, EstimateMaxPurchaseQuantityResponse, Execution,
+        FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
-        Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, GetUSAvailableHoldingOptions, GetUSHistoryOrders,
+        GetUSRealizedPLOptions, GetUSTransactionHistoryOptions, MarginRatio, Order, OrderDetail,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, SubmitOrderResponse, TopicType,
+        TradeContext, USAssetOverview, USAvailableHolding, USCashAndBuyPower, USExchangeRates,
+        USOrderDetailResponse, USRealizedPL, USTransactionHistory,
     },
 };
 
@@ -48,6 +53,8 @@ impl TradeContextSync {
     }
 
     /// Get history executions
+    ///
+    /// `side` may be `Unknown` on Longbridge US accounts.
     ///
     /// # Examples
     ///
@@ -109,6 +116,18 @@ impl TradeContextSync {
     ) -> Result<Vec<Execution>> {
         self.rt
             .call(move |ctx| async move { ctx.today_executions(options).await })
+    }
+
+    /// Get all executions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `history_executions` instead.
+    pub fn all_executions(
+        &self,
+        options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,
+    ) -> Result<AllExecutionsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.all_executions(options).await })
     }
 
     /// Get history orders
@@ -259,6 +278,17 @@ impl TradeContextSync {
             .call(move |ctx| async move { ctx.submit_order(options).await })
     }
 
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    pub fn submit_multileg(
+        &self,
+        options: SubmitMultiLegOrderOptions,
+    ) -> Result<SubmitOrderResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.submit_multileg(options).await })
+    }
+
     /// Cancel order
     ///
     /// # Examples
@@ -278,12 +308,18 @@ impl TradeContextSync {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn cancel_order(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
+    pub fn cancel_order(
+        &self,
+        options: impl Into<CancelOrderOptions> + Send + 'static,
+    ) -> Result<()> {
         self.rt
-            .call(move |ctx| async move { ctx.cancel_order(order_id).await })
+            .call(move |ctx| async move { ctx.cancel_order(options).await })
     }
 
     /// Get account balance
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
     ///
     /// # Examples
     ///
@@ -311,6 +347,9 @@ impl TradeContextSync {
 
     /// Get cash flow
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -337,6 +376,9 @@ impl TradeContextSync {
     }
 
     /// Get fund positions
+    ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     ///
     /// # Examples
     ///
@@ -366,6 +408,9 @@ impl TradeContextSync {
 
     /// Get stock positions
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -394,6 +439,10 @@ impl TradeContextSync {
 
     /// Get margin ratio
     ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -419,6 +468,9 @@ impl TradeContextSync {
 
     /// Get order detail
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
+    ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/order/order_detail>
     ///
     /// # Examples
@@ -441,10 +493,10 @@ impl TradeContextSync {
     /// ```
     pub fn order_detail(
         &self,
-        order_id: impl Into<String> + Send + 'static,
+        options: impl Into<GetOrderDetailOptions> + Send + 'static,
     ) -> Result<OrderDetail> {
         self.rt
-            .call(move |ctx| async move { ctx.order_detail(order_id).await })
+            .call(move |ctx| async move { ctx.order_detail(options).await })
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
@@ -455,5 +507,82 @@ impl TradeContextSync {
     ) -> Result<EstimateMaxPurchaseQuantityResponse> {
         self.rt
             .call(move |ctx| async move { ctx.estimate_max_purchase_quantity(opts).await })
+    }
+
+    // ── US-market blocking wrappers
+    // ───────────────────────────────────────────
+
+    /// Query the paginated US order list (blocking)
+    ///
+    /// US token required.
+    pub fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_query_orders(opts).await })
+    }
+
+    /// Get US order detail (blocking)
+    ///
+    /// US token required.
+    pub fn us_order_detail(
+        &self,
+        order_id: impl Into<String> + Send + 'static,
+    ) -> Result<USOrderDetailResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_order_detail(order_id).await })
+    }
+
+    /// Get the full US account asset overview (blocking)
+    ///
+    /// US token required.
+    pub fn us_asset_overview(&self) -> Result<USAssetOverview> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_asset_overview().await })
+    }
+
+    /// Get realized P&L for the US account (blocking)
+    ///
+    /// US token required.
+    pub fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_realized_pl(opts).await })
+    }
+
+    /// Get cash, buying power and margin status for the US account (blocking)
+    ///
+    /// US token required.
+    pub fn us_cash_and_buy_power(&self, currency: Option<&str>) -> Result<USCashAndBuyPower> {
+        let currency = currency.map(ToString::to_string);
+        self.rt
+            .call(move |ctx| async move { ctx.us_cash_and_buy_power(currency.as_deref()).await })
+    }
+
+    /// Get the quantity of a US holding that is available to trade (blocking)
+    ///
+    /// US token required.
+    pub fn us_available_holding(
+        &self,
+        opts: GetUSAvailableHoldingOptions,
+    ) -> Result<USAvailableHolding> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_available_holding(opts).await })
+    }
+
+    /// Get the US account transaction history (blocking)
+    ///
+    /// US token required.
+    pub fn us_transaction_history(
+        &self,
+        opts: GetUSTransactionHistoryOptions,
+    ) -> Result<USTransactionHistory> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_transaction_history(opts).await })
+    }
+
+    /// Get the exchange rates used by the US account (blocking)
+    ///
+    /// US token required.
+    pub fn us_exchange_rates(&self) -> Result<USExchangeRates> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_exchange_rates().await })
     }
 }

@@ -1,5 +1,7 @@
 package com.longbridge;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * OAuth 2.0 client handle for Longbridge OpenAPI
  *
@@ -23,7 +25,7 @@ public class OAuth implements AutoCloseable {
     /**
      * @hidden
      */
-    final long raw;
+    long raw;
 
     /**
      * @hidden
@@ -39,11 +41,55 @@ public class OAuth implements AutoCloseable {
      * @return raw native pointer
      */
     long getRaw() {
-        return this.raw;
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException("OAuth has already been closed");
+        }
+        return r;
+    }
+
+    /**
+     * Revoke the current token on the server (RFC 7009).
+     *
+     * <p>
+     * The refresh token is revoked when present, otherwise the access token.
+     * Only the server is contacted; the cached token on disk is left untouched
+     * (see {@link #clear()}).
+     *
+     * @return A Future that completes when the token has been revoked
+     * @throws IllegalStateException If the handle has already been closed
+     */
+    public synchronized CompletableFuture<Void> revoke() {
+        long r = getRaw();
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.oauthRevoke(r, callback);
+        });
+    }
+
+    /**
+     * Clear the token locally.
+     *
+     * <p>
+     * Drops the in-memory token and deletes the cached token file
+     * ({@code ~/.longbridge/openapi/tokens/<clientId>}). The server is not
+     * contacted (see {@link #revoke()}).
+     *
+     * @return A Future that completes when the local token has been cleared
+     * @throws IllegalStateException If the handle has already been closed
+     */
+    public synchronized CompletableFuture<Void> clear() {
+        long r = getRaw();
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.oauthClear(r, callback);
+        });
     }
 
     @Override
-    public void close() {
-        SdkNative.freeOAuth(this.raw);
+    public synchronized void close() {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeOAuth(h);
+        }
     }
 }

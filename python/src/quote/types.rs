@@ -156,6 +156,35 @@ pub(crate) enum OptionDirection {
     Call,
 }
 
+/// Special expiration cycle of an option contract
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::quote::OptionExpiryCycleType")]
+pub(crate) enum OptionExpiryCycleType {
+    /// Unknown
+    Unknown,
+    /// Standard monthly option
+    Monthly,
+    /// Weekly option, expires weekly
+    Weekly,
+    /// Quarterly option, expires quarterly
+    Quarterly,
+}
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action (e.g. a stock split or a merger)
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::quote::OptionStandardAttr")]
+pub(crate) enum OptionStandardAttr {
+    /// Unknown
+    Unknown,
+    /// A normal, active contract
+    Normal,
+    /// A legacy contract produced by a corporate action
+    Old,
+}
+
 /// Warrant type
 #[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
@@ -656,19 +685,30 @@ pub(crate) struct Candlestick {
     trade_session: TradeSession,
 }
 
-/// Strike price info
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::StrikePriceInfo")]
-pub(crate) struct StrikePriceInfo {
+#[py(remote = "longbridge::quote::OptionChainContract")]
+pub(crate) struct OptionChainContract {
+    /// Option contract code, in `ticker.region` format
+    symbol: String,
+    /// Expiry date, in US Eastern time
+    expiry_date: PyDateWrapper,
     /// Strike price
-    price: PyDecimal,
-    /// Security code of call option
-    call_symbol: String,
-    /// Security code of put option
-    put_symbol: String,
-    /// Is standard
-    standard: bool,
+    strike_price: PyDecimal,
+    /// Contract direction
+    direction: OptionDirection,
+    /// Special expiration cycle of the contract
+    option_type: OptionExpiryCycleType,
+    /// Whether the contract is a legacy contract left over from a corporate
+    /// action
+    standard_attr: OptionStandardAttr,
+    /// Number of days remaining until the option expires, `0` on the expiry
+    /// day and negative once expired
+    days_to_expiry: i32,
 }
 
 /// Issuer info
@@ -797,7 +837,8 @@ pub(crate) struct WarrantInfo {
     /// Turnover
     turnover: PyDecimal,
     /// Expiry date
-    expiry_date: PyDateWrapper,
+    #[py(opt)]
+    expiry_date: Option<PyDateWrapper>,
     /// Strike price
     #[py(opt)]
     strike_price: Option<PyDecimal>,
@@ -848,6 +889,8 @@ pub(crate) struct WarrantInfo {
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::quote::WarrantStatus")]
 pub enum WarrantStatus {
+    /// Unknown
+    Unknown,
     /// Suspend
     Suspend,
     /// Prepare List
@@ -1292,33 +1335,27 @@ pub(crate) struct SecurityCalcIndex {
     /// Open interest
     #[py(opt)]
     open_interest: Option<i64>,
-    /// Delta
+    /// Delta. Measures the expected change in option price for a $1 move in the
+    /// underlying asset price.
     #[py(opt)]
     delta: Option<PyDecimal>,
-    /// Gamma
+    /// Gamma. Measures the expected change in Delta for a $1 move in the
+    /// underlying asset price.
     #[py(opt)]
     gamma: Option<PyDecimal>,
-    /// Theta
-    ///
-    /// The raw value returned by the API is annualized (scaled by 252 trading
-    /// days per year). To obtain the standard per-calendar-day theta, divide
-    /// by 252: `theta / 252`.
+    /// Theta. Measures the expected change in option price as one day passes;
+    /// the raw value has been divided by 365 to convert to a daily value,
+    /// representing the impact of one day's time decay on the option price.
     #[py(opt)]
     theta: Option<PyDecimal>,
-    /// Vega
-    ///
-    /// The raw value returned by the API is expressed per 1 percentage-point
-    /// change in implied volatility (i.e. the value has been multiplied by
-    /// 100). To obtain the standard vega (per unit change in IV), divide by
-    /// 100: `vega / 100`.
+    /// Vega. Measures the expected change in option price when implied
+    /// volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+    /// get the expected price change per 1% move in IV.
     #[py(opt)]
     vega: Option<PyDecimal>,
-    /// Rho
-    ///
-    /// The raw value returned by the API is expressed per 1 percentage-point
-    /// change in the risk-free rate (i.e. the value has been multiplied by
-    /// 100). To obtain the standard rho (per unit change in rate), divide by
-    /// 100: `rho / 100`.
+    /// Rho. Measures the expected change in option price when the risk-free
+    /// interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+    /// the expected price change per 1% move in the interest rate.
     #[py(opt)]
     rho: Option<PyDecimal>,
 }
@@ -1551,15 +1588,21 @@ impl From<longbridge::quote::ShortTradesResponse> for ShortTradesResponse {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OptionVolumeStats {
-    /// Call volume string
-    pub c: String,
-    /// Put volume string
-    pub p: String,
+    /// Underlying security symbol
+    pub symbol: String,
+    /// Total call volume
+    pub call_volume: i64,
+    /// Total put volume
+    pub put_volume: i64,
 }
 
 impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
     fn from(v: longbridge::quote::OptionVolumeStats) -> Self {
-        Self { c: v.c, p: v.p }
+        Self {
+            symbol: v.symbol,
+            call_volume: v.call_volume,
+            put_volume: v.put_volume,
+        }
     }
 }
 
@@ -1567,6 +1610,8 @@ impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OptionVolumeDaily {
+    /// Underlying security symbol
+    pub symbol: String,
     /// Daily stats
     pub stats: Vec<OptionVolumeDailyStat>,
 }
@@ -1574,6 +1619,7 @@ pub(crate) struct OptionVolumeDaily {
 impl From<longbridge::quote::OptionVolumeDaily> for OptionVolumeDaily {
     fn from(v: longbridge::quote::OptionVolumeDaily) -> Self {
         Self {
+            symbol: v.symbol,
             stats: v.stats.into_iter().map(Into::into).collect(),
         }
     }
@@ -1583,41 +1629,88 @@ impl From<longbridge::quote::OptionVolumeDaily> for OptionVolumeDaily {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OptionVolumeDailyStat {
-    /// Underlying symbol
+    /// Underlying security symbol
     pub symbol: String,
-    /// Date timestamp string
-    pub timestamp: String,
-    /// Total volume
-    pub total_volume: String,
-    /// Put volume
-    pub total_put_volume: String,
+    /// Trading date
+    pub date: PyDateWrapper,
     /// Call volume
-    pub total_call_volume: String,
-    /// Put/call volume ratio
-    pub put_call_volume_ratio: String,
-    /// Total open interest
-    pub total_open_interest: String,
-    /// Put open interest
-    pub total_put_open_interest: String,
+    pub call_volume: i64,
+    /// Put volume
+    pub put_volume: i64,
     /// Call open interest
-    pub total_call_open_interest: String,
+    pub call_open_interest: i64,
+    /// Put open interest
+    pub put_open_interest: i64,
+    /// Total options volume (calls + puts)
+    pub total_volume: i64,
+    /// Total open interest (calls + puts)
+    pub total_open_interest: i64,
+    /// Put/call volume ratio
+    pub pc_vol: f64,
     /// Put/call OI ratio
-    pub put_call_open_interest_ratio: String,
+    pub pc_oi: f64,
 }
 
 impl From<longbridge::quote::OptionVolumeDailyStat> for OptionVolumeDailyStat {
     fn from(v: longbridge::quote::OptionVolumeDailyStat) -> Self {
         Self {
             symbol: v.symbol,
-            timestamp: v.timestamp,
+            date: v.date.into(),
+            call_volume: v.call_volume,
+            put_volume: v.put_volume,
+            call_open_interest: v.call_open_interest,
+            put_open_interest: v.put_open_interest,
             total_volume: v.total_volume,
-            total_put_volume: v.total_put_volume,
-            total_call_volume: v.total_call_volume,
-            put_call_volume_ratio: v.put_call_volume_ratio,
             total_open_interest: v.total_open_interest,
-            total_put_open_interest: v.total_put_open_interest,
-            total_call_open_interest: v.total_call_open_interest,
-            put_call_open_interest_ratio: v.put_call_open_interest_ratio,
+            pc_vol: v.pc_vol,
+            pc_oi: v.pc_oi,
+        }
+    }
+}
+
+/// US cryptocurrency market overview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USCryptoOverview {
+    pub name: String,
+    pub ticker: String,
+    pub currency: String,
+    pub all_time_high: String,
+    pub all_time_high_date: String,
+    pub all_time_low: String,
+    pub all_time_low_date: String,
+    pub ipo_date: String,
+    pub issue_price: String,
+    pub shares: String,
+    pub official_web_address: String,
+    /// User-facing symbol (e.g. "BTCUSD.BKKT")
+    pub symbol: String,
+    pub base_asset: String,
+    pub logo: String,
+    pub wiki_url: String,
+    /// Profile as JSON string
+    pub profile: String,
+}
+
+impl From<longbridge::quote::USCryptoOverview> for USCryptoOverview {
+    fn from(v: longbridge::quote::USCryptoOverview) -> Self {
+        Self {
+            name: v.name,
+            ticker: v.ticker,
+            currency: v.currency,
+            all_time_high: v.all_time_high,
+            all_time_high_date: v.all_time_high_date,
+            all_time_low: v.all_time_low,
+            all_time_low_date: v.all_time_low_date,
+            ipo_date: v.ipo_date,
+            issue_price: v.issue_price,
+            shares: v.shares,
+            official_web_address: v.official_web_address,
+            symbol: v.symbol,
+            base_asset: v.base_asset,
+            logo: v.logo,
+            wiki_url: v.wiki_url,
+            profile: v.profile,
         }
     }
 }

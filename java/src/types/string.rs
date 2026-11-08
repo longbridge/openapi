@@ -26,12 +26,19 @@ impl JSignature for String {
 impl FromJValue for String {
     fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
         let obj = value.l()?;
+        if obj.is_null() {
+            crate::error::throw_illegal_argument(env, "String argument must not be null");
+            return Err(jni::errors::Error::JavaException);
+        }
         let s = JString::from(obj);
         let str = env.get_string(&s)?;
-        Ok(str
-            .to_str()
-            .map(ToString::to_string)
-            .expect("valid utf8 string"))
+        match str.to_str() {
+            Ok(str) => Ok(str.to_string()),
+            Err(_) => {
+                crate::error::throw_illegal_argument(env, "string is not valid UTF-8");
+                Err(jni::errors::Error::JavaException)
+            }
+        }
     }
 }
 

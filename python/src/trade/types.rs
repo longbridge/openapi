@@ -1,8 +1,9 @@
 use longbridge_python_macros::{PyEnum, PyObject};
-use pyo3::pyclass;
+use pyo3::{pyclass, pymethods};
 
 use crate::{
     decimal::PyDecimal,
+    fundamental::types::JsonValue,
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
     types::Market,
 };
@@ -18,7 +19,7 @@ pub(crate) enum TopicType {
 
 /// Trade
 #[pyclass(skip_from_py_object)]
-#[derive(Debug, PyObject)]
+#[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::Execution")]
 pub(crate) struct Execution {
     /// Order ID
@@ -33,6 +34,21 @@ pub(crate) struct Execution {
     quantity: PyDecimal,
     /// Executed price
     price: PyDecimal,
+    /// Order side. `Unknown` when the response omits it (Longbridge US
+    /// `/v1/trade/execution/history`)
+    side: OrderSide,
+}
+
+/// Response for get all executions request
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longbridge::trade::AllExecutionsResponse")]
+pub(crate) struct AllExecutionsResponse {
+    /// Has more records
+    has_more: bool,
+    /// Execution list
+    #[py(array)]
+    trades: Vec<Execution>,
 }
 
 #[pyclass(eq, eq_int, from_py_object)]
@@ -75,6 +91,8 @@ pub(crate) enum OrderStatus {
     Expired,
     /// Partial Withdrawal
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    DelayedNotReported,
 }
 
 #[pyclass(eq, eq_int, from_py_object)]
@@ -137,18 +155,6 @@ pub(crate) enum OrderTag {
     LongTerm,
     /// Grey Order
     Grey,
-    /// Force Selling
-    MarginCall,
-    /// OTC
-    Offline,
-    /// Option Exercise Long
-    Creditor,
-    /// Option Exercise Short
-    Debtor,
-    /// Wavier Of Option Exercise
-    NonExercise,
-    /// Trade Allocation
-    AllocatedSub,
 }
 
 /// Time in force type
@@ -194,6 +200,316 @@ pub(crate) enum OutsideRTH {
     AnyTime,
     /// Overnight
     Overnight,
+    /// Overnight option
+    OptionPreMarket,
+}
+
+/// Attached order type
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::AttachedOrderType")]
+pub(crate) enum AttachedOrderType {
+    /// Unknown
+    Unknown,
+    /// Take profit
+    ProfitTaker,
+    /// Stop loss
+    StopLoss,
+    /// Bracket order
+    Bracket,
+}
+
+/// Attached order detail
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::AttachedOrderDetail")]
+pub(crate) struct AttachedOrderDetail {
+    /// Order ID
+    order_id: String,
+    /// Attached order type
+    attached_type_display: AttachedOrderType,
+    /// Trigger price
+    #[py(opt)]
+    trigger_price: Option<PyDecimal>,
+    /// Quantity
+    quantity: PyDecimal,
+    /// Executed quantity
+    executed_qty: PyDecimal,
+    /// Order status
+    status: OrderStatus,
+    /// Last updated time
+    updated_at: PyOffsetDateTimeWrapper,
+    /// Withdrawn
+    withdrawn: bool,
+    /// Good till date
+    #[py(opt)]
+    gtd: Option<PyDateWrapper>,
+    /// Time in force type
+    time_in_force: TimeInForceType,
+    /// Counter ID
+    counter_id: String,
+    /// Trigger status
+    #[py(opt)]
+    trigger_status: Option<TriggerStatus>,
+    /// Executed amount
+    executed_amount: PyDecimal,
+    /// Tag
+    tag: OrderTag,
+    /// Submitted time
+    submitted_at: PyOffsetDateTimeWrapper,
+    /// Executed price
+    #[py(opt)]
+    executed_price: Option<PyDecimal>,
+    /// Enable or disable outside regular trading hours (force only)
+    #[py(opt)]
+    force_only_rth: Option<OutsideRTH>,
+    /// Reviewed
+    reviewed: bool,
+    /// Activate order type
+    activate_order_type: OrderType,
+    /// Activate RTH
+    #[py(opt)]
+    activate_rth: Option<OutsideRTH>,
+    /// Submit price
+    #[py(opt)]
+    submit_price: Option<PyDecimal>,
+    /// Bid/ask depth level of the limit order submitted price
+    #[py(opt)]
+    limit_depth_level: Option<i32>,
+}
+
+/// Submit attached order parameters
+#[pyclass(from_py_object)]
+#[derive(Clone)]
+pub(crate) struct SubmitAttachedParams(pub(crate) longbridge::trade::SubmitAttachedParams);
+
+#[pymethods]
+impl SubmitAttachedParams {
+    #[new]
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (attached_order_type, *, profit_taker_price=None, stop_loss_price=None, time_in_force=None, expire_time=None, activate_order_type=None, profit_taker_submit_price=None, stop_loss_submit_price=None, activate_rth=None, profit_taker_depth_level=None, stop_loss_depth_level=None))]
+    fn new(
+        attached_order_type: AttachedOrderType,
+        profit_taker_price: Option<PyDecimal>,
+        stop_loss_price: Option<PyDecimal>,
+        time_in_force: Option<TimeInForceType>,
+        expire_time: Option<i64>,
+        activate_order_type: Option<OrderType>,
+        profit_taker_submit_price: Option<PyDecimal>,
+        stop_loss_submit_price: Option<PyDecimal>,
+        activate_rth: Option<OutsideRTH>,
+        profit_taker_depth_level: Option<i32>,
+        stop_loss_depth_level: Option<i32>,
+    ) -> Self {
+        let mut p = longbridge::trade::SubmitAttachedParams::new(attached_order_type.into());
+        if let Some(v) = profit_taker_price {
+            p = p.profit_taker_price(v.into());
+        }
+        if let Some(v) = stop_loss_price {
+            p = p.stop_loss_price(v.into());
+        }
+        if let Some(v) = time_in_force {
+            p = p.time_in_force(v.into());
+        }
+        if let Some(v) = expire_time {
+            p = p.expire_time(v);
+        }
+        if let Some(v) = activate_order_type {
+            p = p.activate_order_type(v.into());
+        }
+        if let Some(v) = profit_taker_submit_price {
+            p = p.profit_taker_submit_price(v.into());
+        }
+        if let Some(v) = stop_loss_submit_price {
+            p = p.stop_loss_submit_price(v.into());
+        }
+        if let Some(v) = activate_rth {
+            p = p.activate_rth(v.into());
+        }
+        if let Some(v) = profit_taker_depth_level {
+            p = p.profit_taker_depth_level(v);
+        }
+        if let Some(v) = stop_loss_depth_level {
+            p = p.stop_loss_depth_level(v);
+        }
+        Self(p)
+    }
+}
+
+/// Replace attached order parameters
+#[pyclass(from_py_object)]
+#[derive(Clone)]
+pub(crate) struct ReplaceAttachedParams(pub(crate) longbridge::trade::ReplaceAttachedParams);
+
+#[pymethods]
+impl ReplaceAttachedParams {
+    #[new]
+    #[pyo3(signature = (attached_order_type, *, profit_taker_price=None, stop_loss_price=None, time_in_force=None, expire_time=None, activate_order_type=None, profit_taker_submit_price=None, stop_loss_submit_price=None, activate_rth=None, profit_taker_id=None, stop_loss_id=None, cancel_all_attached=None, main_id=None, quantity=None, market_price=None, profit_taker_depth_level=None, stop_loss_depth_level=None))]
+    #[allow(clippy::too_many_arguments)]
+    fn new(
+        attached_order_type: AttachedOrderType,
+        profit_taker_price: Option<PyDecimal>,
+        stop_loss_price: Option<PyDecimal>,
+        time_in_force: Option<TimeInForceType>,
+        expire_time: Option<i64>,
+        activate_order_type: Option<OrderType>,
+        profit_taker_submit_price: Option<PyDecimal>,
+        stop_loss_submit_price: Option<PyDecimal>,
+        activate_rth: Option<OutsideRTH>,
+        profit_taker_id: Option<i64>,
+        stop_loss_id: Option<i64>,
+        cancel_all_attached: Option<bool>,
+        main_id: Option<i64>,
+        quantity: Option<PyDecimal>,
+        market_price: Option<PyDecimal>,
+        profit_taker_depth_level: Option<i32>,
+        stop_loss_depth_level: Option<i32>,
+    ) -> Self {
+        let mut p = longbridge::trade::ReplaceAttachedParams::new(attached_order_type.into());
+        if let Some(v) = profit_taker_price {
+            p = p.profit_taker_price(v.into());
+        }
+        if let Some(v) = stop_loss_price {
+            p = p.stop_loss_price(v.into());
+        }
+        if let Some(v) = time_in_force {
+            p = p.time_in_force(v.into());
+        }
+        if let Some(v) = expire_time {
+            p = p.expire_time(v);
+        }
+        if let Some(v) = activate_order_type {
+            p = p.activate_order_type(v.into());
+        }
+        if let Some(v) = profit_taker_submit_price {
+            p = p.profit_taker_submit_price(v.into());
+        }
+        if let Some(v) = stop_loss_submit_price {
+            p = p.stop_loss_submit_price(v.into());
+        }
+        if let Some(v) = activate_rth {
+            p = p.activate_rth(v.into());
+        }
+        if let Some(v) = profit_taker_id {
+            p = p.profit_taker_id(v);
+        }
+        if let Some(v) = stop_loss_id {
+            p = p.stop_loss_id(v);
+        }
+        if cancel_all_attached == Some(true) {
+            p = p.cancel_all_attached();
+        }
+        if let Some(v) = main_id {
+            p = p.main_id(v);
+        }
+        if let Some(v) = quantity {
+            p = p.quantity(v.into());
+        }
+        if let Some(v) = market_price {
+            p = p.market_price(v.into());
+        }
+        if let Some(v) = profit_taker_depth_level {
+            p = p.profit_taker_depth_level(v);
+        }
+        if let Some(v) = stop_loss_depth_level {
+            p = p.stop_loss_depth_level(v);
+        }
+        Self(p)
+    }
+}
+
+/// Multi-leg strategy
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::MultiLegStrategy")]
+pub(crate) enum MultiLegStrategy {
+    /// Unknown
+    Unknown,
+    /// Covered call (covered stock)
+    CoveredCall,
+    /// Covered put (covered stock)
+    CoveredPut,
+    /// Vertical call spread
+    VerticalCallSpread,
+    /// Vertical put spread
+    VerticalPutSpread,
+    /// Collar
+    Collar,
+    /// Straddle
+    Straddle,
+    /// Strangle
+    Strangle,
+    /// Calendar call spread
+    CalendarCallSpread,
+    /// Calendar put spread
+    CalendarPutSpread,
+}
+
+/// Multi-leg position direction
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::MultiLegPosition")]
+pub(crate) enum MultiLegPosition {
+    /// Unknown
+    Unknown,
+    /// Long
+    Long,
+    /// Short
+    Short,
+}
+
+/// Option contract type
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::ContractDirection")]
+pub(crate) enum ContractDirection {
+    /// Unknown
+    Unknown,
+    /// Call
+    Call,
+    /// Put
+    Put,
+}
+
+/// A leg of a multi-leg combination order
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::MultiLegOrderLeg")]
+pub(crate) struct MultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    symbol: String,
+    /// Order side
+    side: OrderSide,
+    /// Position direction
+    position: MultiLegPosition,
+    /// Leg ratio quantity
+    ratio_quantity: PyDecimal,
+    /// Strike price
+    #[py(opt)]
+    strike_price: Option<PyDecimal>,
+    /// Option expiry date
+    #[py(opt)]
+    expire_date: Option<PyDateWrapper>,
+    /// Contract type
+    contract_direction: ContractDirection,
+}
+
+/// Multi-leg strategy information
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::MultiLegInfo")]
+pub(crate) struct MultiLegInfo {
+    /// Multi-leg strategy
+    strategy: MultiLegStrategy,
+    /// Strategy name
+    strategy_name: String,
+    /// Multi-leg combination ID
+    multileg_id: String,
+    /// Multi-leg combination code
+    code: String,
+    /// Legs of the combination order
+    #[py(array)]
+    legs: Vec<MultiLegOrderLeg>,
 }
 
 /// Order
@@ -274,6 +590,17 @@ pub(crate) struct Order {
     monitor_price: Option<PyDecimal>,
     /// Remark
     remark: String,
+    /// Time-condition submit time (not set when the order is not a
+    /// time-condition order)
+    #[py(opt)]
+    delayed_until: Option<PyOffsetDateTimeWrapper>,
+    /// Attached orders
+    #[py(array)]
+    attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[py(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Commission-free Status
@@ -465,6 +792,10 @@ pub(crate) struct OrderDetail {
     monitor_price: Option<PyDecimal>,
     /// Remark
     remark: String,
+    /// Time-condition submit time (not set when the order is not a
+    /// time-condition order)
+    #[py(opt)]
+    delayed_until: Option<PyOffsetDateTimeWrapper>,
     /// Commission-free Status
     free_status: CommissionFreeStatus,
     /// Commission-free amount
@@ -492,7 +823,15 @@ pub(crate) struct OrderDetail {
     #[py(array)]
     history: Vec<OrderHistoryDetail>,
     /// Order charges
-    charge_detail: OrderChargeDetail,
+    #[py(opt)]
+    charge_detail: Option<OrderChargeDetail>,
+    /// Attached orders
+    #[py(array)]
+    attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[py(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Order changed message
@@ -559,6 +898,10 @@ pub(crate) struct PushOrderChanged {
     last_price: Option<PyDecimal>,
     /// Remark message
     remark: String,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[py(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Response for submit order request
@@ -706,8 +1049,8 @@ pub(crate) struct FundPositionChannel {
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::FundPosition")]
 pub(crate) struct FundPosition {
-    /// Fund ISIN code
-    symbol: String,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    counter_id: String,
     /// Current equity
     current_net_asset_value: PyDecimal,
     /// Current equity time
@@ -790,4 +1133,826 @@ pub(crate) struct EstimateMaxPurchaseQuantityResponse {
     pub cash_max_qty: PyDecimal,
     /// Margin available quantity
     pub margin_max_qty: PyDecimal,
+}
+
+// ── US-market types ──────────────────────────────────────────────────────────
+
+/// One cash currency entry in USAssetOverview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USCashEntry {
+    pub currency: String,
+    pub frozen_buy_cash: String,
+    pub outstanding: String,
+    pub settled_cash: String,
+    pub total_amount: String,
+    pub total_cash: String,
+}
+
+impl From<longbridge::trade::USCashEntry> for USCashEntry {
+    fn from(v: longbridge::trade::USCashEntry) -> Self {
+        Self {
+            currency: v.currency,
+            frozen_buy_cash: v.frozen_buy_cash,
+            outstanding: v.outstanding,
+            settled_cash: v.settled_cash,
+            total_amount: v.total_amount,
+            total_cash: v.total_cash,
+        }
+    }
+}
+
+/// One cryptocurrency holding in USAssetOverview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USCryptoEntry {
+    pub asset_type: String,
+    pub symbol: String,
+    pub quantity: String,
+    pub currency: String,
+    pub average_cost: String,
+    pub market: String,
+    pub trade_status: String,
+    pub prev_close: String,
+    pub last_done: String,
+    pub market_price: String,
+    pub pretrade_close: String,
+    pub stock_invest_of_today: String,
+    pub today_pl: String,
+    pub pretrade_stock_invest_of_today: String,
+    pub pretrade_today_pl: String,
+    pub night_last_done: String,
+    pub night_prev_close: String,
+    pub position_side: String,
+    pub open_position_time: String,
+    pub name: String,
+    pub industry_counter_id: String,
+    pub industry_name: String,
+}
+
+impl From<longbridge::trade::USCryptoEntry> for USCryptoEntry {
+    fn from(v: longbridge::trade::USCryptoEntry) -> Self {
+        Self {
+            asset_type: v.asset_type,
+            symbol: v.symbol,
+            quantity: v.quantity,
+            currency: v.currency,
+            average_cost: v.average_cost,
+            market: v.market,
+            trade_status: v.trade_status,
+            prev_close: v.prev_close,
+            last_done: v.last_done,
+            market_price: v.market_price,
+            pretrade_close: v.pretrade_close,
+            stock_invest_of_today: v.stock_invest_of_today,
+            today_pl: v.today_pl,
+            pretrade_stock_invest_of_today: v.pretrade_stock_invest_of_today,
+            pretrade_today_pl: v.pretrade_today_pl,
+            night_last_done: v.night_last_done,
+            night_prev_close: v.night_prev_close,
+            position_side: v.position_side,
+            open_position_time: v.open_position_time,
+            name: v.name,
+            industry_counter_id: v.industry_counter_id,
+            industry_name: v.industry_name,
+        }
+    }
+}
+
+/// One stock/equity position in USAssetOverview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USStockEntry {
+    pub symbol: String,
+    pub full_symbol: String,
+    pub asset_type: String,
+    pub quantity: String,
+    pub currency: String,
+    pub average_cost: String,
+    pub market: String,
+    pub trade_status: String,
+    pub prev_close: String,
+    pub last_done: String,
+    pub market_price: String,
+    pub pretrade_close: String,
+    pub stock_invest_of_today: String,
+    pub today_pl: String,
+    pub pretrade_stock_invest_of_today: String,
+    pub pretrade_today_pl: String,
+    pub night_last_done: String,
+    pub night_prev_close: String,
+    pub position_side: String,
+    pub open_position_time: String,
+    pub name: String,
+    pub industry_counter_id: String,
+    pub industry_name: String,
+}
+
+impl From<longbridge::trade::USStockEntry> for USStockEntry {
+    fn from(v: longbridge::trade::USStockEntry) -> Self {
+        Self {
+            symbol: v.symbol,
+            full_symbol: v.full_symbol,
+            asset_type: v.asset_type,
+            quantity: v.quantity,
+            currency: v.currency,
+            average_cost: v.average_cost,
+            market: v.market,
+            trade_status: v.trade_status,
+            prev_close: v.prev_close,
+            last_done: v.last_done,
+            market_price: v.market_price,
+            pretrade_close: v.pretrade_close,
+            stock_invest_of_today: v.stock_invest_of_today,
+            today_pl: v.today_pl,
+            pretrade_stock_invest_of_today: v.pretrade_stock_invest_of_today,
+            pretrade_today_pl: v.pretrade_today_pl,
+            night_last_done: v.night_last_done,
+            night_prev_close: v.night_prev_close,
+            position_side: v.position_side,
+            open_position_time: v.open_position_time,
+            name: v.name,
+            industry_counter_id: v.industry_counter_id,
+            industry_name: v.industry_name,
+        }
+    }
+}
+
+/// US account asset snapshot
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USAssetOverview {
+    pub account_type: String,
+    pub asset_timestamp: i64,
+    pub cash_buy_power: String,
+    pub overnight_buy_power: String,
+    pub currency: String,
+    pub cash_list: Vec<USCashEntry>,
+    pub stock_list: Vec<USStockEntry>,
+    pub option_list: Vec<JsonValue>,
+    pub crypto_list: Vec<USCryptoEntry>,
+}
+
+impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
+    fn from(v: longbridge::trade::USAssetOverview) -> Self {
+        Self {
+            account_type: v.account_type,
+            asset_timestamp: v
+                .asset_timestamp
+                .map(|t| t.unix_timestamp())
+                .unwrap_or_default(),
+            cash_buy_power: v.cash_buy_power,
+            overnight_buy_power: v.overnight_buy_power,
+            currency: v.currency,
+            cash_list: v.cash_list.into_iter().map(Into::into).collect(),
+            stock_list: v.stock_list.into_iter().map(Into::into).collect(),
+            option_list: v.option_list.into_iter().map(JsonValue).collect(),
+            crypto_list: v.crypto_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One time-period metric in USRealizedPLEntry
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USRealizedPLMetric {
+    pub amount: String,
+    pub period: i32,
+    pub rate: String,
+}
+
+impl From<longbridge::trade::USRealizedPLMetric> for USRealizedPLMetric {
+    fn from(v: longbridge::trade::USRealizedPLMetric) -> Self {
+        Self {
+            amount: v.amount,
+            period: v.period,
+            rate: v.rate,
+        }
+    }
+}
+
+/// One asset-category entry in USRealizedPL
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USRealizedPLEntry {
+    pub category: i32,
+    pub currency: String,
+    pub metrics: Vec<USRealizedPLMetric>,
+}
+
+impl From<longbridge::trade::USRealizedPLEntry> for USRealizedPLEntry {
+    fn from(v: longbridge::trade::USRealizedPLEntry) -> Self {
+        Self {
+            category: v.category,
+            currency: v.currency,
+            metrics: v.metrics.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Realized P&L response for a US account
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USRealizedPL {
+    pub realized_pl_list: Vec<USRealizedPLEntry>,
+}
+
+impl From<longbridge::trade::USRealizedPL> for USRealizedPL {
+    fn from(v: longbridge::trade::USRealizedPL) -> Self {
+        Self {
+            realized_pl_list: v.realized_pl_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Quantity of a US holding that is available to trade
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USAvailableHolding {
+    pub available_qty: String,
+}
+
+impl From<longbridge::trade::USAvailableHolding> for USAvailableHolding {
+    fn from(v: longbridge::trade::USAvailableHolding) -> Self {
+        Self {
+            available_qty: v.available_qty,
+        }
+    }
+}
+
+/// Buying power in USCashAndBuyPower
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USBuyLimitInfo {
+    pub currency: String,
+    pub cash_buy_power: String,
+    pub overnight_buy_power: String,
+    pub day_trade_buy_power: String,
+    pub instant_buy_power: String,
+    pub intraday_margin_buy_power: String,
+    pub option_buy_power: String,
+    pub crypto_buy_power: String,
+    pub mme: String,
+}
+
+impl From<longbridge::trade::USBuyLimitInfo> for USBuyLimitInfo {
+    fn from(v: longbridge::trade::USBuyLimitInfo) -> Self {
+        Self {
+            currency: v.currency,
+            cash_buy_power: v.cash_buy_power,
+            overnight_buy_power: v.overnight_buy_power,
+            day_trade_buy_power: v.day_trade_buy_power,
+            instant_buy_power: v.instant_buy_power,
+            intraday_margin_buy_power: v.intraday_margin_buy_power,
+            option_buy_power: v.option_buy_power,
+            crypto_buy_power: v.crypto_buy_power,
+            mme: v.mme,
+        }
+    }
+}
+
+/// One cash currency entry in USCashAndBuyPower
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USCashDetail {
+    pub currency: String,
+    pub total_amount: String,
+    pub available_cash: String,
+    pub withdraw_cash: String,
+    pub frozen_cash: String,
+    pub settled_cash: String,
+    pub outstanding: String,
+    pub external_amount: String,
+}
+
+impl From<longbridge::trade::USCashDetail> for USCashDetail {
+    fn from(v: longbridge::trade::USCashDetail) -> Self {
+        Self {
+            currency: v.currency,
+            total_amount: v.total_amount,
+            available_cash: v.available_cash,
+            withdraw_cash: v.withdraw_cash,
+            frozen_cash: v.frozen_cash,
+            settled_cash: v.settled_cash,
+            outstanding: v.outstanding,
+            external_amount: v.external_amount,
+        }
+    }
+}
+
+/// Margin account status in USCashAndBuyPower
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USMarginStatus {
+    pub currency: String,
+    pub nlv: String,
+    pub margin_equity: String,
+    pub margin_maintenance_excess: String,
+    pub mmr: String,
+    pub reg_t_excess: String,
+    pub sma: String,
+}
+
+impl From<longbridge::trade::USMarginStatus> for USMarginStatus {
+    fn from(v: longbridge::trade::USMarginStatus) -> Self {
+        Self {
+            currency: v.currency,
+            nlv: v.nlv,
+            margin_equity: v.margin_equity,
+            margin_maintenance_excess: v.margin_maintenance_excess,
+            mmr: v.mmr,
+            reg_t_excess: v.reg_t_excess,
+            sma: v.sma,
+        }
+    }
+}
+
+/// Cash, buying power and margin status of a US account
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USCashAndBuyPower {
+    pub buy_limit_info: USBuyLimitInfo,
+    pub cash_list: Vec<USCashDetail>,
+    pub margin_status: USMarginStatus,
+}
+
+impl From<longbridge::trade::USCashAndBuyPower> for USCashAndBuyPower {
+    fn from(v: longbridge::trade::USCashAndBuyPower) -> Self {
+        Self {
+            buy_limit_info: v.buy_limit_info.into(),
+            cash_list: v.cash_list.into_iter().map(Into::into).collect(),
+            margin_status: v.margin_status.into(),
+        }
+    }
+}
+
+/// One record in USTransactionHistory
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USTransaction {
+    pub title: String,
+    pub biz_code: String,
+    pub biz_code_name: String,
+    pub amount: String,
+    pub currency: String,
+    pub symbol: String,
+    pub market: String,
+    pub equity_type: String,
+    pub position_side: String,
+    pub quantity: String,
+    pub quantity_description: String,
+    pub ref_no: String,
+    pub remark: String,
+    pub create_at: Option<PyOffsetDateTimeWrapper>,
+    pub done_at: Option<PyOffsetDateTimeWrapper>,
+}
+
+impl From<longbridge::trade::USTransaction> for USTransaction {
+    fn from(v: longbridge::trade::USTransaction) -> Self {
+        Self {
+            title: v.title,
+            biz_code: v.biz_code,
+            biz_code_name: v.biz_code_name,
+            amount: v.amount,
+            currency: v.currency,
+            symbol: v.symbol,
+            market: v.market,
+            equity_type: v.equity_type,
+            position_side: v.position_side,
+            quantity: v.quantity,
+            quantity_description: v.quantity_description,
+            ref_no: v.ref_no,
+            remark: v.remark,
+            create_at: v.create_at.map(Into::into),
+            done_at: v.done_at.map(Into::into),
+        }
+    }
+}
+
+/// One page of US account transaction history
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USTransactionHistory {
+    pub current_page: i64,
+    pub items: Vec<USTransaction>,
+}
+
+impl From<longbridge::trade::USTransactionHistory> for USTransactionHistory {
+    fn from(v: longbridge::trade::USTransactionHistory) -> Self {
+        Self {
+            current_page: v.current_page,
+            items: v.items.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One exchange rate in USExchangeRates
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USExchangeRate {
+    pub universal_key: String,
+    pub spec_key: String,
+    pub base_currency: String,
+    pub other_currency: String,
+    pub bid_rate: String,
+    pub offer_rate: String,
+    pub average_rate: String,
+}
+
+impl From<longbridge::trade::USExchangeRate> for USExchangeRate {
+    fn from(v: longbridge::trade::USExchangeRate) -> Self {
+        Self {
+            universal_key: v.universal_key,
+            spec_key: v.spec_key,
+            base_currency: v.base_currency,
+            other_currency: v.other_currency,
+            bid_rate: v.bid_rate,
+            offer_rate: v.offer_rate,
+            average_rate: v.average_rate,
+        }
+    }
+}
+
+/// Exchange rates of a US account
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USExchangeRates {
+    pub exchanges: Vec<USExchangeRate>,
+}
+
+impl From<longbridge::trade::USExchangeRates> for USExchangeRates {
+    fn from(v: longbridge::trade::USExchangeRates) -> Self {
+        Self {
+            exchanges: v.exchanges.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One order state-transition entry within USOrderDetail.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USOrderHistory {
+    pub exec_type: i32,
+    pub status: String,
+    pub price: String,
+    pub qty: String,
+    pub time: String,
+    pub msg: String,
+    pub is_manually: bool,
+    pub opp_party_id: String,
+    pub trd_match_id: String,
+    pub operator: String,
+    pub op_entrust_way: String,
+    pub cxl_rej_response_to: i32,
+    pub withdrawal_reason: String,
+    pub opp_name: String,
+    pub exec_id: String,
+}
+
+impl From<longbridge::trade::USOrderHistory> for USOrderHistory {
+    fn from(v: longbridge::trade::USOrderHistory) -> Self {
+        Self {
+            exec_type: v.exec_type,
+            status: v.status,
+            price: v.price,
+            qty: v.qty,
+            time: v.time,
+            msg: v.msg,
+            is_manually: v.is_manually,
+            opp_party_id: v.opp_party_id,
+            trd_match_id: v.trd_match_id,
+            operator: v.operator,
+            op_entrust_way: v.op_entrust_way,
+            cxl_rej_response_to: v.cxl_rej_response_to,
+            withdrawal_reason: v.withdrawal_reason,
+            opp_name: v.opp_name,
+            exec_id: v.exec_id,
+        }
+    }
+}
+
+/// Action-button state for an order.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USButtonControl {
+    pub withdraw: i32,
+    pub replace: i32,
+    pub exceptionable: Vec<String>,
+}
+
+impl From<longbridge::trade::USButtonControl> for USButtonControl {
+    fn from(v: longbridge::trade::USButtonControl) -> Self {
+        Self {
+            withdraw: v.withdraw,
+            replace: v.replace,
+            exceptionable: v.exceptionable,
+        }
+    }
+}
+
+/// One fee category within USChargeDetail.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USChargeItem {
+    pub code: i32,
+    pub name: String,
+    pub fees: Vec<String>,
+}
+
+impl From<longbridge::trade::USChargeItem> for USChargeItem {
+    fn from(v: longbridge::trade::USChargeItem) -> Self {
+        Self {
+            code: v.code,
+            name: v.name,
+            fees: v.fees,
+        }
+    }
+}
+
+/// Fee breakdown for an order.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USChargeDetail {
+    pub currency: String,
+    pub total_amount: String,
+    pub items: Vec<USChargeItem>,
+}
+
+impl From<longbridge::trade::USChargeDetail> for USChargeDetail {
+    fn from(v: longbridge::trade::USChargeDetail) -> Self {
+        Self {
+            currency: v.currency,
+            total_amount: v.total_amount,
+            items: v.items.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One bracket/conditional sub-order attached to a main order.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USAttachedOrder {
+    pub attached_type_display: i32,
+    pub executed_qty: String,
+    pub quantity: String,
+    pub status: String,
+    pub trigger_price: String,
+    pub order_id: String,
+    pub gtd: String,
+    pub time_in_force: i32,
+    pub tag: i32,
+    pub activate_order_type: String,
+    pub activate_rth: i32,
+    pub submit_price: String,
+    pub symbol: String,
+    pub withdrawn: bool,
+}
+
+impl From<longbridge::trade::USAttachedOrder> for USAttachedOrder {
+    fn from(v: longbridge::trade::USAttachedOrder) -> Self {
+        Self {
+            attached_type_display: v.attached_type_display,
+            executed_qty: v.executed_qty,
+            quantity: v.quantity,
+            status: v.status,
+            trigger_price: v.trigger_price,
+            order_id: v.order_id,
+            gtd: v.gtd,
+            time_in_force: v.time_in_force,
+            tag: v.tag,
+            activate_order_type: v.activate_order_type,
+            activate_rth: v.activate_rth,
+            submit_price: v.submit_price,
+            symbol: v.symbol,
+            withdrawn: v.withdrawn,
+        }
+    }
+}
+
+/// Full typed order object within USOrderDetailResponse.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USOrderDetail {
+    pub id: String,
+    pub aaid: String,
+    pub account_channel: String,
+    pub action: i32,
+    pub symbol: String,
+    pub underlying_symbol: String,
+    pub security_type: String,
+    pub name: String,
+    pub currency: String,
+    pub trade_currency: String,
+    pub order_type: String,
+    pub status: String,
+    pub price: String,
+    pub quantity: String,
+    pub executed_qty: String,
+    pub executed_price: String,
+    pub executed_amount: String,
+    pub operate_direction: String,
+    pub time_in_force: i32,
+    pub gtd: String,
+    pub tag: i32,
+    pub msg: String,
+    pub force_only_rth: i32,
+    pub submitted_at: String,
+    pub done_at: String,
+    pub trigger_price: String,
+    pub trigger_at: String,
+    pub trigger_status: i32,
+    pub trigger_exchange: String,
+    pub trigger_last_done: String,
+    pub trigger_count: i32,
+    pub tailing_amount: String,
+    pub tailing_percent: String,
+    pub limit_offset: String,
+    pub limit_depth_level: i32,
+    pub market_price: String,
+    pub submitted_amount: String,
+    pub estimated_fee: String,
+    pub free_status: i32,
+    pub free_amount: String,
+    pub free_currency: String,
+    pub deductions_status: i32,
+    pub deductions_amount: String,
+    pub deductions_currency: String,
+    pub platform_deductions_status: i32,
+    pub platform_deductions_amount: String,
+    pub platform_deductions_currency: String,
+    pub display_account: String,
+    pub settlement_account: String,
+    pub settlement_channel: String,
+    pub customer_name: String,
+    pub real_name: String,
+    pub en_name: String,
+    pub joint_real_name: String,
+    pub joint_en_name: String,
+    pub org_id: String,
+    pub bcan: String,
+    pub op_entrust_way: i32,
+    pub op_entrust_way_name: String,
+    pub remark: String,
+    pub notice: String,
+    pub short_sell_type: i32,
+    pub ploy_type: String,
+    pub ploy_id: String,
+    pub ploy_status: String,
+    pub trend: i32,
+    pub withdrawal_reason: String,
+    pub activate_order_type: String,
+    pub activate_rth: i32,
+    pub submit_price: String,
+    pub contract_direction: String,
+    pub strike_price: String,
+    pub contract_size: String,
+    pub monitor_price: String,
+    pub button_control: USButtonControl,
+    pub charge_detail: Option<USChargeDetail>,
+    pub attached_orders: Vec<USAttachedOrder>,
+    pub order_histories: Vec<USOrderHistory>,
+}
+
+impl From<longbridge::trade::USOrderDetail> for USOrderDetail {
+    fn from(v: longbridge::trade::USOrderDetail) -> Self {
+        Self {
+            id: v.id,
+            aaid: v.aaid,
+            account_channel: v.account_channel,
+            action: v.action,
+            symbol: v.symbol,
+            underlying_symbol: v.underlying_symbol,
+            security_type: v.security_type,
+            name: v.name,
+            currency: v.currency,
+            trade_currency: v.trade_currency,
+            order_type: v.order_type,
+            status: v.status,
+            price: v.price,
+            quantity: v.quantity,
+            executed_qty: v.executed_qty,
+            executed_price: v.executed_price,
+            executed_amount: v.executed_amount,
+            operate_direction: v.operate_direction,
+            time_in_force: v.time_in_force,
+            gtd: v.gtd,
+            tag: v.tag,
+            msg: v.msg,
+            force_only_rth: v.force_only_rth,
+            submitted_at: v.submitted_at,
+            done_at: v.done_at,
+            trigger_price: v.trigger_price,
+            trigger_at: v.trigger_at,
+            trigger_status: v.trigger_status,
+            trigger_exchange: v.trigger_exchange,
+            trigger_last_done: v.trigger_last_done,
+            trigger_count: v.trigger_count,
+            tailing_amount: v.tailing_amount,
+            tailing_percent: v.tailing_percent,
+            limit_offset: v.limit_offset,
+            limit_depth_level: v.limit_depth_level,
+            market_price: v.market_price,
+            submitted_amount: v.submitted_amount,
+            estimated_fee: v.estimated_fee,
+            free_status: v.free_status,
+            free_amount: v.free_amount,
+            free_currency: v.free_currency,
+            deductions_status: v.deductions_status,
+            deductions_amount: v.deductions_amount,
+            deductions_currency: v.deductions_currency,
+            platform_deductions_status: v.platform_deductions_status,
+            platform_deductions_amount: v.platform_deductions_amount,
+            platform_deductions_currency: v.platform_deductions_currency,
+            display_account: v.display_account,
+            settlement_account: v.settlement_account,
+            settlement_channel: v.settlement_channel,
+            customer_name: v.customer_name,
+            real_name: v.real_name,
+            en_name: v.en_name,
+            joint_real_name: v.joint_real_name,
+            joint_en_name: v.joint_en_name,
+            org_id: v.org_id,
+            bcan: v.bcan,
+            op_entrust_way: v.op_entrust_way,
+            op_entrust_way_name: v.op_entrust_way_name,
+            remark: v.remark,
+            notice: v.notice,
+            short_sell_type: v.short_sell_type,
+            ploy_type: v.ploy_type,
+            ploy_id: v.ploy_id,
+            ploy_status: v.ploy_status,
+            trend: v.trend,
+            withdrawal_reason: v.withdrawal_reason,
+            activate_order_type: v.activate_order_type,
+            activate_rth: v.activate_rth,
+            submit_price: v.submit_price,
+            contract_direction: v.contract_direction,
+            strike_price: v.strike_price,
+            contract_size: v.contract_size,
+            monitor_price: v.monitor_price,
+            button_control: v.button_control.into(),
+            charge_detail: v.charge_detail.map(Into::into),
+            attached_orders: v.attached_orders.into_iter().map(Into::into).collect(),
+            order_histories: v.order_histories.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Response for us_order_detail.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USOrderDetailResponse {
+    pub order: Option<USOrderDetail>,
+    pub current_attached_order: Option<USOrderDetail>,
+    pub current_millisecond: String,
+}
+
+impl From<longbridge::trade::USOrderDetailResponse> for USOrderDetailResponse {
+    fn from(v: longbridge::trade::USOrderDetailResponse) -> Self {
+        Self {
+            order: v.order.map(Into::into),
+            current_attached_order: v.current_attached_order.map(Into::into),
+            current_millisecond: v.current_millisecond,
+        }
+    }
+}
+
+// ── Grid-trading push
+// ───────────────────────────────────────────────────────────
+
+/// Grid trading master-order changed message.
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longbridge::trade::PushGridOrderChanged")]
+pub(crate) struct PushGridOrderChanged {
+    /// Grid master order ID
+    order_id: String,
+    /// Order status
+    status: String,
+    /// Security symbol (e.g. `700.HK`)
+    symbol: String,
+    /// Suspend reason, if any
+    suspend_reason: String,
+    /// Submitted base price
+    submitted_base_price: String,
+    /// Current base price
+    current_base_price: String,
+    /// Upper price bound
+    upper_limit_price: String,
+    /// Lower price bound
+    lower_limit_price: String,
+    /// Trigger price type
+    trigger_price_type: i32,
+    /// Quantity per trigger
+    trigger_quantity: String,
+    /// Settlement currency
+    settlement_currency: String,
+    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+    time_in_force: i32,
+    /// Regular trading hours flag
+    rth: i32,
+    /// Sell-side order type when depth is 0
+    grid_order_type_up: String,
+    /// Buy-side order type when depth is 0
+    grid_order_type_down: String,
 }

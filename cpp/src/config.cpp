@@ -99,9 +99,23 @@ Config::enable_overnight()
 }
 
 Config&
+Config::enable_papertrading()
+{
+  lb_config_enable_papertrading(config_);
+  return *this;
+}
+
+Config&
 Config::set_push_candlestick_mode(PushCandlestickMode mode)
 {
   lb_config_set_push_candlestick_mode(config_, convert::convert(mode));
+  return *this;
+}
+
+Config&
+Config::set_quote_transport(QuoteTransport transport)
+{
+  lb_config_set_quote_transport(config_, convert::convert(transport));
   return *this;
 }
 

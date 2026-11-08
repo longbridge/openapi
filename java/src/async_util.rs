@@ -46,12 +46,24 @@ where
 
     longbridge::runtime_handle().spawn(async move {
         let res = fut.await;
-        let mut env = jvm.attach_current_thread().unwrap();
+        // Runs on a tokio worker thread. Any panic here (a failed `unwrap`)
+        // would unwind across the FFI boundary and abort the whole JVM, so
+        // every step is handled instead of unwrapped.
+        let Ok(mut env) = jvm.attach_current_thread() else {
+            return;
+        };
         match res {
-            Ok(value) => {
-                let value = value.into_jvalue(&mut env).unwrap().l().unwrap();
-                let _ = async_complete(&mut env, &*callback, value);
-            }
+            Ok(value) => match value.into_jvalue(&mut env).and_then(|v| v.l()) {
+                Ok(value) => {
+                    let _ = async_complete(&mut env, &*callback, value);
+                }
+                Err(err) => {
+                    // Converting the result to a Java object failed; report it
+                    // to the callback as an error rather than crashing.
+                    let err = JniError::from(err).into_error_object(&mut env);
+                    let _ = async_error(&mut env, &*callback, err);
+                }
+            },
             Err(err) => {
                 let err = err.into_error_object(&mut env);
                 let _ = async_error(&mut env, &*callback, err);

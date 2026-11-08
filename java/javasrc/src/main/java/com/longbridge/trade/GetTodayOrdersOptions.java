@@ -12,6 +12,7 @@ public class GetTodayOrdersOptions {
     private OrderSide side;
     private Market market;
     private String orderId;
+    private Boolean isAttached;
 
     /**
      * Filters by security symbol.
@@ -66,6 +67,27 @@ public class GetTodayOrdersOptions {
     public GetTodayOrdersOptions setOrderId(String orderId) {
         this.orderId = orderId;
         return this;
+    }
+
+    /**
+     * When set together with order ID, indicates that the order ID is an
+     * attached sub-order ID. The server returns the attached sub-order itself
+     * as an Order entry (not the parent order). Has no effect without order ID.
+     *
+     * @return this instance for chaining
+     */
+    public GetTodayOrdersOptions setIsAttached() {
+        this.isAttached = true;
+        return this;
+    }
+
+    /**
+     * Returns whether the order ID is treated as an attached order ID.
+     *
+     * @return is-attached flag
+     */
+    public Boolean getIsAttached() {
+        return isAttached;
     }
 
 }

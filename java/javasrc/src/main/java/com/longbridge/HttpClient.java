@@ -15,6 +15,15 @@ import com.google.gson.Gson;
 public class HttpClient implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * @hidden
      */
@@ -54,8 +63,12 @@ public class HttpClient implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeHttpClient(this.raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeHttpClient(h);
+        }
     }
 
     /**
@@ -81,7 +94,7 @@ public class HttpClient implements AutoCloseable {
      * @return HttpClient object
      */
     public static HttpClient fromOAuth(OAuth oauth) {
-        return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), null));
+        synchronized (oauth) { return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), null)); }
     }
 
     /**
@@ -96,7 +109,7 @@ public class HttpClient implements AutoCloseable {
      * @return HttpClient object
      */
     public static HttpClient fromOAuth(OAuth oauth, String httpUrl) {
-        return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), httpUrl));
+        synchronized (oauth) { return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), httpUrl)); }
     }
 
     /**
@@ -109,7 +122,7 @@ public class HttpClient implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws RuntimeException If an error occurs
      */
-    public <T> CompletableFuture<T> request(Class<T> respClass, String method, String path)
+    public synchronized <T> CompletableFuture<T> request(Class<T> respClass, String method, String path)
             throws RuntimeException {
         return doRequest(respClass, method, path, null, null);
     }
@@ -125,7 +138,7 @@ public class HttpClient implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws RuntimeException If an error occurs
      */
-    public <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody)
+    public synchronized <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody)
             throws RuntimeException {
         return doRequest(respClass, method, path, requestBody, null);
     }
@@ -142,7 +155,7 @@ public class HttpClient implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws RuntimeException If the request fails
      */
-    public <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody,
+    public synchronized <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody,
             HashMap<String, String> headers)
             throws RuntimeException {
         return doRequest(respClass, method, path, requestBody, headers);
@@ -167,7 +180,7 @@ public class HttpClient implements AutoCloseable {
 
         String requestJson = gson.toJson(request);
         CompletableFuture<String> fut = AsyncCallback.executeTask((callback) -> {
-            SdkNative.httpClientRequest(this.raw, requestJson, callback);
+            SdkNative.httpClientRequest(raw(), requestJson, callback);
         });
         return fut.thenApply(respBody -> {
             if (respClass != null) {

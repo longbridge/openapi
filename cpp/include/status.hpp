@@ -40,7 +40,9 @@ public:
   /// Returns the error kind if an error occurs
   std::optional<ErrorKind> kind() const;
 
-  /// Returns the error code if an error occurs
+  /// Returns the error code if an error occurs: the HTTP status, the OpenAPI
+  /// error code, or for `ErrorKind::OAuth` a stable code identifying the
+  /// failure (see `lb_error_code` in longbridge.h for the table)
   std::optional<int64_t> code() const;
 
   /// Returns the error message if an error occurs

@@ -3,10 +3,12 @@ use std::{ffi::c_void, os::raw::c_char, sync::Arc, time::Instant};
 use longbridge::{
     TradeContext,
     trade::{
-        EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent, ReplaceOrderOptions,
-        SubmitOrderOptions,
+        AttachedOrderType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
+        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent,
+        ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams, SubmitMultiLegOrderLeg,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -19,25 +21,30 @@ use crate::{
     trade_context::{
         enum_types::CTopicType,
         types::{
-            CAccountBalanceOwned, CCashFlowOwned, CEstimateMaxPurchaseQuantityOptions,
-            CEstimateMaxPurchaseQuantityResponseOwned, CExecutionOwned,
-            CFundPositionsResponseOwned, CGetCashFlowOptions, CGetFundPositionsOptions,
-            CGetHistoryExecutionsOptions, CGetHistoryOrdersOptions, CGetStockPositionsOptions,
-            CGetTodayExecutionsOptions, CGetTodayOrdersOptions, CMarginRatioOwned,
-            COrderDetailOwned, COrderOwned, CPushOrderChanged, CPushOrderChangedOwned,
-            CReplaceOrderOptions, CStockPositionsResponseOwned, CSubmitOrderOptions,
-            CSubmitOrderResponseOwned,
+            CAccountBalanceOwned, CAllExecutionsResponseOwned, CCashFlowOwned,
+            CEstimateMaxPurchaseQuantityOptions, CEstimateMaxPurchaseQuantityResponseOwned,
+            CExecutionOwned, CFundPositionsResponseOwned, CGetAllExecutionsOptions,
+            CGetCashFlowOptions, CGetFundPositionsOptions, CGetHistoryExecutionsOptions,
+            CGetHistoryOrdersOptions, CGetStockPositionsOptions, CGetTodayExecutionsOptions,
+            CGetTodayOrdersOptions, CMarginRatioOwned, COrderDetailOwned, COrderOwned,
+            CPushGridOrderChanged, CPushGridOrderChangedOwned, CPushOrderChanged,
+            CPushOrderChangedOwned, CReplaceOrderOptions, CStockPositionsResponseOwned,
+            CSubmitMultiLegOrderOptions, CSubmitOrderOptions, CSubmitOrderResponseOwned,
         },
     },
-    types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
+    types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust, slice_from_raw_parts},
 };
 
 pub type COnOrderChangedCallback =
     extern "C" fn(*const CTradeContext, *const CPushOrderChanged, *mut c_void);
 
+pub type COnGridOrderChangedCallback =
+    extern "C" fn(*const CTradeContext, *const CPushGridOrderChanged, *mut c_void);
+
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<Callback<COnOrderChangedCallback>>,
+    grid_order_changed: Option<Callback<COnGridOrderChangedCallback>>,
 }
 
 pub struct CTradeContextState {
@@ -106,6 +113,28 @@ pub unsafe extern "C" fn lb_trade_context_new(config: *const CConfig) -> *const 
                         );
                     }
                 }
+                PushEvent::GridOrderChanged(grid_order_changed) => {
+                    if let Some(callback) = &state.callbacks.grid_order_changed {
+                        let log_subscriber = ctx.ctx.log_subscriber();
+                        let _guard = tracing::dispatcher::set_default(&log_subscriber.into());
+
+                        let s = Instant::now();
+                        tracing::info!("begin call on_grid_order_changed callback");
+
+                        let grid_order_changed_owned: CPushGridOrderChangedOwned =
+                            grid_order_changed.into();
+                        (callback.f)(
+                            Arc::as_ptr(&ctx),
+                            &grid_order_changed_owned.to_ffi_type(),
+                            callback.userdata,
+                        );
+
+                        tracing::info!(
+                            duration = ?s.elapsed(),
+                            "after call on_grid_order_changed callback"
+                        );
+                    }
+                }
             }
         }
     });
@@ -167,6 +196,22 @@ pub unsafe extern "C" fn lb_trade_context_set_on_order_changed(
     });
 }
 
+/// Set grid order changed callback, after receiving the grid order changed
+/// event, it will call back to this function.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_set_on_grid_order_changed(
+    ctx: *const CTradeContext,
+    callback: COnGridOrderChangedCallback,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
+) {
+    (*ctx).state.lock().callbacks.grid_order_changed = Some(Callback {
+        f: callback,
+        userdata,
+        free_userdata,
+    });
+}
+
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_subscribe(
     ctx: *const CTradeContext,
@@ -176,7 +221,7 @@ pub unsafe extern "C" fn lb_trade_context_subscribe(
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let topics = std::slice::from_raw_parts(topics, num_topics)
+    let topics = slice_from_raw_parts(topics, num_topics)
         .iter()
         .copied()
         .map(Into::into)
@@ -195,7 +240,7 @@ pub unsafe extern "C" fn lb_trade_context_unsubscribe(
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let topics = std::slice::from_raw_parts(topics, num_topics)
+    let topics = slice_from_raw_parts(topics, num_topics)
         .iter()
         .copied()
         .map(Into::into)
@@ -206,6 +251,8 @@ pub unsafe extern "C" fn lb_trade_context_unsubscribe(
 }
 
 /// Get history executions
+///
+/// `side` may be `Unknown` on Longbridge US accounts.
 ///
 /// @param[in] opts Options for get history executions request (can be null)
 #[unsafe(no_mangle)]
@@ -264,6 +311,49 @@ pub unsafe extern "C" fn lb_trade_context_today_executions(
     });
 }
 
+/// Get all executions
+///
+/// AP accounts only: US data-center accounts get a region error; use
+/// `lb_trade_context_history_executions` instead.
+///
+/// @param[in] opts Options for get all executions request (can be null)
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_all_executions(
+    ctx: *const CTradeContext,
+    opts: *const CGetAllExecutionsOptions,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let mut opts2 = GetAllExecutionsOptions::new();
+    if !opts.is_null() {
+        if !(*opts).symbol.is_null() {
+            opts2 = opts2.symbol(cstr_to_rust((*opts).symbol));
+        }
+        if !(*opts).order_id.is_null() {
+            opts2 = opts2.order_id(cstr_to_rust((*opts).order_id));
+        }
+        if !(*opts).start_at.is_null() {
+            opts2 = opts2.start_at(
+                OffsetDateTime::from_unix_timestamp(*(*opts).start_at).expect("invalid start at"),
+            );
+        }
+        if !(*opts).end_at.is_null() {
+            opts2 = opts2.end_at(
+                OffsetDateTime::from_unix_timestamp(*(*opts).end_at).expect("invalid end at"),
+            );
+        }
+        if !(*opts).page.is_null() {
+            opts2 = opts2.page(*(*opts).page);
+        }
+    }
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CAllExecutionsResponseOwned> =
+            CCow::new(ctx_inner.all_executions(opts2).await?);
+        Ok(resp)
+    });
+}
+
 /// Get history orders
 ///
 /// @param[in] opts Options for get history orders request (can be null)
@@ -281,7 +371,7 @@ pub unsafe extern "C" fn lb_trade_context_history_orders(
             opts2 = opts2.symbol(cstr_to_rust((*opts).symbol));
         }
         if !(*opts).status.is_null() {
-            let status = std::slice::from_raw_parts((*opts).status, (*opts).num_status);
+            let status = slice_from_raw_parts((*opts).status, (*opts).num_status);
             opts2 = opts2.status(status.iter().copied().map(Into::into));
         }
         if !(*opts).side.is_null() {
@@ -324,7 +414,7 @@ pub unsafe extern "C" fn lb_trade_context_today_orders(
             opts2 = opts2.symbol(cstr_to_rust((*opts).symbol));
         }
         if !(*opts).status.is_null() {
-            let status = std::slice::from_raw_parts((*opts).status, (*opts).num_status);
+            let status = slice_from_raw_parts((*opts).status, (*opts).num_status);
             opts2 = opts2.status(status.iter().copied().map(Into::into));
         }
         if !(*opts).side.is_null() {
@@ -335,6 +425,9 @@ pub unsafe extern "C" fn lb_trade_context_today_orders(
         }
         if !(*opts).order_id.is_null() {
             opts2 = opts2.order_id(cstr_to_rust((*opts).order_id));
+        }
+        if !(*opts).is_attached.is_null() && *(*opts).is_attached {
+            opts2 = opts2.is_attached();
         }
     }
     execute_async(callback, ctx, userdata, async move {
@@ -384,7 +477,70 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
     }
+    let delayed_until = if (*opts).clear_delayed_until {
+        opts2 = opts2.clear_delayed_until();
+        Ok(None)
+    } else {
+        parse_delayed_until((*opts).delayed_until)
+    };
+    if !(*opts).attached_params.is_null() {
+        let ap = &*(*opts).attached_params;
+        let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
+        let mut rp = ReplaceAttachedParams::new(attached_order_type);
+        if !ap.profit_taker_price.is_null() {
+            rp = rp.profit_taker_price((*ap.profit_taker_price).value);
+        }
+        if !ap.stop_loss_price.is_null() {
+            rp = rp.stop_loss_price((*ap.stop_loss_price).value);
+        }
+        if !ap.time_in_force.is_null() {
+            rp = rp.time_in_force((*ap.time_in_force).into());
+        }
+        if !ap.expire_time.is_null() {
+            rp = rp.expire_time(*ap.expire_time);
+        }
+        if !ap.activate_order_type.is_null() {
+            rp = rp.activate_order_type((*ap.activate_order_type).into());
+        }
+        if !ap.profit_taker_submit_price.is_null() {
+            rp = rp.profit_taker_submit_price((*ap.profit_taker_submit_price).value);
+        }
+        if !ap.stop_loss_submit_price.is_null() {
+            rp = rp.stop_loss_submit_price((*ap.stop_loss_submit_price).value);
+        }
+        if !ap.activate_rth.is_null() {
+            rp = rp.activate_rth((*ap.activate_rth).into());
+        }
+        if !ap.profit_taker_id.is_null() {
+            rp = rp.profit_taker_id(*ap.profit_taker_id);
+        }
+        if !ap.stop_loss_id.is_null() {
+            rp = rp.stop_loss_id(*ap.stop_loss_id);
+        }
+        if !ap.cancel_all_attached.is_null() && *ap.cancel_all_attached {
+            rp = rp.cancel_all_attached();
+        }
+        if !ap.main_id.is_null() {
+            rp = rp.main_id(*ap.main_id);
+        }
+        if !ap.quantity.is_null() {
+            rp = rp.quantity((*ap.quantity).value);
+        }
+        if !ap.market_price.is_null() {
+            rp = rp.market_price((*ap.market_price).value);
+        }
+        if !ap.profit_taker_depth_level.is_null() {
+            rp = rp.profit_taker_depth_level(*ap.profit_taker_depth_level);
+        }
+        if !ap.stop_loss_depth_level.is_null() {
+            rp = rp.stop_loss_depth_level(*ap.stop_loss_depth_level);
+        }
+        opts2 = opts2.attached_params(rp);
+    }
     execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
         ctx_inner.replace_order(opts2).await?;
         Ok(())
     });
@@ -446,8 +602,96 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
     }
+    if !(*opts).client_request_id.is_null() {
+        opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
+    }
+    let delayed_until = parse_delayed_until((*opts).delayed_until);
+    if !(*opts).attached_params.is_null() {
+        let ap = &*(*opts).attached_params;
+        let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
+        let mut sp = SubmitAttachedParams::new(attached_order_type);
+        if !ap.profit_taker_price.is_null() {
+            sp = sp.profit_taker_price((*ap.profit_taker_price).value);
+        }
+        if !ap.stop_loss_price.is_null() {
+            sp = sp.stop_loss_price((*ap.stop_loss_price).value);
+        }
+        if !ap.time_in_force.is_null() {
+            sp = sp.time_in_force((*ap.time_in_force).into());
+        }
+        if !ap.expire_time.is_null() {
+            sp = sp.expire_time(*ap.expire_time);
+        }
+        if !ap.activate_order_type.is_null() {
+            sp = sp.activate_order_type((*ap.activate_order_type).into());
+        }
+        if !ap.profit_taker_submit_price.is_null() {
+            sp = sp.profit_taker_submit_price((*ap.profit_taker_submit_price).value);
+        }
+        if !ap.stop_loss_submit_price.is_null() {
+            sp = sp.stop_loss_submit_price((*ap.stop_loss_submit_price).value);
+        }
+        if !ap.activate_rth.is_null() {
+            sp = sp.activate_rth((*ap.activate_rth).into());
+        }
+        if !ap.profit_taker_depth_level.is_null() {
+            sp = sp.profit_taker_depth_level(*ap.profit_taker_depth_level);
+        }
+        if !ap.stop_loss_depth_level.is_null() {
+            sp = sp.stop_loss_depth_level(*ap.stop_loss_depth_level);
+        }
+        opts2 = opts2.attached_params(sp);
+    }
     execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
         let resp: CCow<CSubmitOrderResponseOwned> = CCow::new(ctx_inner.submit_order(opts2).await?);
+        Ok(resp)
+    });
+}
+
+/// Submit a multi-leg option combination order (such as vertical spreads,
+/// straddles, strangles, collars, etc.). All legs are submitted together as a
+/// single strategy order.
+///
+/// @param[in] opts Options for submit multi-leg order request
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_submit_multileg(
+    ctx: *const CTradeContext,
+    opts: *const CSubmitMultiLegOrderOptions,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let side = (*opts).side.into();
+    let order_type = (*opts).order_type.into();
+    let submitted_quantity = (*(*opts).submitted_quantity).value;
+    let strategy = (*opts).strategy.into();
+    let legs = slice_from_raw_parts((*opts).legs, (*opts).num_legs)
+        .iter()
+        .map(|leg| {
+            SubmitMultiLegOrderLeg::new(cstr_to_rust(leg.symbol), (*leg.ratio_quantity).value)
+        })
+        .collect::<Vec<_>>();
+    let mut opts2 =
+        SubmitMultiLegOrderOptions::new(side, order_type, submitted_quantity, strategy, legs);
+    if !(*opts).submitted_price.is_null() {
+        opts2 = opts2.submitted_price((*(*opts).submitted_price).value);
+    }
+    if !(*opts).remark.is_null() {
+        opts2 = opts2.remark(cstr_to_rust((*opts).remark));
+    }
+    if !(*opts).client_request_id.is_null() {
+        opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
+    }
+    let delayed_until = parse_delayed_until((*opts).delayed_until);
+    execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
+        let resp: CCow<CSubmitOrderResponseOwned> =
+            CCow::new(ctx_inner.submit_multileg(opts2).await?);
         Ok(resp)
     });
 }
@@ -468,7 +712,27 @@ pub unsafe extern "C" fn lb_trade_context_cancel_order(
     });
 }
 
+/// Cancel attached order
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_cancel_order_attached(
+    ctx: *const CTradeContext,
+    order_id: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let order_id = cstr_to_rust(order_id);
+    execute_async(callback, ctx, userdata, async move {
+        ctx_inner
+            .cancel_order(CancelOrderOptions::new(order_id).is_attached())
+            .await?;
+        Ok(())
+    });
+}
+
 /// Get account balance
+///
+/// AP accounts only: US data-center accounts get a region error.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_account_balance(
     ctx: *const CTradeContext,
@@ -486,6 +750,8 @@ pub unsafe extern "C" fn lb_trade_context_account_balance(
 }
 
 /// Get cash flow
+///
+/// AP accounts only: US data-center accounts get a region error.
 ///
 /// @param[in] opts Options for get cash flow request
 #[unsafe(no_mangle)]
@@ -520,6 +786,9 @@ pub unsafe extern "C" fn lb_trade_context_cash_flow(
 
 /// Get fund positions
 ///
+/// AP accounts only: US data-center accounts have no fund holdings and get a
+/// region error. No US equivalent.
+///
 /// @param[in] opts Options for get fund positions request
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_fund_positions(
@@ -542,6 +811,8 @@ pub unsafe extern "C" fn lb_trade_context_fund_positions(
 
 /// Get stock positions
 ///
+/// AP accounts only: US data-center accounts get a region error.
+///
 /// @param[in] opts Options for get stock positions request
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_stock_positions(
@@ -563,6 +834,9 @@ pub unsafe extern "C" fn lb_trade_context_stock_positions(
 }
 
 /// Get margin ratio
+///
+/// AP accounts only: US data-center accounts get a region error. No US
+/// equivalent.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_margin_ratio(
     ctx: *const CTradeContext,
@@ -579,6 +853,8 @@ pub unsafe extern "C" fn lb_trade_context_margin_ratio(
 }
 
 /// Get order detail
+///
+/// AP accounts only: US data-center accounts get a region error.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_order_detail(
     ctx: *const CTradeContext,
@@ -590,6 +866,26 @@ pub unsafe extern "C" fn lb_trade_context_order_detail(
     let order_id = cstr_to_rust(order_id);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<COrderDetailOwned> = CCow::new(ctx_inner.order_detail(order_id).await?);
+        Ok(resp)
+    });
+}
+
+/// Get order detail for attached order
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_order_detail_attached(
+    ctx: *const CTradeContext,
+    order_id: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let order_id = cstr_to_rust(order_id);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<COrderDetailOwned> = CCow::new(
+            ctx_inner
+                .order_detail(GetOrderDetailOptions::new(order_id).is_attached())
+                .await?,
+        );
         Ok(resp)
     });
 }
@@ -624,4 +920,22 @@ pub unsafe extern "C" fn lb_trade_context_estimate_max_purchase_quantity(
             CCow::new(ctx_inner.estimate_max_purchase_quantity(opts2).await?);
         Ok(resp)
     });
+}
+
+/// Converts an optional C `delayed_until` (Unix seconds) into a time, reporting
+/// an out-of-range value through the callback instead of panicking.
+unsafe fn parse_delayed_until(
+    value: *const i64,
+) -> Result<Option<OffsetDateTime>, time::error::ComponentRange> {
+    if value.is_null() {
+        return Ok(None);
+    }
+    unsafe { OffsetDateTime::from_unix_timestamp(*value) }.map(Some)
+}
+
+fn delayed_until_error(err: time::error::ComponentRange) -> longbridge::Error {
+    longbridge::Error::ParseField {
+        name: "delayed_until",
+        error: err.to_string(),
+    }
 }

@@ -228,11 +228,12 @@ impl FundamentalContext {
         Ok(self.ctx.buyback(symbol).await.map_err(ErrorNewType)?.into())
     }
 
-    /// Get stock ratings for a security
-    #[napi]
-    pub async fn ratings(&self, symbol: String) -> Result<StockRatings> {
-        Ok(self.ctx.ratings(symbol).await.map_err(ErrorNewType)?.into())
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings for a security
+    // #[napi]
+    // pub async fn ratings(&self, symbol: String) -> Result<StockRatings> {
+    //     Ok(self.ctx.ratings(symbol).await.map_err(ErrorNewType)?.into())
+    // }
 
     /// Get ranked list of top shareholders
     #[napi]
@@ -318,6 +319,130 @@ impl FundamentalContext {
         Ok(self
             .ctx
             .macroeconomic(indicator_code, start_date, end_date, offset, limit)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    // ── US-market methods
+    // ─────────────────────────────────────────────────────
+
+    /// Get US company overview. US token required.
+    #[napi]
+    pub async fn us_company_overview(&self, symbol: String) -> Result<USCompanyOverview> {
+        Ok(self
+            .ctx
+            .us_company_overview(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US valuation overview. US token required.
+    #[napi]
+    pub async fn us_valuation_overview(&self, symbol: String) -> Result<USValuationOverview> {
+        Ok(self
+            .ctx
+            .us_valuation_overview(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US financial overview. US token required.
+    #[napi]
+    pub async fn us_financial_overview(
+        &self,
+        symbol: String,
+        report: String,
+    ) -> Result<USFinancialOverview> {
+        Ok(self
+            .ctx
+            .us_financial_overview(symbol, report)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US financial statement v3. `kind` selects one statement (there is
+    /// no "all" mode). US token required.
+    #[napi]
+    pub async fn us_financial_statement(
+        &self,
+        symbol: String,
+        kind: FinancialStatementKind,
+        report: String,
+    ) -> Result<USFinancialStatement> {
+        Ok(self
+            .ctx
+            .us_financial_statement(symbol, kind.into(), report)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US key financial metrics. US token required.
+    #[napi]
+    pub async fn us_key_financial_metrics(
+        &self,
+        symbol: String,
+        report: String,
+    ) -> Result<USKeyFinancialMetrics> {
+        Ok(self
+            .ctx
+            .us_key_financial_metrics(symbol, report)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US analyst consensus estimates. US token required.
+    #[napi]
+    pub async fn us_analyst_consensus(
+        &self,
+        symbol: String,
+        report: String,
+    ) -> Result<USAnalystConsensus> {
+        Ok(self
+            .ctx
+            .us_analyst_consensus(symbol, report)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US ETF dividend history. US token required.
+    #[napi]
+    pub async fn us_etf_dividend_info(&self, symbol: String) -> Result<USETFDividendInfo> {
+        Ok(self
+            .ctx
+            .us_etf_dividend_info(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US company dividends. US token required.
+    #[napi]
+    pub async fn us_company_dividends(&self, symbol: String) -> Result<USCompanyDividends> {
+        Ok(self
+            .ctx
+            .us_company_dividends(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US ETF document list. size=None returns all. US token required.
+    #[napi]
+    pub async fn us_etf_files(
+        &self,
+        symbol: String,
+        size: Option<u32>,
+    ) -> Result<USETFFilesResponse> {
+        Ok(self
+            .ctx
+            .us_etf_files(symbol, size)
             .await
             .map_err(ErrorNewType)?
             .into())

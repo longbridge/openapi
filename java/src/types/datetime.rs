@@ -32,8 +32,21 @@ impl JSignature for OffsetDateTime {
 impl FromJValue for OffsetDateTime {
     fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
         let obj = value.l()?;
+        if obj.is_null() {
+            crate::error::throw_illegal_argument(env, "OffsetDateTime argument must not be null");
+            return Err(jni::errors::Error::JavaException);
+        }
         let value = env.call_method(obj, "toEpochSecond", "()J", &[])?.j()?;
-        Ok(OffsetDateTime::from_unix_timestamp(value).unwrap())
+        match OffsetDateTime::from_unix_timestamp(value) {
+            Ok(dt) => Ok(dt),
+            Err(_) => {
+                crate::error::throw_illegal_argument(
+                    env,
+                    format!("epoch second {value} is out of range for OffsetDateTime"),
+                );
+                Err(jni::errors::Error::JavaException)
+            }
+        }
     }
 }
 
@@ -75,13 +88,25 @@ impl JSignature for Date {
 impl FromJValue for Date {
     fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
         let obj = value.l()?;
+        if obj.is_null() {
+            crate::error::throw_illegal_argument(env, "LocalDate argument must not be null");
+            return Err(jni::errors::Error::JavaException);
+        }
         let year = env.call_method(&obj, "getYear", "()I", &[])?.i()?;
         let month = env.call_method(&obj, "getMonthValue", "()I", &[])?.i()?;
         let day = env.call_method(&obj, "getDayOfMonth", "()I", &[])?.i()?;
-        Ok(
-            Date::from_calendar_date(year, Month::try_from(month as u8).unwrap(), day as u8)
-                .unwrap(),
-        )
+        let date = Month::try_from(month as u8)
+            .and_then(|month| Date::from_calendar_date(year, month, day as u8));
+        match date {
+            Ok(date) => Ok(date),
+            Err(_) => {
+                crate::error::throw_illegal_argument(
+                    env,
+                    format!("invalid date {year}-{month}-{day}"),
+                );
+                Err(jni::errors::Error::JavaException)
+            }
+        }
     }
 }
 
@@ -117,10 +142,23 @@ impl JSignature for Time {
 impl FromJValue for Time {
     fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
         let obj = value.l()?;
+        if obj.is_null() {
+            crate::error::throw_illegal_argument(env, "LocalTime argument must not be null");
+            return Err(jni::errors::Error::JavaException);
+        }
         let hour = env.call_method(&obj, "getHour", "()I", &[])?.i()?;
         let minute = env.call_method(&obj, "getMinute", "()I", &[])?.i()?;
         let second = env.call_method(&obj, "getSecond", "()I", &[])?.i()?;
-        Ok(Time::from_hms(hour as u8, minute as u8, second as u8).unwrap())
+        match Time::from_hms(hour as u8, minute as u8, second as u8) {
+            Ok(time) => Ok(time),
+            Err(_) => {
+                crate::error::throw_illegal_argument(
+                    env,
+                    format!("invalid time {hour}:{minute}:{second}"),
+                );
+                Err(jni::errors::Error::JavaException)
+            }
+        }
     }
 }
 

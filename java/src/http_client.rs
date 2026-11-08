@@ -93,7 +93,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_httpClientRequest(
     }
 
     jni_result(&mut env, (), |env| {
-        let http_client = &*(http_client as *const HttpClient);
+        // Clone the (Arc-backed) client so the spawned future owns it: the Java
+        // `HttpClient` may be close()d while this request is still in flight.
+        let http_client = (*(http_client as *const HttpClient)).clone();
         let request = String::from_jvalue(env, request.into())?;
         let request: Request =
             serde_json::from_str(&request).map_err(|err| JniError::Other(err.to_string()))?;

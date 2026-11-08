@@ -3,11 +3,13 @@ use std::os::raw::c_char;
 use longbridge::{
     Market,
     trade::{
-        AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo,
+        AccountBalance, AllExecutionsResponse, AttachedOrderDetail, AttachedOrderType, BalanceType,
+        CashFlow, CashFlowDirection, CashInfo, ContractDirection,
         EstimateMaxPurchaseQuantityResponse, Execution, FrozenTransactionFee, FundPosition,
-        FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderChargeDetail,
-        OrderChargeFee, OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus,
-        OrderTag, OrderType, PushOrderChanged, StockPosition, StockPositionChannel,
+        FundPositionChannel, FundPositionsResponse, MarginRatio, MultiLegInfo, MultiLegOrderLeg,
+        MultiLegPosition, MultiLegStrategy, Order, OrderChargeDetail, OrderChargeFee,
+        OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus, OrderTag,
+        OrderType, PushGridOrderChanged, PushOrderChanged, StockPosition, StockPositionChannel,
         StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
     },
 };
@@ -16,11 +18,491 @@ use time::OffsetDateTime;
 use crate::{
     trade_context::enum_types::{
         CBalanceType, CCashFlowDirection, CChargeCategoryCode, CCommissionFreeStatus,
-        CDeductionStatus, COrderSide, COrderStatus, COrderTag, COrderType, COutsideRTH,
-        CTimeInForceType, CTriggerStatus,
+        CContractDirection, CDeductionStatus, CMultiLegPosition, CMultiLegStrategy, COrderSide,
+        COrderStatus, COrderTag, COrderType, COutsideRTH, CTimeInForceType, CTriggerStatus,
     },
     types::{CDate, CDecimal, CMarket, CString, CVec, ToFFI},
 };
+
+/// Attached order type
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CAttachedOrderType {
+    /// Unknown
+    AttachedOrderTypeUnknown = 0,
+    /// Take profit
+    AttachedOrderTypeProfitTaker = 1,
+    /// Stop loss
+    AttachedOrderTypeStopLoss = 2,
+    /// Bracket order
+    AttachedOrderTypeBracket = 3,
+}
+
+impl From<AttachedOrderType> for CAttachedOrderType {
+    fn from(value: AttachedOrderType) -> Self {
+        match value {
+            AttachedOrderType::Unknown => CAttachedOrderType::AttachedOrderTypeUnknown,
+            AttachedOrderType::ProfitTaker => CAttachedOrderType::AttachedOrderTypeProfitTaker,
+            AttachedOrderType::StopLoss => CAttachedOrderType::AttachedOrderTypeStopLoss,
+            AttachedOrderType::Bracket => CAttachedOrderType::AttachedOrderTypeBracket,
+        }
+    }
+}
+
+impl From<CAttachedOrderType> for AttachedOrderType {
+    fn from(value: CAttachedOrderType) -> Self {
+        match value {
+            CAttachedOrderType::AttachedOrderTypeUnknown => AttachedOrderType::Unknown,
+            CAttachedOrderType::AttachedOrderTypeProfitTaker => AttachedOrderType::ProfitTaker,
+            CAttachedOrderType::AttachedOrderTypeStopLoss => AttachedOrderType::StopLoss,
+            CAttachedOrderType::AttachedOrderTypeBracket => AttachedOrderType::Bracket,
+        }
+    }
+}
+
+/// Attached order detail
+#[repr(C)]
+pub struct CAttachedOrderDetail {
+    /// Attached order ID
+    pub order_id: *const c_char,
+    /// Attached order type
+    pub attached_type_display: CAttachedOrderType,
+    /// Trigger price (maybe null)
+    pub trigger_price: *const CDecimal,
+    /// Quantity
+    pub quantity: *const CDecimal,
+    /// Executed quantity
+    pub executed_qty: *const CDecimal,
+    /// Order status
+    pub status: COrderStatus,
+    /// Last updated time (unix timestamp)
+    pub updated_at: i64,
+    /// Whether withdrawn
+    pub withdrawn: bool,
+    /// GTD date (maybe null)
+    pub gtd: *const CDate,
+    /// Time in force type
+    pub time_in_force: CTimeInForceType,
+    /// Counter order ID
+    pub counter_id: *const c_char,
+    /// Trigger status (maybe null)
+    pub trigger_status: *const CTriggerStatus,
+    /// Executed amount
+    pub executed_amount: *const CDecimal,
+    /// Tag
+    pub tag: COrderTag,
+    /// Submitted time (unix timestamp)
+    pub submitted_at: i64,
+    /// Executed price
+    pub executed_price: *const CDecimal,
+    /// Force RTH only (maybe null)
+    pub force_only_rth: *const COutsideRTH,
+    /// Whether reviewed
+    pub reviewed: bool,
+    /// Order type to submit after trigger
+    pub activate_order_type: COrderType,
+    /// RTH setting for activated order (maybe null)
+    pub activate_rth: *const COutsideRTH,
+    /// Submit price (maybe null)
+    pub submit_price: *const CDecimal,
+    /// Bid/ask depth level of the limit order submitted price (maybe null)
+    pub limit_depth_level: *const i32,
+}
+
+#[derive(Debug)]
+pub(crate) struct CAttachedOrderDetailOwned {
+    order_id: CString,
+    attached_type_display: AttachedOrderType,
+    trigger_price: Option<CDecimal>,
+    quantity: CDecimal,
+    executed_qty: CDecimal,
+    status: OrderStatus,
+    updated_at: i64,
+    withdrawn: bool,
+    gtd: Option<CDate>,
+    time_in_force: TimeInForceType,
+    counter_id: CString,
+    trigger_status: Option<CTriggerStatus>,
+    executed_amount: CDecimal,
+    tag: OrderTag,
+    submitted_at: i64,
+    executed_price: Option<CDecimal>,
+    force_only_rth: Option<COutsideRTH>,
+    reviewed: bool,
+    activate_order_type: OrderType,
+    activate_rth: Option<COutsideRTH>,
+    submit_price: Option<CDecimal>,
+    limit_depth_level: Option<i32>,
+}
+
+impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
+    fn from(detail: AttachedOrderDetail) -> Self {
+        let AttachedOrderDetail {
+            order_id,
+            attached_type_display,
+            trigger_price,
+            quantity,
+            executed_qty,
+            status,
+            updated_at,
+            withdrawn,
+            gtd,
+            time_in_force,
+            counter_id,
+            trigger_status,
+            executed_amount,
+            tag,
+            submitted_at,
+            executed_price,
+            force_only_rth,
+            reviewed,
+            activate_order_type,
+            activate_rth,
+            submit_price,
+            limit_depth_level,
+        } = detail;
+        Self {
+            order_id: order_id.into(),
+            attached_type_display,
+            trigger_price: trigger_price.map(Into::into),
+            quantity: quantity.into(),
+            executed_qty: executed_qty.into(),
+            status,
+            updated_at: updated_at.unix_timestamp(),
+            withdrawn,
+            gtd: gtd.map(Into::into),
+            time_in_force,
+            counter_id: counter_id.into(),
+            trigger_status: trigger_status.map(Into::into),
+            executed_amount: executed_amount.into(),
+            tag,
+            submitted_at: submitted_at.unix_timestamp(),
+            executed_price: executed_price.map(Into::into),
+            force_only_rth: force_only_rth.map(Into::into),
+            reviewed,
+            activate_order_type,
+            activate_rth: activate_rth.map(Into::into),
+            submit_price: submit_price.map(Into::into),
+            limit_depth_level,
+        }
+    }
+}
+
+impl ToFFI for CAttachedOrderDetailOwned {
+    type FFIType = CAttachedOrderDetail;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CAttachedOrderDetailOwned {
+            order_id,
+            attached_type_display,
+            trigger_price,
+            quantity,
+            executed_qty,
+            status,
+            updated_at,
+            withdrawn,
+            gtd,
+            time_in_force,
+            counter_id,
+            trigger_status,
+            executed_amount,
+            tag,
+            submitted_at,
+            executed_price,
+            force_only_rth,
+            reviewed,
+            activate_order_type,
+            activate_rth,
+            submit_price,
+            limit_depth_level,
+        } = self;
+        CAttachedOrderDetail {
+            order_id: order_id.to_ffi_type(),
+            attached_type_display: (*attached_type_display).into(),
+            trigger_price: trigger_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            quantity: quantity.to_ffi_type(),
+            executed_qty: executed_qty.to_ffi_type(),
+            status: (*status).into(),
+            updated_at: *updated_at,
+            withdrawn: *withdrawn,
+            gtd: gtd
+                .as_ref()
+                .map(|value| value as *const CDate)
+                .unwrap_or(std::ptr::null()),
+            time_in_force: (*time_in_force).into(),
+            counter_id: counter_id.to_ffi_type(),
+            trigger_status: trigger_status
+                .as_ref()
+                .map(|value| value as *const CTriggerStatus)
+                .unwrap_or(std::ptr::null()),
+            executed_amount: executed_amount.to_ffi_type(),
+            tag: (*tag).into(),
+            submitted_at: *submitted_at,
+            executed_price: executed_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            force_only_rth: force_only_rth
+                .as_ref()
+                .map(|value| value as *const COutsideRTH)
+                .unwrap_or(std::ptr::null()),
+            reviewed: *reviewed,
+            activate_order_type: (*activate_order_type).into(),
+            activate_rth: activate_rth
+                .as_ref()
+                .map(|value| value as *const COutsideRTH)
+                .unwrap_or(std::ptr::null()),
+            submit_price: submit_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            limit_depth_level: limit_depth_level
+                .as_ref()
+                .map(|value| value as *const i32)
+                .unwrap_or(std::ptr::null()),
+        }
+    }
+}
+
+/// A leg of a multi-leg combination order
+#[repr(C)]
+pub struct CMultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    pub symbol: *const c_char,
+    /// Order side
+    pub side: COrderSide,
+    /// Position direction
+    pub position: CMultiLegPosition,
+    /// Leg ratio quantity
+    pub ratio_quantity: *const CDecimal,
+    /// Strike price (maybe null)
+    pub strike_price: *const CDecimal,
+    /// Option expiry date (maybe null)
+    pub expire_date: *const CDate,
+    /// Contract type
+    pub contract_direction: CContractDirection,
+}
+
+#[derive(Debug)]
+pub(crate) struct CMultiLegOrderLegOwned {
+    symbol: CString,
+    side: OrderSide,
+    position: MultiLegPosition,
+    ratio_quantity: CDecimal,
+    strike_price: Option<CDecimal>,
+    expire_date: Option<CDate>,
+    contract_direction: ContractDirection,
+}
+
+impl From<MultiLegOrderLeg> for CMultiLegOrderLegOwned {
+    fn from(leg: MultiLegOrderLeg) -> Self {
+        let MultiLegOrderLeg {
+            symbol,
+            side,
+            position,
+            ratio_quantity,
+            strike_price,
+            expire_date,
+            contract_direction,
+        } = leg;
+        Self {
+            symbol: symbol.into(),
+            side,
+            position,
+            ratio_quantity: ratio_quantity.into(),
+            strike_price: strike_price.map(Into::into),
+            expire_date: expire_date.map(Into::into),
+            contract_direction,
+        }
+    }
+}
+
+impl ToFFI for CMultiLegOrderLegOwned {
+    type FFIType = CMultiLegOrderLeg;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CMultiLegOrderLegOwned {
+            symbol,
+            side,
+            position,
+            ratio_quantity,
+            strike_price,
+            expire_date,
+            contract_direction,
+        } = self;
+        CMultiLegOrderLeg {
+            symbol: symbol.to_ffi_type(),
+            side: (*side).into(),
+            position: (*position).into(),
+            ratio_quantity: ratio_quantity.to_ffi_type(),
+            strike_price: strike_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            expire_date: expire_date
+                .as_ref()
+                .map(|value| value as *const CDate)
+                .unwrap_or(std::ptr::null()),
+            contract_direction: (*contract_direction).into(),
+        }
+    }
+}
+
+/// Multi-leg strategy information
+#[repr(C)]
+pub struct CMultiLegInfo {
+    /// Multi-leg strategy
+    pub strategy: CMultiLegStrategy,
+    /// Strategy name
+    pub strategy_name: *const c_char,
+    /// Multi-leg combination ID
+    pub multileg_id: *const c_char,
+    /// Multi-leg combination code
+    pub code: *const c_char,
+    /// Legs of the combination order
+    pub legs: *const CMultiLegOrderLeg,
+    /// Number of legs
+    pub num_legs: usize,
+}
+
+impl Default for CMultiLegInfo {
+    fn default() -> Self {
+        Self {
+            strategy: CMultiLegStrategy::MultiLegStrategyUnknown,
+            strategy_name: std::ptr::null(),
+            multileg_id: std::ptr::null(),
+            code: std::ptr::null(),
+            legs: std::ptr::null(),
+            num_legs: 0,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct CMultiLegInfoOwned {
+    strategy: MultiLegStrategy,
+    strategy_name: CString,
+    multileg_id: CString,
+    code: CString,
+    legs: CVec<CMultiLegOrderLegOwned>,
+}
+
+impl From<MultiLegInfo> for CMultiLegInfoOwned {
+    fn from(info: MultiLegInfo) -> Self {
+        let MultiLegInfo {
+            strategy,
+            strategy_name,
+            multileg_id,
+            code,
+            legs,
+        } = info;
+        Self {
+            strategy,
+            strategy_name: strategy_name.into(),
+            multileg_id: multileg_id.into(),
+            code: code.into(),
+            legs: legs.into(),
+        }
+    }
+}
+
+impl ToFFI for CMultiLegInfoOwned {
+    type FFIType = CMultiLegInfo;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CMultiLegInfoOwned {
+            strategy,
+            strategy_name,
+            multileg_id,
+            code,
+            legs,
+        } = self;
+        CMultiLegInfo {
+            strategy: (*strategy).into(),
+            strategy_name: strategy_name.to_ffi_type(),
+            multileg_id: multileg_id.to_ffi_type(),
+            code: code.to_ffi_type(),
+            legs: legs.to_ffi_type(),
+            num_legs: legs.len(),
+        }
+    }
+}
+
+/// Options for submit attached order params
+#[derive(Debug)]
+#[repr(C)]
+pub struct CSubmitAttachedParams {
+    /// Attached order type
+    pub attached_order_type: CAttachedOrderType,
+    /// Take-profit trigger price (can be null)
+    pub profit_taker_price: *const CDecimal,
+    /// Stop-loss trigger price (can be null)
+    pub stop_loss_price: *const CDecimal,
+    /// Time in force type (can be null)
+    pub time_in_force: *const CTimeInForceType,
+    /// Expiry time unix timestamp (can be null)
+    pub expire_time: *const i64,
+    /// Order type to submit after trigger (can be null)
+    pub activate_order_type: *const COrderType,
+    /// Take-profit limit price (can be null)
+    pub profit_taker_submit_price: *const CDecimal,
+    /// Stop-loss limit price (can be null)
+    pub stop_loss_submit_price: *const CDecimal,
+    /// RTH setting for activated order (can be null)
+    pub activate_rth: *const COutsideRTH,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub profit_taker_depth_level: *const i32,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub stop_loss_depth_level: *const i32,
+}
+
+/// Options for replace attached order params
+#[derive(Debug)]
+#[repr(C)]
+pub struct CReplaceAttachedParams {
+    /// Attached order type
+    pub attached_order_type: CAttachedOrderType,
+    /// Take-profit trigger price (can be null)
+    pub profit_taker_price: *const CDecimal,
+    /// Stop-loss trigger price (can be null)
+    pub stop_loss_price: *const CDecimal,
+    /// Time in force type (can be null)
+    pub time_in_force: *const CTimeInForceType,
+    /// Expiry time unix timestamp (can be null)
+    pub expire_time: *const i64,
+    /// Order type to submit after trigger (can be null)
+    pub activate_order_type: *const COrderType,
+    /// Take-profit limit price (can be null)
+    pub profit_taker_submit_price: *const CDecimal,
+    /// Stop-loss limit price (can be null)
+    pub stop_loss_submit_price: *const CDecimal,
+    /// RTH setting for activated order (can be null)
+    pub activate_rth: *const COutsideRTH,
+    /// Take-profit order ID (can be null)
+    pub profit_taker_id: *const i64,
+    /// Stop-loss order ID (can be null)
+    pub stop_loss_id: *const i64,
+    /// Cancel all attached orders flag (can be null)
+    pub cancel_all_attached: *const bool,
+    /// Main order ID (can be null)
+    pub main_id: *const i64,
+    /// Quantity (can be null)
+    pub quantity: *const CDecimal,
+    /// Market price (can be null)
+    pub market_price: *const CDecimal,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub profit_taker_depth_level: *const i32,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub stop_loss_depth_level: *const i32,
+}
 
 /// Order changed message
 #[repr(C)]
@@ -75,6 +557,11 @@ pub struct CPushOrderChanged {
     pub last_price: *const CDecimal,
     /// Remark message
     pub remark: *const c_char,
+    /// Whether multi_leg is valid (true only for multi-leg option combination
+    /// orders)
+    pub has_multi_leg: bool,
+    /// Multi-leg strategy information (only valid when has_multi_leg is true)
+    pub multi_leg: CMultiLegInfo,
 }
 
 pub struct CPushOrderChangedOwned {
@@ -104,6 +591,7 @@ pub struct CPushOrderChangedOwned {
     last_price: Option<CDecimal>,
     /// Remark message
     pub remark: CString,
+    multi_leg: Option<CMultiLegInfoOwned>,
 }
 
 impl From<PushOrderChanged> for CPushOrderChangedOwned {
@@ -134,6 +622,7 @@ impl From<PushOrderChanged> for CPushOrderChangedOwned {
             last_share,
             last_price,
             remark,
+            multi_leg,
         } = order_changed;
         CPushOrderChangedOwned {
             side,
@@ -161,6 +650,7 @@ impl From<PushOrderChanged> for CPushOrderChangedOwned {
             last_share: last_share.map(Into::into),
             last_price: last_price.map(Into::into),
             remark: remark.into(),
+            multi_leg: multi_leg.map(Into::into),
         }
     }
 }
@@ -195,6 +685,7 @@ impl ToFFI for CPushOrderChangedOwned {
             last_share,
             last_price,
             remark,
+            multi_leg,
         } = self;
         CPushOrderChanged {
             side: (*side).into(),
@@ -249,6 +740,11 @@ impl ToFFI for CPushOrderChangedOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             remark: remark.to_ffi_type(),
+            has_multi_leg: multi_leg.is_some(),
+            multi_leg: multi_leg
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or_default(),
         }
     }
 }
@@ -268,6 +764,9 @@ pub struct CExecution {
     pub quantity: *const CDecimal,
     /// Executed price
     pub price: *const CDecimal,
+    /// Order side. `Unknown` when the response omits it (Longbridge US
+    /// `/v1/trade/execution/history`)
+    pub side: COrderSide,
 }
 
 #[derive(Debug)]
@@ -278,6 +777,7 @@ pub(crate) struct CExecutionOwned {
     trade_done_at: i64,
     quantity: CDecimal,
     price: CDecimal,
+    side: OrderSide,
 }
 
 impl From<Execution> for CExecutionOwned {
@@ -289,6 +789,7 @@ impl From<Execution> for CExecutionOwned {
             trade_done_at,
             quantity,
             price,
+            side,
         } = execution;
         CExecutionOwned {
             order_id: order_id.into(),
@@ -297,6 +798,7 @@ impl From<Execution> for CExecutionOwned {
             trade_done_at: trade_done_at.unix_timestamp(),
             quantity: quantity.into(),
             price: price.into(),
+            side,
         }
     }
 }
@@ -312,6 +814,7 @@ impl ToFFI for CExecutionOwned {
             trade_done_at,
             quantity,
             price,
+            side,
         } = self;
         CExecution {
             order_id: order_id.to_ffi_type(),
@@ -320,6 +823,7 @@ impl ToFFI for CExecutionOwned {
             trade_done_at: *trade_done_at,
             quantity: quantity.to_ffi_type(),
             price: price.to_ffi_type(),
+            side: (*side).into(),
         }
     }
 }
@@ -342,6 +846,60 @@ pub struct CGetTodayExecutionsOptions {
     pub symbol: *const c_char,
     /// Order id (can be null)
     pub order_id: *const c_char,
+}
+
+/// Options for get all executions request
+#[repr(C)]
+pub struct CGetAllExecutionsOptions {
+    /// Security code (can be null)
+    pub symbol: *const c_char,
+    /// Order id (can be null)
+    pub order_id: *const c_char,
+    /// Start time (can be null)
+    pub start_at: *const i64,
+    /// End time (can be null)
+    pub end_at: *const i64,
+    /// Page number (can be null)
+    pub page: *const u64,
+}
+
+/// All executions response
+#[repr(C)]
+pub struct CAllExecutionsResponse {
+    /// Has more records
+    pub has_more: bool,
+    /// Executions
+    pub trades: *const CExecution,
+    /// Number of executions
+    pub num_trades: usize,
+}
+
+pub(crate) struct CAllExecutionsResponseOwned {
+    pub has_more: bool,
+    pub trades: CVec<CExecutionOwned>,
+}
+
+impl From<AllExecutionsResponse> for CAllExecutionsResponseOwned {
+    fn from(resp: AllExecutionsResponse) -> Self {
+        let AllExecutionsResponse { has_more, trades } = resp;
+        Self {
+            has_more,
+            trades: trades.into(),
+        }
+    }
+}
+
+impl ToFFI for CAllExecutionsResponseOwned {
+    type FFIType = CAllExecutionsResponse;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CAllExecutionsResponseOwned { has_more, trades } = self;
+        CAllExecutionsResponse {
+            has_more: *has_more,
+            trades: trades.to_ffi_type(),
+            num_trades: trades.len(),
+        }
+    }
 }
 
 /// Order
@@ -405,6 +963,17 @@ pub struct COrder {
     pub monitor_price: *const CDecimal,
     /// Remark
     pub remark: *const c_char,
+    /// Attached orders
+    pub attached_orders: *const CAttachedOrderDetail,
+    /// Number of attached orders
+    pub num_attached_orders: usize,
+    /// Whether multi_leg is valid (true only for multi-leg option combination
+    /// orders)
+    pub has_multi_leg: bool,
+    /// Multi-leg strategy information (only valid when has_multi_leg is true)
+    pub multi_leg: CMultiLegInfo,
+    /// Time-condition submit time (maybe null)
+    pub delayed_until: *const i64,
 }
 
 #[derive(Debug)]
@@ -438,6 +1007,9 @@ pub(crate) struct COrderOwned {
     trigger_count: Option<i32>,
     monitor_price: Option<CDecimal>,
     remark: CString,
+    delayed_until: Option<i64>,
+    attached_orders: CVec<CAttachedOrderDetailOwned>,
+    multi_leg: Option<CMultiLegInfoOwned>,
 }
 
 impl From<Order> for COrderOwned {
@@ -472,6 +1044,9 @@ impl From<Order> for COrderOwned {
             trigger_count,
             monitor_price,
             remark,
+            delayed_until,
+            attached_orders,
+            multi_leg,
         } = order;
         COrderOwned {
             order_id: order_id.into(),
@@ -503,6 +1078,9 @@ impl From<Order> for COrderOwned {
             trigger_count,
             monitor_price: monitor_price.map(Into::into),
             remark: remark.into(),
+            delayed_until: delayed_until.map(OffsetDateTime::unix_timestamp),
+            attached_orders: attached_orders.into(),
+            multi_leg: multi_leg.map(Into::into),
         }
     }
 }
@@ -541,6 +1119,9 @@ impl ToFFI for COrderOwned {
             trigger_count,
             monitor_price,
             remark,
+            delayed_until,
+            attached_orders,
+            multi_leg,
         } = self;
         COrder {
             order_id: order_id.to_ffi_type(),
@@ -617,6 +1198,17 @@ impl ToFFI for COrderOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             remark: remark.to_ffi_type(),
+            delayed_until: delayed_until
+                .as_ref()
+                .map(|value| value as *const i64)
+                .unwrap_or(std::ptr::null()),
+            attached_orders: attached_orders.to_ffi_type(),
+            num_attached_orders: attached_orders.len(),
+            has_multi_leg: multi_leg.is_some(),
+            multi_leg: multi_leg
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or_default(),
         }
     }
 }
@@ -657,6 +1249,8 @@ pub struct CGetTodayOrdersOptions {
     pub market: *const CMarket,
     /// Order id (can be null)
     pub order_id: *const c_char,
+    /// Filter by attached order (can be null)
+    pub is_attached: *const bool,
 }
 
 /// Options for replace order request
@@ -685,6 +1279,15 @@ pub struct CReplaceOrderOptions {
     pub monitor_price: *const CDecimal,
     /// Remark (can be null)
     pub remark: *const c_char,
+    /// Attached order parameters (can be null)
+    pub attached_params: *const CReplaceAttachedParams,
+    /// New time-condition submit time, Unix timestamp in seconds; must be
+    /// later than now and no more than 90 days ahead (can be null to keep the
+    /// current time condition)
+    pub delayed_until: *const i64,
+    /// Clear the time condition, turning the order into a regular order
+    /// (takes precedence over `delayed_until`)
+    pub clear_delayed_until: bool,
 }
 
 /// Options for submit order request
@@ -724,6 +1327,16 @@ pub struct CSubmitOrderOptions {
     pub monitor_price: *const CDecimal,
     /// Remark (Maximum 64 characters) (can be null)
     pub remark: *const c_char,
+    /// Idempotent request ID for preventing duplicate orders (can be null).
+    /// If not specified, idempotency control is skipped.
+    /// The server caches this ID for 10 minutes.
+    pub client_request_id: *const c_char,
+    /// Attached order parameters (can be null)
+    pub attached_params: *const CSubmitAttachedParams,
+    /// Time-condition submit time, Unix timestamp in seconds (can be null).
+    /// The order is held in `DelayedNotReported` status and only submitted at
+    /// this time, which must be later than now and no more than 90 days ahead.
+    pub delayed_until: *const i64,
 }
 
 /// Response for submit order request
@@ -754,6 +1367,48 @@ impl ToFFI for CSubmitOrderResponseOwned {
             order_id: self.order_id.to_ffi_type(),
         }
     }
+}
+
+/// A leg of a multi-leg combination order to submit
+#[repr(C)]
+pub struct CSubmitMultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
+    pub symbol: *const c_char,
+    /// Leg ratio quantity — must be a positive number.  The direction of each
+    /// leg is implied by the strategy together with the order side, not by the
+    /// sign of this value; a negative or zero ratio is rejected by the server
+    /// with `602001`.
+    pub ratio_quantity: *const CDecimal,
+}
+
+/// Options for submit multi-leg order request
+#[repr(C)]
+pub struct CSubmitMultiLegOrderOptions {
+    /// Order side
+    pub side: COrderSide,
+    /// Order type
+    pub order_type: COrderType,
+    /// Submitted quantity (number of combinations)
+    pub submitted_quantity: *const CDecimal,
+    /// Multi-leg strategy
+    pub strategy: CMultiLegStrategy,
+    /// Legs of the combination order
+    pub legs: *const CSubmitMultiLegOrderLeg,
+    /// Number of legs
+    pub num_legs: usize,
+    /// Submitted price (required for limit order types such as `LO`) (can be
+    /// null)
+    pub submitted_price: *const CDecimal,
+    /// Remark (Maximum 255 characters) (can be null)
+    pub remark: *const c_char,
+    /// Idempotent request ID for preventing duplicate orders (can be null).
+    /// If not specified, idempotency control is skipped.
+    /// The server caches this ID for 10 minutes.
+    pub client_request_id: *const c_char,
+    /// Time-condition submit time, Unix timestamp in seconds (can be null);
+    /// must be later than now and no more than 90 days ahead. Only `LO` / `MO`
+    /// support time conditions.
+    pub delayed_until: *const i64,
 }
 
 /// Account balance
@@ -1179,8 +1834,8 @@ impl ToFFI for CFundPositionChannelOwned {
 /// Fund position
 #[repr(C)]
 pub struct CFundPosition {
-    /// Fund ISIN code
-    pub symbol: *const c_char,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    pub counter_id: *const c_char,
     /// Current equity
     pub current_net_asset_value: *const CDecimal,
     /// Current equity time
@@ -1196,7 +1851,7 @@ pub struct CFundPosition {
 }
 
 pub(crate) struct CFundPositionOwned {
-    symbol: CString,
+    counter_id: CString,
     current_net_asset_value: CDecimal,
     net_asset_value_day: i64,
     symbol_name: CString,
@@ -1208,7 +1863,7 @@ pub(crate) struct CFundPositionOwned {
 impl From<FundPosition> for CFundPositionOwned {
     fn from(position: FundPosition) -> Self {
         let FundPosition {
-            symbol,
+            counter_id,
             current_net_asset_value,
             net_asset_value_day,
             symbol_name,
@@ -1217,7 +1872,7 @@ impl From<FundPosition> for CFundPositionOwned {
             holding_units,
         } = position;
         Self {
-            symbol: symbol.into(),
+            counter_id: counter_id.into(),
             current_net_asset_value: current_net_asset_value.into(),
             net_asset_value_day: net_asset_value_day.unix_timestamp(),
             symbol_name: symbol_name.into(),
@@ -1233,7 +1888,7 @@ impl ToFFI for CFundPositionOwned {
 
     fn to_ffi_type(&self) -> Self::FFIType {
         let CFundPositionOwned {
-            symbol,
+            counter_id,
             current_net_asset_value,
             net_asset_value_day,
             symbol_name,
@@ -1242,7 +1897,7 @@ impl ToFFI for CFundPositionOwned {
             holding_units,
         } = self;
         CFundPosition {
-            symbol: symbol.to_ffi_type(),
+            counter_id: counter_id.to_ffi_type(),
             current_net_asset_value: current_net_asset_value.to_ffi_type(),
             net_asset_value_day: *net_asset_value_day,
             symbol_name: symbol_name.to_ffi_type(),
@@ -1641,6 +2296,7 @@ impl ToFFI for COrderChargeItemOwned {
 }
 
 /// Order charge detail
+#[derive(Clone)]
 #[repr(C)]
 pub struct COrderChargeDetail {
     /// Total charges amount
@@ -1651,6 +2307,17 @@ pub struct COrderChargeDetail {
     pub items: *const COrderChargeItem,
     /// Number of items
     pub num_items: usize,
+}
+
+impl Default for COrderChargeDetail {
+    fn default() -> Self {
+        Self {
+            total_amount: std::ptr::null(),
+            currency: std::ptr::null(),
+            items: std::ptr::null(),
+            num_items: 0,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -1769,8 +2436,21 @@ pub struct COrderDetail {
     pub history: *const COrderHistoryDetail,
     /// Number of history
     pub num_history: usize,
-    /// Order charges
+    /// Whether charge_detail is valid (false when the order has no charge info)
+    pub has_charge_detail: bool,
+    /// Order charges (only valid when has_charge_detail is true)
     pub charge_detail: COrderChargeDetail,
+    /// Attached orders
+    pub attached_orders: *const CAttachedOrderDetail,
+    /// Number of attached orders
+    pub num_attached_orders: usize,
+    /// Whether multi_leg is valid (true only for multi-leg option combination
+    /// orders)
+    pub has_multi_leg: bool,
+    /// Multi-leg strategy information (only valid when has_multi_leg is true)
+    pub multi_leg: CMultiLegInfo,
+    /// Time-condition submit time (maybe null)
+    pub delayed_until: *const i64,
 }
 
 #[derive(Debug)]
@@ -1804,6 +2484,7 @@ pub(crate) struct COrderDetailOwned {
     trigger_count: Option<i32>,
     monitor_price: Option<CDecimal>,
     remark: CString,
+    delayed_until: Option<i64>,
     free_status: CCommissionFreeStatus,
     free_amount: Option<CDecimal>,
     free_currency: Option<CString>,
@@ -1814,7 +2495,9 @@ pub(crate) struct COrderDetailOwned {
     platform_deducted_amount: Option<CDecimal>,
     platform_deducted_currency: Option<CString>,
     history: CVec<COrderHistoryDetailOwned>,
-    charge_detail: COrderChargeDetailOwned,
+    charge_detail: Option<COrderChargeDetailOwned>,
+    attached_orders: CVec<CAttachedOrderDetailOwned>,
+    multi_leg: Option<CMultiLegInfoOwned>,
 }
 
 impl From<OrderDetail> for COrderDetailOwned {
@@ -1849,6 +2532,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             trigger_count,
             monitor_price,
             remark,
+            delayed_until,
             free_status,
             free_amount,
             free_currency,
@@ -1860,6 +2544,8 @@ impl From<OrderDetail> for COrderDetailOwned {
             platform_deducted_currency,
             history,
             charge_detail,
+            attached_orders,
+            multi_leg,
         } = order;
         COrderDetailOwned {
             order_id: order_id.into(),
@@ -1891,6 +2577,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             trigger_count,
             monitor_price: monitor_price.map(Into::into),
             remark: remark.into(),
+            delayed_until: delayed_until.map(OffsetDateTime::unix_timestamp),
             free_status: free_status.into(),
             free_amount: free_amount.map(Into::into),
             free_currency: free_currency.map(Into::into),
@@ -1901,7 +2588,9 @@ impl From<OrderDetail> for COrderDetailOwned {
             platform_deducted_amount: platform_deducted_amount.map(Into::into),
             platform_deducted_currency: platform_deducted_currency.map(Into::into),
             history: history.into(),
-            charge_detail: charge_detail.into(),
+            charge_detail: charge_detail.map(Into::into),
+            attached_orders: attached_orders.into(),
+            multi_leg: multi_leg.map(Into::into),
         }
     }
 }
@@ -1940,6 +2629,7 @@ impl ToFFI for COrderDetailOwned {
             trigger_count,
             monitor_price,
             remark,
+            delayed_until,
             free_status,
             free_amount,
             free_currency,
@@ -1951,6 +2641,8 @@ impl ToFFI for COrderDetailOwned {
             platform_deducted_currency,
             history,
             charge_detail,
+            attached_orders,
+            multi_leg,
         } = self;
         COrderDetail {
             order_id: order_id.to_ffi_type(),
@@ -2027,6 +2719,10 @@ impl ToFFI for COrderDetailOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             remark: remark.to_ffi_type(),
+            delayed_until: delayed_until
+                .as_ref()
+                .map(|value| value as *const i64)
+                .unwrap_or(std::ptr::null()),
             free_status: *free_status,
             free_amount: free_amount
                 .as_ref()
@@ -2056,7 +2752,18 @@ impl ToFFI for COrderDetailOwned {
                 .unwrap_or(std::ptr::null()),
             history: history.to_ffi_type(),
             num_history: history.len(),
-            charge_detail: charge_detail.to_ffi_type(),
+            has_charge_detail: charge_detail.is_some(),
+            charge_detail: charge_detail
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or_default(),
+            attached_orders: attached_orders.to_ffi_type(),
+            num_attached_orders: attached_orders.len(),
+            has_multi_leg: multi_leg.is_some(),
+            multi_leg: multi_leg
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or_default(),
         }
     }
 }
@@ -2116,6 +2823,109 @@ impl ToFFI for CEstimateMaxPurchaseQuantityResponseOwned {
         CEstimateMaxPurchaseQuantityResponse {
             cash_max_qty: self.cash_max_qty.to_ffi_type(),
             margin_max_qty: self.margin_max_qty.to_ffi_type(),
+        }
+    }
+}
+
+// ââ Grid trading push (stays on the trade context)
+// ââââââââââââââââââââââââââââââââââ
+
+/// Grid trading master-order changed message.
+#[repr(C)]
+pub struct CPushGridOrderChanged {
+    /// Grid master order ID
+    pub order_id: *const c_char,
+    /// Order status
+    pub status: *const c_char,
+    /// Security symbol (e.g. `700.HK`)
+    pub symbol: *const c_char,
+    /// Suspend reason, if any
+    pub suspend_reason: *const c_char,
+    /// Submitted base price
+    pub submitted_base_price: *const c_char,
+    /// Current base price
+    pub current_base_price: *const c_char,
+    /// Upper price bound
+    pub upper_limit_price: *const c_char,
+    /// Lower price bound
+    pub lower_limit_price: *const c_char,
+    /// Trigger price type
+    pub trigger_price_type: i32,
+    /// Quantity per trigger
+    pub trigger_quantity: *const c_char,
+    /// Settlement currency
+    pub settlement_currency: *const c_char,
+    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+    pub time_in_force: i32,
+    /// Regular trading hours flag
+    pub rth: i32,
+    /// Sell-side order type when depth is 0
+    pub grid_order_type_up: *const c_char,
+    /// Buy-side order type when depth is 0
+    pub grid_order_type_down: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CPushGridOrderChangedOwned {
+    order_id: CString,
+    status: CString,
+    symbol: CString,
+    suspend_reason: CString,
+    submitted_base_price: CString,
+    current_base_price: CString,
+    upper_limit_price: CString,
+    lower_limit_price: CString,
+    trigger_price_type: i32,
+    trigger_quantity: CString,
+    settlement_currency: CString,
+    time_in_force: i32,
+    rth: i32,
+    grid_order_type_up: CString,
+    grid_order_type_down: CString,
+}
+
+impl From<PushGridOrderChanged> for CPushGridOrderChangedOwned {
+    fn from(p: PushGridOrderChanged) -> Self {
+        CPushGridOrderChangedOwned {
+            order_id: p.order_id.into(),
+            status: p.status.into(),
+            symbol: p.symbol.into(),
+            suspend_reason: p.suspend_reason.into(),
+            submitted_base_price: p.submitted_base_price.into(),
+            current_base_price: p.current_base_price.into(),
+            upper_limit_price: p.upper_limit_price.into(),
+            lower_limit_price: p.lower_limit_price.into(),
+            trigger_price_type: p.trigger_price_type,
+            trigger_quantity: p.trigger_quantity.into(),
+            settlement_currency: p.settlement_currency.into(),
+            time_in_force: p.time_in_force,
+            rth: p.rth,
+            grid_order_type_up: p.grid_order_type_up.into(),
+            grid_order_type_down: p.grid_order_type_down.into(),
+        }
+    }
+}
+
+impl ToFFI for CPushGridOrderChangedOwned {
+    type FFIType = CPushGridOrderChanged;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CPushGridOrderChanged {
+            order_id: self.order_id.to_ffi_type(),
+            status: self.status.to_ffi_type(),
+            symbol: self.symbol.to_ffi_type(),
+            suspend_reason: self.suspend_reason.to_ffi_type(),
+            submitted_base_price: self.submitted_base_price.to_ffi_type(),
+            current_base_price: self.current_base_price.to_ffi_type(),
+            upper_limit_price: self.upper_limit_price.to_ffi_type(),
+            lower_limit_price: self.lower_limit_price.to_ffi_type(),
+            trigger_price_type: self.trigger_price_type,
+            trigger_quantity: self.trigger_quantity.to_ffi_type(),
+            settlement_currency: self.settlement_currency.to_ffi_type(),
+            time_in_force: self.time_in_force,
+            rth: self.rth,
+            grid_order_type_up: self.grid_order_type_up.to_ffi_type(),
+            grid_order_type_down: self.grid_order_type_down.to_ffi_type(),
         }
     }
 }

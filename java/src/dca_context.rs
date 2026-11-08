@@ -47,6 +47,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextList(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let status: Option<DCAStatus> = if opts.is_null() {
             None
         } else {
@@ -58,7 +59,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextList(
             get_field(env, &opts, "symbol")?
         };
         async_util::execute(env, callback, async move {
-            Ok(ctx.ctx.list(status, symbol).await?)
+            Ok(__owned_ctx.list(status, symbol).await?)
         })?;
         Ok(())
     })
@@ -74,12 +75,17 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextStats(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let sym: Option<String> = if symbol.is_null() {
             None
         } else {
             Some(FromJValue::from_jvalue(env, symbol.into())?)
         };
-        async_util::execute(env, callback, async move { Ok(ctx.ctx.stats(sym).await?) })?;
+        async_util::execute(
+            env,
+            callback,
+            async move { Ok(__owned_ctx.stats(sym).await?) },
+        )?;
         Ok(())
     })
 }
@@ -94,9 +100,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextCheckSuppo
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let syms: ObjectArray<String> = FromJValue::from_jvalue(env, symbols.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ctx.ctx.check_support(syms.0).await?)
+            Ok(__owned_ctx.check_support(syms.0).await?)
         })?;
         Ok(())
     })
@@ -112,12 +119,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextHistory(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let plan_id: String = get_field(env, &opts, "planId")?;
         let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
         let limit: Option<JavaInteger> = get_field(env, &opts, "limit")?;
         async_util::execute(env, callback, async move {
-            Ok(ctx
-                .ctx
+            Ok(__owned_ctx
                 .history(
                     plan_id,
                     page.map(i32::from).unwrap_or(1),
@@ -139,8 +146,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextPause(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let id: String = FromJValue::from_jvalue(env, plan_id.into())?;
-        async_util::execute(env, callback, async move { Ok(ctx.ctx.pause(id).await?) })?;
+        async_util::execute(
+            env,
+            callback,
+            async move { Ok(__owned_ctx.pause(id).await?) },
+        )?;
         Ok(())
     })
 }
@@ -155,8 +167,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextResume(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let id: String = FromJValue::from_jvalue(env, plan_id.into())?;
-        async_util::execute(env, callback, async move { Ok(ctx.ctx.resume(id).await?) })?;
+        async_util::execute(
+            env,
+            callback,
+            async move { Ok(__owned_ctx.resume(id).await?) },
+        )?;
         Ok(())
     })
 }
@@ -171,8 +188,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextStop(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let id: String = FromJValue::from_jvalue(env, plan_id.into())?;
-        async_util::execute(env, callback, async move { Ok(ctx.ctx.stop(id).await?) })?;
+        async_util::execute(
+            env,
+            callback,
+            async move { Ok(__owned_ctx.stop(id).await?) },
+        )?;
         Ok(())
     })
 }
@@ -187,6 +209,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextCalcDate(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let frequency: Option<DCAFrequency> = get_field(env, &opts, "frequency")?;
         let frequency = frequency.unwrap_or(DCAFrequency::Monthly);
@@ -194,8 +217,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextCalcDate(
         let day_of_month_i: Option<JavaInteger> = get_field(env, &opts, "dayOfMonth")?;
         let day_of_month: Option<u32> = day_of_month_i.map(|v| i32::from(v) as u32);
         async_util::execute(env, callback, async move {
-            Ok(ctx
-                .ctx
+            Ok(__owned_ctx
                 .calc_date(symbol, frequency, day_of_week, day_of_month)
                 .await?)
         })?;
@@ -213,12 +235,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextSetReminde
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let h: String = FromJValue::from_jvalue(env, hours.into())?;
-        async_util::execute(
-            env,
-            callback,
-            async move { Ok(ctx.ctx.set_reminder(h).await?) },
-        )?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.set_reminder(h).await?)
+        })?;
         Ok(())
     })
 }
@@ -233,6 +254,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextCreate(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let amount: String = get_field(env, &opts, "amount")?;
         let freq_v: Option<DCAFrequency> = get_field(env, &opts, "frequency")?;
@@ -243,8 +265,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextCreate(
 
         let allow_margin: bool = get_field(env, &opts, "allowMargin")?;
         async_util::execute(env, callback, async move {
-            Ok(ctx
-                .ctx
+            Ok(__owned_ctx
                 .create(
                     symbol,
                     amount,
@@ -269,6 +290,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextUpdate(
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let plan_id: String = get_field(env, &opts, "planId")?;
         let amount: Option<String> = get_field(env, &opts, "amount")?;
         let frequency: Option<DCAFrequency> = get_field(env, &opts, "frequency")?;
@@ -278,8 +300,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_dcaContextUpdate(
 
         let allow_margin: bool = get_field(env, &opts, "allowMargin")?;
         async_util::execute(env, callback, async move {
-            Ok(ctx
-                .ctx
+            Ok(__owned_ctx
                 .update(
                     plan_id,
                     amount,

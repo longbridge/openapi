@@ -70,7 +70,11 @@ pub enum Error {
 
     /// OAuth error
     #[error("oauth error: {0}")]
-    OAuth(String),
+    OAuth(#[from] longbridge_oauth::OAuthError),
+
+    /// A conversation event stream ended before a final result was observed
+    #[error("conversation stream ended before a final result was observed")]
+    ConversationStreamEnded,
 }
 
 impl Error {
@@ -114,6 +118,12 @@ impl Error {
                     SimpleError::Other(err.to_string())
                 }
             }
+            Error::HttpClient(HttpClientError::OAuth(err)) | Error::OAuth(err) => {
+                SimpleError::OAuth {
+                    code: err.code(),
+                    message: err.to_string(),
+                }
+            }
             Error::WsClient(WsClientError::ResponseError {
                 detail: Some(detail),
                 ..
@@ -130,10 +140,10 @@ impl Error {
             | Error::ParseField { .. }
             | Error::UnknownCommand(_)
             | Error::HttpClient(_)
-            | Error::WsClient(_) => SimpleError::Other(self.to_string()),
+            | Error::WsClient(_)
+            | Error::ConversationStreamEnded => SimpleError::Other(self.to_string()),
             #[cfg(feature = "blocking")]
             Error::Blocking(_) => SimpleError::Other(self.to_string()),
-            Error::OAuth(msg) => SimpleError::OAuth(msg),
         }
     }
 }
@@ -164,8 +174,14 @@ pub enum SimpleError {
     #[error("other error: {0}")]
     Other(String),
     /// OAuth error
-    #[error("oauth error: {0}")]
-    OAuth(String),
+    #[error("oauth error: {message}")]
+    OAuth {
+        /// Stable error code, see
+        /// [`OAuthError::code`](longbridge_oauth::OAuthError::code)
+        code: i64,
+        /// Error message
+        message: String,
+    },
 }
 
 impl From<Error> for SimpleError {
@@ -195,7 +211,7 @@ impl SimpleError {
             SimpleError::Http { .. } => SimpleErrorKind::Http,
             SimpleError::OpenApi { .. } => SimpleErrorKind::OpenApi,
             SimpleError::Other(_) => SimpleErrorKind::Other,
-            SimpleError::OAuth(_) => SimpleErrorKind::OAuth,
+            SimpleError::OAuth { .. } => SimpleErrorKind::OAuth,
         }
     }
 
@@ -205,7 +221,7 @@ impl SimpleError {
             SimpleError::Http { status_code } => Some(*status_code as i64),
             SimpleError::OpenApi { code, .. } => Some(*code),
             SimpleError::Other(_) => None,
-            SimpleError::OAuth(_) => None,
+            SimpleError::OAuth { code, .. } => Some(*code),
         }
     }
 
@@ -215,7 +231,7 @@ impl SimpleError {
             SimpleError::Http { .. } => None,
             SimpleError::OpenApi { trace_id, .. } => Some(trace_id),
             SimpleError::Other(_) => None,
-            SimpleError::OAuth(_) => None,
+            SimpleError::OAuth { .. } => None,
         }
     }
 
@@ -225,7 +241,30 @@ impl SimpleError {
             SimpleError::Http { .. } => "bad status code",
             SimpleError::OpenApi { message, .. } => message.as_str(),
             SimpleError::Other(message) => message.as_str(),
-            SimpleError::OAuth(message) => message.as_str(),
+            SimpleError::OAuth { message, .. } => message.as_str(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use longbridge_oauth::OAuthError;
+
+    use super::*;
+
+    #[test]
+    fn oauth_errors_keep_their_code() {
+        let err = Error::OAuth(OAuthError::NoTokenAvailable).into_simple_error();
+        assert_eq!(err.kind(), SimpleErrorKind::OAuth);
+        assert_eq!(err.code(), Some(1));
+        assert_eq!(err.message(), "no token available");
+
+        // A request that could not obtain a token reports the same code.
+        let err = Error::HttpClient(HttpClientError::OAuth(OAuthError::RevokeFailed {
+            message: "x".to_string(),
+        }))
+        .into_simple_error();
+        assert_eq!(err.kind(), SimpleErrorKind::OAuth);
+        assert_eq!(err.code(), Some(4));
     }
 }

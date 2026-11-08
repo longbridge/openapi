@@ -20,12 +20,12 @@ use crate::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
             FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-            MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-            PinnedMode, QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security,
-            SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
-            SecurityStaticInfo, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
-            Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
-            WarrantType, WatchlistGroup,
+            MarketTradingDays, MarketTradingSession, OptionChainContract, OptionQuote,
+            ParticipantInfo, Period, PinnedMode, QuotePackageDetail, RealtimeQuote,
+            SecuritiesUpdateMode, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+            SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType, SubType,
+            SubTypes, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
+            WarrantStatus, WarrantType, WatchlistGroup,
         },
     },
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
@@ -466,22 +466,25 @@ impl AsyncQuoteContext {
         .map(|b| b.unbind())
     }
 
-    /// Get option chain info by date. Returns awaitable.
+    /// Get the option contract list of an underlying security for a given
+    /// expiry date. Returns awaitable.
+    #[pyo3(signature = (symbol, expiry_date, standard_only = false))]
     fn option_chain_info_by_date(
         &self,
         py: Python<'_>,
         symbol: String,
         expiry_date: PyDateWrapper,
+        standard_only: bool,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let v = ctx
-                .option_chain_info_by_date(symbol, expiry_date.0)
+                .option_chain_info_by_date(symbol, expiry_date.0, standard_only)
                 .await
                 .map_err(ErrorNewType)?;
             v.into_iter()
-                .map(|x| -> PyResult<StrikePriceInfo> { x.try_into() })
-                .collect::<PyResult<Vec<StrikePriceInfo>>>()
+                .map(|x| -> PyResult<OptionChainContract> { x.try_into() })
+                .collect::<PyResult<Vec<OptionChainContract>>>()
         })
         .map(|b| b.unbind())
     }
@@ -888,6 +891,21 @@ impl AsyncQuoteContext {
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: crate::quote::types::ShortTradesResponse = ctx
                 .short_trades(symbol, count)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US cryptocurrency market overview. US token required. Returns
+    /// awaitable.
+    fn us_crypto_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::quote::types::USCryptoOverview = ctx
+                .us_crypto_overview(symbol)
                 .await
                 .map_err(ErrorNewType)?
                 .into();

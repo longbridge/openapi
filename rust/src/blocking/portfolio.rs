@@ -29,6 +29,9 @@ impl PortfolioContextSync {
     }
 
     /// Get exchange rates
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `TradeContextSync::us_exchange_rates` instead.
     pub fn exchange_rate(&self) -> Result<ExchangeRates> {
         self.rt.call(|ctx| async move { ctx.exchange_rate().await })
     }

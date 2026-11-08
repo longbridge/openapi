@@ -4,6 +4,8 @@ mod cache;
 mod cmd_code;
 mod context;
 mod core;
+mod http_json;
+mod overnight;
 mod push_types;
 mod store;
 mod sub_flags;
@@ -35,8 +37,11 @@ pub use types::{
     MarketTemperature,
     MarketTradingDays,
     MarketTradingSession,
+    OptionChainContract,
     OptionDirection,
+    OptionExpiryCycleType,
     OptionQuote,
+    OptionStandardAttr,
     OptionType,
     // New in Step 3
     OptionVolumeDaily,
@@ -63,13 +68,13 @@ pub use types::{
     ShortTradesItem,
     ShortTradesResponse,
     SortOrderType,
-    StrikePriceInfo,
     Subscription,
     Trade,
     TradeDirection,
     TradeSession,
     TradeSessions,
     TradingSessionInfo,
+    USCryptoOverview,
     WarrantInfo,
     WarrantQuote,
     WarrantSortBy,

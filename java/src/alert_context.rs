@@ -35,9 +35,23 @@ fn read_alert_item(
             std::slice::from_raw_parts(elements.as_ptr(), elements.len()).to_vec()
         }
     };
-    // valueMap: JSON string
-    let value_map_str: String = get_field(env, item, "valueMap")?;
-    let value_map = serde_json::from_str(&value_map_str).unwrap_or(serde_json::Value::Null);
+    // valueMap: AlertValueMap object with a `price` (BigDecimal) and `chg`
+    // (Double) field
+    let value_map = {
+        let vm_obj = env
+            .get_field(item, "valueMap", "Lcom/longbridge/alert/AlertValueMap;")?
+            .l()?;
+        if vm_obj.is_null() {
+            longbridge::alert::AlertValueMap::default()
+        } else {
+            let price: Option<longbridge::Decimal> = get_field(env, &vm_obj, "price")?;
+            let chg: Option<crate::types::JavaDouble> = get_field(env, &vm_obj, "chg")?;
+            longbridge::alert::AlertValueMap {
+                price,
+                chg: chg.map(Into::into),
+            }
+        }
+    };
     Ok(longbridge::alert::AlertItem {
         id,
         indicator_id,
@@ -85,7 +99,8 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextList(
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
-        async_util::execute(env, callback, async move { Ok(context.ctx.list().await?) })?;
+        let __owned_ctx = context.ctx.clone();
+        async_util::execute(env, callback, async move { Ok(__owned_ctx.list().await?) })?;
         Ok(())
     })
 }
@@ -100,6 +115,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextAdd(
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let condition: Option<AlertCondition> = get_field(env, &opts, "condition")?;
         let condition = condition.unwrap_or(AlertCondition::PriceRise);
@@ -107,8 +123,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextAdd(
         let frequency: Option<AlertFrequency> = get_field(env, &opts, "frequency")?;
         let frequency = frequency.unwrap_or(AlertFrequency::Once);
         async_util::execute(env, callback, async move {
-            context
-                .ctx
+            __owned_ctx
                 .add(symbol, condition, trigger_value, frequency)
                 .await?;
             Ok(())
@@ -127,9 +142,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextUpdate(
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let alert_item = read_alert_item(env, &item)?;
         async_util::execute(env, callback, async move {
-            context.ctx.update(&alert_item).await?;
+            __owned_ctx.update(&alert_item).await?;
             Ok(())
         })?;
         Ok(())
@@ -146,10 +162,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextDelete(
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let ids_raw: ObjectArray<String> = get_field(env, &opts, "ids")?;
         let ids: Vec<String> = ids_raw.0;
         async_util::execute(env, callback, async move {
-            context.ctx.delete(ids).await?;
+            __owned_ctx.delete(ids).await?;
             Ok(())
         })?;
         Ok(())

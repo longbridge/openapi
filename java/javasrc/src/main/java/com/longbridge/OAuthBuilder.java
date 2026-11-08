@@ -69,7 +69,9 @@ public class OAuthBuilder {
      *
      * @param onOpenUrl Called with the authorization URL; open it in a browser
      *                  or print it to the console
-     * @return CompletableFuture that resolves to a new {@link OAuth} handle
+     * @return CompletableFuture that resolves to a new {@link OAuth} handle; on
+     *         failure it completes exceptionally with an
+     *         {@link OpenApiException} of kind {@link ErrorKind#OAuth}
      */
     public CompletableFuture<OAuth> build(Consumer<String> onOpenUrl) {
         return AsyncCallback.<Long>executeTask((callback) -> {

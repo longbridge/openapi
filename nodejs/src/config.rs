@@ -4,7 +4,7 @@ use napi::Result;
 use crate::{
     error::ErrorNewType,
     oauth::OAuth,
-    types::{Language, PushCandlestickMode},
+    types::{Language, PushCandlestickMode, QuoteTransport},
     utils::from_datetime,
 };
 
@@ -26,11 +26,28 @@ pub struct ExtraConfigParams {
     pub enable_overnight: Option<bool>,
     /// Push candlesticks mode (default: PushCandlestickMode.Realtime)
     pub push_candlestick_mode: Option<PushCandlestickMode>,
+    /// Transport for quote pull (request/response) APIs (default:
+    /// QuoteTransport.WebSocket)
+    ///
+    /// Subscriptions and push events always use the WebSocket connection; this
+    /// only selects how request/response quote APIs reach the server.
+    pub quote_transport: Option<QuoteTransport>,
     /// Enable printing the opened quote packages when connected to the server
     /// (default: true).  Set to `false` to suppress the output.
     pub enable_print_quote_packages: Option<bool>,
     /// Set the path of the log files (Default: `no logs`)
     pub log_path: Option<String>,
+    /// Enable paper trading mode (default: `false`).
+    ///
+    /// When `true`, all API calls target the paper trading (simulation)
+    /// environment.  The server validates the token: if it belongs to a
+    /// real-money account the server returns an error.
+    ///
+    /// When `false` (the default) the server imposes no restrictions — both
+    /// paper trading and real-money accounts are accepted.
+    ///
+    /// Paper trading users should set this to `true` as a safety guard.
+    pub enable_papertrading: Option<bool>,
 }
 
 fn apply_extra(
@@ -56,11 +73,17 @@ fn apply_extra(
         if let Some(mode) = extra.push_candlestick_mode {
             config.set_push_candlestick_mode(mode.into());
         }
+        if let Some(quote_transport) = extra.quote_transport {
+            config.set_quote_transport(quote_transport.into());
+        }
         if let Some(false) = extra.enable_print_quote_packages {
             config.set_dont_print_quote_packages();
         }
         if let Some(log_path) = extra.log_path {
             config.set_log_path(log_path);
+        }
+        if let Some(true) = extra.enable_papertrading {
+            config.set_enable_papertrading();
         }
     }
     config
@@ -78,7 +101,8 @@ impl Config {
     /// (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
     /// `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
     /// `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-    /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+    /// `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+    /// `LONGBRIDGE_LOG_PATH`).  Fields
     /// set in `extra` override the corresponding environment variables.
     ///
     /// @param appKey       Application key
@@ -126,6 +150,8 @@ impl Config {
     ///   `false` (Default: `false`)
     /// - `LONGBRIDGE_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
     ///   (Default: `realtime`)
+    /// - `LONGBRIDGE_QUOTE_TRANSPORT` - Transport for quote pull APIs, `ws` or
+    ///   `http` (Default: `ws`)
     /// - `LONGBRIDGE_PRINT_QUOTE_PACKAGES` - Print quote packages when
     ///   connected, `true` or `false` (Default: `true`)
     /// - `LONGBRIDGE_LOG_PATH` - Log file directory (Default: no logs)
@@ -145,7 +171,8 @@ impl Config {
     /// (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
     /// `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
     /// `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-    /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+    /// `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+    /// `LONGBRIDGE_LOG_PATH`).  Fields
     /// set in `extra` override the corresponding environment variables.
     ///
     /// @param oauth  OAuth handle obtained from `OAuth.build(...)`

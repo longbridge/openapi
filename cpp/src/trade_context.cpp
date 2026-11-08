@@ -8,6 +8,8 @@ namespace longbridge {
 namespace trade {
 
 using longbridge::convert::convert;
+using longbridge::convert::convert_submit_attached;
+using longbridge::convert::convert_replace_attached;
 
 TradeContext::TradeContext()
   : ctx_(nullptr)
@@ -219,6 +221,45 @@ TradeContext::today_executions(
     new AsyncCallback<TradeContext, std::vector<Execution>>(callback));
 }
 
+/// Get all executions
+void
+TradeContext::all_executions(
+  const std::optional<GetAllExecutionsOptions>& opts,
+  AsyncCallback<TradeContext, AllExecutionsResponse> callback) const
+{
+  lb_get_all_executions_options_t opts2 = { nullptr, nullptr, nullptr, nullptr, nullptr };
+
+  if (opts) {
+    opts2.symbol = opts->symbol ? opts->symbol->c_str() : nullptr;
+    opts2.order_id = opts->order_id ? opts->order_id->c_str() : nullptr;
+    opts2.start_at = opts->start_at ? (const int64_t*)&opts->start_at.value() : nullptr;
+    opts2.end_at = opts->end_at ? (const int64_t*)&opts->end_at.value() : nullptr;
+    opts2.page = opts->page ? &opts->page.value() : nullptr;
+  }
+
+  lb_trade_context_all_executions(
+    ctx_,
+    (const lb_get_all_executions_options_t*)&opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, AllExecutionsResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        AllExecutionsResponse resp =
+          convert((const lb_all_executions_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, AllExecutionsResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, AllExecutionsResponse>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, AllExecutionsResponse>(callback));
+}
+
 /// Get history orders
 void
 TradeContext::history_orders(
@@ -294,7 +335,7 @@ TradeContext::today_orders(
   AsyncCallback<TradeContext, std::vector<Order>> callback) const
 {
   lb_get_today_orders_options_t opts2 = {
-    nullptr, nullptr, 0, nullptr, nullptr, nullptr,
+    nullptr, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
   };
   std::vector<lb_order_status_t> order_status;
   lb_order_side_t side;
@@ -325,6 +366,7 @@ TradeContext::today_orders(
     }
 
     opts2.order_id = opts->order_id ? opts->order_id->c_str() : nullptr;
+    opts2.is_attached = opts->is_attached ? &opts->is_attached.value() : nullptr;
   }
 
   lb_trade_context_today_orders(
@@ -371,7 +413,11 @@ TradeContext::replace_order(const ReplaceOrderOptions& opts,
     nullptr,
     nullptr,
     nullptr,
+    nullptr,
+    nullptr,
+    false,
   };
+  longbridge::convert::CReplaceAttachedParamsStorage attached_params_storage;
 
   opts2.price = opts.price ? (const lb_decimal_t*)opts.price.value() : nullptr;
   opts2.trigger_price = opts.trigger_price
@@ -394,6 +440,13 @@ TradeContext::replace_order(const ReplaceOrderOptions& opts,
                           ? (const lb_decimal_t*)opts.monitor_price.value()
                           : nullptr;
   opts2.remark = opts.remark ? opts.remark->c_str() : nullptr;
+  if (opts.attached_params) {
+    attached_params_storage = convert_replace_attached(*opts.attached_params);
+    opts2.attached_params = &attached_params_storage.params;
+  }
+  opts2.delayed_until =
+    opts.delayed_until ? &opts.delayed_until.value() : nullptr;
+  opts2.clear_delayed_until = opts.clear_delayed_until;
 
   lb_trade_context_replace_order(
     ctx_,
@@ -431,9 +484,13 @@ TradeContext::submit_order(
     nullptr,
     nullptr,
     opts.remark ? opts.remark->c_str() : nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
   };
   lb_date_t expire_date;
   lb_outside_rth_t outside_rth;
+  longbridge::convert::CSubmitAttachedParamsStorage attached_params_storage;
 
   if (opts.submitted_price) {
     opts2.submitted_price = (const lb_decimal_t*)opts.submitted_price.value();
@@ -467,6 +524,16 @@ TradeContext::submit_order(
     outside_rth = convert(*opts.outside_rth);
     opts2.outside_rth = &outside_rth;
   }
+  if (opts.client_request_id) {
+    opts2.client_request_id = opts.client_request_id->c_str();
+  }
+  if (opts.attached_params) {
+    attached_params_storage = convert_submit_attached(*opts.attached_params);
+    opts2.attached_params = &attached_params_storage.params;
+  }
+  if (opts.delayed_until) {
+    opts2.delayed_until = &opts.delayed_until.value();
+  }
 
   lb_trade_context_submit_order(
     ctx_,
@@ -492,21 +559,88 @@ TradeContext::submit_order(
 }
 
 void
-TradeContext::cancel_order(const std::string& order_id,
-                           AsyncCallback<TradeContext, void> callback) const
+TradeContext::submit_multileg(
+  const SubmitMultiLegOrderOptions& opts,
+  AsyncCallback<TradeContext, SubmitOrderResponse> callback) const
 {
-  lb_trade_context_cancel_order(
+  std::vector<CSubmitMultiLegOrderLeg> legs;
+  legs.reserve(opts.legs.size());
+  for (const auto& leg : opts.legs) {
+    legs.push_back(CSubmitMultiLegOrderLeg{
+      leg.symbol.c_str(),
+      (const lb_decimal_t*)leg.ratio_quantity,
+    });
+  }
+
+  CSubmitMultiLegOrderOptions opts2 = {
+    convert(opts.side),
+    convert(opts.order_type),
+    (const lb_decimal_t*)opts.submitted_quantity,
+    convert(opts.strategy),
+    legs.data(),
+    legs.size(),
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+  };
+
+  if (opts.submitted_price) {
+    opts2.submitted_price = (const lb_decimal_t*)opts.submitted_price.value();
+  }
+  if (opts.remark) {
+    opts2.remark = opts.remark->c_str();
+  }
+  if (opts.client_request_id) {
+    opts2.client_request_id = opts.client_request_id->c_str();
+  }
+  if (opts.delayed_until) {
+    opts2.delayed_until = &opts.delayed_until.value();
+  }
+
+  lb_trade_context_submit_multileg(
     ctx_,
-    order_id.c_str(),
+    &opts2,
     [](auto res) {
       auto callback_ptr =
-        callback::get_async_callback<TradeContext, void>(res->userdata);
-      (*callback_ptr)(AsyncResult<TradeContext, void>(
-        TradeContext((const lb_trade_context_t*)res->ctx),
-        Status(res->error),
-        nullptr));
+        callback::get_async_callback<TradeContext, SubmitOrderResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        SubmitOrderResponse resp =
+          convert((const lb_submit_order_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, SubmitOrderResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, SubmitOrderResponse>(
+          ctx, std::move(status), nullptr));
+      }
     },
-    new AsyncCallback<TradeContext, void>(callback));
+    new AsyncCallback<TradeContext, SubmitOrderResponse>(callback));
+}
+
+void
+TradeContext::cancel_order(const std::string& order_id,
+                           AsyncCallback<TradeContext, void> callback,
+                           bool is_attached) const
+{
+  auto trampoline = [](auto res) {
+    auto callback_ptr =
+      callback::get_async_callback<TradeContext, void>(res->userdata);
+    (*callback_ptr)(AsyncResult<TradeContext, void>(
+      TradeContext((const lb_trade_context_t*)res->ctx),
+      Status(res->error),
+      nullptr));
+  };
+  auto* userdata = new AsyncCallback<TradeContext, void>(callback);
+  if (is_attached) {
+    lb_trade_context_cancel_order_attached(
+      ctx_, order_id.c_str(), trampoline, userdata);
+  } else {
+    lb_trade_context_cancel_order(ctx_, order_id.c_str(), trampoline, userdata);
+  }
 }
 
 void
@@ -757,6 +891,32 @@ TradeContext::order_detail(
 }
 
 void
+TradeContext::order_detail_attached(
+  const std::string& order_id,
+  AsyncCallback<TradeContext, OrderDetail> callback) const
+{
+  lb_trade_context_order_detail_attached(
+    ctx_,
+    order_id.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, OrderDetail>(res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        OrderDetail resp = convert((const lb_order_detail_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, OrderDetail>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, OrderDetail>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, OrderDetail>(callback));
+}
+
+void
 TradeContext::estimate_max_purchase_quantity(
   const EstimateMaxPurchaseQuantityOptions& opts,
   AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse> callback)
@@ -801,6 +961,26 @@ TradeContext::estimate_max_purchase_quantity(
     },
     new AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse>(
       callback));
+}
+
+void
+TradeContext::set_on_grid_order_changed(
+  PushCallback<TradeContext, PushGridOrderChanged> callback) const
+{
+  lb_trade_context_set_on_grid_order_changed(
+    ctx_,
+    [](auto ctx, auto event, auto userdata) {
+      auto callback_ptr =
+        callback::get_push_callback<TradeContext, PushGridOrderChanged>(
+          userdata);
+      PushGridOrderChanged event2 = convert(event);
+      (*callback_ptr)(PushEvent<TradeContext, PushGridOrderChanged>(
+        TradeContext(ctx), &event2));
+    },
+    new PushCallback<TradeContext, PushGridOrderChanged>(callback),
+    [](auto p) {
+      delete (PushCallback<TradeContext, PushGridOrderChanged>*)p;
+    });
 }
 
 } // namespace trade

@@ -664,7 +664,7 @@ impl From<FlowItem> for CFlowItemOwned {
     fn from(v: FlowItem) -> Self {
         Self {
             executed_date: v.executed_date.into(),
-            executed_timestamp: v.executed_timestamp.to_string().into(),
+            executed_timestamp: v.executed_timestamp.unwrap_or_default().into(),
             code: v.code.into(),
             direction: v.direction.into(),
             executed_quantity: v

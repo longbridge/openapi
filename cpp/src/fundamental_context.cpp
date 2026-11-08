@@ -95,9 +95,10 @@ void FundamentalContext::executive(const std::string& s, AsyncCallback<Fundament
 void FundamentalContext::buyback(const std::string& s, AsyncCallback<FundamentalContext, BuybackData> callback) const {
   F_TYPED(BuybackData, lb_buyback_data_t, lb_fundamental_context_buyback, ctx_, s.c_str());
 }
-void FundamentalContext::ratings(const std::string& s, AsyncCallback<FundamentalContext, StockRatings> callback) const {
-  F_TYPED(StockRatings, lb_stock_ratings_t, lb_fundamental_context_ratings, ctx_, s.c_str());
-}
+// TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+// void FundamentalContext::ratings(const std::string& s, AsyncCallback<FundamentalContext, StockRatings> callback) const {
+//   F_TYPED(StockRatings, lb_stock_ratings_t, lb_fundamental_context_ratings, ctx_, s.c_str());
+// }
 void FundamentalContext::business_segments(const std::string& s, AsyncCallback<FundamentalContext, BusinessSegments> callback) const {
   F_TYPED(BusinessSegments, lb_business_segments_t, lb_fundamental_context_business_segments, ctx_, s.c_str());
 }
@@ -107,11 +108,11 @@ void FundamentalContext::business_segments_history(const std::string& s, const c
 void FundamentalContext::institution_rating_views(const std::string& s, AsyncCallback<FundamentalContext, InstitutionRatingViews> callback) const {
   F_TYPED(InstitutionRatingViews, lb_institution_rating_views_t, lb_fundamental_context_institution_rating_views, ctx_, s.c_str());
 }
-void FundamentalContext::industry_rank(const std::string& market, const std::string& indicator, const std::string& sort_type, uint32_t limit, AsyncCallback<FundamentalContext, IndustryRankResponse> callback) const {
-  F_TYPED(IndustryRankResponse, lb_industry_rank_response_t, lb_fundamental_context_industry_rank, ctx_, market.c_str(), indicator.c_str(), sort_type.c_str(), limit);
+void FundamentalContext::industry_rank(Market market, IndustryRankIndicator indicator, IndustryRankSortType sort_type, uint32_t limit, AsyncCallback<FundamentalContext, IndustryRankResponse> callback) const {
+  F_TYPED(IndustryRankResponse, lb_industry_rank_response_t, lb_fundamental_context_industry_rank, ctx_, (lb_market_t)market, (lb_industry_rank_indicator_t)indicator, (lb_industry_rank_sort_type_t)sort_type, limit);
 }
-void FundamentalContext::industry_peers(const std::string& counter_id, const std::string& market, const char* industry_id, AsyncCallback<FundamentalContext, IndustryPeersResponse> callback) const {
-  F_TYPED(IndustryPeersResponse, lb_industry_peers_response_t, lb_fundamental_context_industry_peers, ctx_, counter_id.c_str(), market.c_str(), industry_id);
+void FundamentalContext::industry_peers(const std::string& symbol, const std::string& market, const char* industry_id, AsyncCallback<FundamentalContext, IndustryPeersResponse> callback) const {
+  F_TYPED(IndustryPeersResponse, lb_industry_peers_response_t, lb_fundamental_context_industry_peers, ctx_, symbol.c_str(), market.c_str(), industry_id);
 }
 void FundamentalContext::financial_report_snapshot(const std::string& s, const char* report, int32_t fiscal_year, const char* fiscal_period, AsyncCallback<FundamentalContext, FinancialReportSnapshot> callback) const {
   // C API takes fiscal_year as a string; convert 0 → nullptr

@@ -4,9 +4,9 @@ use longbridge::market::{
     AhPremiumIntraday, AhPremiumKline, AhPremiumKlines, AnomalyItem, AnomalyResponse,
     BrokerHoldingChanges, BrokerHoldingDailyHistory, BrokerHoldingDailyItem, BrokerHoldingDetail,
     BrokerHoldingDetailItem, BrokerHoldingEntry, BrokerHoldingTop, ConstituentStock,
-    IndexConstituents, MarketStatusResponse, MarketTimeItem, RankCategoriesResponse, RankListItem,
-    RankListResponse, TopMoversEvent, TopMoversResponse, TopMoversStock, TradePriceLevel,
-    TradeStatistics, TradeStatsResponse,
+    IndexConstituents, MarketStatusResponse, MarketTimeItem, RankCategoriesResponse, RankCategory,
+    RankListItem, RankListResponse, RankSubCategory, TopMoversEvent, TopMoversResponse,
+    TopMoversStock, TradePriceLevel, TradeStatistics, TradeStatsResponse,
 };
 
 use crate::types::{CMarket, CString, CVec, ToFFI};
@@ -1088,7 +1088,7 @@ pub struct CTopMoversResponse {
     pub events: *const CTopMoversEvent,
     /// Number of items in `events`
     pub num_events: usize,
-    /// Pagination cursor as a JSON string
+    /// Pagination cursor (empty string means no more pages)
     pub next_params: *const c_char,
 }
 
@@ -1101,7 +1101,7 @@ impl From<TopMoversResponse> for CTopMoversResponseOwned {
     fn from(v: TopMoversResponse) -> Self {
         Self {
             events: v.events.into(),
-            next_params: v.next_params.to_string().into(),
+            next_params: v.next_params.into(),
         }
     }
 }
@@ -1119,21 +1119,104 @@ impl ToFFI for CTopMoversResponseOwned {
 
 // ── RankCategoriesResponse ────────────────────────────────────────
 
-/// Rank categories response. `data` is a NUL-terminated JSON string.
+/// One leaf rank sub-category.
+#[repr(C)]
+pub struct CRankSubCategory {
+    /// Sub-category key (e.g. `"hot_all-us"`). Pass to
+    /// `lb_market_context_rank_list`.
+    pub key: *const c_char,
+    /// Display name
+    pub name: *const c_char,
+    /// Market code (e.g. `"US"`, `"HK"`)
+    pub market: *const c_char,
+}
+
+pub(crate) struct CRankSubCategoryOwned {
+    key: CString,
+    name: CString,
+    market: CString,
+}
+
+impl From<RankSubCategory> for CRankSubCategoryOwned {
+    fn from(v: RankSubCategory) -> Self {
+        Self {
+            key: v.key.into(),
+            name: v.name.into(),
+            market: v.market.into(),
+        }
+    }
+}
+
+impl ToFFI for CRankSubCategoryOwned {
+    type FFIType = CRankSubCategory;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRankSubCategory {
+            key: self.key.to_ffi_type(),
+            name: self.name.to_ffi_type(),
+            market: self.market.to_ffi_type(),
+        }
+    }
+}
+
+/// A top-level rank category.
+#[repr(C)]
+pub struct CRankCategory {
+    /// Top-level key (e.g. `"hot"`)
+    pub key: *const c_char,
+    /// Display name
+    pub name: *const c_char,
+    /// Sub-categories pointer
+    pub sub_categories: *const CRankSubCategory,
+    /// Number of sub-categories
+    pub num_sub_categories: usize,
+}
+
+pub(crate) struct CRankCategoryOwned {
+    key: CString,
+    name: CString,
+    sub_categories: CVec<CRankSubCategoryOwned>,
+}
+
+impl From<RankCategory> for CRankCategoryOwned {
+    fn from(v: RankCategory) -> Self {
+        Self {
+            key: v.key.into(),
+            name: v.name.into(),
+            sub_categories: v.sub_categories.into(),
+        }
+    }
+}
+
+impl ToFFI for CRankCategoryOwned {
+    type FFIType = CRankCategory;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRankCategory {
+            key: self.key.to_ffi_type(),
+            name: self.name.to_ffi_type(),
+            sub_categories: self.sub_categories.to_ffi_type(),
+            num_sub_categories: self.sub_categories.len(),
+        }
+    }
+}
+
+/// Rank categories response.
 #[repr(C)]
 pub struct CRankCategoriesResponse {
-    /// Raw rank categories data as a JSON string
-    pub data: *const c_char,
+    /// Top-level categories pointer
+    pub categories: *const CRankCategory,
+    /// Number of categories
+    pub num_categories: usize,
 }
 
 pub(crate) struct CRankCategoriesResponseOwned {
-    data: CString,
+    categories: CVec<CRankCategoryOwned>,
 }
 
 impl From<RankCategoriesResponse> for CRankCategoriesResponseOwned {
     fn from(v: RankCategoriesResponse) -> Self {
-        let json = serde_json::to_string(&v.data).unwrap_or_default();
-        Self { data: json.into() }
+        Self {
+            categories: v.categories.into(),
+        }
     }
 }
 
@@ -1141,7 +1224,8 @@ impl ToFFI for CRankCategoriesResponseOwned {
     type FFIType = CRankCategoriesResponse;
     fn to_ffi_type(&self) -> Self::FFIType {
         CRankCategoriesResponse {
-            data: self.data.to_ffi_type(),
+            categories: self.categories.to_ffi_type(),
+            num_categories: self.categories.len(),
         }
     }
 }

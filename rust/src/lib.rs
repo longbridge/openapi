@@ -14,43 +14,62 @@ pub mod runtime;
 pub use runtime::runtime_handle;
 mod serde_utils;
 mod types;
-mod utils;
-
-pub use utils::counter;
 
 #[cfg(feature = "blocking")]
 #[cfg_attr(docsrs, doc(cfg(feature = "blocking")))]
 pub mod blocking;
 
 pub use longbridge_oauth as oauth;
+pub mod agent;
 pub mod alert;
 pub mod asset;
 pub mod calendar;
 pub mod content;
 pub mod dca;
+pub mod fund;
 pub mod fundamental;
+pub mod grid;
 pub mod market;
 pub mod portfolio;
 pub mod quote;
 pub mod screener;
 pub mod sharelist;
+pub mod signal;
 pub mod trade;
 
+pub use agent::AgentContext;
 pub use alert::AlertContext;
 pub use asset::AssetContext;
 pub use calendar::CalendarContext;
-pub use config::{Config, Language, PushCandlestickMode};
+pub use config::{Config, Language, PushCandlestickMode, QuoteTransport};
 pub use content::ContentContext;
 pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
+pub use fund::FundContext;
 pub use fundamental::FundamentalContext;
+// US-market type re-exports
+pub use fundamental::types::{
+    FinancialStatementKind, IndustryRankIndicator, IndustryRankSortType, USCompanyDividends,
+    USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile, USETFFilesResponse,
+    USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
+};
+pub use grid::GridContext;
 pub use longbridge_httpcli as httpclient;
+pub use longbridge_httpcli::{DC_REGION_HEADER, DcRegion};
 pub use longbridge_wscli as wsclient;
 pub use market::MarketContext;
 pub use portfolio::PortfolioContext;
-pub use quote::QuoteContext;
+pub use quote::{QuoteContext, USCryptoOverview};
 pub use rust_decimal::Decimal;
 pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
-pub use trade::TradeContext;
+pub use signal::SignalContext;
+pub use trade::{
+    GetUSAvailableHoldingOptions, GetUSHistoryOrders, GetUSRealizedPLOptions,
+    GetUSTransactionHistoryOptions, QueryUSOrdersOptions, QueryUSOrdersResponse, TradeContext,
+    USAssetOverview, USAvailableHolding, USBuyLimitInfo, USCashAndBuyPower, USCashDetail,
+    USCashEntry, USCryptoEntry, USExchangeRate, USExchangeRates, USMarginStatus,
+    USOrderDetailResponse, USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
+    USTransaction, USTransactionHistory,
+};
 pub use types::Market;

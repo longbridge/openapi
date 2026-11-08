@@ -12,6 +12,15 @@ import com.longbridge.*;
 public class QuoteContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create a QuoteContext object
      *
@@ -20,13 +29,17 @@ public class QuoteContext implements AutoCloseable {
      */
     public static QuoteContext create(Config config) {
         QuoteContext ctx = new QuoteContext();
-        ctx.raw = SdkNative.newQuoteContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newQuoteContext(config.getRaw()); }
         return ctx;
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeQuoteContext(raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeQuoteContext(h);
+        }
     }
 
     /**
@@ -34,9 +47,9 @@ public class QuoteContext implements AutoCloseable {
      *
      * @return A Future representing the member ID
      */
-    public CompletableFuture<Long> getMemberId() {
+    public synchronized CompletableFuture<Long> getMemberId() {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextGetMemberId(this.raw, callback);
+            SdkNative.quoteContextGetMemberId(raw(), callback);
         });
     }
 
@@ -45,9 +58,9 @@ public class QuoteContext implements AutoCloseable {
      *
      * @return A Future representing the quote level
      */
-    public CompletableFuture<String> getQuoteLevel() {
+    public synchronized CompletableFuture<String> getQuoteLevel() {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextGetQuoteLevel(this.raw, callback);
+            SdkNative.quoteContextGetQuoteLevel(raw(), callback);
         });
     }
 
@@ -56,9 +69,9 @@ public class QuoteContext implements AutoCloseable {
      *
      * @return A Future representing the quote package details
      */
-    public CompletableFuture<QuotePackageDetail[]> getQuotePackageDetails() {
+    public synchronized CompletableFuture<QuotePackageDetail[]> getQuotePackageDetails() {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextGetQuotePackageDetails(this.raw, callback);
+            SdkNative.quoteContextGetQuotePackageDetails(raw(), callback);
         });
     }
 
@@ -68,8 +81,8 @@ public class QuoteContext implements AutoCloseable {
      * 
      * @param handler A quote handler
      */
-    public void setOnQuote(QuoteHandler handler) {
-        SdkNative.quoteContextSetOnQuote(this.raw, handler);
+    public synchronized void setOnQuote(QuoteHandler handler) {
+        SdkNative.quoteContextSetOnQuote(raw(), handler);
     }
 
     /**
@@ -78,8 +91,8 @@ public class QuoteContext implements AutoCloseable {
      * 
      * @param handler A depth handler
      */
-    public void setOnDepth(DepthHandler handler) {
-        SdkNative.quoteContextSetOnDepth(this.raw, handler);
+    public synchronized void setOnDepth(DepthHandler handler) {
+        SdkNative.quoteContextSetOnDepth(raw(), handler);
     }
 
     /**
@@ -89,8 +102,8 @@ public class QuoteContext implements AutoCloseable {
      * 
      * @param handler A brokers handler
      */
-    public void setOnBrokers(BrokersHandler handler) {
-        SdkNative.quoteContextSetOnBrokers(this.raw, handler);
+    public synchronized void setOnBrokers(BrokersHandler handler) {
+        SdkNative.quoteContextSetOnBrokers(raw(), handler);
     }
 
     /**
@@ -100,8 +113,8 @@ public class QuoteContext implements AutoCloseable {
      * 
      * @param handler A trades handler
      */
-    public void setOnTrades(TradesHandler handler) {
-        SdkNative.quoteContextSetOnTrades(this.raw, handler);
+    public synchronized void setOnTrades(TradesHandler handler) {
+        SdkNative.quoteContextSetOnTrades(raw(), handler);
     }
 
     /**
@@ -110,8 +123,8 @@ public class QuoteContext implements AutoCloseable {
      * 
      * @param handler A candlestick handler
      */
-    public void setOnCandlestick(CandlestickHandler handler) {
-        SdkNative.quoteContextSetOnCandlestick(this.raw, handler);
+    public synchronized void setOnCandlestick(CandlestickHandler handler) {
+        SdkNative.quoteContextSetOnCandlestick(raw(), handler);
     }
 
     /**
@@ -143,9 +156,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> subscribe(String[] symbols, int flags) throws OpenApiException {
+    public synchronized CompletableFuture<Void> subscribe(String[] symbols, int flags) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextSubscribe(this.raw, symbols, flags, callback);
+            SdkNative.quoteContextSubscribe(raw(), symbols, flags, callback);
         });
     }
 
@@ -179,9 +192,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> unsubscribe(String[] symbols, int flags) throws OpenApiException {
+    public synchronized CompletableFuture<Void> unsubscribe(String[] symbols, int flags) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextUnsubscribe(this.raw, symbols, flags, callback);
+            SdkNative.quoteContextUnsubscribe(raw(), symbols, flags, callback);
         });
     }
 
@@ -215,11 +228,11 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Candlestick[]> subscribeCandlesticks(String symbol, Period period,
+    public synchronized CompletableFuture<Candlestick[]> subscribeCandlesticks(String symbol, Period period,
             TradeSessions tradeSessions)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextSubscribeCandlesticks(this.raw, symbol, period, tradeSessions, callback);
+            SdkNative.quoteContextSubscribeCandlesticks(raw(), symbol, period, tradeSessions, callback);
         });
     }
 
@@ -231,9 +244,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> unsubscribeCandlesticks(String symbol, Period period) throws OpenApiException {
+    public synchronized CompletableFuture<Void> unsubscribeCandlesticks(String symbol, Period period) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextUnsubscribeCandlesticks(this.raw, symbol, period, callback);
+            SdkNative.quoteContextUnsubscribeCandlesticks(raw(), symbol, period, callback);
         });
     }
 
@@ -264,9 +277,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Subscription[]> getSubscrptions() throws OpenApiException {
+    public synchronized CompletableFuture<Subscription[]> getSubscrptions() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextSubscriptions(this.raw, callback);
+            SdkNative.quoteContextSubscriptions(raw(), callback);
         });
     }
 
@@ -299,9 +312,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SecurityStaticInfo[]> getStaticInfo(String[] symbols) throws OpenApiException {
+    public synchronized CompletableFuture<SecurityStaticInfo[]> getStaticInfo(String[] symbols) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextStaticInfo(this.raw, symbols, callback);
+            SdkNative.quoteContextStaticInfo(raw(), symbols, callback);
         });
     }
 
@@ -333,9 +346,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SecurityQuote[]> getQuote(String[] symbols) throws OpenApiException {
+    public synchronized CompletableFuture<SecurityQuote[]> getQuote(String[] symbols) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextQuote(this.raw, symbols, callback);
+            SdkNative.quoteContextQuote(raw(), symbols, callback);
         });
     }
 
@@ -366,9 +379,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OptionQuote[]> getOptionQuote(String[] symbols) throws OpenApiException {
+    public synchronized CompletableFuture<OptionQuote[]> getOptionQuote(String[] symbols) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextOptionQuote(this.raw, symbols, callback);
+            SdkNative.quoteContextOptionQuote(raw(), symbols, callback);
         });
     }
 
@@ -399,9 +412,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<WarrantQuote[]> getWarrantQuote(String[] symbols) throws OpenApiException {
+    public synchronized CompletableFuture<WarrantQuote[]> getWarrantQuote(String[] symbols) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextWarrantQuote(this.raw, symbols, callback);
+            SdkNative.quoteContextWarrantQuote(raw(), symbols, callback);
         });
     }
 
@@ -430,9 +443,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SecurityDepth> getDepth(String symbol) throws OpenApiException {
+    public synchronized CompletableFuture<SecurityDepth> getDepth(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextDepth(this.raw, symbol, callback);
+            SdkNative.quoteContextDepth(raw(), symbol, callback);
         });
     }
 
@@ -461,9 +474,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SecurityBrokers> getBrokers(String symbol) throws OpenApiException {
+    public synchronized CompletableFuture<SecurityBrokers> getBrokers(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextBrokers(this.raw, symbol, callback);
+            SdkNative.quoteContextBrokers(raw(), symbol, callback);
         });
     }
 
@@ -493,9 +506,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ParticipantInfo[]> getParticipants() throws OpenApiException {
+    public synchronized CompletableFuture<ParticipantInfo[]> getParticipants() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextParticipants(this.raw, callback);
+            SdkNative.quoteContextParticipants(raw(), callback);
         });
     }
 
@@ -527,9 +540,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Trade[]> getTrades(String symbol, int count) throws OpenApiException {
+    public synchronized CompletableFuture<Trade[]> getTrades(String symbol, int count) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextTrades(this.raw, symbol, count, callback);
+            SdkNative.quoteContextTrades(raw(), symbol, count, callback);
         });
     }
 
@@ -561,10 +574,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<IntradayLine[]> getIntraday(String symbol, TradeSessions tradeSessions)
+    public synchronized CompletableFuture<IntradayLine[]> getIntraday(String symbol, TradeSessions tradeSessions)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextIntraday(this.raw, symbol, tradeSessions, callback);
+            SdkNative.quoteContextIntraday(raw(), symbol, tradeSessions, callback);
         });
     }
 
@@ -601,10 +614,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Candlestick[]> getCandlesticks(String symbol, Period period, int count,
+    public synchronized CompletableFuture<Candlestick[]> getCandlesticks(String symbol, Period period, int count,
             AdjustType adjustType, TradeSessions tradeSessions) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextCandlesticks(this.raw, symbol, period, count, adjustType, tradeSessions, callback);
+            SdkNative.quoteContextCandlesticks(raw(), symbol, period, count, adjustType, tradeSessions, callback);
         });
     }
 
@@ -636,14 +649,19 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<LocalDate[]> getOptionChainExpiryDateList(String symbol) throws OpenApiException {
+    public synchronized CompletableFuture<LocalDate[]> getOptionChainExpiryDateList(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextOptionChainExpiryDateList(this.raw, symbol, callback);
+            SdkNative.quoteContextOptionChainExpiryDateList(raw(), symbol, callback);
         });
     }
 
     /**
-     * Get option chain info by date
+     * Get the option contract list of an underlying security for a given expiry
+     * date
+     * 
+     * <p>
+     * Every contract is an independent entry: calls and puts are not paired, so
+     * a strike price that is listed on one side only yields a single entry.
      * 
      * <pre>
      * {@code
@@ -656,8 +674,8 @@ public class QuoteContext implements AutoCloseable {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
      *             .build(url -> System.out.println("Visit: " + url)).get();
      *         try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config)) {
-     *             StrikePriceInfo[] resp = ctx.getOptionChainInfoByDate("AAPL.US", LocalDate.of(2023, 1, 20)).get();
-     *             for (StrikePriceInfo obj : resp) {
+     *             OptionChainContract[] resp = ctx.getOptionChainInfoByDate("AAPL.US", LocalDate.of(2023, 1, 20), false).get();
+     *             for (OptionChainContract obj : resp) {
      *                 System.out.println(obj);
      *             }
      *         }
@@ -666,15 +684,21 @@ public class QuoteContext implements AutoCloseable {
      * }
      * </pre>
      * 
-     * @param symbol     Security symbol
-     * @param expiryDate Option expiry date
+     * @param symbol       Security symbol
+     * @param expiryDate   Option expiry date
+     * @param standardOnly Whether to filter out the legacy contracts produced by
+     *                     corporate actions. {@code true} returns standard
+     *                     contracts only; {@code false} returns everything,
+     *                     including the contracts carrying
+     *                     {@link OptionStandardAttr#Old}
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<StrikePriceInfo[]> getOptionChainInfoByDate(String symbol, LocalDate expiryDate)
+    public synchronized CompletableFuture<OptionChainContract[]> getOptionChainInfoByDate(String symbol,
+            LocalDate expiryDate, boolean standardOnly)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextOptionChainInfoByDate(this.raw, symbol, expiryDate, callback);
+            SdkNative.quoteContextOptionChainInfoByDate(raw(), symbol, expiryDate, standardOnly, callback);
         });
     }
 
@@ -704,10 +728,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<IssuerInfo[]> getWarrantIssuers()
+    public synchronized CompletableFuture<IssuerInfo[]> getWarrantIssuers()
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextWarrantIssuers(this.raw, callback);
+            SdkNative.quoteContextWarrantIssuers(raw(), callback);
         });
     }
 
@@ -740,10 +764,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<WarrantInfo[]> queryWarrantList(QueryWarrantOptions opts)
+    public synchronized CompletableFuture<WarrantInfo[]> queryWarrantList(QueryWarrantOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextWarrantList(this.raw, opts, callback);
+            SdkNative.quoteContextWarrantList(raw(), opts, callback);
         });
     }
 
@@ -773,10 +797,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<MarketTradingSession[]> getTradingSession()
+    public synchronized CompletableFuture<MarketTradingSession[]> getTradingSession()
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextTradingSession(this.raw, callback);
+            SdkNative.quoteContextTradingSession(raw(), callback);
         });
     }
 
@@ -812,10 +836,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<MarketTradingDays> getTradingDays(Market market, LocalDate begin, LocalDate end)
+    public synchronized CompletableFuture<MarketTradingDays> getTradingDays(Market market, LocalDate begin, LocalDate end)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextTradingDays(this.raw, market, begin, end, callback);
+            SdkNative.quoteContextTradingDays(raw(), market, begin, end, callback);
         });
     }
 
@@ -846,9 +870,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<CapitalFlowLine[]> getCapitalFlow(String symbol) throws OpenApiException {
+    public synchronized CompletableFuture<CapitalFlowLine[]> getCapitalFlow(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextCapitalFlow(this.raw, symbol, callback);
+            SdkNative.quoteContextCapitalFlow(raw(), symbol, callback);
         });
     }
 
@@ -877,10 +901,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<CapitalDistributionResponse> getCapitalDistribution(String symbol)
+    public synchronized CompletableFuture<CapitalDistributionResponse> getCapitalDistribution(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextCapitalDistribution(this.raw, symbol, callback);
+            SdkNative.quoteContextCapitalDistribution(raw(), symbol, callback);
         });
     }
 
@@ -897,11 +921,11 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Candlestick[]> getHistoryCandlesticksByOffset(String symbol, Period period,
+    public synchronized CompletableFuture<Candlestick[]> getHistoryCandlesticksByOffset(String symbol, Period period,
             AdjustType adjustType, boolean forward, LocalDateTime datetime, int count, TradeSessions tradeSessions)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextHistoryCandlesticksByOffset(this.raw, symbol, period, adjustType, forward, datetime,
+            SdkNative.quoteContextHistoryCandlesticksByOffset(raw(), symbol, period, adjustType, forward, datetime,
                     count, tradeSessions, callback);
         });
     }
@@ -918,11 +942,11 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Candlestick[]> getHistoryCandlesticksByDate(String symbol, Period period,
+    public synchronized CompletableFuture<Candlestick[]> getHistoryCandlesticksByDate(String symbol, Period period,
             AdjustType adjustType, LocalDate start, LocalDate end, TradeSessions tradeSessions)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextHistoryCandlesticksByDate(this.raw, symbol, period, adjustType, start, end,
+            SdkNative.quoteContextHistoryCandlesticksByDate(raw(), symbol, period, adjustType, start, end,
                     tradeSessions, callback);
         });
     }
@@ -935,10 +959,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SecurityCalcIndex[]> getCalcIndexes(String[] symbols, CalcIndex[] indexes)
+    public synchronized CompletableFuture<SecurityCalcIndex[]> getCalcIndexes(String[] symbols, CalcIndex[] indexes)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextCalcIndexes(this.raw, symbols, indexes, callback);
+            SdkNative.quoteContextCalcIndexes(raw(), symbols, indexes, callback);
         });
     }
 
@@ -967,10 +991,10 @@ public class QuoteContext implements AutoCloseable {
      * @throws OpenApiException If an error occurs
      */
 
-    public CompletableFuture<WatchlistGroup[]> getWatchlist()
+    public synchronized CompletableFuture<WatchlistGroup[]> getWatchlist()
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextWatchlist(this.raw, callback);
+            SdkNative.quoteContextWatchlist(raw(), callback);
         });
     }
 
@@ -1001,9 +1025,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Long> createWatchlistGroup(CreateWatchlistGroup req) throws OpenApiException {
+    public synchronized CompletableFuture<Long> createWatchlistGroup(CreateWatchlistGroup req) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextCreateWatchlistGroup(this.raw, req, callback);
+            SdkNative.quoteContextCreateWatchlistGroup(raw(), req, callback);
         }).thenApply(resp -> ((CreateWatchlistGroupResponse) resp).id);
     }
 
@@ -1032,9 +1056,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> deleteWatchlistGroup(DeleteWatchlistGroup req) throws OpenApiException {
+    public synchronized CompletableFuture<Void> deleteWatchlistGroup(DeleteWatchlistGroup req) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextDeleteWatchlistGroup(this.raw, req, callback);
+            SdkNative.quoteContextDeleteWatchlistGroup(raw(), req, callback);
         });
     }
 
@@ -1065,9 +1089,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Long> updateWatchlistGroup(UpdateWatchlistGroup req) throws OpenApiException {
+    public synchronized CompletableFuture<Long> updateWatchlistGroup(UpdateWatchlistGroup req) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextUpdateWatchlistGroup(this.raw, req, callback);
+            SdkNative.quoteContextUpdateWatchlistGroup(raw(), req, callback);
         });
     }
 
@@ -1078,10 +1102,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<FilingItem[]> getFilings(String symbol)
+    public synchronized CompletableFuture<FilingItem[]> getFilings(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextFilings(this.raw, symbol, callback);
+            SdkNative.quoteContextFilings(raw(), symbol, callback);
         });
     }
 
@@ -1114,10 +1138,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Security[]> getSecurityList(Market market, SecurityListCategory category)
+    public synchronized CompletableFuture<Security[]> getSecurityList(Market market, SecurityListCategory category)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextSecurityList(this.raw, market, category, callback);
+            SdkNative.quoteContextSecurityList(raw(), market, category, callback);
         });
     }
 
@@ -1149,10 +1173,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Security[]> getSecurityList(Market market)
+    public synchronized CompletableFuture<Security[]> getSecurityList(Market market)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextSecurityList(this.raw, market, null, callback);
+            SdkNative.quoteContextSecurityList(raw(), market, null, callback);
         });
     }
 
@@ -1181,10 +1205,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<MarketTemperature> getMarketTemperature(Market market)
+    public synchronized CompletableFuture<MarketTemperature> getMarketTemperature(Market market)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextMarketTemperature(raw, market, callback);
+            SdkNative.quoteContextMarketTemperature(raw(), market, callback);
         });
     }
 
@@ -1217,12 +1241,12 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<HistoryMarketTemperatureResponse> getHistoryMarketTemperature(Market market,
+    public synchronized CompletableFuture<HistoryMarketTemperatureResponse> getHistoryMarketTemperature(Market market,
             LocalDate start,
             LocalDate end)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextHistoryMarketTemperature(raw, market, start, end, callback);
+            SdkNative.quoteContextHistoryMarketTemperature(raw(), market, start, end, callback);
         });
     }
 
@@ -1258,10 +1282,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<RealtimeQuote[]> getRealtimeQuote(String[] symbols)
+    public synchronized CompletableFuture<RealtimeQuote[]> getRealtimeQuote(String[] symbols)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextRealtimeQuote(this.raw, symbols, callback);
+            SdkNative.quoteContextRealtimeQuote(raw(), symbols, callback);
         });
     }
 
@@ -1295,10 +1319,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SecurityDepth> getRealtimeDepth(String symbol)
+    public synchronized CompletableFuture<SecurityDepth> getRealtimeDepth(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextRealtimeDepth(this.raw, symbol, callback);
+            SdkNative.quoteContextRealtimeDepth(raw(), symbol, callback);
         });
     }
 
@@ -1332,10 +1356,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SecurityBrokers> getRealtimeBrokers(String symbol)
+    public synchronized CompletableFuture<SecurityBrokers> getRealtimeBrokers(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextRealtimeBrokers(this.raw, symbol, callback);
+            SdkNative.quoteContextRealtimeBrokers(raw(), symbol, callback);
         });
     }
 
@@ -1372,10 +1396,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Trade[]> getRealtimeTrades(String symbol, int count)
+    public synchronized CompletableFuture<Trade[]> getRealtimeTrades(String symbol, int count)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextRealtimeTrades(this.raw, symbol, count, callback);
+            SdkNative.quoteContextRealtimeTrades(raw(), symbol, count, callback);
         });
     }
 
@@ -1383,19 +1407,20 @@ public class QuoteContext implements AutoCloseable {
      * Get short positions for a symbol
      *
      * @param symbol Security symbol
+     * @param count  Number of records to return
      * @return A Future representing the short positions response
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ShortPositionsResponse> getShortPositions(String symbol) throws OpenApiException {
+    public synchronized CompletableFuture<ShortPositionsResponse> getShortPositions(String symbol, int count) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextShortPositions(this.raw, symbol, callback);
+            SdkNative.quoteContextShortPositions(raw(), symbol, count, callback);
         });
     }
 
     /** Get daily short sale volume for US or HK stocks (market auto-detected from symbol suffix). */
-    public CompletableFuture<ShortTradesResponse> getShortTrades(ShortTradesOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<ShortTradesResponse> getShortTrades(ShortTradesOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextShortTrades(this.raw, opts, callback);
+            SdkNative.quoteContextShortTrades(raw(), opts, callback);
         });
     }
 
@@ -1406,9 +1431,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the option volume statistics
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OptionVolumeStats> getOptionVolume(String symbol) throws OpenApiException {
+    public synchronized CompletableFuture<OptionVolumeStats> getOptionVolume(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextOptionVolume(this.raw, symbol, callback);
+            SdkNative.quoteContextOptionVolume(raw(), symbol, callback);
         });
     }
 
@@ -1419,10 +1444,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the daily option volume
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OptionVolumeDaily> getOptionVolumeDaily(OptionVolumeDailyOptions opts)
+    public synchronized CompletableFuture<OptionVolumeDaily> getOptionVolumeDaily(OptionVolumeDailyOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextOptionVolumeDaily(this.raw, opts, callback);
+            SdkNative.quoteContextOptionVolumeDaily(raw(), opts, callback);
         });
     }
 
@@ -1433,9 +1458,9 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future that completes when the operation is done
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> updatePinned(UpdatePinnedRequest req) throws OpenApiException {
+    public synchronized CompletableFuture<Void> updatePinned(UpdatePinnedRequest req) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextUpdatePinned(this.raw, req, callback);
+            SdkNative.quoteContextUpdatePinned(raw(), req, callback);
         });
     }
 
@@ -1473,10 +1498,10 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Candlestick[]> getRealtimeCandlesticks(String symbol, Period period, int count)
+    public synchronized CompletableFuture<Candlestick[]> getRealtimeCandlesticks(String symbol, Period period, int count)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextRealtimeCandlesticks(this.raw, symbol, period, count, callback);
+            SdkNative.quoteContextRealtimeCandlesticks(raw(), symbol, period, count, callback);
         });
     }
 }

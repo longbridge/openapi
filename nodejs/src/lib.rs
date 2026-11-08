@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+mod agent;
 mod alert;
 mod asset;
 mod calendar;
@@ -8,7 +9,9 @@ mod content;
 mod dca;
 mod decimal;
 mod error;
+mod fund;
 mod fundamental;
+mod grid;
 mod http_client;
 mod market;
 mod oauth;

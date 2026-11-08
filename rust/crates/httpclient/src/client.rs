@@ -1,12 +1,26 @@
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
+use longbridge_geo::DcRegion;
 use reqwest::{
     Client, Method,
     header::{HeaderMap, HeaderName, HeaderValue},
 };
 use serde::Deserialize;
 
-use crate::{HttpClientConfig, HttpClientError, HttpClientResult, Json, RequestBuilder};
+use crate::{
+    AuthConfig, HttpClientConfig, HttpClientError, HttpClientResult, Json, RequestBuilder,
+};
+
+/// Process-wide shared `reqwest::Client`.
+///
+/// `reqwest::Client` is internally reference-counted and owns the connection
+/// pool, DNS cache and TLS state; cloning it is cheap and shares that pool.
+/// Every SDK context builds its own [`HttpClient`], so a process that churns
+/// thousands of contexts would otherwise spin up thousands of independent
+/// connection pools. All requests target the same OpenAPI host and auth is
+/// applied per-request, so a single shared client is both correct and far
+/// cheaper.
+static SHARED_HTTP_CLIENT: LazyLock<Client> = LazyLock::new(Client::new);
 
 /// Longbridge HTTP client
 #[derive(Clone)]
@@ -20,7 +34,7 @@ impl HttpClient {
     /// Create a new `HttpClient`
     pub fn new(config: HttpClientConfig) -> Self {
         Self {
-            http_cli: Client::new(),
+            http_cli: SHARED_HTTP_CLIENT.clone(),
             config: Arc::new(config),
             default_headers: HeaderMap::new(),
         }
@@ -38,6 +52,24 @@ impl HttpClient {
             self.default_headers.insert(key, value);
         }
         self
+    }
+
+    /// The data-center region (`us`/`ap`) derived from this client's auth
+    /// credentials. Used by non-HTTP call sites (e.g. WebSocket quote commands)
+    /// to apply the same AP-only routing guard the HTTP path enforces.
+    pub async fn dc_region(&self) -> DcRegion {
+        match &self.config.auth {
+            AuthConfig::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            } => DcRegion::from_credentials(&[app_key, access_token, app_secret]),
+            AuthConfig::OAuth(oauth) => oauth
+                .access_token()
+                .await
+                .map(|token| DcRegion::from_credential(&token))
+                .unwrap_or(DcRegion::Ap),
+        }
     }
 
     /// Create a new request builder

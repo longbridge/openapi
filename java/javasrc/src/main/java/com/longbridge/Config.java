@@ -9,6 +9,15 @@ import java.util.concurrent.CompletableFuture;
 public class Config implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * @hidden
      */
@@ -23,7 +32,8 @@ public class Config implements AutoCloseable {
      * {@code LONGBRIDGE_HTTP_URL}, {@code LONGBRIDGE_LANGUAGE},
      * {@code LONGBRIDGE_QUOTE_WS_URL}, {@code LONGBRIDGE_TRADE_WS_URL},
      * {@code LONGBRIDGE_ENABLE_OVERNIGHT}, {@code LONGBRIDGE_PUSH_CANDLESTICK_MODE},
-     * {@code LONGBRIDGE_PRINT_QUOTE_PACKAGES}, {@code LONGBRIDGE_LOG_PATH}.
+     * {@code LONGBRIDGE_QUOTE_TRANSPORT}, {@code LONGBRIDGE_PRINT_QUOTE_PACKAGES},
+     * {@code LONGBRIDGE_LOG_PATH}.
      * Use the chainable setter methods (e.g. {@link #httpUrl}) to override any of
      * these values.
      *
@@ -60,6 +70,8 @@ public class Config implements AutoCloseable {
      * or {@code false} (Default: {@code false})</li>
      * <li>{@code LONGBRIDGE_PUSH_CANDLESTICK_MODE} - {@code realtime} or
      * {@code confirmed} (Default: {@code realtime})</li>
+     * <li>{@code LONGBRIDGE_QUOTE_TRANSPORT} - Transport for the quote pull APIs,
+     * {@code ws} or {@code http} (Default: {@code ws})</li>
      * <li>{@code LONGBRIDGE_PRINT_QUOTE_PACKAGES} - Print quote packages when
      * connected, {@code true} or {@code false} (Default: {@code true})</li>
      * <li>{@code LONGBRIDGE_LOG_PATH} - Set the path of the log files (Default: no
@@ -83,7 +95,8 @@ public class Config implements AutoCloseable {
      * {@code LONGBRIDGE_HTTP_URL}, {@code LONGBRIDGE_LANGUAGE},
      * {@code LONGBRIDGE_QUOTE_WS_URL}, {@code LONGBRIDGE_TRADE_WS_URL},
      * {@code LONGBRIDGE_ENABLE_OVERNIGHT}, {@code LONGBRIDGE_PUSH_CANDLESTICK_MODE},
-     * {@code LONGBRIDGE_PRINT_QUOTE_PACKAGES}, {@code LONGBRIDGE_LOG_PATH}.
+     * {@code LONGBRIDGE_QUOTE_TRANSPORT}, {@code LONGBRIDGE_PRINT_QUOTE_PACKAGES},
+     * {@code LONGBRIDGE_LOG_PATH}.
      * Use the chainable setter methods (e.g. {@link #httpUrl}) to override any of
      * these values.
      *
@@ -92,7 +105,7 @@ public class Config implements AutoCloseable {
      * @throws OpenApiException If an error occurs
      */
     public static Config fromOAuth(OAuth oauth) throws OpenApiException {
-        return new Config(SdkNative.newConfigFromOauth(oauth.getRaw()));
+        synchronized (oauth) { return new Config(SdkNative.newConfigFromOauth(oauth.getRaw())); }
     }
 
     /**
@@ -103,8 +116,8 @@ public class Config implements AutoCloseable {
      * @param httpUrl OpenAPI endpoint (Default: {@code https://openapi.longbridge.com})
      * @return this object
      */
-    public Config httpUrl(String httpUrl) {
-        this.raw = SdkNative.configSetHttpUrl(this.raw, httpUrl);
+    public synchronized Config httpUrl(String httpUrl) {
+        this.raw = SdkNative.configSetHttpUrl(raw(), httpUrl);
         return this;
     }
 
@@ -116,8 +129,8 @@ public class Config implements AutoCloseable {
      * @param quoteWsUrl OpenAPI quote websocket endpoint
      * @return this object
      */
-    public Config quoteWebsocketUrl(String quoteWsUrl) {
-        this.raw = SdkNative.configSetQuoteWsUrl(this.raw, quoteWsUrl);
+    public synchronized Config quoteWebsocketUrl(String quoteWsUrl) {
+        this.raw = SdkNative.configSetQuoteWsUrl(raw(), quoteWsUrl);
         return this;
     }
 
@@ -129,8 +142,8 @@ public class Config implements AutoCloseable {
      * @param tradeWsUrl OpenAPI trade websocket endpoint
      * @return this object
      */
-    public Config tradeWebsocketUrl(String tradeWsUrl) {
-        this.raw = SdkNative.configSetTradeWsUrl(this.raw, tradeWsUrl);
+    public synchronized Config tradeWebsocketUrl(String tradeWsUrl) {
+        this.raw = SdkNative.configSetTradeWsUrl(raw(), tradeWsUrl);
         return this;
     }
 
@@ -140,8 +153,8 @@ public class Config implements AutoCloseable {
      * @param language Language identifier (Default: {@link Language#EN})
      * @return this object
      */
-    public Config language(Language language) {
-        this.raw = SdkNative.configSetLanguage(this.raw, language);
+    public synchronized Config language(Language language) {
+        this.raw = SdkNative.configSetLanguage(raw(), language);
         return this;
     }
 
@@ -150,8 +163,8 @@ public class Config implements AutoCloseable {
      *
      * @return this object
      */
-    public Config enableOvernight() {
-        this.raw = SdkNative.configSetEnableOvernight(this.raw);
+    public synchronized Config enableOvernight() {
+        this.raw = SdkNative.configSetEnableOvernight(raw());
         return this;
     }
 
@@ -161,8 +174,19 @@ public class Config implements AutoCloseable {
      * @param mode Mode (Default: {@link PushCandlestickMode#Realtime})
      * @return this object
      */
-    public Config pushCandlestickMode(PushCandlestickMode mode) {
-        this.raw = SdkNative.configSetPushCandlestickMode(this.raw, mode);
+    public synchronized Config pushCandlestickMode(PushCandlestickMode mode) {
+        this.raw = SdkNative.configSetPushCandlestickMode(raw(), mode);
+        return this;
+    }
+
+    /**
+     * Set the transport used by the quote pull APIs.
+     *
+     * @param transport Transport (Default: {@link QuoteTransport#WebSocket})
+     * @return this object
+     */
+    public synchronized Config quoteTransport(QuoteTransport transport) {
+        this.raw = SdkNative.configSetQuoteTransport(raw(), transport);
         return this;
     }
 
@@ -171,8 +195,8 @@ public class Config implements AutoCloseable {
      *
      * @return this object
      */
-    public Config disablePrintQuotePackages() {
-        this.raw = SdkNative.configSetEnablePrintQuotePackages(this.raw, false);
+    public synchronized Config disablePrintQuotePackages() {
+        this.raw = SdkNative.configSetEnablePrintQuotePackages(raw(), false);
         return this;
     }
 
@@ -182,8 +206,27 @@ public class Config implements AutoCloseable {
      * @param path The path of the log files (Default: no logs)
      * @return this object
      */
-    public Config logPath(String path) {
-        this.raw = SdkNative.configSetLogPath(this.raw, path);
+    public synchronized Config logPath(String path) {
+        this.raw = SdkNative.configSetLogPath(raw(), path);
+        return this;
+    }
+
+    /**
+     * Enable paper trading mode.
+     *
+     * <p>When enabled, all API calls target the paper trading (simulation)
+     * environment.  The server validates the token: if it belongs to a real-money
+     * account the server returns an error.
+     *
+     * <p>By default this option is disabled and the server imposes no restrictions
+     * — requests from both paper trading and real-money accounts are accepted.
+     *
+     * <p>Paper trading users should call this method as a safety guard.
+     *
+     * @return this object
+     */
+    public synchronized Config enablePapertrading() {
+        this.raw = SdkNative.configSetEnablePapertrading(raw());
         return this;
     }
 
@@ -200,9 +243,9 @@ public class Config implements AutoCloseable {
      *         string.
      * @see <a href="https://open.longportapp.com/en/docs/refresh-token-api">Refresh Token API</a>
      */
-    public CompletableFuture<String> refreshAccessToken(OffsetDateTime expiredAt) {
+    public synchronized CompletableFuture<String> refreshAccessToken(OffsetDateTime expiredAt) {
         CompletableFuture<String> future = new CompletableFuture<>();
-        SdkNative.configRefreshAccessToken(this.raw, expiredAt, new AsyncCallback() {
+        SdkNative.configRefreshAccessToken(raw(), expiredAt, new AsyncCallback() {
             @Override
             public void callback(Object err, Object result) {
                 if (err != null) {
@@ -219,12 +262,16 @@ public class Config implements AutoCloseable {
      * @hidden
      * @return Context pointer
      */
-    public long getRaw() {
-        return this.raw;
+    public synchronized long getRaw() {
+        return raw();
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeConfig(this.raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeConfig(h);
+        }
     }
 }

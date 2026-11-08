@@ -270,9 +270,17 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/quote/StrikePriceInfo",
-    longbridge::quote::StrikePriceInfo,
-    [price, call_symbol, put_symbol, standard]
+    "com/longbridge/quote/OptionChainContract",
+    longbridge::quote::OptionChainContract,
+    [
+        symbol,
+        expiry_date,
+        strike_price,
+        direction,
+        option_type,
+        standard_attr,
+        days_to_expiry
+    ]
 );
 
 impl_java_class!(
@@ -586,6 +594,62 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/trade/AttachedOrderDetail",
+    longbridge::trade::AttachedOrderDetail,
+    [
+        order_id,
+        attached_type_display,
+        trigger_price,
+        quantity,
+        executed_qty,
+        status,
+        updated_at,
+        withdrawn,
+        gtd,
+        time_in_force,
+        counter_id,
+        trigger_status,
+        executed_amount,
+        tag,
+        submitted_at,
+        executed_price,
+        force_only_rth,
+        reviewed,
+        activate_order_type,
+        activate_rth,
+        submit_price,
+        limit_depth_level
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/MultiLegOrderLeg",
+    longbridge::trade::MultiLegOrderLeg,
+    [
+        symbol,
+        side,
+        position,
+        ratio_quantity,
+        strike_price,
+        expire_date,
+        contract_direction
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/MultiLegInfo",
+    longbridge::trade::MultiLegInfo,
+    [
+        strategy,
+        strategy_name,
+        multileg_id,
+        code,
+        #[java(objarray)]
+        legs
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/trade/PushOrderChanged",
     longbridge::trade::PushOrderChanged,
     [
@@ -613,14 +677,33 @@ impl_java_class!(
         account_no,
         last_share,
         last_price,
-        remark
+        remark,
+        multi_leg
     ]
 );
 
 impl_java_class!(
     "com/longbridge/trade/Execution",
     longbridge::trade::Execution,
-    [order_id, trade_id, symbol, trade_done_at, quantity, price]
+    [
+        order_id,
+        trade_id,
+        symbol,
+        trade_done_at,
+        quantity,
+        price,
+        side
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/AllExecutionsResponse",
+    longbridge::trade::AllExecutionsResponse,
+    [
+        has_more,
+        #[java(objarray)]
+        trades
+    ]
 );
 
 impl_java_class!(
@@ -657,7 +740,11 @@ impl_java_class!(
         #[java(set_as_opt = crate::types::JavaInteger)]
         trigger_count,
         monitor_price,
-        remark
+        remark,
+        delayed_until,
+        #[java(objarray)]
+        attached_orders,
+        multi_leg
     ]
 );
 
@@ -744,7 +831,7 @@ impl_java_class!(
     "com/longbridge/trade/FundPosition",
     longbridge::trade::FundPosition,
     [
-        symbol,
+        counter_id,
         current_net_asset_value,
         net_asset_value_day,
         symbol_name,
@@ -923,6 +1010,7 @@ impl_java_class!(
         trigger_count,
         monitor_price,
         remark,
+        delayed_until,
         free_status,
         free_amount,
         free_currency,
@@ -934,7 +1022,10 @@ impl_java_class!(
         platform_deducted_currency,
         #[java(objarray)]
         history,
-        charge_detail
+        charge_detail,
+        #[java(objarray)]
+        attached_orders,
+        multi_leg
     ]
 );
 
@@ -942,6 +1033,273 @@ impl_java_class!(
     "com/longbridge/trade/EstimateMaxPurchaseQuantityResponse",
     longbridge::trade::EstimateMaxPurchaseQuantityResponse,
     [cash_max_qty, margin_max_qty]
+);
+
+// ── Grid trading types ────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/grid/SubmitGridOrderResponse",
+    longbridge::grid::SubmitGridOrderResponse,
+    [order_id]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrder",
+    longbridge::grid::GridOrder,
+    [
+        order_id,
+        symbol,
+        stock_name,
+        market,
+        status,
+        grid_status,
+        submitted_base_price,
+        current_base_price,
+        pre_trigger_base_price,
+        post_trigger_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_spread_up,
+        trigger_spread_down,
+        trigger_percent_up,
+        trigger_percent_down,
+        pullback_percent,
+        pullback_spread,
+        rebound_percent,
+        rebound_spread,
+        trigger_sell_order_type,
+        trigger_buy_order_type,
+        trigger_sell_depth,
+        trigger_buy_depth,
+        trigger_quantity,
+        trigger_sell_quantity,
+        trigger_buy_quantity,
+        upper_limit_quantity,
+        lower_limit_quantity,
+        upper_limit_event,
+        lower_limit_event,
+        multiple_trigger,
+        trigger_times,
+        total_buy_quantity,
+        total_sell_quantity,
+        total_profit_balance,
+        settlement_currency,
+        time_in_force,
+        gtd,
+        created_at,
+        rth,
+        support_shortsell,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderSubOrder",
+    longbridge::grid::GridOrderSubOrder,
+    [
+        id,
+        price,
+        order_type,
+        quantity,
+        executed_qty,
+        action,
+        status,
+        submitted_at,
+        rth
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderHistory",
+    longbridge::grid::GridOrderHistory,
+    [history_id, created_at, status, suspend_reason, reason]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderDetail",
+    longbridge::grid::GridOrderDetail,
+    [
+        order_id,
+        symbol,
+        stock_name,
+        status,
+        grid_status,
+        suspend_reason,
+        sleeping_reason,
+        submitted_base_price,
+        current_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_spread_up,
+        trigger_spread_down,
+        trigger_percent_up,
+        trigger_percent_down,
+        pullback_percent,
+        pullback_spread,
+        rebound_percent,
+        rebound_spread,
+        multiple_trigger,
+        time_in_force,
+        trigger_quantity,
+        trigger_sell_quantity,
+        trigger_buy_quantity,
+        upper_limit_quantity,
+        lower_limit_quantity,
+        upper_limit_event,
+        lower_limit_event,
+        trigger_sell_depth,
+        trigger_buy_depth,
+        created_at,
+        updated_at,
+        settlement_currency,
+        expire_time,
+        gtd,
+        #[java(objarray)]
+        grid_sub_orders,
+        sub_has_more,
+        #[java(objarray)]
+        grid_order_history,
+        history_has_more,
+        support_shortsell,
+        rth,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/TriggerOrder",
+    longbridge::grid::TriggerOrder,
+    [
+        id,
+        status,
+        name,
+        symbol,
+        price,
+        quantity,
+        executed_price,
+        executed_qty,
+        submitted_at,
+        action,
+        order_type,
+        trigger_price,
+        msg,
+        currency,
+        last_done,
+        updated_at,
+        time_in_force,
+        gtd,
+        trigger_at,
+        trigger_status
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridBidSize",
+    longbridge::grid::GridBidSize,
+    [str_proceed, end_proceed, bid_size]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridChannelInfo",
+    longbridge::grid::GridChannelInfo,
+    [
+        strategy_granted,
+        support_rth,
+        currency,
+        #[java(objarray)]
+        settlement_currency
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridSymbolInfo",
+    longbridge::grid::GridSymbolInfo,
+    [
+        name,
+        last_done,
+        lot_size,
+        buy_lot_size,
+        sell_lot_size,
+        #[java(objarray)]
+        bid_sizes,
+        channel_info
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/PushGridOrderChanged",
+    longbridge::trade::PushGridOrderChanged,
+    [
+        order_id,
+        status,
+        symbol,
+        suspend_reason,
+        submitted_base_price,
+        current_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_quantity,
+        settlement_currency,
+        time_in_force,
+        rth,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+// Mirror the grid list / trigger-history responses with binding-side structs so
+// the `has_more` paging flag can be flattened alongside the item array.
+pub(crate) struct GridOrdersResponse {
+    grid_order: Vec<longbridge::grid::GridOrder>,
+    has_more: bool,
+}
+
+impl GridOrdersResponse {
+    pub(crate) fn new(grid_order: Vec<longbridge::grid::GridOrder>, has_more: bool) -> Self {
+        Self {
+            grid_order,
+            has_more,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrdersResponse",
+    GridOrdersResponse,
+    [
+        #[java(objarray)]
+        grid_order,
+        has_more
+    ]
+);
+
+pub(crate) struct GridTriggerHistoryResponse {
+    trigger_orders: Vec<longbridge::grid::TriggerOrder>,
+    has_more: bool,
+}
+
+impl GridTriggerHistoryResponse {
+    pub(crate) fn new(trigger_orders: Vec<longbridge::grid::TriggerOrder>, has_more: bool) -> Self {
+        Self {
+            trigger_orders,
+            has_more,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/grid/GridTriggerHistoryResponse",
+    GridTriggerHistoryResponse,
+    [
+        #[java(objarray)]
+        trigger_orders,
+        has_more
+    ]
 );
 
 impl_java_class!(
@@ -1670,6 +2028,16 @@ impl_java_class!(
 // ── AlertContext types ────────────────────────────────────────────
 
 impl_java_class!(
+    "com/longbridge/alert/AlertValueMap",
+    longbridge::alert::AlertValueMap,
+    [
+        price,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        chg
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/alert/AlertItem",
     longbridge::alert::AlertItem,
     [
@@ -2280,13 +2648,14 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/quote/OptionVolumeStats",
     longbridge::quote::OptionVolumeStats,
-    [c, p]
+    [symbol, call_volume, put_volume]
 );
 
 impl_java_class!(
     "com/longbridge/quote/OptionVolumeDaily",
     longbridge::quote::OptionVolumeDaily,
     [
+        symbol,
         #[java(objarray)]
         stats
     ]
@@ -2297,15 +2666,15 @@ impl_java_class!(
     longbridge::quote::OptionVolumeDailyStat,
     [
         symbol,
-        timestamp,
+        date,
+        call_volume,
+        put_volume,
+        call_open_interest,
+        put_open_interest,
         total_volume,
-        total_put_volume,
-        total_call_volume,
-        put_call_volume_ratio,
         total_open_interest,
-        total_put_open_interest,
-        total_call_open_interest,
-        put_call_open_interest_ratio
+        pc_vol,
+        pc_oi
     ]
 );
 
@@ -2353,13 +2722,25 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/fundamental/RatingIndicator",
     longbridge::fundamental::RatingIndicator,
-    [name, score, letter]
+    [
+        name,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        score,
+        letter
+    ]
 );
 
 impl_java_class!(
     "com/longbridge/fundamental/RatingLeafIndicator",
     longbridge::fundamental::RatingLeafIndicator,
-    [name, value, value_type, score, letter]
+    [
+        name,
+        value,
+        value_type,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        score,
+        letter
+    ]
 );
 
 impl_java_class!(
@@ -2389,13 +2770,18 @@ impl_java_class!(
         style_txt_name,
         scale_txt_name,
         report_period_txt,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         multi_score,
         multi_letter,
         multi_score_change,
         industry_name,
+        #[java(set_as_opt = crate::types::JavaLong)]
         industry_rank,
+        #[java(set_as_opt = crate::types::JavaLong)]
         industry_total,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         industry_mean_score,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         industry_median_score,
         #[java(objarray)]
         ratings
@@ -2471,7 +2857,7 @@ impl_java_class!(
     longbridge::fundamental::IndustryRankItem,
     [
         name,
-        counter_id,
+        symbol,
         chg,
         leading_name,
         leading_ticker,
@@ -2543,7 +2929,7 @@ impl crate::types::IntoJValue for longbridge::fundamental::IndustryPeerNode {
     ) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
         let longbridge::fundamental::IndustryPeerNode {
             name,
-            counter_id,
+            symbol,
             stock_num,
             chg,
             ytd_chg,
@@ -2553,7 +2939,7 @@ impl crate::types::IntoJValue for longbridge::fundamental::IndustryPeerNode {
         let cls = <Self as crate::types::ClassLoader>::class_ref();
         let obj = env.new_object(cls.borrow(), "()V", &[])?;
         crate::types::set_field(env, &obj, "name", name)?;
-        crate::types::set_field(env, &obj, "counterId", counter_id)?;
+        crate::types::set_field(env, &obj, "symbol", symbol)?;
         crate::types::set_field(env, &obj, "stockNum", stock_num)?;
         crate::types::set_field(env, &obj, "chg", chg)?;
         crate::types::set_field(env, &obj, "ytdChg", ytd_chg)?;
@@ -2626,6 +3012,7 @@ impl_java_class!(
     longbridge::portfolio::FlowItem,
     [
         executed_date,
+        #[java(nullable)]
         executed_timestamp,
         code,
         direction,
@@ -2794,9 +3181,29 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/market/RankSubCategory",
+    longbridge::market::RankSubCategory,
+    [key, name, market]
+);
+
+impl_java_class!(
+    "com/longbridge/market/RankCategory",
+    longbridge::market::RankCategory,
+    [
+        key,
+        name,
+        #[java(objarray)]
+        sub_categories
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/market/RankCategoriesResponse",
     longbridge::market::RankCategoriesResponse,
-    [data]
+    [
+        #[java(objarray)]
+        categories
+    ]
 );
 
 impl_java_class!(
@@ -2862,4 +3269,1187 @@ impl_java_class!(
     "com/longbridge/screener/ScreenerIndicatorsResponse",
     longbridge::screener::ScreenerIndicatorsResponse,
     [data]
+);
+
+// ── AgentContext types ─────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/agent/Workspace",
+    longbridge::agent::Workspace,
+    [id, name, created_at, updated_at]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/WorkspacesResponse",
+    longbridge::agent::WorkspacesResponse,
+    [
+        #[java(objarray)]
+        workspaces
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/Agent",
+    longbridge::agent::Agent,
+    [
+        uid,
+        name,
+        description,
+        mode,
+        icon,
+        is_published,
+        published_at,
+        created_at,
+        updated_at
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/AgentsResponse",
+    longbridge::agent::AgentsResponse,
+    [
+        #[java(objarray)]
+        agents,
+        total
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/Reference",
+    longbridge::agent::Reference,
+    [index, original_index, ref_type, id, title, url, content]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/QuestionOption",
+    longbridge::agent::QuestionOption,
+    [label, description]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/Question",
+    longbridge::agent::Question,
+    [
+        question,
+        #[java(objarray)]
+        options,
+        multi_select
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/HumanInteraction",
+    longbridge::agent::HumanInteraction,
+    [
+        tool_call_id,
+        interrupt_id,
+        interaction_type,
+        tool_name,
+        #[java(objarray)]
+        questions,
+        tool_args
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/Interrupt",
+    longbridge::agent::Interrupt,
+    [
+        node_id,
+        tool_call_id,
+        #[java(objarray)]
+        questions,
+        #[java(objarray)]
+        interactions,
+        message_id,
+        chat_id
+    ]
+);
+
+// The Java class is named `ConversationError` (not `AgentError`) since it
+// describes a failed conversation *run*, not a JNI/transport-level failure —
+// `OpenApiException` already owns that role for this SDK. `impl_java_class!`
+// only cares that the two names are given independently, so no wrapper type
+// is needed just to rename it.
+impl_java_class!(
+    "com/longbridge/agent/ConversationError",
+    longbridge::agent::AgentError,
+    [code, message]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatStartedEvent",
+    longbridge::agent::ChatStartedPayload,
+    [chat_uid, message_id, chat_id, error, error_message]
+);
+
+// JNI-side view of `longbridge::agent::WorkflowStartedInputs`, the `inputs`
+// sub-object of a `workflow_started` event — mapped to its own Java class
+// the same way `Interrupt`/`Question` nest inside `ConversationResponse`
+// above.
+impl_java_class!(
+    "com/longbridge/agent/WorkflowStartedInputs",
+    longbridge::agent::WorkflowStartedInputs,
+    [chat_id, chat_uid, message_id, query]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/WorkflowStartedEvent",
+    longbridge::agent::WorkflowStartedPayload,
+    [hit_cache, inputs, started_at, workflow_id]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/MessageEvent",
+    longbridge::agent::MessagePayload,
+    [
+        text,
+        message_type,
+        key,
+        started_at,
+        stage,
+        stage_title,
+        stage_finished_title,
+        outputs
+    ]
+);
+
+/// JNI-side marker for
+/// [`longbridge::agent::ConversationStreamEvent::Ping`], which — unlike
+/// every other variant — carries no payload at all. `impl_java_class!` works
+/// fine against a zero-field struct, so this is used instead of hand-writing
+/// a bespoke JNI object constructor for the one variant with nothing to
+/// carry. See the manual `IntoJValue` for `ConversationStreamEvent` below,
+/// the only place this type is used.
+pub(crate) struct PingEvent {}
+
+impl_java_class!("com/longbridge/agent/PingEvent", PingEvent, []);
+
+impl_java_class!(
+    "com/longbridge/agent/ThinkingStartedEvent",
+    longbridge::agent::ThinkingStartedPayload,
+    [started_at]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ThinkingFinishedEvent",
+    longbridge::agent::ThinkingFinishedPayload,
+    [finished_at, elapsed_time]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/NodeToolUseStartedEvent",
+    longbridge::agent::NodeToolUseStartedPayload,
+    [
+        tool_use_id,
+        tool_name,
+        tool_func_name,
+        tool_args,
+        tips,
+        #[java(objarray)]
+        tip_chips,
+        iteration,
+        started_at
+    ]
+);
+
+/// JNI-side view of [`longbridge::agent::NodeToolUseOutputs`], with
+/// `references`/`reference_domains` normalized from `Option<Vec<_>>` down to a
+/// plain `Vec` (empty when absent) — same convention as
+/// [`ConversationResponse`]'s `references` field above.
+pub(crate) struct NodeToolUseOutputs {
+    pub(crate) references: Vec<longbridge::agent::Reference>,
+    pub(crate) reference_domains: Vec<String>,
+    pub(crate) query: Option<String>,
+    pub(crate) text: Option<String>,
+    pub(crate) tool_args: Option<serde_json::Value>,
+    pub(crate) data: Option<serde_json::Value>,
+}
+
+impl From<longbridge::agent::NodeToolUseOutputs> for NodeToolUseOutputs {
+    fn from(value: longbridge::agent::NodeToolUseOutputs) -> Self {
+        Self {
+            references: value.references.unwrap_or_default(),
+            reference_domains: value.reference_domains.unwrap_or_default(),
+            query: value.query,
+            text: value.text,
+            tool_args: value.tool_args,
+            data: value.data,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/agent/NodeToolUseOutputs",
+    NodeToolUseOutputs,
+    [
+        #[java(objarray)]
+        references,
+        #[java(objarray)]
+        reference_domains,
+        query,
+        text,
+        tool_args,
+        data
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/NodeToolUseFinishedEvent",
+    longbridge::agent::NodeToolUseFinishedPayload,
+    [
+        tool_use_id,
+        status,
+        error,
+        elapsed_time,
+        started_at,
+        tool_name,
+        tool_func_name,
+        tool_args,
+        tool_type,
+        tips,
+        #[java(objarray)]
+        tip_chips,
+        iteration,
+        is_thinking,
+        #[java(set_as = crate::types::NodeToolUseOutputs)]
+        outputs
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/SubagentStartedEvent",
+    longbridge::agent::SubagentStartedPayload,
+    [
+        node_id,
+        tool_use_id,
+        started_at,
+        goal,
+        prompt,
+        subagent_id,
+        #[java(objarray)]
+        tools
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/SubagentProgressEvent",
+    longbridge::agent::SubagentProgressPayload,
+    [
+        node_id,
+        parent_tool_call_id,
+        subagent_tool_name,
+        subagent_tool_args,
+        subagent_status,
+        subagent_duration_ms,
+        subagent_iteration,
+        started_at
+    ]
+);
+
+/// JNI-side view of [`longbridge::agent::SubagentOutputs`], with
+/// `subagent_tools` normalized from `Option<Vec<_>>` down to a plain `Vec`
+/// (empty when absent) — same convention as [`NodeToolUseOutputs`] above.
+pub(crate) struct SubagentOutputs {
+    pub(crate) goal: Option<String>,
+    pub(crate) result: Option<String>,
+    pub(crate) subagent_tools: Vec<serde_json::Value>,
+}
+
+impl From<longbridge::agent::SubagentOutputs> for SubagentOutputs {
+    fn from(value: longbridge::agent::SubagentOutputs) -> Self {
+        Self {
+            goal: value.goal,
+            result: value.result,
+            subagent_tools: value.subagent_tools.unwrap_or_default(),
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/agent/SubagentOutputs",
+    SubagentOutputs,
+    [
+        goal,
+        result,
+        #[java(objarray)]
+        subagent_tools
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/SubagentFinishedEvent",
+    longbridge::agent::SubagentFinishedPayload,
+    [
+        node_id,
+        tool_use_id,
+        status,
+        started_at,
+        elapsed_time,
+        error,
+        #[java(set_as = crate::types::SubagentOutputs)]
+        outputs
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/AgentToolStartedEvent",
+    longbridge::agent::AgentToolStartedPayload,
+    [
+        node_id,
+        tool_use_id,
+        agent_tool_name,
+        title,
+        started_at,
+        tool_args,
+        tool_name,
+        tips,
+        #[java(objarray)]
+        tip_chips,
+        is_thinking
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/AgentToolProgressEvent",
+    longbridge::agent::AgentToolProgressPayload,
+    [
+        node_id,
+        parent_tool_call_id,
+        agent_tool_name,
+        inner_tool_name,
+        inner_tool_args,
+        status,
+        duration_ms,
+        started_at,
+        is_thinking
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/AgentToolFinishedEvent",
+    longbridge::agent::AgentToolFinishedPayload,
+    [
+        node_id,
+        tool_use_id,
+        agent_tool_name,
+        status,
+        started_at,
+        elapsed_time,
+        error,
+        tool_args,
+        outputs,
+        tool_type,
+        tips,
+        #[java(objarray)]
+        tip_chips,
+        is_thinking
+    ]
+);
+
+/// JNI-side wrapper so that
+/// [`longbridge::agent::ConversationStreamEvent::HumanInteractionRequired`]
+/// can go through the same `impl_java_class!` machinery as every other event
+/// payload, wrapping the same [`ConversationResponse`] that
+/// [`WorkflowFinishedEvent`] wraps — see the manual `IntoJValue` for
+/// `ConversationStreamEvent` below, which is the only place this type is
+/// used.
+pub(crate) struct HumanInteractionRequiredEvent {
+    pub(crate) response: ConversationResponse,
+}
+
+impl_java_class!(
+    "com/longbridge/agent/HumanInteractionRequiredEvent",
+    HumanInteractionRequiredEvent,
+    [response]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/QueryMaskedEvent",
+    longbridge::agent::QueryMaskedPayload,
+    [raw_query, masked_query]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/PlanChangedEvent",
+    longbridge::agent::PlanChangedPayload,
+    [node_id, started_at, outputs, tool_name]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ContextCompressStartedEvent",
+    longbridge::agent::ContextCompressStartedPayload,
+    [started_at, inputs]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ContextCompressFinishedEvent",
+    longbridge::agent::ContextCompressFinishedPayload,
+    [created_at, inputs, outputs]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatFinishedEvent",
+    longbridge::agent::ChatFinishedPayload,
+    [chat_id, chat_uid, message_id, error, error_message]
+);
+
+/// JNI-side view of [`longbridge::agent::ConversationResponse`], with
+/// `references`/`further_questions` normalized from `Option<Vec<_>>` down to
+/// a plain `Vec` (empty when absent) so they can use the same
+/// `#[java(objarray)]` convention as every other list field — mirrors how
+/// `StockPosition` above collapses `Option<Decimal>`/`Option<i64>` fields
+/// with `unwrap_or_default`.
+pub(crate) struct ConversationResponse {
+    pub(crate) chat_uid: String,
+    pub(crate) message_id: String,
+    pub(crate) status: longbridge::agent::ConversationStatus,
+    pub(crate) answer: String,
+    pub(crate) references: Vec<longbridge::agent::Reference>,
+    pub(crate) further_questions: Vec<String>,
+    pub(crate) elapsed_time: f64,
+    pub(crate) interrupt: Option<longbridge::agent::Interrupt>,
+    pub(crate) error: Option<longbridge::agent::AgentError>,
+}
+
+impl From<longbridge::agent::ConversationResponse> for ConversationResponse {
+    fn from(value: longbridge::agent::ConversationResponse) -> Self {
+        Self {
+            chat_uid: value.chat_uid,
+            message_id: value.message_id,
+            status: value.status,
+            answer: value.answer,
+            references: value.references.unwrap_or_default(),
+            further_questions: value.further_questions.unwrap_or_default(),
+            elapsed_time: value.elapsed_time,
+            interrupt: value.interrupt,
+            error: value.error,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/agent/ConversationResponse",
+    ConversationResponse,
+    [
+        chat_uid,
+        message_id,
+        status,
+        answer,
+        #[java(objarray)]
+        references,
+        #[java(objarray)]
+        further_questions,
+        elapsed_time,
+        interrupt,
+        error
+    ]
+);
+
+/// JNI-side wrapper so that
+/// [`longbridge::agent::ConversationStreamEvent::WorkflowFinished`] can go
+/// through the same `impl_java_class!` machinery as every other event
+/// payload — see the manual `IntoJValue` for `ConversationStreamEvent` below,
+/// which is the only place this type is used.
+pub(crate) struct WorkflowFinishedEvent {
+    pub(crate) response: ConversationResponse,
+}
+
+impl_java_class!(
+    "com/longbridge/agent/WorkflowFinishedEvent",
+    WorkflowFinishedEvent,
+    [response]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatTitleUpdatedEvent",
+    longbridge::agent::ChatTitleUpdatedPayload,
+    [chat_id, chat_uid, source, title, updated_at]
+);
+
+/// JNI-side wrapper for
+/// [`longbridge::agent::ConversationStreamEvent::Other`], carrying the SSE
+/// envelope's `event` type name alongside the raw event JSON as a string
+/// (same convention as `AlertItem.valueMap`).
+pub(crate) struct OtherEvent {
+    pub(crate) event: String,
+    pub(crate) json: serde_json::Value,
+}
+
+impl_java_class!("com/longbridge/agent/OtherEvent", OtherEvent, [event, json]);
+
+/// `ConversationStreamEvent` is an enum-with-payload, so unlike every type
+/// above it can't go through `impl_java_class!` (which only knows how to
+/// build a single Java class by reflecting named struct fields onto it).
+/// Instead each variant is modeled as its own Java subclass of the
+/// `ConversationStreamEvent` sealed-style hierarchy
+/// (`ChatStartedEvent`/`WorkflowStartedEvent`/`MessageEvent`/`PingEvent`/
+/// `ThinkingStartedEvent`/`ThinkingFinishedEvent`/`NodeToolUseStartedEvent`/
+/// `NodeToolUseFinishedEvent`/`SubagentStartedEvent`/`SubagentProgressEvent`/
+/// `SubagentFinishedEvent`/`AgentToolStartedEvent`/`AgentToolProgressEvent`/
+/// `AgentToolFinishedEvent`/`HumanInteractionRequiredEvent`/
+/// `QueryMaskedEvent`/`PlanChangedEvent`/`ContextCompressStartedEvent`/
+/// `ContextCompressFinishedEvent`/`ChatFinishedEvent`/`WorkflowFinishedEvent`/
+/// `ChatTitleUpdatedEvent`/`OtherEvent`), and this manual `IntoJValue` picks
+/// the right one — the resulting object reference is passed to
+/// `Flow.Subscriber.onNext(Object)` as-is (generics are erased on the Java
+/// side, so any subclass of the sealed base is a valid argument there).
+impl crate::types::IntoJValue for longbridge::agent::ConversationStreamEvent {
+    fn into_jvalue<'a>(
+        self,
+        env: &mut jni::JNIEnv<'a>,
+    ) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
+        use longbridge::agent::ConversationStreamEvent::*;
+        match self {
+            ChatStarted(payload) => payload.into_jvalue(env),
+            WorkflowStarted(payload) => payload.into_jvalue(env),
+            Message(payload) => payload.into_jvalue(env),
+            Ping => PingEvent {}.into_jvalue(env),
+            ThinkingStarted(payload) => payload.into_jvalue(env),
+            ThinkingFinished(payload) => payload.into_jvalue(env),
+            NodeToolUseStarted(payload) => payload.into_jvalue(env),
+            NodeToolUseFinished(payload) => payload.into_jvalue(env),
+            SubagentStarted(payload) => payload.into_jvalue(env),
+            SubagentProgress(payload) => payload.into_jvalue(env),
+            SubagentFinished(payload) => payload.into_jvalue(env),
+            AgentToolStarted(payload) => payload.into_jvalue(env),
+            AgentToolProgress(payload) => payload.into_jvalue(env),
+            AgentToolFinished(payload) => payload.into_jvalue(env),
+            HumanInteractionRequired(resp) => HumanInteractionRequiredEvent {
+                response: ConversationResponse::from(resp),
+            }
+            .into_jvalue(env),
+            QueryMasked(payload) => payload.into_jvalue(env),
+            PlanChanged(payload) => payload.into_jvalue(env),
+            ContextCompressStarted(payload) => payload.into_jvalue(env),
+            ContextCompressFinished(payload) => payload.into_jvalue(env),
+            ChatFinished(payload) => payload.into_jvalue(env),
+            WorkflowFinished(resp) => WorkflowFinishedEvent {
+                response: ConversationResponse::from(resp),
+            }
+            .into_jvalue(env),
+            ChatTitleUpdated(payload) => payload.into_jvalue(env),
+            Other { event, data } => OtherEvent { event, json: data }.into_jvalue(env),
+        }
+    }
+}
+
+// ── Fund (mutual fund) types ───────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/fund/FundNavValue",
+    longbridge::fund::FundNavValue,
+    [
+        change,
+        change_percent,
+        change_percent_format,
+        counter_id,
+        counter_name,
+        currency,
+        date_format,
+        isin,
+        last_update_time,
+        value,
+        value_format
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPerformancePoint",
+    longbridge::fund::FundPerformancePoint,
+    [date, last_done]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/HotFund",
+    longbridge::fund::HotFund,
+    [
+        asset_class,
+        asset_class_name,
+        counter_id,
+        currency,
+        earning_rate,
+        #[java(objarray)]
+        fund_performances,
+        name,
+        purchase_amount,
+        recommendation_text,
+        risk_level,
+        risk_level_name,
+        time_interval
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundBrief",
+    longbridge::fund::FundBrief,
+    [
+        asset_class,
+        asset_class_name,
+        code,
+        counter_id,
+        currency,
+        description,
+        earning_rate,
+        holding,
+        isin,
+        name,
+        product,
+        purchase_amount,
+        recommendation_text,
+        risk_level,
+        risk_level_name,
+        time_interval,
+        unit_value
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundFilters",
+    longbridge::fund::FundFilters,
+    [
+        #[java(objarray)]
+        asset_class,
+        #[java(objarray)]
+        company,
+        #[java(objarray)]
+        currency,
+        #[java(objarray)]
+        industry_category_name,
+        #[java(objarray)]
+        risk_level
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAssetAllocationItem",
+    longbridge::fund::FundAssetAllocationItem,
+    [code, counter_id, name, position_ratio]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAssetAllocation",
+    longbridge::fund::FundAssetAllocation,
+    [
+        asset_type,
+        #[java(objarray)]
+        lists,
+        report_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundDetail",
+    longbridge::fund::FundDetail,
+    [
+        additional_purchase_amount,
+        affirm_day,
+        amount_affirm_day,
+        asset_allocation,
+        asset_class,
+        asset_class_name,
+        bill_purchase_rate,
+        channel,
+        close_period,
+        code,
+        currency,
+        cut_off_time,
+        derivatives,
+        done_day,
+        excess_return_fee,
+        gst_rate,
+        introduce,
+        is_cash_plus,
+        is_complex,
+        is_new_cash_plus,
+        is_yinghebao,
+        isin,
+        manage_rate,
+        manager,
+        min_hold_cash,
+        min_hold_share,
+        min_sell_share,
+        month_raise_day,
+        name,
+        nav_deadline,
+        no_load,
+        open_date,
+        open_period,
+        product,
+        product_information_locals,
+        profile,
+        purchasable,
+        purchase_affirm_day,
+        purchase_amount,
+        purchase_rate,
+        rating,
+        redeemable,
+        redemption_advance_day,
+        redemption_amount,
+        redemption_close_period_shows,
+        redemption_done_day,
+        redemption_open_day_shows,
+        risk_level,
+        risk_level_name,
+        verify_status,
+        virtual_currency,
+        year_to_date_yield,
+        ytd_yield_type
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAnalysis",
+    longbridge::fund::FundAnalysis,
+    [
+        actual_period,
+        cost_level,
+        return_ability,
+        risk_ability,
+        updated_at,
+        value_for_money,
+        visible
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAnalysisDetail",
+    longbridge::fund::FundAnalysisDetail,
+    [
+        actual_period,
+        #[java(priarray)]
+        available_periods,
+        cost_level,
+        return_ability,
+        risk_ability,
+        updated_at,
+        value_for_money,
+        visible
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundTrendContrast",
+    longbridge::fund::FundTrendContrast,
+    [
+        benchmark_name,
+        #[java(objarray)]
+        performances
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundTrend",
+    longbridge::fund::FundTrend,
+    [
+        actual_period,
+        #[java(priarray)]
+        available_periods,
+        #[java(objarray)]
+        category_average_performances,
+        contrast_performances,
+        #[java(objarray)]
+        fund_performances
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundNamedContrast",
+    longbridge::fund::FundNamedContrast,
+    [
+        name,
+        #[java(objarray)]
+        performances
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPerformanceComparison",
+    longbridge::fund::FundPerformanceComparison,
+    [
+        #[java(objarray)]
+        contrast_performances,
+        #[java(objarray)]
+        fund_performances
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAnnualReturn",
+    longbridge::fund::FundAnnualReturn,
+    [change_percent, year]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundQuarterlyReturn",
+    longbridge::fund::FundQuarterlyReturn,
+    [change_percent, quarter, year]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPerformance",
+    longbridge::fund::FundPerformance,
+    [
+        annualized_return_five,
+        annualized_return_one,
+        annualized_return_ten,
+        annualized_return_three,
+        annualized_return_two,
+        counter_id,
+        fund_name,
+        performance_rank_five_years,
+        performance_rank_one_day,
+        performance_rank_one_month,
+        performance_rank_one_week,
+        performance_rank_one_year,
+        performance_rank_six_months,
+        performance_rank_ten_years,
+        performance_rank_three_months,
+        performance_rank_three_years,
+        performance_rank_two_years,
+        performance_rank_ytd,
+        performance_return_five_years,
+        performance_return_one_day,
+        performance_return_one_month,
+        performance_return_one_week,
+        performance_return_one_year,
+        performance_return_six_months,
+        performance_return_ten_years,
+        performance_return_three_months,
+        performance_return_three_years,
+        performance_return_two_years,
+        performance_return_ytd,
+        performance_total_five_years,
+        performance_total_one_day,
+        performance_total_one_month,
+        performance_total_one_week,
+        performance_total_one_year,
+        performance_total_six_months,
+        performance_total_ten_years,
+        performance_total_three_months,
+        performance_total_three_years,
+        performance_total_two_years,
+        performance_total_ytd,
+        seven_days_annualized,
+        ten_thousand_price,
+        update_time
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundHolding",
+    longbridge::fund::FundHolding,
+    [
+        bond_type,
+        bond_type_name,
+        country_name,
+        holding_type,
+        industry_name,
+        market_value,
+        maturity_date,
+        name,
+        share_change,
+        share_change_percent,
+        shares,
+        weighting
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundHoldings",
+    longbridge::fund::FundHoldings,
+    [
+        #[java(objarray)]
+        holdings,
+        report_date,
+        weighting
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundStockHolding",
+    longbridge::fund::FundStockHolding,
+    [
+        code,
+        counter_id,
+        currency,
+        name,
+        position_ratio,
+        report_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPosition",
+    longbridge::fund::FundPosition,
+    [
+        amount,
+        counter_id,
+        currency,
+        freeze_units,
+        holding_profit,
+        holding_units,
+        name,
+        recent_profit,
+        recent_trading_day,
+        sum_recent_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositions",
+    longbridge::fund::FundPositions,
+    [
+        account_channel,
+        #[java(objarray)]
+        list,
+        pending_buy_orders,
+        recent_trading_day,
+        sold_pending_credit_orders
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundDatedValue",
+    longbridge::fund::FundDatedValue,
+    [date, value]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundUnitValue",
+    longbridge::fund::FundUnitValue,
+    [date, day_increase_rate, total_value, unit_value]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionDetailValues",
+    longbridge::fund::FundPositionDetailValues,
+    [
+        amount,
+        currency,
+        holding_cost,
+        holding_profit,
+        holding_profit_rate,
+        holding_units,
+        holding_value,
+        pending_buy_value,
+        pending_sell_value,
+        profit_amount_accum_td,
+        profit_amount_accum_td_rate,
+        recent_profit,
+        recent_tradingday,
+        recent_unit_value,
+        sold_pending_confirm_units
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionDetail",
+    longbridge::fund::FundPositionDetail,
+    [
+        detail_values,
+        #[java(objarray)]
+        sum_profit,
+        #[java(objarray)]
+        ut_value
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionPerformance",
+    longbridge::fund::FundPositionPerformance,
+    [
+        annualized_return_five,
+        annualized_return_one,
+        annualized_return_ten,
+        annualized_return_three,
+        annualized_return_two,
+        counter_id,
+        fund_name,
+        performance_return_five_years,
+        performance_return_one_day,
+        performance_return_one_month,
+        performance_return_one_week,
+        performance_return_one_year,
+        performance_return_six_months,
+        performance_return_ten_years,
+        performance_return_three_months,
+        performance_return_three_years,
+        performance_return_two_years,
+        performance_return_ytd,
+        update_time
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionProfits",
+    longbridge::fund::FundPositionProfits,
+    [
+        currency,
+        #[java(objarray)]
+        history_value,
+        last_update_time,
+        sum_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionNav",
+    longbridge::fund::FundPositionNav,
+    [
+        change,
+        change_percent,
+        counter_id,
+        counter_name,
+        last_update_time,
+        value
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundDividend",
+    longbridge::fund::FundDividend,
+    [amount, counter_id, currency, date, div_method, name]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundDividends",
+    longbridge::fund::FundDividends,
+    [
+        currency,
+        #[java(objarray)]
+        div_cash_infos,
+        lastest_date,
+        total_div_cash
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrder",
+    longbridge::fund::FundOrder,
+    [
+        action,
+        amount,
+        counter_id,
+        created_at,
+        currency,
+        fund_name,
+        id,
+        is_auto,
+        net_worth,
+        product_type,
+        state,
+        state_desc,
+        units
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderKeyword",
+    longbridge::fund::FundOrderKeyword,
+    [content, group, key, line_strategy, title]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderStage",
+    longbridge::fund::FundOrderStage,
+    [desc, key, link, link_text, progress, stage]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderInfo",
+    longbridge::fund::FundOrderInfo,
+    [
+        aaid,
+        account_channel,
+        action,
+        amount,
+        channel,
+        counter_id,
+        created_at,
+        currency,
+        dividend_option,
+        eq_at,
+        fee,
+        fund_name,
+        fund_source,
+        histories,
+        id,
+        message,
+        net_worth,
+        price_at,
+        processed_at,
+        product_type,
+        repurchaseable,
+        sale_proceeds,
+        sales_charge,
+        sales_price,
+        sales_unit,
+        state,
+        state_desc,
+        status,
+        status_ex,
+        t_description,
+        time_partition,
+        total_amount,
+        transaction_at,
+        units,
+        withdraw_at,
+        withdrawable
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderDetail",
+    longbridge::fund::FundOrderDetail,
+    [
+        #[java(objarray)]
+        keywords,
+        order,
+        #[java(objarray)]
+        stages
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundTransaction",
+    longbridge::fund::FundTransaction,
+    [
+        amount,
+        category,
+        created_at,
+        currency,
+        description,
+        detail_created_at,
+        detail_type,
+        done_at,
+        quantity_description,
+        redirect_page,
+        redirect_page_v2,
+        ref_no,
+        stock_quantity,
+        tx_type,
+        type_name
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderValidation",
+    longbridge::fund::FundOrderValidation,
+    [
+        auth_token,
+        eval_address,
+        fund_risk_level,
+        msg,
+        user_pi,
+        user_risk_level
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderSubmitResponse",
+    longbridge::fund::FundOrderSubmitResponse,
+    [
+        action, amount, counter_id, created_at, fund_name, id, msg, status, units
+    ]
 );

@@ -36,7 +36,7 @@ public class CompanyOverview {
     public String category;
     /** Fiscal year end, e.g. {@code "12 月 31 日"}. */
     public String yearEnd;
-    /** Number of employees. */
+    /** Number of employees (returned as a string by the API, e.g. {@code "10000"}). */
     public String employees;
     /** Phone number. */
     public String phone;

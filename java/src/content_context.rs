@@ -51,13 +51,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextMyTopi
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
         let size: Option<JavaInteger> = get_field(env, &opts, "size")?;
         let topic_type: Option<String> = get_field(env, &opts, "topicType")?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
-                context
-                    .ctx
+                __owned_ctx
                     .my_topics(MyTopicsOptions {
                         page: page.map(i32::from),
                         size: size.map(i32::from),
@@ -80,14 +80,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextCreate
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let title: String = get_field(env, &opts, "title")?;
         let body: String = get_field(env, &opts, "body")?;
         let topic_type: Option<String> = get_field(env, &opts, "topicType")?;
         let tickers: Option<ObjectArray<String>> = get_field(env, &opts, "tickers")?;
         let hashtags: Option<ObjectArray<String>> = get_field(env, &opts, "hashtags")?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .create_topic(CreateTopicOptions {
                     title,
                     body,
@@ -111,9 +111,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextTopics
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.topics(symbol).await?))
+            Ok(ObjectArray(__owned_ctx.topics(symbol).await?))
         })?;
         Ok(())
     })
@@ -129,9 +130,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextNews(
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.news(symbol).await?))
+            Ok(ObjectArray(__owned_ctx.news(symbol).await?))
         })?;
         Ok(())
     })

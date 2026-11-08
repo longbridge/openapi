@@ -6,7 +6,7 @@ use crate::{
     async_call::{CAsyncCallback, execute_async},
     config::CConfig,
     fundamental_context::{enum_types::*, types::*},
-    types::{CCow, cstr_to_rust},
+    types::{CCow, CMarket, cstr_to_rust},
 };
 
 // Helper: convert a nullable C string to an Option<&'static str> by matching
@@ -412,22 +412,24 @@ pub unsafe extern "C" fn lb_fundamental_context_buyback(
     });
 }
 
-/// Get stock ratings. Returns `CStockRatings`.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_fundamental_context_ratings(
-    ctx: *const CFundamentalContext,
-    symbol: *const c_char,
-    callback: CAsyncCallback,
-    userdata: *mut c_void,
-) {
-    let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
-    execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CStockRatingsOwned> =
-            CCow::new(CStockRatingsOwned::from(ctx_inner.ratings(symbol).await?));
-        Ok(resp)
-    });
-}
+// TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+// /// Get stock ratings. Returns `CStockRatings`.
+// #[unsafe(no_mangle)]
+// pub unsafe extern "C" fn lb_fundamental_context_ratings(
+//     ctx: *const CFundamentalContext,
+//     symbol: *const c_char,
+//     callback: CAsyncCallback,
+//     userdata: *mut c_void,
+// ) {
+//     let ctx_inner = (*ctx).ctx.clone();
+//     let symbol = cstr_to_rust(symbol);
+//     execute_async(callback, ctx, userdata, async move {
+//         let resp: CCow<CStockRatingsOwned> =
+//
+// CCow::new(CStockRatingsOwned::from(ctx_inner.ratings(symbol).await?));
+//         Ok(resp)
+//     });
+// }
 
 /// Get ranked list of top shareholders. Returns `CShareholderTopResponse`.
 #[unsafe(no_mangle)]
@@ -542,21 +544,18 @@ pub unsafe extern "C" fn lb_fundamental_context_institution_rating_views(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_industry_rank(
     ctx: *const CFundamentalContext,
-    market: *const c_char,
-    indicator: *const c_char,
-    sort_type: *const c_char,
+    market: CMarket,
+    indicator: CIndustryRankIndicator,
+    sort_type: CIndustryRankSortType,
     limit: u32,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let market = cstr_to_rust(market);
-    let indicator = cstr_to_rust(indicator);
-    let sort_type = cstr_to_rust(sort_type);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CIndustryRankResponseOwned> = CCow::new(CIndustryRankResponseOwned::from(
             ctx_inner
-                .industry_rank(market, indicator, sort_type, limit)
+                .industry_rank(market.into(), indicator.into(), sort_type.into(), limit)
                 .await?,
         ));
         Ok(resp)
@@ -569,14 +568,14 @@ pub unsafe extern "C" fn lb_fundamental_context_industry_rank(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_industry_peers(
     ctx: *const CFundamentalContext,
-    counter_id: *const c_char,
+    symbol: *const c_char,
     market: *const c_char,
     industry_id: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let counter_id = cstr_to_rust(counter_id);
+    let symbol = cstr_to_rust(symbol);
     let market = cstr_to_rust(market);
     let industry_id: Option<String> = if industry_id.is_null() {
         None
@@ -586,7 +585,7 @@ pub unsafe extern "C" fn lb_fundamental_context_industry_peers(
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CIndustryPeersResponseOwned> = CCow::new(CIndustryPeersResponseOwned::from(
             ctx_inner
-                .industry_peers(counter_id, market, industry_id)
+                .industry_peers(symbol, market, industry_id)
                 .await?,
         ));
         Ok(resp)

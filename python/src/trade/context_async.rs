@@ -3,10 +3,11 @@
 use std::sync::Arc;
 
 use longbridge::trade::{
-    EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-    GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
-    TradeContext,
+    CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+    GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+    GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderLeg,
+    SubmitMultiLegOrderOptions, SubmitOrderOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -15,15 +16,16 @@ use crate::{
     config::Config,
     decimal::PyDecimal,
     error::ErrorNewType,
-    time::{PyDateWrapper, PyOffsetDateTimeWrapper},
+    time::{PyDateWrapper, PyInstantWrapper, PyOffsetDateTimeWrapper},
     trade::{
         context::Callbacks,
         push::handle_push_event,
         types::{
-            AccountBalance, BalanceType, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
-            FundPositionsResponse, MarginRatio, Order, OrderDetail, OrderSide, OrderStatus,
-            OrderType, OutsideRTH, StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
-            TopicType,
+            AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
+            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
+            MultiLegStrategy, Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
+            ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
+            SubmitOrderResponse, TimeInForceType, TopicType,
         },
     },
     types::Market,
@@ -74,6 +76,16 @@ impl AsyncTradeContext {
             self.callbacks.lock().order_changed = None;
         } else {
             self.callbacks.lock().order_changed = Some(callback);
+        }
+    }
+
+    /// Set grid order changed callback. May be sync or async (coroutines are
+    /// scheduled).
+    fn set_on_grid_order_changed(&self, py: Python<'_>, callback: Py<PyAny>) {
+        if callback.is_none(py) {
+            self.callbacks.lock().grid_order_changed = None;
+        } else {
+            self.callbacks.lock().grid_order_changed = Some(callback);
         }
     }
 
@@ -161,6 +173,48 @@ impl AsyncTradeContext {
         .map(|b| b.unbind())
     }
 
+    /// Get all executions. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `history_executions` instead.
+    #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
+    fn all_executions(
+        &self,
+        py: Python<'_>,
+        symbol: Option<String>,
+        order_id: Option<String>,
+        start_at: Option<PyOffsetDateTimeWrapper>,
+        end_at: Option<PyOffsetDateTimeWrapper>,
+        page: Option<u64>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = GetAllExecutionsOptions::new();
+        if let Some(s) = symbol {
+            opts = opts.symbol(s);
+        }
+        if let Some(o) = order_id {
+            opts = opts.order_id(o);
+        }
+        if let Some(s) = start_at {
+            opts = opts.start_at(s.0);
+        }
+        if let Some(e) = end_at {
+            opts = opts.end_at(e.0);
+        }
+        if let Some(p) = page {
+            opts = opts.page(p);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: AllExecutionsResponse = ctx
+                .all_executions(Some(opts))
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
     /// Get history orders. Returns awaitable.
     #[allow(clippy::too_many_arguments)]
     #[pyo3(signature = (symbol = None, status = None, side = None, market = None, start_at = None, end_at = None))]
@@ -202,7 +256,8 @@ impl AsyncTradeContext {
     }
 
     /// Get today orders. Returns awaitable.
-    #[pyo3(signature = (symbol = None, status = None, side = None, market = None, order_id = None))]
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (symbol = None, status = None, side = None, market = None, order_id = None, is_attached = false))]
     fn today_orders(
         &self,
         py: Python<'_>,
@@ -211,6 +266,7 @@ impl AsyncTradeContext {
         side: Option<OrderSide>,
         market: Option<Market>,
         order_id: Option<String>,
+        is_attached: bool,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let mut opts = GetTodayOrdersOptions::new();
@@ -227,6 +283,9 @@ impl AsyncTradeContext {
         if let Some(o) = order_id {
             opts = opts.order_id(o);
         }
+        if is_attached {
+            opts = opts.is_attached();
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let v = ctx.today_orders(Some(opts)).await.map_err(ErrorNewType)?;
             v.into_iter()
@@ -237,7 +296,7 @@ impl AsyncTradeContext {
     }
 
     /// Replace order. Returns awaitable.
-    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
+    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, attached_params = None, delayed_until = None, clear_delayed_until = false))]
     #[allow(clippy::too_many_arguments)]
     fn replace_order(
         &self,
@@ -253,6 +312,9 @@ impl AsyncTradeContext {
         trigger_count: Option<i32>,
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
+        attached_params: Option<ReplaceAttachedParams>,
+        delayed_until: Option<PyInstantWrapper>,
+        clear_delayed_until: bool,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let mut opts = ReplaceOrderOptions::new(order_id, quantity.into());
@@ -283,6 +345,14 @@ impl AsyncTradeContext {
         if let Some(r) = remark {
             opts = opts.remark(r);
         }
+        if let Some(p) = attached_params {
+            opts = opts.attached_params(p.0);
+        }
+        if clear_delayed_until {
+            opts = opts.clear_delayed_until();
+        } else if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             ctx.replace_order(opts).await.map_err(ErrorNewType)?;
             Ok(())
@@ -291,7 +361,7 @@ impl AsyncTradeContext {
     }
 
     /// Submit order. Returns awaitable.
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None, attached_params = None, delayed_until = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -312,6 +382,9 @@ impl AsyncTradeContext {
         trigger_count: Option<i32>,
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
+        client_request_id: Option<String>,
+        attached_params: Option<SubmitAttachedParams>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let mut opts = SubmitOrderOptions::new(
@@ -354,6 +427,15 @@ impl AsyncTradeContext {
         if let Some(r) = remark {
             opts = opts.remark(r);
         }
+        if let Some(id) = client_request_id {
+            opts = opts.client_request_id(id);
+        }
+        if let Some(p) = attached_params {
+            opts = opts.attached_params(p.0);
+        }
+        if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: SubmitOrderResponse = ctx
                 .submit_order(opts)
@@ -365,17 +447,89 @@ impl AsyncTradeContext {
         .map(|b| b.unbind())
     }
 
-    /// Cancel order. Returns awaitable.
-    fn cancel_order(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+    /// Submit a multi-leg option combination order. Returns awaitable.
+    ///
+    /// `legs` is a list of `(symbol, ratio_quantity)` tuples.  Each
+    /// `ratio_quantity` must be a positive number: the direction of a leg is
+    /// implied by `strategy` together with `side`, not by the sign of the
+    /// ratio, and a negative or zero ratio is rejected by the server with
+    /// `602001`.
+    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None, delayed_until = None))]
+    #[allow(clippy::too_many_arguments)]
+    fn submit_multileg(
+        &self,
+        py: Python<'_>,
+        side: OrderSide,
+        order_type: OrderType,
+        submitted_quantity: PyDecimal,
+        strategy: MultiLegStrategy,
+        legs: Vec<(String, PyDecimal)>,
+        submitted_price: Option<PyDecimal>,
+        remark: Option<String>,
+        client_request_id: Option<String>,
+        delayed_until: Option<PyInstantWrapper>,
+    ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
+        let legs = legs
+            .into_iter()
+            .map(|(symbol, ratio_quantity)| {
+                SubmitMultiLegOrderLeg::new(symbol, ratio_quantity.into())
+            })
+            .collect::<Vec<_>>();
+        let mut opts = SubmitMultiLegOrderOptions::new(
+            side.into(),
+            order_type.into(),
+            submitted_quantity.into(),
+            strategy.into(),
+            legs,
+        );
+        if let Some(p) = submitted_price {
+            opts = opts.submitted_price(p.into());
+        }
+        if let Some(r) = remark {
+            opts = opts.remark(r);
+        }
+        if let Some(id) = client_request_id {
+            opts = opts.client_request_id(id);
+        }
+        if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            ctx.cancel_order(order_id).await.map_err(ErrorNewType)?;
+            let r: SubmitOrderResponse = ctx
+                .submit_multileg(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Cancel order. Returns awaitable.
+    #[pyo3(signature = (order_id, is_attached = false))]
+    fn cancel_order(
+        &self,
+        py: Python<'_>,
+        order_id: String,
+        is_attached: bool,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = CancelOrderOptions::new(order_id);
+        if is_attached {
+            opts = opts.is_attached();
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.cancel_order(opts).await.map_err(ErrorNewType)?;
             Ok(())
         })
         .map(|b| b.unbind())
     }
 
     /// Get account balance. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
     #[pyo3(signature = (currency = None))]
     fn account_balance(&self, py: Python<'_>, currency: Option<String>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
@@ -392,6 +546,9 @@ impl AsyncTradeContext {
     }
 
     /// Get cash flow. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
     #[allow(clippy::too_many_arguments)]
     #[pyo3(signature = (start_at, end_at, business_type = None, symbol = None, page = None, size = None))]
     fn cash_flow(
@@ -428,6 +585,9 @@ impl AsyncTradeContext {
     }
 
     /// Get fund positions. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     #[pyo3(signature = (symbols = None))]
     fn fund_positions(&self, py: Python<'_>, symbols: Option<Vec<String>>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
@@ -444,6 +604,9 @@ impl AsyncTradeContext {
     }
 
     /// Get stock positions. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
     #[pyo3(signature = (symbols = None))]
     fn stock_positions(&self, py: Python<'_>, symbols: Option<Vec<String>>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
@@ -460,6 +623,10 @@ impl AsyncTradeContext {
     }
 
     /// Get margin ratio. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
     fn margin_ratio(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
@@ -474,14 +641,202 @@ impl AsyncTradeContext {
     }
 
     /// Get order detail. Returns awaitable.
-    fn order_detail(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
+    #[pyo3(signature = (order_id, is_attached = false))]
+    fn order_detail(
+        &self,
+        py: Python<'_>,
+        order_id: String,
+        is_attached: bool,
+    ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
+        let mut opts = GetOrderDetailOptions::new(order_id);
+        if is_attached {
+            opts = opts.is_attached();
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: OrderDetail = ctx
-                .order_detail(order_id)
+                .order_detail(opts)
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    // ── US-market async methods ───────────────────────────────────────────
+
+    /// Query US order list (JSON string). US token required. Returns awaitable.
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+    #[pyo3(signature = (symbol = None, action = 0, start_at = 0, end_at = 0, query_type = 0, page = 1, limit = 20))]
+    fn us_query_orders(
+        &self,
+        py: Python<'_>,
+        symbol: Option<String>,
+        action: i32,
+        start_at: i64,
+        end_at: i64,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let opts = longbridge::trade::GetUSHistoryOrders {
+            symbol,
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
+            let s = serde_json::to_string(&resp)
+                .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            Ok(s)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US order detail. US token required. Returns awaitable.
+    fn us_order_detail(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp: crate::trade::types::USOrderDetailResponse = ctx
+                .us_order_detail(order_id)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(resp)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US account asset overview. US token required. Returns awaitable.
+    fn us_asset_overview(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USAssetOverview =
+                ctx.us_asset_overview().await.map_err(ErrorNewType)?.into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US realized P&L. US token required. Returns awaitable.
+    fn us_realized_pl(
+        &self,
+        py: Python<'_>,
+        currency: String,
+        category: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USRealizedPL = ctx
+                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get cash, buying power and margin status for the US account. US token
+    /// required. Returns awaitable.
+    #[pyo3(signature = (currency = None))]
+    fn us_cash_and_buy_power(
+        &self,
+        py: Python<'_>,
+        currency: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USCashAndBuyPower = ctx
+                .us_cash_and_buy_power(currency.as_deref())
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the quantity of a US holding that is available to trade. US token
+    /// required. Returns awaitable.
+    #[pyo3(signature = (symbol, equity_type = None, position_side = None))]
+    fn us_available_holding(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        equity_type: Option<String>,
+        position_side: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USAvailableHolding = ctx
+                .us_available_holding(longbridge::trade::GetUSAvailableHoldingOptions {
+                    symbol,
+                    equity_type: equity_type.unwrap_or_default(),
+                    position_side: position_side.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the US account transaction history. US token required. Returns
+    /// awaitable.
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (start_at, end_at, page = 1, size = 20, types = None, currency = None))]
+    fn us_transaction_history(
+        &self,
+        py: Python<'_>,
+        start_at: PyOffsetDateTimeWrapper,
+        end_at: PyOffsetDateTimeWrapper,
+        page: i32,
+        size: i32,
+        types: Option<Vec<String>>,
+        currency: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = longbridge::trade::GetUSTransactionHistoryOptions::new(start_at.0, end_at.0);
+        opts.page = page;
+        opts.size = size;
+        opts.types = types.unwrap_or_default();
+        opts.currency = currency.unwrap_or_default();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USTransactionHistory = ctx
+                .us_transaction_history(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the exchange rates used by the US account. US token required.
+    /// Returns awaitable.
+    fn us_exchange_rates(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USExchangeRates =
+                ctx.us_exchange_rates().await.map_err(ErrorNewType)?.into();
             Ok(r)
         })
         .map(|b| b.unbind())

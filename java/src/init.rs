@@ -10,6 +10,7 @@ use crate::types::ClassLoader;
 
 pub(crate) static INTEGER_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static LONG_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static DOUBLE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static STRING_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DECIMAL_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_INSTANT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
@@ -20,6 +21,7 @@ pub(crate) static TIME_LOCALDATETIME_CLASS: OnceLock<GlobalRef> = OnceLock::new(
 pub(crate) static TIME_ZONE_ID: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DERIVATIVE_TYPE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static OPENAPI_EXCEPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static CONVERSATION_STREAM_SUBSCRIPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 
 fn init_timezone_id(env: &mut JNIEnv) {
     let utc = env.new_string("UTC").unwrap();
@@ -60,6 +62,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         env,
         (INTEGER_CLASS, "java/lang/Integer"),
         (LONG_CLASS, "java/lang/Long"),
+        (DOUBLE_CLASS, "java/lang/Double"),
         (STRING_CLASS, "java/lang/String"),
         (DECIMAL_CLASS, "java/math/BigDecimal"),
         (TIME_INSTANT_CLASS, "java/time/Instant"),
@@ -68,7 +71,11 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         (TIME_LOCALTIME_CLASS, "java/time/LocalTime"),
         (TIME_LOCALDATETIME_CLASS, "java/time/LocalDateTime"),
         (DERIVATIVE_TYPE_CLASS, "com/longbridge/quote/DerivativeType"),
-        (OPENAPI_EXCEPTION_CLASS, "com/longbridge/OpenApiException")
+        (OPENAPI_EXCEPTION_CLASS, "com/longbridge/OpenApiException"),
+        (
+            CONVERSATION_STREAM_SUBSCRIPTION_CLASS,
+            "com/longbridge/agent/ConversationStreamSubscription"
+        )
     );
 
     init_timezone_id(&mut env);
@@ -79,12 +86,15 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::SimpleErrorKind,
         longbridge::Language,
         longbridge::PushCandlestickMode,
+        longbridge::QuoteTransport,
         longbridge::Market,
         longbridge::quote::TradeStatus,
         longbridge::quote::TradeSession,
         longbridge::quote::TradeDirection,
         longbridge::quote::OptionType,
         longbridge::quote::OptionDirection,
+        longbridge::quote::OptionExpiryCycleType,
+        longbridge::quote::OptionStandardAttr,
         longbridge::quote::WarrantType,
         longbridge::quote::WarrantStatus,
         longbridge::quote::SortOrderType,
@@ -112,11 +122,18 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::CommissionFreeStatus,
         longbridge::trade::DeductionStatus,
         longbridge::trade::ChargeCategoryCode,
+        longbridge::trade::AttachedOrderType,
+        longbridge::trade::MultiLegStrategy,
+        longbridge::trade::MultiLegPosition,
+        longbridge::trade::ContractDirection,
         longbridge::quote::PinnedMode,
         longbridge::portfolio::types::FlowDirection,
         longbridge::portfolio::types::AssetType,
         longbridge::fundamental::types::InstitutionRecommend,
         longbridge::fundamental::types::FinancialReportKind,
+        longbridge::fundamental::types::FinancialStatementKind,
+        longbridge::fundamental::types::IndustryRankIndicator,
+        longbridge::fundamental::types::IndustryRankSortType,
         longbridge::fundamental::types::FinancialReportPeriod,
         longbridge::market::types::BrokerHoldingPeriod,
         longbridge::market::types::AhPremiumPeriod,
@@ -124,7 +141,12 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::types::DCAStatus,
         longbridge::alert::types::AlertCondition,
         longbridge::alert::types::AlertFrequency,
-        longbridge::calendar::types::CalendarCategory
+        longbridge::calendar::types::CalendarCategory,
+        longbridge::calendar::types::CalendarPageDirection,
+        longbridge::agent::ConversationStatus,
+        longbridge::grid::TriggerPriceType,
+        longbridge::grid::GridLimitEvent,
+        longbridge::grid::GridTimeInForce
     );
 
     // classes
@@ -149,7 +171,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::quote::ParticipantInfo,
         longbridge::quote::IntradayLine,
         longbridge::quote::Candlestick,
-        longbridge::quote::StrikePriceInfo,
+        longbridge::quote::OptionChainContract,
         longbridge::quote::IssuerInfo,
         longbridge::quote::WarrantInfo,
         longbridge::quote::MarketTradingSession,
@@ -168,8 +190,12 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::quote::MarketTemperature,
         longbridge::quote::HistoryMarketTemperatureResponse,
         longbridge::quote::FilingItem,
+        longbridge::trade::AttachedOrderDetail,
+        longbridge::trade::MultiLegOrderLeg,
+        longbridge::trade::MultiLegInfo,
         longbridge::trade::PushOrderChanged,
         longbridge::trade::Execution,
+        longbridge::trade::AllExecutionsResponse,
         longbridge::trade::Order,
         longbridge::trade::SubmitOrderResponse,
         longbridge::trade::CashInfo,
@@ -189,6 +215,60 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::OrderChargeDetail,
         longbridge::trade::OrderDetail,
         longbridge::trade::EstimateMaxPurchaseQuantityResponse,
+        // Grid trading (GridContext types live in `longbridge::grid`)
+        longbridge::grid::SubmitGridOrderResponse,
+        longbridge::grid::GridOrder,
+        longbridge::grid::GridOrderSubOrder,
+        longbridge::grid::GridOrderHistory,
+        longbridge::grid::GridOrderDetail,
+        longbridge::grid::TriggerOrder,
+        longbridge::grid::GridBidSize,
+        longbridge::grid::GridChannelInfo,
+        longbridge::grid::GridSymbolInfo,
+        // Grid push stays on the trade side
+        longbridge::trade::PushGridOrderChanged,
+        crate::types::GridOrdersResponse,
+        crate::types::GridTriggerHistoryResponse,
+        // FundContext (types live in `longbridge::fund`)
+        longbridge::fund::FundNavValue,
+        longbridge::fund::FundPerformancePoint,
+        longbridge::fund::HotFund,
+        longbridge::fund::FundBrief,
+        longbridge::fund::FundFilters,
+        longbridge::fund::FundAssetAllocationItem,
+        longbridge::fund::FundAssetAllocation,
+        longbridge::fund::FundDetail,
+        longbridge::fund::FundAnalysis,
+        longbridge::fund::FundAnalysisDetail,
+        longbridge::fund::FundTrendContrast,
+        longbridge::fund::FundTrend,
+        longbridge::fund::FundNamedContrast,
+        longbridge::fund::FundPerformanceComparison,
+        longbridge::fund::FundAnnualReturn,
+        longbridge::fund::FundQuarterlyReturn,
+        longbridge::fund::FundPerformance,
+        longbridge::fund::FundHolding,
+        longbridge::fund::FundHoldings,
+        longbridge::fund::FundStockHolding,
+        longbridge::fund::FundPosition,
+        longbridge::fund::FundPositions,
+        longbridge::fund::FundDatedValue,
+        longbridge::fund::FundUnitValue,
+        longbridge::fund::FundPositionDetailValues,
+        longbridge::fund::FundPositionDetail,
+        longbridge::fund::FundPositionPerformance,
+        longbridge::fund::FundPositionProfits,
+        longbridge::fund::FundPositionNav,
+        longbridge::fund::FundDividend,
+        longbridge::fund::FundDividends,
+        longbridge::fund::FundOrder,
+        longbridge::fund::FundOrderKeyword,
+        longbridge::fund::FundOrderStage,
+        longbridge::fund::FundOrderInfo,
+        longbridge::fund::FundOrderDetail,
+        longbridge::fund::FundTransaction,
+        longbridge::fund::FundOrderValidation,
+        longbridge::fund::FundOrderSubmitResponse,
         longbridge::content::TopicItem,
         longbridge::content::NewsItem,
         longbridge::content::TopicAuthor,
@@ -208,7 +288,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::DcaSupportInfo,
         longbridge::dca::DcaSupportList,
         longbridge::dca::DcaCalcDateResult,
-        // AlertContext - list returns JSON via AlertList IntoJValue (serde_json)
+        // AlertContext - list returns JSON via AlertList IntoJValue
+        // (serde_json)
         longbridge::dca::DcaPlan,
         longbridge::dca::DcaList,
         longbridge::dca::DcaStats,
@@ -223,6 +304,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::DcaSupportInfo,
         longbridge::dca::DcaSupportList,
         // AlertContext
+        longbridge::alert::AlertValueMap,
         longbridge::alert::AlertItem,
         longbridge::alert::AlertSymbolGroup,
         longbridge::alert::AlertList,
@@ -279,7 +361,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::DcaSupportInfo,
         longbridge::dca::DcaSupportList,
         longbridge::dca::DcaCalcDateResult,
-        // AlertContext - list returns JSON via AlertList IntoJValue (serde_json)
+        // AlertContext - list returns JSON via AlertList IntoJValue
+        // (serde_json)
         longbridge::dca::DcaPlan,
         longbridge::dca::DcaList,
         longbridge::dca::DcaStats,
@@ -390,10 +473,30 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fundamental::ValuationHistoryPoint,
         longbridge::fundamental::ValuationComparisonItem,
         longbridge::fundamental::ValuationComparisonResponse,
+        // FundamentalContext: industry rank / peers
+        longbridge::fundamental::IndustryRankItem,
+        longbridge::fundamental::IndustryRankGroup,
+        longbridge::fundamental::IndustryRankResponse,
+        longbridge::fundamental::IndustryPeersTop,
+        longbridge::fundamental::IndustryPeerNode,
+        longbridge::fundamental::IndustryPeersResponse,
+        // FundamentalContext: business segments / rating views / snapshot
+        longbridge::fundamental::BusinessSegmentItem,
+        longbridge::fundamental::BusinessSegments,
+        longbridge::fundamental::BusinessSegmentHistoryItem,
+        longbridge::fundamental::BusinessSegmentsHistoricalItem,
+        longbridge::fundamental::BusinessSegmentsHistory,
+        longbridge::fundamental::InstitutionRatingViewItem,
+        longbridge::fundamental::InstitutionRatingViews,
+        longbridge::fundamental::SnapshotForecastMetric,
+        longbridge::fundamental::SnapshotReportedMetric,
+        longbridge::fundamental::FinancialReportSnapshot,
         // MarketContext: top movers / rank
         longbridge::market::TopMoversStock,
         longbridge::market::TopMoversEvent,
         longbridge::market::TopMoversResponse,
+        longbridge::market::RankSubCategory,
+        longbridge::market::RankCategory,
         longbridge::market::RankCategoriesResponse,
         longbridge::market::RankListItem,
         longbridge::market::RankListResponse,
@@ -407,6 +510,44 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::portfolio::FlowItem,
         longbridge::portfolio::ProfitAnalysisFlows,
         // DCAContext
-        longbridge::dca::DcaCreateResult
+        longbridge::dca::DcaCreateResult,
+        // AgentContext
+        longbridge::agent::Workspace,
+        longbridge::agent::WorkspacesResponse,
+        longbridge::agent::Agent,
+        longbridge::agent::AgentsResponse,
+        longbridge::agent::Reference,
+        longbridge::agent::QuestionOption,
+        longbridge::agent::Question,
+        longbridge::agent::HumanInteraction,
+        longbridge::agent::Interrupt,
+        longbridge::agent::AgentError,
+        longbridge::agent::ChatStartedPayload,
+        longbridge::agent::WorkflowStartedInputs,
+        longbridge::agent::WorkflowStartedPayload,
+        longbridge::agent::MessagePayload,
+        crate::types::PingEvent,
+        longbridge::agent::ThinkingStartedPayload,
+        longbridge::agent::ThinkingFinishedPayload,
+        longbridge::agent::NodeToolUseStartedPayload,
+        crate::types::NodeToolUseOutputs,
+        longbridge::agent::NodeToolUseFinishedPayload,
+        longbridge::agent::SubagentStartedPayload,
+        longbridge::agent::SubagentProgressPayload,
+        crate::types::SubagentOutputs,
+        longbridge::agent::SubagentFinishedPayload,
+        longbridge::agent::AgentToolStartedPayload,
+        longbridge::agent::AgentToolProgressPayload,
+        longbridge::agent::AgentToolFinishedPayload,
+        crate::types::ConversationResponse,
+        crate::types::HumanInteractionRequiredEvent,
+        longbridge::agent::QueryMaskedPayload,
+        longbridge::agent::PlanChangedPayload,
+        longbridge::agent::ContextCompressStartedPayload,
+        longbridge::agent::ContextCompressFinishedPayload,
+        longbridge::agent::ChatFinishedPayload,
+        crate::types::WorkflowFinishedEvent,
+        longbridge::agent::ChatTitleUpdatedPayload,
+        crate::types::OtherEvent
     );
 }

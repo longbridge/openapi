@@ -51,6 +51,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextStatemen
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let statement_type: Option<JavaInteger> = get_field(env, &opts, "statementType")?;
         let start_date: Option<JavaInteger> = get_field(env, &opts, "startDate")?;
         let limit: Option<JavaInteger> = get_field(env, &opts, "limit")?;
@@ -68,7 +69,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextStatemen
         }
 
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.statements(options).await?;
+            let resp = __owned_ctx.statements(options).await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
@@ -85,11 +86,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextDownload
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let file_key: String = FromJValue::from_jvalue(env, file_key.into())?;
         let options = GetStatementOptions::new(file_key);
 
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.statement_download_url(options).await?;
+            let resp = __owned_ctx.statement_download_url(options).await?;
             Ok(resp.url)
         })?;
         Ok(())

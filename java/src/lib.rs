@@ -1,6 +1,7 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(unsafe_op_in_unsafe_fn)]
 
+mod agent_context;
 mod alert_context;
 mod asset_context;
 mod async_util;
@@ -9,7 +10,9 @@ mod config;
 mod content_context;
 mod dca_context;
 mod error;
+mod fund_context;
 mod fundamental_context;
+mod grid_context;
 mod http_client;
 mod init;
 mod market_context;
