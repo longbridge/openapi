@@ -1,6 +1,6 @@
 #include <iostream>
 #include <longbridge.hpp>
-#include <cassert>
+#include <stdexcept>
 #include <type_traits>
 
 #ifdef WIN32
@@ -15,37 +15,51 @@ static_assert(std::is_same_v<decltype(market::MarketTimeItem{}.delay_trade_statu
                              market::TradeStatus>);
 
 static void
+check_trade_status(bool condition)
+{
+  if (!condition) {
+    throw std::runtime_error("market trade-status check failed");
+  }
+}
+
+static void
 test_market_trade_status()
 {
   using market::TradeStatus;
 
-  assert(market::code(TradeStatus::US_TRADING) == 202);
-  assert(market::code(market::normalize(TradeStatus::US_CLEAN)) == 201);
-  assert(market::normalize(TradeStatus::CLEAN) == TradeStatus::CLOSING);
-  assert(market::label(TradeStatus::US_CLEAN) == std::string("Pre-Market"));
-  assert(std::string(market::label(TradeStatus::OPEN_BID)).empty());
-  assert(market::name(TradeStatus::REALTIME_QUOTE) ==
-         std::string("Temporary Break"));
-  assert(market::name(TradeStatus::UNITED) == std::string("Not Listed"));
-  assert(market::name(TradeStatus::TRADING_HALT) == std::string("Terminated"));
-  assert(market::name(TradeStatus::FUSE) == std::string("Fuse"));
-  assert(market::is_us_market(TradeStatus::US_TRADING));
-  assert(market::is_us_pre_post(TradeStatus::US_AFTER));
-  assert(market::is_us_night(TradeStatus::US_NIGHT));
-  assert(market::is_us_closing(TradeStatus::US_CLOSING));
-  assert(market::is_closing(TradeStatus::HALF_CLOSING));
-  assert(market::is_us_prev(TradeStatus::US_CLEAN));
-  assert(market::is_us_after(TradeStatus::US_AFTER));
-  assert(market::is_trading(TradeStatus::US_AFTER_MARKET_CLEAN));
-  assert(market::is_dark(TradeStatus::DARK_TRADING));
-  assert(market::allow_trading(TradeStatus::NOON_CLOSING));
-  assert(market::is_special(TradeStatus::TRADING_HALT));
-  assert(market::from_trade_status_code(456) == TradeStatus::UNKNOWN);
-  assert(market::from_trade_status_code(2001) == TradeStatus::FUSE);
-  assert(market::trade_status_as_string(TradeStatus::US_CLEAN) ==
-         std::string("US_CLEAN"));
-  assert(market::trade_status_as_string(TradeStatus::FUSE) ==
-         std::string("FUSE"));
+  check_trade_status(market::code(TradeStatus::US_TRADING) == 202);
+  check_trade_status(market::code(market::normalize(TradeStatus::US_CLEAN)) ==
+                     201);
+  check_trade_status(market::normalize(TradeStatus::CLEAN) ==
+                     TradeStatus::CLOSING);
+  check_trade_status(market::label(TradeStatus::US_CLEAN) ==
+                     std::string("Pre-Market"));
+  check_trade_status(std::string(market::label(TradeStatus::OPEN_BID)).empty());
+  check_trade_status(market::name(TradeStatus::REALTIME_QUOTE) ==
+                     std::string("Temporary Break"));
+  check_trade_status(market::name(TradeStatus::UNITED) ==
+                     std::string("Not Listed"));
+  check_trade_status(market::name(TradeStatus::TRADING_HALT) ==
+                     std::string("Terminated"));
+  check_trade_status(market::name(TradeStatus::FUSE) == std::string("Fuse"));
+  check_trade_status(market::is_us_market(TradeStatus::US_TRADING));
+  check_trade_status(market::is_us_pre_post(TradeStatus::US_AFTER));
+  check_trade_status(market::is_us_night(TradeStatus::US_NIGHT));
+  check_trade_status(market::is_us_closing(TradeStatus::US_CLOSING));
+  check_trade_status(market::is_closing(TradeStatus::HALF_CLOSING));
+  check_trade_status(market::is_us_prev(TradeStatus::US_CLEAN));
+  check_trade_status(market::is_us_after(TradeStatus::US_AFTER));
+  check_trade_status(market::is_trading(TradeStatus::US_AFTER_MARKET_CLEAN));
+  check_trade_status(market::is_dark(TradeStatus::DARK_TRADING));
+  check_trade_status(market::allow_trading(TradeStatus::NOON_CLOSING));
+  check_trade_status(market::is_special(TradeStatus::TRADING_HALT));
+  check_trade_status(market::from_trade_status_code(456) ==
+                     TradeStatus::UNKNOWN);
+  check_trade_status(market::from_trade_status_code(2001) == TradeStatus::FUSE);
+  check_trade_status(market::trade_status_as_string(TradeStatus::US_CLEAN) ==
+                     std::string("US_CLEAN"));
+  check_trade_status(market::trade_status_as_string(TradeStatus::FUSE) ==
+                     std::string("FUSE"));
 }
 
 int
