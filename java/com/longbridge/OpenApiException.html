@@ -154,8 +154,9 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Exception.h
  pieces of diagnostic information:
  <ul>
    <li><a href="#getKind()"><code>getKind()</code></a> – broad category of the error (HTTP, OpenAPI, OAuth, Other)</li>
-   <li><a href="#getCode()"><code>getCode()</code></a> – numeric error code returned by the server, or <code>null</code> for
-       client-side errors</li>
+   <li><a href="#getCode()"><code>getCode()</code></a> – numeric error code: the HTTP status or OpenAPI code returned
+       by the server, a stable OAuth error code for <a href="ErrorKind.html#OAuth"><code>ErrorKind.OAuth</code></a> (see
+       <a href="#getCode()"><code>getCode()</code></a>), or <code>null</code> for other client-side errors</li>
    <li><a href="#getMessage()"><code>getMessage()</code></a> – human-readable error description</li>
  </ul></div>
 <dl>
@@ -211,7 +212,7 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Exception.h
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang" class="externalLink">Long</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCode()">getCode</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Returns the numeric error code returned by the server.</div>
+<div class="block">Returns the numeric error code.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -313,10 +314,14 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Exception.h
 <li class="blockList">
 <h4>getCode</h4>
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang" class="externalLink">Long</a>&nbsp;getCode()</pre>
-<div class="block">Returns the numeric error code returned by the server.</div>
+<div class="block">Returns the numeric error code.
+
+ <p>
+ For <a href="ErrorKind.html#OAuth"><code>ErrorKind.OAuth</code></a> errors this is a stable code identifying the
+ failure: 1 no token available, 2 no refresh token, 3 refresh failed, 4 revoke failed, 5 authorization failed, 6 authorization timeout, 7 code exchange failed, 8 CSRF mismatch, 9 callback bind failed, 10 local address failed, 11 callback channel closed, 12 no home dir, 13 token file read, 14 token file parse, 15 token file write, 16 token file delete, 17 create dir failed, 18 serialize token, 0 other.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>error code, or <code>null</code> for client-side errors</dd>
+<dd>error code, or <code>null</code> for client-side errors other than OAuth</dd>
 </dl>
 </li>
 </ul>

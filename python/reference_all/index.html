@@ -58,6 +58,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ErrorKind.Other">Other</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ErrorKind.OAuth">OAuth</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OpenApiException">OpenApiException</a>
@@ -65,6 +67,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OpenApiException.kind">kind</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OpenApiException.code">code</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OpenApiException.trace_id">trace_id</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OpenApiException.message">message</a>
     </li>
@@ -103,6 +107,16 @@
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OAuth">OAuth</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OAuth.revoke">revoke</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OAuth.revoke_async">revoke_async</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OAuth.clear">clear</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OAuth.clear_async">clear_async</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OAuthBuilder">OAuthBuilder</a>
         <ul>
@@ -8450,6 +8464,54 @@
 
 </div>
 
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.ErrorKind.OAuth" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">OAuth</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ErrorKind (longbridge.openapi.ErrorKind)" href="#longbridge.openapi.ErrorKind">ErrorKind</a></code></p>
+
+
+
+        <p>OAuth error</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
 
 
 
@@ -8532,11 +8594,36 @@
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">code: int</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">code: Optional[int]</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Error code</p>
+        <p>Error code: the HTTP status or OpenAPI code returned by the server, or for
+<code>ErrorKind.OAuth</code> a stable code identifying the failure (1 no token available, 2 no refresh token, 3 refresh failed, 4 revoke failed, 5 authorization failed, 6 authorization timeout, 7 code exchange failed, 8 CSRF mismatch, 9 callback bind failed, 10 local address failed, 11 callback channel closed, 12 no home dir, 13 token file read, 14 token file parse, 15 token file write, 16 token file delete, 17 create dir failed, 18 serialize token, 0 other).
+<code>None</code> for other client-side errors.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.OpenApiException.trace_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">trace_id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">trace_id: Optional[str]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Trace ID of the request, if any</p>
 
     </div>
 
@@ -8576,7 +8663,7 @@
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">__init__(code: int, message: str) -&gt; None</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">__init__(kind: ErrorKind, code: Optional[int], trace_id: Optional[str], message: str) -&gt; None</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -9269,6 +9356,114 @@ only HTTP-backed APIs never opens a WebSocket connection.</p>
 
 
 
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.OAuth.revoke" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">revoke</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">revoke() -&gt; None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Revoke the current token on the server (RFC 7009), blocking.</p>
+<p>The refresh token is revoked when present, otherwise the access token.
+Only the server is contacted; the cached token on disk
+(<code>~/.longbridge/openapi/tokens/&lt;client_id&gt;</code>) is left untouched.
+Call :meth:<code>clear</code> afterwards to drop it locally.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.OAuth.revoke_async" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">revoke_async</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">revoke_async() -&gt; None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Async version of :meth:<code>revoke</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.OAuth.clear" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">clear</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">clear() -&gt; None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Clear the token locally, blocking.</p>
+<p>Drops the in-memory token and deletes the cached token file
+(<code>~/.longbridge/openapi/tokens/&lt;client_id&gt;</code>). The server is not
+contacted; use :meth:<code>revoke</code> for that.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.OAuth.clear_async" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">clear_async</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">clear_async() -&gt; None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Async version of :meth:<code>clear</code>.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
 
     </div>
 

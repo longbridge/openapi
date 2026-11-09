@@ -91,6 +91,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a24958225da779565d68ceebd70fce069"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affc9752f663a5b804a09407a6e6892d9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_o_auth.html#affc9752f663a5b804a09407a6e6892d9">operator const lb_oauth_t *</a> () const</td></tr>
 <tr class="separator:affc9752f663a5b804a09407a6e6892d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48a72cd1f2cddc2def70522ddd679dd8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_o_auth.html#a48a72cd1f2cddc2def70522ddd679dd8">revoke</a> (<a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="structlongbridge_1_1_no_context.html">NoContext</a>, void &gt; callback) const</td></tr>
+<tr class="separator:a48a72cd1f2cddc2def70522ddd679dd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afce6d9857188c9bc16d8a8f36afdf6af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_o_auth.html#afce6d9857188c9bc16d8a8f36afdf6af">clear</a> (<a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="structlongbridge_1_1_no_context.html">NoContext</a>, void &gt; callback) const</td></tr>
+<tr class="separator:afce6d9857188c9bc16d8a8f36afdf6af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 client (opaque handle)</p>
@@ -176,6 +180,32 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="afce6d9857188c9bc16d8a8f36afdf6af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afce6d9857188c9bc16d8a8f36afdf6af">&#9670;&nbsp;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::OAuth::clear </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="structlongbridge_1_1_no_context.html">NoContext</a>, void &gt;&#160;</td>
+          <td class="paramname"><em>callback</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Asynchronously clear the token locally</p>
+<p>Drops the in-memory token and deletes the cached token file (<code>~/.longbridge/openapi/tokens/&lt;client_id&gt;</code>). The server is not contacted (see <code>revoke</code>).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>Invoked on completion; check <code>status()</code> for errors </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="affc9752f663a5b804a09407a6e6892d9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#affc9752f663a5b804a09407a6e6892d9">&#9670;&nbsp;</a></span>operator const lb_oauth_t *()</h2>
 
@@ -234,6 +264,32 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a48a72cd1f2cddc2def70522ddd679dd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48a72cd1f2cddc2def70522ddd679dd8">&#9670;&nbsp;</a></span>revoke()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::OAuth::revoke </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="structlongbridge_1_1_no_context.html">NoContext</a>, void &gt;&#160;</td>
+          <td class="paramname"><em>callback</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Asynchronously revoke the current token on the server (RFC 7009)</p>
+<p>The refresh token is revoked when present, otherwise the access token. Only the server is contacted; the cached token on disk is left untouched (see <code>clear</code>).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>Invoked on completion; check <code>status()</code> for errors </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

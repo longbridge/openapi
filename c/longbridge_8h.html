@@ -2649,6 +2649,10 @@ Functions</h2></td></tr>
 <tr class="separator:af54364ae07669f2526d22d1daac8dec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aceaa716c10e79aa58e6c52555c521ec8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#aceaa716c10e79aa58e6c52555c521ec8">lb_oauth_free</a> (struct <a class="el" href="longbridge_8h.html#a8600413a409daa7adf54f278d8f0eca8">lb_oauth_t</a> *oauth)</td></tr>
 <tr class="separator:aceaa716c10e79aa58e6c52555c521ec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02c2ec4b18f77b33b65fad663ce5cb1d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a02c2ec4b18f77b33b65fad663ce5cb1d">lb_oauth_revoke</a> (const struct <a class="el" href="longbridge_8h.html#a8600413a409daa7adf54f278d8f0eca8">lb_oauth_t</a> *oauth, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:a02c2ec4b18f77b33b65fad663ce5cb1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89579da9d67d564149f5614678d8ac77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a89579da9d67d564149f5614678d8ac77">lb_oauth_clear</a> (const struct <a class="el" href="longbridge_8h.html#a8600413a409daa7adf54f278d8f0eca8">lb_oauth_t</a> *oauth, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:a89579da9d67d564149f5614678d8ac77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25941301e970612fdb0a2416d5864667"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="longbridge_8h.html#ada0193f107554e39afe0c4117a4e63cd">lb_portfolio_context_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a25941301e970612fdb0a2416d5864667">lb_portfolio_context_new</a> (const struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *config)</td></tr>
 <tr class="separator:a25941301e970612fdb0a2416d5864667"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33cd3851f2d97b8d233f99e8d171ee98"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a33cd3851f2d97b8d233f99e8d171ee98">lb_portfolio_context_retain</a> (const struct <a class="el" href="longbridge_8h.html#ada0193f107554e39afe0c4117a4e63cd">lb_portfolio_context_t</a> *ctx)</td></tr>
@@ -15085,6 +15089,51 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Returns the error code.</p>
+<p>For <code>ErrorKindHttp</code> it is the HTTP status, for <code>ErrorKindOpenApi</code> the OpenAPI error code. For <code>ErrorKindOAuth</code> it is a stable code identifying the failure:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Code   </th><th class="markdownTableHeadNone">Meaning    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">0   </td><td class="markdownTableBodyNone">other (e.g. NULL OAuth handle)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">no token available    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">2   </td><td class="markdownTableBodyNone">no refresh token    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">3   </td><td class="markdownTableBodyNone">token refresh failed    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">4   </td><td class="markdownTableBodyNone">token revocation failed    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">5   </td><td class="markdownTableBodyNone">authorization failed    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">6   </td><td class="markdownTableBodyNone">authorization timeout    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">7   </td><td class="markdownTableBodyNone">authorization code exchange failed    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">8   </td><td class="markdownTableBodyNone">CSRF token mismatch    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">9   </td><td class="markdownTableBodyNone">failed to bind the callback server    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">10   </td><td class="markdownTableBodyNone">failed to get the local address    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">11   </td><td class="markdownTableBodyNone">callback channel closed    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">12   </td><td class="markdownTableBodyNone">cannot determine the home directory    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">13   </td><td class="markdownTableBodyNone">failed to read the token file    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">14   </td><td class="markdownTableBodyNone">failed to parse the token file    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">15   </td><td class="markdownTableBodyNone">failed to write the token file    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">16   </td><td class="markdownTableBodyNone">failed to delete the token file    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">17   </td><td class="markdownTableBodyNone">failed to create the token directory    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">18   </td><td class="markdownTableBodyNone">failed to serialize the token   </td></tr>
+</table>
+<p>It is 0 when the error carries no code; check <code>lb_error_kind</code> first. </p>
 
 </div>
 </div>
@@ -19211,6 +19260,50 @@ Variables</h1>
 
 </div>
 </div>
+<a id="a89579da9d67d564149f5614678d8ac77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89579da9d67d564149f5614678d8ac77">&#9670;&nbsp;</a></span>lb_oauth_clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_oauth_clear </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#a8600413a409daa7adf54f278d8f0eca8">lb_oauth_t</a> *&#160;</td>
+          <td class="paramname"><em>oauth</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>userdata</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Asynchronously clear the token locally</p>
+<p>Drops the in-memory token and deletes the cached token file (<code>~/.longbridge/openapi/tokens/&lt;client_id&gt;</code>). The server is not contacted (use <code>lb_oauth_revoke</code> for that).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">oauth</td><td>OAuth 2.0 client; if NULL, <code>callback</code> receives an error </td></tr>
+    <tr><td class="paramname">callback</td><td>Async completion callback; <code>error</code> is set on failure </td></tr>
+    <tr><td class="paramname">userdata</td><td>Opaque pointer forwarded to <code>callback</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="af54364ae07669f2526d22d1daac8dec8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af54364ae07669f2526d22d1daac8dec8">&#9670;&nbsp;</a></span>lb_oauth_clone()</h2>
 
@@ -19308,6 +19401,50 @@ Variables</h1>
     <tr><td class="paramname">open_url_callback</td><td>Called with the authorization URL and <code>open_url_userdata</code> during the auth flow </td></tr>
     <tr><td class="paramname">open_url_userdata</td><td>Opaque pointer forwarded to <code>open_url_callback</code> </td></tr>
     <tr><td class="paramname">callback</td><td>Async completion callback; <code>data</code> is <code>*mut LbOAuth</code> on success (free with <code>lb_oauth_free</code>) </td></tr>
+    <tr><td class="paramname">userdata</td><td>Opaque pointer forwarded to <code>callback</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a02c2ec4b18f77b33b65fad663ce5cb1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02c2ec4b18f77b33b65fad663ce5cb1d">&#9670;&nbsp;</a></span>lb_oauth_revoke()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_oauth_revoke </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#a8600413a409daa7adf54f278d8f0eca8">lb_oauth_t</a> *&#160;</td>
+          <td class="paramname"><em>oauth</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>userdata</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Asynchronously revoke the current token on the server (RFC 7009)</p>
+<p>The refresh token is revoked when present, otherwise the access token. Only the server is contacted; the cached token on disk is left untouched (use <code>lb_oauth_clear</code> to remove it).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">oauth</td><td>OAuth 2.0 client; if NULL, <code>callback</code> receives an error </td></tr>
+    <tr><td class="paramname">callback</td><td>Async completion callback; <code>error</code> is set on failure </td></tr>
     <tr><td class="paramname">userdata</td><td>Opaque pointer forwarded to <code>callback</code> </td></tr>
   </table>
   </dd>

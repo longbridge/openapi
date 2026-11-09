@@ -302,7 +302,9 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <dd><code>onOpenUrl</code> - Called with the authorization URL; open it in a browser
                   or print it to the console</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>CompletableFuture that resolves to a new <a href="OAuth.html" title="class in com.longbridge"><code>OAuth</code></a> handle</dd>
+<dd>CompletableFuture that resolves to a new <a href="OAuth.html" title="class in com.longbridge"><code>OAuth</code></a> handle; on
+         failure it completes exceptionally with an
+         <a href="OpenApiException.html" title="class in com.longbridge"><code>OpenApiException</code></a> of kind <a href="ErrorKind.html#OAuth"><code>ErrorKind.OAuth</code></a></dd>
 </dl>
 </li>
 </ul>

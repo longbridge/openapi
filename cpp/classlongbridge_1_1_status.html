@@ -101,7 +101,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab40d62d13447671dbf48215708b7330c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error kind if an error occurs.  <a href="classlongbridge_1_1_status.html#ab40d62d13447671dbf48215708b7330c">More...</a><br /></td></tr>
 <tr class="separator:ab40d62d13447671dbf48215708b7330c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbb88c3fb1f55d609d64d6415f44c12d"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_status.html#adbb88c3fb1f55d609d64d6415f44c12d">code</a> () const</td></tr>
-<tr class="memdesc:adbb88c3fb1f55d609d64d6415f44c12d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error code if an error occurs.  <a href="classlongbridge_1_1_status.html#adbb88c3fb1f55d609d64d6415f44c12d">More...</a><br /></td></tr>
 <tr class="separator:adbb88c3fb1f55d609d64d6415f44c12d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66f604656886364fac3d2ce1a4fcbdb7"><td class="memItemLeft" align="right" valign="top">std::optional&lt; const char * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_status.html#a66f604656886364fac3d2ce1a4fcbdb7">message</a> () const</td></tr>
 <tr class="memdesc:a66f604656886364fac3d2ce1a4fcbdb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error message if an error occurs.  <a href="classlongbridge_1_1_status.html#a66f604656886364fac3d2ce1a4fcbdb7">More...</a><br /></td></tr>
@@ -219,8 +218,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Returns the error code if an error occurs. </p>
+<p>Returns the error code if an error occurs: the HTTP status, the OpenAPI error code, or for <code><a class="el" href="namespacelongbridge.html#ae47e393ec668e34c6bb11272a11ae1e0a54699d9a7e6df4edbca4053281b2458e">ErrorKind::OAuth</a></code> a stable code identifying the failure (see <code>lb_error_code</code> in longbridge.h for the table) </p>
 
 </div>
 </div>
