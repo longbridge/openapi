@@ -138,6 +138,15 @@ jobs:
       - name: Build
         working-directory: nodejs
         run: ${{ matrix.settings.build }}
+        env:
+          # `--use-napi-cross` installs GCC 4.8.5 for
+          # aarch64-unknown-linux-gnu, which predates the ACLE `__ARM_ARCH`
+          # macro, so ring's pregenerated aarch64 assembly stops at
+          # `#error "ARM assembler must define __ARM_ARCH"` (asm_base.h). That
+          # compiler never defines it, not even with `-march=armv8-a`, so
+          # define it here; aarch64 is ARMv8 by definition. The variable is
+          # target-specific and inert for the other matrix entries.
+          CFLAGS_aarch64_unknown_linux_gnu: -D__ARM_ARCH=8
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
