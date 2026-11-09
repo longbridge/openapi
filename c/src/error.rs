@@ -78,7 +78,7 @@ pub unsafe extern "C" fn lb_error_message(error: *const CError) -> *const c_char
 /// | 5 | authorization failed |
 /// | 6 | authorization timeout |
 /// | 7 | authorization code exchange failed |
-/// | 8 | CSRF token mismatch |
+/// | 8 | CSRF token mismatch (no longer returned) |
 /// | 9 | failed to bind the callback server |
 /// | 10 | failed to get the local address |
 /// | 11 | callback channel closed |
