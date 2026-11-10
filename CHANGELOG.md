@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **C++:** Keep market trade-status test checks enabled in release builds.
 - **Node.js:** the published native bindings are release builds again, not debug builds, so they are optimised and no longer carry debug info.
 - **All SDKs:** an OAuth token refresh is bounded by a 30-second timeout (`RefreshTokenFailed: timed out after 30s`). It runs under the token lock, so a hung refresh previously blocked every request needing a token, and `revoke()` / `clear()`, indefinitely; a hung refresh while building the client now falls back to the browser authorization after 30 s instead of never returning. Trade-off: if the server rotated the refresh token but its response arrives after the timeout, the new token is lost and the next refresh fails with `invalid_grant`, requiring a new authorization. The authorization code exchange is bounded too (10 s to connect, 35 s in total).
 - **All SDKs:** OAuth transport failures report their cause (e.g. `Request failed: client error: error sending request ...: tcp connect error: ...`) instead of a bare `Request failed`. Server rejections of the code exchange, refresh and revoke read `Server returned error response: <error>[: <error_description>][ (see <error_uri>)]`; 5.3.0 showed only `Server returned error response`, without the server's `error` (e.g. `invalid_grant`).
@@ -266,6 +267,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Rust:** `market::TradeStatus` models `/v1/quote/market-status` trade status codes, including engine-compatible normalization and display helpers.
+- **C++:** `market::TradeStatus` models `/v1/quote/market-status` trade status codes, with status-code conversion, normalization, display helpers, and typed `MarketTimeItem` status fields.
 
 ### Fixed
 
