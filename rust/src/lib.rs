@@ -26,6 +26,7 @@ pub mod asset;
 pub mod calendar;
 pub mod content;
 pub mod dca;
+pub mod forex;
 pub mod fund;
 pub mod fundamental;
 pub mod grid;
