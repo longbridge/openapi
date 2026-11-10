@@ -5,8 +5,9 @@ use crate::{
     blocking::runtime::BlockingRuntime,
     trade::{
         AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
-        EstimateMaxPurchaseQuantityOptions, EstimateMaxPurchaseQuantityResponse, Execution,
-        FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
+        EstimateMaxPurchaseQuantityOptions, EstimateMaxPurchaseQuantityResponse,
+        EstimateMultiLegAvailableQuantityOptions, EstimateMultiLegAvailableQuantityResponse,
+        Execution, FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
         GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
         GetTodayOrdersOptions, GetUSAvailableHoldingOptions, GetUSHistoryOrders,
@@ -507,6 +508,16 @@ impl TradeContextSync {
     ) -> Result<EstimateMaxPurchaseQuantityResponse> {
         self.rt
             .call(move |ctx| async move { ctx.estimate_max_purchase_quantity(opts).await })
+    }
+
+    /// Estimate a multi-leg option combination's maximum tradable quantity and
+    /// margin impact (blocking).
+    pub fn estimate_multileg_available_quantity(
+        &self,
+        opts: EstimateMultiLegAvailableQuantityOptions,
+    ) -> Result<EstimateMultiLegAvailableQuantityResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.estimate_multileg_available_quantity(opts).await })
     }
 
     // ── US-market blocking wrappers
