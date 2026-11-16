@@ -22,8 +22,8 @@ pub(crate) use self::{
     classes::{
         ConversationResponse, CreateWatchlistGroupResponse, GridOrdersResponse,
         GridTriggerHistoryResponse, HumanInteractionRequiredEvent, NodeToolUseOutputs, OtherEvent,
-        PingEvent, SecurityCalcIndex, StockPosition, StockPositionChannel, StockPositionsResponse,
-        SubagentOutputs, WorkflowFinishedEvent,
+        PingEvent, RiskAssessment, SecurityCalcIndex, StockPosition, StockPositionChannel,
+        StockPositionsResponse, SubagentOutputs, WorkflowFinishedEvent,
     },
     object_array::ObjectArray,
     primary_array::PrimaryArray,

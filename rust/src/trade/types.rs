@@ -1009,6 +1009,47 @@ pub struct MarginRatio {
     pub fm_factor: Decimal,
 }
 
+/// Risk assessment (suitability questionnaire) result of the current member
+///
+/// Mirrors the server response of `GET /v1/members/me/risk-assessment`
+/// field-for-field. Decoding is lenient: integers are accepted as JSON integers
+/// or integer strings (anything else becomes 0), string fields render
+/// non-string values as JSON text (null becomes empty), and null maps or lists
+/// become empty.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct RiskAssessment {
+    /// Risk level of the latest questionnaire (e.g. `A5`)
+    #[serde(default, deserialize_with = "serde_utils::string_lenient")]
+    pub risk: String,
+    /// Professional investor (PI) status code
+    #[serde(default, deserialize_with = "serde_utils::int32_lenient")]
+    pub pi: i32,
+    /// Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`,
+    /// `is_corporate_client`)
+    #[serde(default, deserialize_with = "serde_utils::string_map_lenient")]
+    pub approvals: BTreeMap<String, String>,
+    /// Re-authentication flag, as returned by the server (empty when not set)
+    #[serde(default, deserialize_with = "serde_utils::string_lenient")]
+    pub re_authentication: String,
+    /// Professional investor status end time, as returned by the server (`0`
+    /// when not set)
+    #[serde(default, deserialize_with = "serde_utils::int64_lenient")]
+    pub pi_end_at: i64,
+    /// Deadlines keyed by item, as returned by the server
+    #[serde(default, deserialize_with = "serde_utils::int64_map_lenient")]
+    pub deadlines: BTreeMap<String, i64>,
+    /// Date of the latest risk assessment, as returned by the server (e.g.
+    /// `2026-10-14`)
+    #[serde(default, deserialize_with = "serde_utils::string_lenient")]
+    pub risk_assessment_at: String,
+    /// Questionnaire score
+    #[serde(default, deserialize_with = "serde_utils::int32_lenient")]
+    pub score: i32,
+    /// Strategy risk levels the member is allowed to trade
+    #[serde(default, deserialize_with = "serde_utils::string_vec_lenient")]
+    pub strategy_risk_levels: Vec<String>,
+}
+
 impl_serde_for_enum_string!(
     OrderType,
     OrderStatus,
@@ -2823,5 +2864,84 @@ mod tests {
         value.as_object_mut().unwrap().remove("limit_depth_level");
         let detail = serde_json::from_value::<AttachedOrderDetail>(value).unwrap();
         assert!(detail.limit_depth_level.is_none());
+    }
+
+    #[test]
+    fn risk_assessment_decode() {
+        // Real test-env response (2026-11-16).
+        let ra: RiskAssessment = serde_json::from_str(
+            r#"{"approvals":{"car":"pass","cka":"pass","is_corporate_client":"false","risk_audit":"pass"},
+                "deadlines":{},"pi":0,"pi_end_at":"0","re_authentication":"","risk":"A5",
+                "risk_assessment_at":"2026-10-14","score":0,"strategy_risk_levels":[]}"#,
+        )
+        .unwrap();
+        assert_eq!(ra.risk, "A5");
+        assert_eq!(ra.pi, 0);
+        assert_eq!(ra.pi_end_at, 0);
+        assert_eq!(ra.re_authentication, "");
+        assert_eq!(ra.risk_assessment_at, "2026-10-14");
+        assert_eq!(ra.score, 0);
+        assert!(ra.strategy_risk_levels.is_empty());
+        assert!(ra.deadlines.is_empty());
+        assert_eq!(ra.approvals.len(), 4);
+        assert_eq!(ra.approvals["car"], "pass");
+        assert_eq!(ra.approvals["is_corporate_client"], "false");
+
+        // int64 as strings or numbers, int32 as strings, non-string approval
+        // values, null list.
+        let ra: RiskAssessment = serde_json::from_str(
+            r#"{"risk":"R1","pi":"1","pi_end_at":1790000000,"score":"42",
+                "deadlines":{"pi":"1790000000","risk":1790000001,"x":null},
+                "approvals":{"flag":true,"n":3},"strategy_risk_levels":null}"#,
+        )
+        .unwrap();
+        assert_eq!(ra.pi, 1);
+        assert_eq!(ra.pi_end_at, 1790000000);
+        assert_eq!(ra.score, 42);
+        assert_eq!(ra.deadlines["pi"], 1790000000);
+        assert_eq!(ra.deadlines["risk"], 1790000001);
+        assert_eq!(ra.deadlines["x"], 0);
+        assert_eq!(ra.approvals["flag"], "true");
+        assert_eq!(ra.approvals["n"], "3");
+        assert!(ra.strategy_risk_levels.is_empty());
+
+        // Floats, out-of-range ints and non-numeric strings become 0;
+        // non-string string fields render as JSON text; null list elements
+        // become empty strings.
+        let ra: RiskAssessment = serde_json::from_str(
+            r#"{"risk":5,"re_authentication":true,"risk_assessment_at":null,"pi":1.5,
+                "score":3000000000,"pi_end_at":1.79e9,
+                "deadlines":{"a":-2,"b":-2.7,"c":"x","d":18446744073709551615},
+                "approvals":{"o":{"b":1,"a":2}},"strategy_risk_levels":["S1",null,3]}"#,
+        )
+        .unwrap();
+        assert_eq!(ra.risk, "5");
+        assert_eq!(ra.re_authentication, "true");
+        assert_eq!(ra.risk_assessment_at, "");
+        assert_eq!((ra.pi, ra.score, ra.pi_end_at), (0, 0, 0));
+        assert_eq!(
+            ra.deadlines.into_iter().collect::<Vec<_>>(),
+            vec![
+                ("a".to_string(), -2),
+                ("b".to_string(), 0),
+                ("c".to_string(), 0),
+                ("d".to_string(), 0)
+            ]
+        );
+        assert_eq!(ra.approvals["o"], r#"{"a":2,"b":1}"#);
+        assert_eq!(ra.strategy_risk_levels, vec!["S1", "", "3"]);
+
+        // Maps serialize in key order.
+        let ra: RiskAssessment =
+            serde_json::from_str(r#"{"approvals":{"z":"1","a":"2","m":"3"}}"#).unwrap();
+        let json = serde_json::to_string(&ra).unwrap();
+        assert!(json.contains(r#""approvals":{"a":"2","m":"3","z":"1"}"#));
+
+        // Empty object and null maps still decode.
+        let ra: RiskAssessment =
+            serde_json::from_str(r#"{"approvals":null,"deadlines":null}"#).unwrap();
+        assert!(ra.risk.is_empty());
+        assert_eq!(ra.score, 0);
+        assert!(ra.approvals.is_empty() && ra.deadlines.is_empty());
     }
 }

@@ -2290,6 +2290,31 @@ struct MarginRatio
   Decimal fm_factor;
 };
 
+/// Risk assessment (suitability questionnaire) result of the current member
+struct RiskAssessment
+{
+  /// Risk level of the latest questionnaire (e.g. `A5`)
+  std::string risk;
+  /// Professional investor (PI) status code
+  int32_t pi;
+  /// Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`)
+  std::map<std::string, std::string> approvals;
+  /// Re-authentication flag, as returned by the server (empty when not set)
+  std::string re_authentication;
+  /// Professional investor status end time, as returned by the server (`0`
+  /// when not set)
+  int64_t pi_end_at;
+  /// Deadlines keyed by item, as returned by the server
+  std::map<std::string, int64_t> deadlines;
+  /// Date of the latest risk assessment, as returned by the server (e.g.
+  /// `2026-10-14`)
+  std::string risk_assessment_at;
+  /// Questionnaire score
+  int32_t score;
+  /// Strategy risk levels the member is allowed to trade
+  std::vector<std::string> strategy_risk_levels;
+};
+
 /// Commission-free Status
 enum class CommissionFreeStatus
 {

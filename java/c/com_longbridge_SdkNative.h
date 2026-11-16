@@ -601,6 +601,14 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextMarginRatio
 
 /*
  * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextRiskAssessment
+ * Signature: (JLcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextRiskAssessment
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
  * Method:    tradeContextOrderDetail
  * Signature: (JLjava/lang/String;Lcom/longbridge/AsyncCallback;)V
  */

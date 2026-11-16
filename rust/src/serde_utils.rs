@@ -637,6 +637,101 @@ pub(crate) mod f64_opt_str {
     }
 }
 
+/// Parse a JSON value as an integer: a JSON integer or an integer string
+/// (proto3 JSON encodes int64 as a string). Anything else — null, floats,
+/// non-numeric strings, values outside `i64` — becomes 0, so a server-side
+/// change in how a number is encoded cannot fail the whole response.
+fn lenient_int(value: serde_json::Value) -> i64 {
+    match value {
+        serde_json::Value::Number(n) => n.as_i64().unwrap_or_default(),
+        serde_json::Value::String(s) => s.trim().parse().unwrap_or_default(),
+        _ => 0,
+    }
+}
+
+/// Render a JSON value as a string: strings as-is, null as an empty string,
+/// anything else as its compact JSON text.
+fn lenient_string(value: serde_json::Value) -> String {
+    match value {
+        serde_json::Value::String(s) => s,
+        serde_json::Value::Null => String::new(),
+        other => other.to_string(),
+    }
+}
+
+/// Deserializes an `i32` leniently (see [`lenient_int`]); values outside
+/// `i32` become 0.
+pub(crate) fn int32_lenient<'de, D>(d: D) -> Result<i32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let v = lenient_int(serde_json::Value::deserialize(d)?);
+    Ok(i32::try_from(v).unwrap_or_default())
+}
+
+/// Deserializes an `i64` leniently (see [`lenient_int`]).
+pub(crate) fn int64_lenient<'de, D>(d: D) -> Result<i64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(lenient_int(serde_json::Value::deserialize(d)?))
+}
+
+/// Deserializes a `String` leniently (see [`lenient_string`]).
+pub(crate) fn string_lenient<'de, D>(d: D) -> Result<String, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(lenient_string(serde_json::Value::deserialize(d)?))
+}
+
+/// Deserializes a list of strings leniently: a null list becomes empty and
+/// each element goes through [`lenient_string`].
+pub(crate) fn string_vec_lenient<'de, D>(d: D) -> Result<Vec<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(Option::<Vec<serde_json::Value>>::deserialize(d)?
+        .unwrap_or_default()
+        .into_iter()
+        .map(lenient_string)
+        .collect())
+}
+
+/// Deserializes a `string -> string` JSON object leniently: a null object
+/// becomes empty and each value goes through [`lenient_string`].
+pub(crate) fn string_map_lenient<'de, D>(
+    d: D,
+) -> Result<std::collections::BTreeMap<String, String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(
+        Option::<std::collections::BTreeMap<String, serde_json::Value>>::deserialize(d)?
+            .unwrap_or_default()
+            .into_iter()
+            .map(|(k, v)| (k, lenient_string(v)))
+            .collect(),
+    )
+}
+
+/// Deserializes a `string -> int64` JSON object leniently: a null object
+/// becomes empty and each value goes through [`lenient_int`].
+pub(crate) fn int64_map_lenient<'de, D>(
+    d: D,
+) -> Result<std::collections::BTreeMap<String, i64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(
+        Option::<std::collections::BTreeMap<String, serde_json::Value>>::deserialize(d)?
+            .unwrap_or_default()
+            .into_iter()
+            .map(|(k, v)| (k, lenient_int(v)))
+            .collect(),
+    )
+}
+
 /// Deserializer that maps a JSON `null` to the type's `Default` value.
 pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
 where

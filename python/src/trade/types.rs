@@ -1124,6 +1124,55 @@ pub(crate) struct MarginRatio {
     fm_factor: PyDecimal,
 }
 
+/// Risk assessment (suitability questionnaire) result of the current member
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct RiskAssessment {
+    /// Risk level of the latest questionnaire (e.g. `A5`)
+    pub risk: String,
+    /// Professional investor (PI) status code
+    pub pi: i32,
+    /// Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`)
+    pub approvals: std::collections::BTreeMap<String, String>,
+    /// Re-authentication flag, as returned by the server (empty when not set)
+    pub re_authentication: String,
+    /// Professional investor status end time, as returned by the server (`0`
+    /// when not set)
+    pub pi_end_at: i64,
+    /// Deadlines keyed by item, as returned by the server
+    pub deadlines: std::collections::BTreeMap<String, i64>,
+    /// Date of the latest risk assessment, as returned by the server (e.g.
+    /// `2026-10-14`)
+    pub risk_assessment_at: String,
+    /// Questionnaire score
+    pub score: i32,
+    /// Strategy risk levels the member is allowed to trade
+    pub strategy_risk_levels: Vec<String>,
+}
+
+#[pymethods]
+impl RiskAssessment {
+    fn __repr__(&self) -> String {
+        format!("{self:?}")
+    }
+}
+
+impl From<longbridge::trade::RiskAssessment> for RiskAssessment {
+    fn from(v: longbridge::trade::RiskAssessment) -> Self {
+        Self {
+            risk: v.risk,
+            pi: v.pi,
+            approvals: v.approvals,
+            re_authentication: v.re_authentication,
+            pi_end_at: v.pi_end_at,
+            deadlines: v.deadlines,
+            risk_assessment_at: v.risk_assessment_at,
+            score: v.score,
+            strategy_risk_levels: v.strategy_risk_levels,
+        }
+    }
+}
+
 /// Response for estimate maximum purchase quantity
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]

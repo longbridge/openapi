@@ -865,6 +865,31 @@ TradeContext::margin_ratio(
 }
 
 void
+TradeContext::risk_assessment(
+  AsyncCallback<TradeContext, RiskAssessment> callback) const
+{
+  lb_trade_context_risk_assessment(
+    ctx_,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, RiskAssessment>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        RiskAssessment resp = convert((const lb_risk_assessment_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, RiskAssessment>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, RiskAssessment>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, RiskAssessment>(callback));
+}
+
+void
 TradeContext::order_detail(
   const std::string& order_id,
   AsyncCallback<TradeContext, OrderDetail> callback) const

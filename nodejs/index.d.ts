@@ -4645,6 +4645,22 @@ export declare class TradeContext {
    */
   marginRatio(symbol: string): Promise<MarginRatio>
   /**
+   * Get the risk assessment (suitability questionnaire) result of the
+   * current member
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, TradeContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.riskAssessment();
+   * console.log(resp);
+   * ```
+   */
+  riskAssessment(): Promise<RiskAssessment>
+  /**
    * Get order detail
    *
    * AP accounts only: US data-center accounts get a region error; use
@@ -8292,6 +8308,34 @@ export interface ReplaceOrderOptions {
    * precedence over `delayedUntil`)
    */
   clearDelayedUntil?: boolean
+}
+
+/** Risk assessment (suitability questionnaire) result of the current member */
+export interface RiskAssessment {
+  /** Risk level of the latest questionnaire (e.g. `A5`) */
+  risk: string
+  /** Professional investor (PI) status code */
+  pi: number
+  /** Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`) */
+  approvals: Record<string, string>
+  /** Re-authentication flag, as returned by the server (empty when not set) */
+  reAuthentication: string
+  /**
+   * Professional investor status end time, as returned by the server (`0`
+   * when not set)
+   */
+  piEndAt: number
+  /** Deadlines keyed by item, as returned by the server */
+  deadlines: Record<string, number>
+  /**
+   * Date of the latest risk assessment, as returned by the server (e.g.
+   * `2026-10-14`)
+   */
+  riskAssessmentAt: string
+  /** Questionnaire score */
+  score: number
+  /** Strategy risk levels the member is allowed to trade */
+  strategyRiskLevels: Array<string>
 }
 
 /** A filter condition for screener_search Mode B. */

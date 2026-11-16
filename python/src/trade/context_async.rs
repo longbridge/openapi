@@ -24,7 +24,7 @@ use crate::{
             AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
             EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
             MultiLegStrategy, Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
-            ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
+            ReplaceAttachedParams, RiskAssessment, StockPositionsResponse, SubmitAttachedParams,
             SubmitOrderResponse, TimeInForceType, TopicType,
         },
     },
@@ -635,6 +635,17 @@ impl AsyncTradeContext {
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the risk assessment (suitability questionnaire) result of the
+    /// current member. Returns awaitable.
+    fn risk_assessment(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: RiskAssessment = ctx.risk_assessment().await.map_err(ErrorNewType)?.into();
             Ok(r)
         })
         .map(|b| b.unbind())

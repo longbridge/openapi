@@ -6355,6 +6355,90 @@ typedef struct lb_margin_ratio_t {
 } lb_margin_ratio_t;
 
 /**
+ * One `approvals` entry of [`CRiskAssessment`]
+ */
+typedef struct lb_risk_assessment_approval_t {
+  /**
+   * Approval item (e.g. `car`, `cka`, `risk_audit`)
+   */
+  const char *key;
+  /**
+   * Approval state (e.g. `pass`)
+   */
+  const char *value;
+} lb_risk_assessment_approval_t;
+
+/**
+ * One `deadlines` entry of [`CRiskAssessment`]
+ */
+typedef struct lb_risk_assessment_deadline_t {
+  /**
+   * Deadline item
+   */
+  const char *key;
+  /**
+   * Deadline value, as returned by the server
+   */
+  int64_t value;
+} lb_risk_assessment_deadline_t;
+
+/**
+ * Risk assessment (suitability questionnaire) result of the current member
+ */
+typedef struct lb_risk_assessment_t {
+  /**
+   * Risk level of the latest questionnaire (e.g. `A5`)
+   */
+  const char *risk;
+  /**
+   * Professional investor (PI) status code
+   */
+  int32_t pi;
+  /**
+   * Approval states, sorted by key
+   */
+  const struct lb_risk_assessment_approval_t *approvals;
+  /**
+   * Number of approval entries
+   */
+  uintptr_t num_approvals;
+  /**
+   * Re-authentication flag, as returned by the server (empty when not set)
+   */
+  const char *re_authentication;
+  /**
+   * Professional investor status end time, as returned by the server (`0`
+   * when not set)
+   */
+  int64_t pi_end_at;
+  /**
+   * Deadlines, sorted by key
+   */
+  const struct lb_risk_assessment_deadline_t *deadlines;
+  /**
+   * Number of deadline entries
+   */
+  uintptr_t num_deadlines;
+  /**
+   * Date of the latest risk assessment, as returned by the server (e.g.
+   * `2026-10-14`)
+   */
+  const char *risk_assessment_at;
+  /**
+   * Questionnaire score
+   */
+  int32_t score;
+  /**
+   * Strategy risk levels the member is allowed to trade
+   */
+  const char *const *strategy_risk_levels;
+  /**
+   * Number of strategy risk levels
+   */
+  uintptr_t num_strategy_risk_levels;
+} lb_risk_assessment_t;
+
+/**
  * Historical status record for a single order transition
  */
 typedef struct lb_order_history_detail_t {
@@ -16607,6 +16691,14 @@ void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
                                    const char *symbol,
                                    lb_async_callback_t callback,
                                    void *userdata);
+
+/**
+ * Get the risk assessment (suitability questionnaire) result of the current
+ * member
+ */
+void lb_trade_context_risk_assessment(const struct lb_trade_context_t *ctx,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
 
 /**
  * Get order detail
