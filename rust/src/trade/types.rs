@@ -1014,8 +1014,9 @@ pub struct MarginRatio {
 /// Mirrors the server response of `GET /v1/members/me/risk-assessment`
 /// field-for-field. Decoding is lenient: integers are accepted as JSON integers
 /// or integer strings (anything else becomes 0), string fields render
-/// non-string values as JSON text (null becomes empty), and null maps or lists
-/// become empty.
+/// non-string values as JSON text (null becomes empty), and a map or list
+/// field holding anything other than an object / array (e.g. null, or `[]` for
+/// a map) becomes empty.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct RiskAssessment {
     /// Risk level of the latest questionnaire (e.g. `A5`)
@@ -2936,6 +2937,16 @@ mod tests {
             serde_json::from_str(r#"{"approvals":{"z":"1","a":"2","m":"3"}}"#).unwrap();
         let json = serde_json::to_string(&ra).unwrap();
         assert!(json.contains(r#""approvals":{"a":"2","m":"3","z":"1"}"#));
+
+        // Wrong-shaped maps and lists become empty instead of failing the call.
+        let ra: RiskAssessment = serde_json::from_str(
+            r#"{"approvals":[],"deadlines":"x","strategy_risk_levels":{"a":1}}"#,
+        )
+        .unwrap();
+        assert!(ra.approvals.is_empty() && ra.deadlines.is_empty());
+        assert!(ra.strategy_risk_levels.is_empty());
+        let ra: RiskAssessment = serde_json::from_str(r#"{"strategy_risk_levels":"S1"}"#).unwrap();
+        assert!(ra.strategy_risk_levels.is_empty());
 
         // Empty object and null maps still decode.
         let ra: RiskAssessment =

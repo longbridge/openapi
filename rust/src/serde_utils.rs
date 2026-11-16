@@ -685,20 +685,29 @@ where
     Ok(lenient_string(serde_json::Value::deserialize(d)?))
 }
 
-/// Deserializes a list of strings leniently: a null list becomes empty and
-/// each element goes through [`lenient_string`].
+/// Deserializes a list of strings leniently: anything other than a JSON
+/// array (null, an object, a scalar) becomes empty, and each element goes
+/// through [`lenient_string`].
 pub(crate) fn string_vec_lenient<'de, D>(d: D) -> Result<Vec<String>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    Ok(Option::<Vec<serde_json::Value>>::deserialize(d)?
-        .unwrap_or_default()
-        .into_iter()
-        .map(lenient_string)
-        .collect())
+    Ok(match serde_json::Value::deserialize(d)? {
+        serde_json::Value::Array(items) => items.into_iter().map(lenient_string).collect(),
+        _ => Vec::new(),
+    })
 }
 
-/// Deserializes a `string -> string` JSON object leniently: a null object
+/// Returns the entries of a JSON object; anything else (null, an array such as
+/// `[]`, a scalar) yields no entries.
+fn lenient_object(value: serde_json::Value) -> serde_json::Map<String, serde_json::Value> {
+    match value {
+        serde_json::Value::Object(map) => map,
+        _ => serde_json::Map::new(),
+    }
+}
+
+/// Deserializes a `string -> string` JSON object leniently: a non-object value
 /// becomes empty and each value goes through [`lenient_string`].
 pub(crate) fn string_map_lenient<'de, D>(
     d: D,
@@ -706,16 +715,13 @@ pub(crate) fn string_map_lenient<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    Ok(
-        Option::<std::collections::BTreeMap<String, serde_json::Value>>::deserialize(d)?
-            .unwrap_or_default()
-            .into_iter()
-            .map(|(k, v)| (k, lenient_string(v)))
-            .collect(),
-    )
+    Ok(lenient_object(serde_json::Value::deserialize(d)?)
+        .into_iter()
+        .map(|(k, v)| (k, lenient_string(v)))
+        .collect())
 }
 
-/// Deserializes a `string -> int64` JSON object leniently: a null object
+/// Deserializes a `string -> int64` JSON object leniently: a non-object value
 /// becomes empty and each value goes through [`lenient_int`].
 pub(crate) fn int64_map_lenient<'de, D>(
     d: D,
@@ -723,16 +729,12 @@ pub(crate) fn int64_map_lenient<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    Ok(
-        Option::<std::collections::BTreeMap<String, serde_json::Value>>::deserialize(d)?
-            .unwrap_or_default()
-            .into_iter()
-            .map(|(k, v)| (k, lenient_int(v)))
-            .collect(),
-    )
+    Ok(lenient_object(serde_json::Value::deserialize(d)?)
+        .into_iter()
+        .map(|(k, v)| (k, lenient_int(v)))
+        .collect())
 }
 
-/// Deserializer that maps a JSON `null` to the type's `Default` value.
 pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
 where
     D: Deserializer<'de>,
