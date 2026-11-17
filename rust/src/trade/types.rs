@@ -1061,9 +1061,9 @@ pub struct RiskAssessment {
     /// `2026-10-14`).
     ///
     /// Kept as the server's string rather than a `Date`: the server is not
-    /// documented to guarantee the `yyyy-mm-dd` form. May be empty; note that
-    /// lenient decoding also renders a null or non-string value as an empty
-    /// string, so emptiness does not by itself mean "never assessed".
+    /// documented to guarantee the `yyyy-mm-dd` form. May be empty; a null or
+    /// absent value also decodes to an empty string, so emptiness does not by
+    /// itself mean "never assessed".
     #[serde(default, deserialize_with = "serde_utils::string_lenient")]
     pub risk_assessment_at: String,
     /// Questionnaire score

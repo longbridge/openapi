@@ -112,7 +112,9 @@ public class RiskAssessment {
      * (e.g. {@code 2026-10-14}).
      *
      * <p>Kept as the server's string: the {@code yyyy-mm-dd} form is not
-     * documented to be guaranteed.
+     * documented to be guaranteed. May be empty; a null or absent value also
+     * decodes to an empty string, so emptiness does not by itself mean
+     * "never assessed".
      *
      * @return risk assessment date
      */

@@ -1149,7 +1149,9 @@ pub(crate) struct RiskAssessment {
     pub deadlines: std::collections::BTreeMap<String, i64>,
     /// Date of the latest risk assessment, as returned by the server (e.g.
     /// `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is
-    /// not documented to be guaranteed.
+    /// not documented to be guaranteed. May be empty; a null or absent value
+    /// also decodes to an empty string, so emptiness does not by itself mean
+    /// "never assessed".
     pub risk_assessment_at: String,
     /// Questionnaire score
     pub score: i32,

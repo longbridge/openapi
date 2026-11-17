@@ -6378,7 +6378,8 @@ typedef struct lb_risk_assessment_deadline_t {
    */
   const char *key;
   /**
-   * Deadline value, as returned by the server
+   * Deadline value, as returned by the server. The unit (seconds or
+   * milliseconds) is not documented, so the SDK does not interpret it.
    */
   int64_t value;
 } lb_risk_assessment_deadline_t;
@@ -6411,8 +6412,8 @@ typedef struct lb_risk_assessment_t {
   const char *re_authentication;
   /**
    * Professional investor status end time, as returned by the server (`0`
-   * when not set). The unit (seconds or milliseconds) is not documented,
-   * unlike the other time fields in this header, which are Unix seconds.
+   * when not set). The unit (seconds or milliseconds) is not documented, so
+   * the SDK does not interpret it.
    */
   int64_t pi_end_at;
   /**
@@ -6427,7 +6428,9 @@ typedef struct lb_risk_assessment_t {
   /**
    * Date of the latest risk assessment, as returned by the server (e.g.
    * `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is not
-   * documented to be guaranteed.
+   * documented to be guaranteed. May be empty; a null or absent value also
+   * decodes to an empty string, so emptiness does not by itself mean
+   * "never assessed".
    */
   const char *risk_assessment_at;
   /**
