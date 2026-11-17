@@ -97,11 +97,6 @@ jobs:
         run: |
           pip install longbridge --no-index --find-links dist --force-reinstall
           python -c "import longbridge"
-      - name: Upload wheels
-        uses: actions/upload-artifact@v7
-        with:
-          name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
-          path: dist
 
   check-python-sdk-musl:
     needs:
@@ -152,11 +147,6 @@ jobs:
             -v $(pwd)/dist:/dist \
             python:${{ matrix.python-version }}-alpine \
             sh -c "pip install --upgrade pip && pip install longbridge --no-index --find-links /dist --force-reinstall && python -c 'import longbridge'"
-      - name: Upload wheels
-        uses: actions/upload-artifact@v7
-        with:
-          name: wheels-musl-${{ matrix.target }}-${{ matrix.python-version }}
-          path: dist
 
   check-nodejs-sdk:
     needs:
