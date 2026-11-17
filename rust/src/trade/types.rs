@@ -1019,28 +1019,49 @@ pub struct MarginRatio {
 /// a map) becomes empty.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct RiskAssessment {
-    /// Risk level of the latest questionnaire (e.g. `A5`)
+    /// Risk level of the latest questionnaire (e.g. `A5`).
+    ///
+    /// The server does not document the scale, so do not infer an ordering
+    /// between levels; report the value as-is. Empty when never assessed.
     #[serde(default, deserialize_with = "serde_utils::string_lenient")]
     pub risk: String,
-    /// Professional investor (PI) status code
+    /// Professional investor (PI) status code, as returned by the server.
+    ///
+    /// The server does not document the code values; treat it as an opaque
+    /// identifier rather than inferring an ordering from it.
     #[serde(default, deserialize_with = "serde_utils::int32_lenient")]
     pub pi: i32,
     /// Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`,
-    /// `is_corporate_client`)
+    /// `is_corporate_client`).
+    ///
+    /// Values are the server's strings, not booleans: `is_corporate_client`
+    /// arrives as `"true"` / `"false"`, so compare the string rather than
+    /// testing it for truthiness.
     #[serde(default, deserialize_with = "serde_utils::string_map_lenient")]
     pub approvals: BTreeMap<String, String>,
     /// Re-authentication flag, as returned by the server (empty when not set)
     #[serde(default, deserialize_with = "serde_utils::string_lenient")]
     pub re_authentication: String,
     /// Professional investor status end time, as returned by the server (`0`
-    /// when not set)
+    /// when not set).
+    ///
+    /// Deliberately left as the raw integer: the server does not document the
+    /// unit (seconds or milliseconds), so the SDK does not convert it to a
+    /// timestamp the way other `*_at` fields are converted. Confirm the unit
+    /// with the gateway before interpreting a non-zero value.
     #[serde(default, deserialize_with = "serde_utils::int64_lenient")]
     pub pi_end_at: i64,
-    /// Deadlines keyed by item, as returned by the server
+    /// Deadlines keyed by item, as returned by the server.
+    ///
+    /// Raw integers, with the same undocumented unit as [`Self::pi_end_at`].
     #[serde(default, deserialize_with = "serde_utils::int64_map_lenient")]
     pub deadlines: BTreeMap<String, i64>,
     /// Date of the latest risk assessment, as returned by the server (e.g.
-    /// `2026-10-14`)
+    /// `2026-10-14`).
+    ///
+    /// Kept as the server's string rather than a `Date`: the server is not
+    /// documented to guarantee the `yyyy-mm-dd` form, and an empty string is
+    /// returned when the member has never been assessed.
     #[serde(default, deserialize_with = "serde_utils::string_lenient")]
     pub risk_assessment_at: String,
     /// Questionnaire score

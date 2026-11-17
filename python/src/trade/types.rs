@@ -1130,14 +1130,18 @@ pub(crate) struct MarginRatio {
 pub(crate) struct RiskAssessment {
     /// Risk level of the latest questionnaire (e.g. `A5`)
     pub risk: String,
-    /// Professional investor (PI) status code
+    /// Professional investor (PI) status code. The server does not document
+    /// the code values; treat it as opaque.
     pub pi: i32,
-    /// Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`)
+    /// Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`).
+    /// Values are strings, not booleans: `is_corporate_client` arrives as
+    /// `"true"` / `"false"`.
     pub approvals: std::collections::BTreeMap<String, String>,
     /// Re-authentication flag, as returned by the server (empty when not set)
     pub re_authentication: String,
     /// Professional investor status end time, as returned by the server (`0`
-    /// when not set)
+    /// when not set). Raw integer: the unit (seconds or milliseconds) is not
+    /// documented, so it is not converted to a timestamp.
     pub pi_end_at: i64,
     /// Deadlines keyed by item, as returned by the server
     pub deadlines: std::collections::BTreeMap<String, i64>,

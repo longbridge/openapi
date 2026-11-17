@@ -3005,7 +3005,8 @@ impl ToFFI for CRiskAssessmentDeadlineOwned {
 pub struct CRiskAssessment {
     /// Risk level of the latest questionnaire (e.g. `A5`)
     pub risk: *const c_char,
-    /// Professional investor (PI) status code
+    /// Professional investor (PI) status code. The server does not document
+    /// the code values; treat it as opaque.
     pub pi: i32,
     /// Approval states, sorted by key
     pub approvals: *const CRiskAssessmentApproval,
@@ -3014,7 +3015,8 @@ pub struct CRiskAssessment {
     /// Re-authentication flag, as returned by the server (empty when not set)
     pub re_authentication: *const c_char,
     /// Professional investor status end time, as returned by the server (`0`
-    /// when not set)
+    /// when not set). Raw integer: the unit (seconds or milliseconds) is not
+    /// documented, so it is not converted to a timestamp.
     pub pi_end_at: i64,
     /// Deadlines, sorted by key
     pub deadlines: *const CRiskAssessmentDeadline,

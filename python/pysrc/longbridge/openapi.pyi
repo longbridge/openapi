@@ -7490,12 +7490,12 @@ class RiskAssessment:
 
     pi: int
     """
-    Professional investor (PI) status code
+    Professional investor (PI) status code. The server does not document the code values; treat it as opaque.
     """
 
     approvals: dict[str, str]
     """
-    Approval states keyed by item (e.g. ``car``, ``cka``, ``risk_audit``)
+    Approval states keyed by item (e.g. ``car``, ``cka``, ``risk_audit``). Values are strings, not booleans: ``is_corporate_client`` arrives as ``"true"`` / ``"false"``.
     """
 
     re_authentication: str
@@ -7505,7 +7505,7 @@ class RiskAssessment:
 
     pi_end_at: int
     """
-    Professional investor status end time, as returned by the server (``0`` when not set)
+    Professional investor status end time, as returned by the server (``0`` when not set). Raw integer: the unit (seconds or milliseconds) is not documented, so it is not converted to a timestamp.
     """
 
     deadlines: dict[str, int]

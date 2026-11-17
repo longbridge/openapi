@@ -42,7 +42,8 @@ public class RiskAssessment {
     }
 
     /**
-     * Returns the professional investor (PI) status code.
+     * Returns the professional investor (PI) status code. The server does not
+     * document the code values; treat it as opaque.
      *
      * @return PI status code
      */
@@ -53,6 +54,9 @@ public class RiskAssessment {
     /**
      * Returns the approval states keyed by item (e.g. {@code car}, {@code cka},
      * {@code risk_audit}).
+     *
+     * <p>Values are strings, not booleans: {@code is_corporate_client} arrives
+     * as {@code "true"} / {@code "false"}.
      *
      * @return approval states, in key order (read-only); empty when the server
      *         returns none
@@ -76,7 +80,8 @@ public class RiskAssessment {
 
     /**
      * Returns the professional investor status end time, as returned by the
-     * server ({@code 0} when not set).
+     * server ({@code 0} when not set). Raw integer: the unit (seconds or
+     * milliseconds) is not documented, so it is not converted to a timestamp.
      *
      * @return PI end time
      */

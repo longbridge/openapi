@@ -6391,7 +6391,8 @@ typedef struct lb_risk_assessment_t {
    */
   const char *risk;
   /**
-   * Professional investor (PI) status code
+   * Professional investor (PI) status code. The server does not document
+   * the code values; treat it as opaque.
    */
   int32_t pi;
   /**
@@ -6408,7 +6409,8 @@ typedef struct lb_risk_assessment_t {
   const char *re_authentication;
   /**
    * Professional investor status end time, as returned by the server (`0`
-   * when not set)
+   * when not set). Raw integer: the unit (seconds or milliseconds) is not
+   * documented, so it is not converted to a timestamp.
    */
   int64_t pi_end_at;
   /**
