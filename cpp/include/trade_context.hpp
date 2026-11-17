@@ -134,6 +134,11 @@ public:
   void margin_ratio(const std::string& symbol,
                     AsyncCallback<TradeContext, MarginRatio> callback) const;
 
+  /// Get the risk assessment (suitability questionnaire) result of the current
+  /// member
+  void risk_assessment(
+    AsyncCallback<TradeContext, RiskAssessment> callback) const;
+
   /// Get order detail
   ///
   /// AP accounts only: US data-center accounts get a region error.

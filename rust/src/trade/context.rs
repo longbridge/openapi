@@ -17,7 +17,7 @@ use crate::{
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
         GetUSAvailableHoldingOptions, GetUSHistoryOrders, GetUSRealizedPLOptions,
         GetUSTransactionHistoryOptions, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
-        QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        QueryUSOrdersResponse, ReplaceOrderOptions, RiskAssessment, StockPositionsResponse,
         SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType, USAssetOverview,
         USAvailableHolding, USCashAndBuyPower, USExchangeRates, USOrderDetailResponse,
         USRealizedPL, USTransactionHistory,
@@ -869,6 +869,40 @@ impl TradeContext {
                 symbol: symbol.into(),
             })
             .response::<Json<MarginRatio>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the risk assessment (suitability questionnaire) result of the
+    /// current member
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{Config, oauth::OAuthBuilder, trade::TradeContext};
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let (ctx, _) = TradeContext::new(config);
+    ///
+    /// let resp = ctx.risk_assessment().await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn risk_assessment(&self) -> Result<RiskAssessment> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/members/me/risk-assessment")
+            .response::<Json<RiskAssessment>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

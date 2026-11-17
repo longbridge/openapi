@@ -93,6 +93,7 @@ using longbridge::trade::GetHistoryOrdersOptions;
 using longbridge::trade::GetTodayExecutionsOptions;
 using longbridge::trade::ContractDirection;
 using longbridge::trade::MarginRatio;
+using longbridge::trade::RiskAssessment;
 using longbridge::trade::MultiLegInfo;
 using longbridge::trade::MultiLegOrderLeg;
 using longbridge::trade::MultiLegPosition;
@@ -2025,6 +2026,34 @@ convert(const lb_margin_ratio_t* info)
   return MarginRatio{ Decimal(info->im_factor),
                       Decimal(info->mm_factor),
                       Decimal(info->fm_factor) };
+}
+
+inline RiskAssessment
+convert(const lb_risk_assessment_t* info)
+{
+  std::map<std::string, std::string> approvals;
+  for (size_t i = 0; i < info->num_approvals; ++i) {
+    const auto& entry = info->approvals[i];
+    approvals.emplace(entry.key ? entry.key : "",
+                      entry.value ? entry.value : "");
+  }
+  std::map<std::string, int64_t> deadlines;
+  for (size_t i = 0; i < info->num_deadlines; ++i) {
+    const auto& entry = info->deadlines[i];
+    deadlines.emplace(entry.key ? entry.key : "", entry.value);
+  }
+  std::vector<std::string> strategy_risk_levels(
+    info->strategy_risk_levels,
+    info->strategy_risk_levels + info->num_strategy_risk_levels);
+  return RiskAssessment{ info->risk,
+                         info->pi,
+                         std::move(approvals),
+                         info->re_authentication,
+                         info->pi_end_at,
+                         std::move(deadlines),
+                         info->risk_assessment_at,
+                         info->score,
+                         std::move(strategy_risk_levels) };
 }
 
 inline OrderHistoryDetail

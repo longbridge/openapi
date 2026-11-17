@@ -9,8 +9,8 @@ use longbridge::{
         FundPositionChannel, FundPositionsResponse, MarginRatio, MultiLegInfo, MultiLegOrderLeg,
         MultiLegPosition, MultiLegStrategy, Order, OrderChargeDetail, OrderChargeFee,
         OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus, OrderTag,
-        OrderType, PushGridOrderChanged, PushOrderChanged, StockPosition, StockPositionChannel,
-        StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
+        OrderType, PushGridOrderChanged, PushOrderChanged, RiskAssessment, StockPosition,
+        StockPositionChannel, StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
     },
 };
 use time::OffsetDateTime;
@@ -2926,6 +2926,192 @@ impl ToFFI for CPushGridOrderChangedOwned {
             rth: self.rth,
             grid_order_type_up: self.grid_order_type_up.to_ffi_type(),
             grid_order_type_down: self.grid_order_type_down.to_ffi_type(),
+        }
+    }
+}
+
+/// One `approvals` entry of [`CRiskAssessment`]
+#[repr(C)]
+pub struct CRiskAssessmentApproval {
+    /// Approval item (e.g. `car`, `cka`, `risk_audit`)
+    pub key: *const c_char,
+    /// Approval state (e.g. `pass`). A string, not a boolean:
+    /// `is_corporate_client` arrives as `"true"` / `"false"`.
+    pub value: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CRiskAssessmentApprovalOwned {
+    key: CString,
+    value: CString,
+}
+
+impl From<(String, String)> for CRiskAssessmentApprovalOwned {
+    fn from((key, value): (String, String)) -> Self {
+        Self {
+            key: key.into(),
+            value: value.into(),
+        }
+    }
+}
+
+impl ToFFI for CRiskAssessmentApprovalOwned {
+    type FFIType = CRiskAssessmentApproval;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRiskAssessmentApproval {
+            key: self.key.to_ffi_type(),
+            value: self.value.to_ffi_type(),
+        }
+    }
+}
+
+/// One `deadlines` entry of [`CRiskAssessment`]
+#[repr(C)]
+pub struct CRiskAssessmentDeadline {
+    /// Deadline item
+    pub key: *const c_char,
+    /// Deadline value, as returned by the server. The unit (seconds or
+    /// milliseconds) is not documented, so the SDK does not interpret it.
+    pub value: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct CRiskAssessmentDeadlineOwned {
+    key: CString,
+    value: i64,
+}
+
+impl From<(String, i64)> for CRiskAssessmentDeadlineOwned {
+    fn from((key, value): (String, i64)) -> Self {
+        Self {
+            key: key.into(),
+            value,
+        }
+    }
+}
+
+impl ToFFI for CRiskAssessmentDeadlineOwned {
+    type FFIType = CRiskAssessmentDeadline;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRiskAssessmentDeadline {
+            key: self.key.to_ffi_type(),
+            value: self.value,
+        }
+    }
+}
+
+/// Risk assessment (suitability questionnaire) result of the current member
+#[repr(C)]
+pub struct CRiskAssessment {
+    /// Risk level of the latest questionnaire (e.g. `A5`). The server does not
+    /// document the scale, so do not infer an ordering between levels.
+    pub risk: *const c_char,
+    /// Professional investor (PI) status code. The server does not document
+    /// the code values; treat it as opaque.
+    pub pi: i32,
+    /// Approval states, sorted by key
+    pub approvals: *const CRiskAssessmentApproval,
+    /// Number of approval entries
+    pub num_approvals: usize,
+    /// Re-authentication flag, as returned by the server (empty when not set)
+    pub re_authentication: *const c_char,
+    /// Professional investor status end time, as returned by the server (`0`
+    /// when not set). The unit (seconds or milliseconds) is not documented, so
+    /// the SDK does not interpret it.
+    pub pi_end_at: i64,
+    /// Deadlines, sorted by key. Raw integers with the same undocumented unit
+    /// as `pi_end_at`.
+    pub deadlines: *const CRiskAssessmentDeadline,
+    /// Number of deadline entries
+    pub num_deadlines: usize,
+    /// Date of the latest risk assessment, as returned by the server (e.g.
+    /// `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is not
+    /// documented to be guaranteed. May be empty; a JSON null or an absent
+    /// value also decodes to an empty string, so emptiness does not by itself
+    /// mean "never assessed".
+    pub risk_assessment_at: *const c_char,
+    /// Questionnaire score
+    pub score: i32,
+    /// Strategy risk levels of the member. The server does not document what
+    /// these levels permit, so do not read them as a trading entitlement.
+    pub strategy_risk_levels: *const *const c_char,
+    /// Number of strategy risk levels
+    pub num_strategy_risk_levels: usize,
+}
+
+#[derive(Debug)]
+pub(crate) struct CRiskAssessmentOwned {
+    risk: CString,
+    pi: i32,
+    approvals: CVec<CRiskAssessmentApprovalOwned>,
+    re_authentication: CString,
+    pi_end_at: i64,
+    deadlines: CVec<CRiskAssessmentDeadlineOwned>,
+    risk_assessment_at: CString,
+    score: i32,
+    strategy_risk_levels: CVec<CString>,
+}
+
+impl From<RiskAssessment> for CRiskAssessmentOwned {
+    fn from(resp: RiskAssessment) -> Self {
+        let RiskAssessment {
+            risk,
+            pi,
+            approvals,
+            re_authentication,
+            pi_end_at,
+            deadlines,
+            risk_assessment_at,
+            score,
+            strategy_risk_levels,
+        } = resp;
+        // `BTreeMap` iterates in key order, so the arrays are key-sorted.
+        let approvals = approvals.into_iter().collect::<Vec<_>>();
+        let deadlines = deadlines.into_iter().collect::<Vec<_>>();
+        CRiskAssessmentOwned {
+            risk: risk.into(),
+            pi,
+            approvals: approvals.into(),
+            re_authentication: re_authentication.into(),
+            pi_end_at,
+            deadlines: deadlines.into(),
+            risk_assessment_at: risk_assessment_at.into(),
+            score,
+            strategy_risk_levels: strategy_risk_levels.into(),
+        }
+    }
+}
+
+impl ToFFI for CRiskAssessmentOwned {
+    type FFIType = CRiskAssessment;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CRiskAssessmentOwned {
+            risk,
+            pi,
+            approvals,
+            re_authentication,
+            pi_end_at,
+            deadlines,
+            risk_assessment_at,
+            score,
+            strategy_risk_levels,
+        } = self;
+        CRiskAssessment {
+            risk: risk.to_ffi_type(),
+            pi: *pi,
+            approvals: approvals.to_ffi_type(),
+            num_approvals: approvals.len(),
+            re_authentication: re_authentication.to_ffi_type(),
+            pi_end_at: *pi_end_at,
+            deadlines: deadlines.to_ffi_type(),
+            num_deadlines: deadlines.len(),
+            risk_assessment_at: risk_assessment_at.to_ffi_type(),
+            score: *score,
+            strategy_risk_levels: strategy_risk_levels.to_ffi_type(),
+            num_strategy_risk_levels: strategy_risk_levels.len(),
         }
     }
 }

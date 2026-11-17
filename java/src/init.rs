@@ -209,6 +209,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         crate::types::StockPositionChannel,
         crate::types::StockPosition,
         longbridge::trade::MarginRatio,
+        crate::types::RiskAssessment,
         longbridge::trade::OrderHistoryDetail,
         longbridge::trade::OrderChargeFee,
         longbridge::trade::OrderChargeItem,

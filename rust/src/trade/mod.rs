@@ -57,6 +57,7 @@ pub use types::{
     OutsideRTH,
     QueryUSOrdersOptions,
     QueryUSOrdersResponse,
+    RiskAssessment,
     StockPosition,
     StockPositionChannel,
     StockPositionsResponse,
