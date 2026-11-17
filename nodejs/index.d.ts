@@ -8312,7 +8312,10 @@ export interface ReplaceOrderOptions {
 
 /** Risk assessment (suitability questionnaire) result of the current member */
 export interface RiskAssessment {
-  /** Risk level of the latest questionnaire (e.g. `A5`) */
+  /**
+   * Risk level of the latest questionnaire (e.g. `A5`). The server does
+   * not document the scale, so do not infer an ordering between levels.
+   */
   risk: string
   /**
    * Professional investor (PI) status code. The server does not document
@@ -8333,11 +8336,15 @@ export interface RiskAssessment {
    * documented, so it is not converted to a timestamp.
    */
   piEndAt: number
-  /** Deadlines keyed by item, as returned by the server */
+  /**
+   * Deadlines keyed by item, as returned by the server. Raw integers with
+   * the same undocumented unit as `pi_end_at`.
+   */
   deadlines: Record<string, number>
   /**
    * Date of the latest risk assessment, as returned by the server (e.g.
-   * `2026-10-14`)
+   * `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is
+   * not documented to be guaranteed.
    */
   riskAssessmentAt: string
   /** Questionnaire score */

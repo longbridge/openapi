@@ -1022,7 +1022,8 @@ pub struct RiskAssessment {
     /// Risk level of the latest questionnaire (e.g. `A5`).
     ///
     /// The server does not document the scale, so do not infer an ordering
-    /// between levels; report the value as-is. Empty when never assessed.
+    /// between levels; report the value as-is. May be empty; the server does
+    /// not document when.
     #[serde(default, deserialize_with = "serde_utils::string_lenient")]
     pub risk: String,
     /// Professional investor (PI) status code, as returned by the server.
@@ -1060,8 +1061,9 @@ pub struct RiskAssessment {
     /// `2026-10-14`).
     ///
     /// Kept as the server's string rather than a `Date`: the server is not
-    /// documented to guarantee the `yyyy-mm-dd` form, and an empty string is
-    /// returned when the member has never been assessed.
+    /// documented to guarantee the `yyyy-mm-dd` form. May be empty; note that
+    /// lenient decoding also renders a null or non-string value as an empty
+    /// string, so emptiness does not by itself mean "never assessed".
     #[serde(default, deserialize_with = "serde_utils::string_lenient")]
     pub risk_assessment_at: String,
     /// Questionnaire score

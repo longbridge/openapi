@@ -6363,7 +6363,8 @@ typedef struct lb_risk_assessment_approval_t {
    */
   const char *key;
   /**
-   * Approval state (e.g. `pass`)
+   * Approval state (e.g. `pass`). A string, not a boolean:
+   * `is_corporate_client` arrives as `"true"` / `"false"`.
    */
   const char *value;
 } lb_risk_assessment_approval_t;
@@ -6387,7 +6388,8 @@ typedef struct lb_risk_assessment_deadline_t {
  */
 typedef struct lb_risk_assessment_t {
   /**
-   * Risk level of the latest questionnaire (e.g. `A5`)
+   * Risk level of the latest questionnaire (e.g. `A5`). The server does not
+   * document the scale, so do not infer an ordering between levels.
    */
   const char *risk;
   /**
@@ -6409,12 +6411,13 @@ typedef struct lb_risk_assessment_t {
   const char *re_authentication;
   /**
    * Professional investor status end time, as returned by the server (`0`
-   * when not set). Raw integer: the unit (seconds or milliseconds) is not
-   * documented, so it is not converted to a timestamp.
+   * when not set). The unit (seconds or milliseconds) is not documented,
+   * unlike the other time fields in this header, which are Unix seconds.
    */
   int64_t pi_end_at;
   /**
-   * Deadlines, sorted by key
+   * Deadlines, sorted by key. Raw integers with the same undocumented unit
+   * as `pi_end_at`.
    */
   const struct lb_risk_assessment_deadline_t *deadlines;
   /**
@@ -6423,7 +6426,8 @@ typedef struct lb_risk_assessment_t {
   uintptr_t num_deadlines;
   /**
    * Date of the latest risk assessment, as returned by the server (e.g.
-   * `2026-10-14`)
+   * `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is not
+   * documented to be guaranteed.
    */
   const char *risk_assessment_at;
   /**

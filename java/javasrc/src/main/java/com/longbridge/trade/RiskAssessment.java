@@ -35,6 +35,9 @@ public class RiskAssessment {
     /**
      * Returns the risk level of the latest questionnaire (e.g. {@code A5}).
      *
+     * <p>The server does not document the scale, so do not infer an ordering
+     * between levels.
+     *
      * @return risk level
      */
     public String getRisk() {
@@ -92,6 +95,8 @@ public class RiskAssessment {
     /**
      * Returns the deadlines keyed by item, as returned by the server.
      *
+     * <p>Raw integers with the same undocumented unit as {@code piEndAt}.
+     *
      * @return deadlines, in key order (read-only); empty when the server returns
      *         none
      */
@@ -105,6 +110,9 @@ public class RiskAssessment {
     /**
      * Returns the date of the latest risk assessment, as returned by the server
      * (e.g. {@code 2026-10-14}).
+     *
+     * <p>Kept as the server's string: the {@code yyyy-mm-dd} form is not
+     * documented to be guaranteed.
      *
      * @return risk assessment date
      */

@@ -2935,7 +2935,8 @@ impl ToFFI for CPushGridOrderChangedOwned {
 pub struct CRiskAssessmentApproval {
     /// Approval item (e.g. `car`, `cka`, `risk_audit`)
     pub key: *const c_char,
-    /// Approval state (e.g. `pass`)
+    /// Approval state (e.g. `pass`). A string, not a boolean:
+    /// `is_corporate_client` arrives as `"true"` / `"false"`.
     pub value: *const c_char,
 }
 
@@ -3003,7 +3004,8 @@ impl ToFFI for CRiskAssessmentDeadlineOwned {
 /// Risk assessment (suitability questionnaire) result of the current member
 #[repr(C)]
 pub struct CRiskAssessment {
-    /// Risk level of the latest questionnaire (e.g. `A5`)
+    /// Risk level of the latest questionnaire (e.g. `A5`). The server does not
+    /// document the scale, so do not infer an ordering between levels.
     pub risk: *const c_char,
     /// Professional investor (PI) status code. The server does not document
     /// the code values; treat it as opaque.
@@ -3015,15 +3017,17 @@ pub struct CRiskAssessment {
     /// Re-authentication flag, as returned by the server (empty when not set)
     pub re_authentication: *const c_char,
     /// Professional investor status end time, as returned by the server (`0`
-    /// when not set). Raw integer: the unit (seconds or milliseconds) is not
-    /// documented, so it is not converted to a timestamp.
+    /// when not set). The unit (seconds or milliseconds) is not documented,
+    /// unlike the other time fields in this header, which are Unix seconds.
     pub pi_end_at: i64,
-    /// Deadlines, sorted by key
+    /// Deadlines, sorted by key. Raw integers with the same undocumented unit
+    /// as `pi_end_at`.
     pub deadlines: *const CRiskAssessmentDeadline,
     /// Number of deadline entries
     pub num_deadlines: usize,
     /// Date of the latest risk assessment, as returned by the server (e.g.
-    /// `2026-10-14`)
+    /// `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is not
+    /// documented to be guaranteed.
     pub risk_assessment_at: *const c_char,
     /// Questionnaire score
     pub score: i32,

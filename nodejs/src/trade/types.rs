@@ -993,7 +993,8 @@ pub struct MarginRatio {
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct RiskAssessment {
-    /// Risk level of the latest questionnaire (e.g. `A5`)
+    /// Risk level of the latest questionnaire (e.g. `A5`). The server does
+    /// not document the scale, so do not infer an ordering between levels.
     pub risk: String,
     /// Professional investor (PI) status code. The server does not document
     /// the code values; treat it as opaque.
@@ -1008,10 +1009,12 @@ pub struct RiskAssessment {
     /// when not set). Raw integer: the unit (seconds or milliseconds) is not
     /// documented, so it is not converted to a timestamp.
     pub pi_end_at: i64,
-    /// Deadlines keyed by item, as returned by the server
+    /// Deadlines keyed by item, as returned by the server. Raw integers with
+    /// the same undocumented unit as `pi_end_at`.
     pub deadlines: std::collections::BTreeMap<String, i64>,
     /// Date of the latest risk assessment, as returned by the server (e.g.
-    /// `2026-10-14`)
+    /// `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is
+    /// not documented to be guaranteed.
     pub risk_assessment_at: String,
     /// Questionnaire score
     pub score: i32,
