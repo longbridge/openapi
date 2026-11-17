@@ -7478,6 +7478,56 @@ class MarginRatio:
     Forced close-out margin ratio
     """
 
+class RiskAssessment:
+    """
+    Risk assessment (suitability questionnaire) result of the current member
+    """
+
+    risk: str
+    """
+    Risk level of the latest questionnaire (e.g. ``A5``). The server does not document the scale, so do not infer an ordering between levels.
+    """
+
+    pi: int
+    """
+    Professional investor (PI) status code. The server does not document the code values; treat it as opaque.
+    """
+
+    approvals: dict[str, str]
+    """
+    Approval states keyed by item (e.g. ``car``, ``cka``, ``risk_audit``). Values are strings, not booleans: ``is_corporate_client`` arrives as ``"true"`` / ``"false"``.
+    """
+
+    re_authentication: str
+    """
+    Re-authentication flag, as returned by the server (empty when not set)
+    """
+
+    pi_end_at: int
+    """
+    Professional investor status end time, as returned by the server (``0`` when not set). Raw integer: the unit (seconds or milliseconds) is not documented, so it is not converted to a timestamp.
+    """
+
+    deadlines: dict[str, int]
+    """
+    Deadlines keyed by item, as returned by the server. Raw integers with the same undocumented unit as ``pi_end_at``.
+    """
+
+    risk_assessment_at: str
+    """
+    Date of the latest risk assessment, as returned by the server (e.g. ``2026-10-14``). Kept as the server's string: the ``yyyy-mm-dd`` form is not documented to be guaranteed. May be empty; a null or absent value also decodes to an empty string, so emptiness does not by itself mean "never assessed".
+    """
+
+    score: int
+    """
+    Questionnaire score
+    """
+
+    strategy_risk_levels: List[str]
+    """
+    Strategy risk levels of the member. The server does not document what these levels permit, so do not read them as a trading entitlement.
+    """
+
 class EstimateMaxPurchaseQuantityResponse:
     """
     Response for estimate maximum purchase quantity
@@ -8097,6 +8147,28 @@ class TradeContext:
                 ctx = TradeContext(config)
 
                 resp = ctx.margin_ratio("700.HK")
+                print(resp)
+        """
+
+    def risk_assessment(self) -> RiskAssessment:
+        """
+        Get the risk assessment (suitability questionnaire) result of the current member
+
+        Returns:
+            Risk assessment
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = TradeContext(config)
+
+                resp = ctx.risk_assessment()
                 print(resp)
         """
 
@@ -12110,6 +12182,29 @@ class AsyncTradeContext:
                     config = Config.from_oauth(oauth)
                     ctx = AsyncTradeContext.create(config)
                     resp = await ctx.margin_ratio("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def risk_assessment(self) -> Awaitable[RiskAssessment]:
+        """
+        Get the risk assessment (suitability questionnaire) result of the current member. Returns an awaitable that resolves to risk assessment.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncTradeContext.create(config)
+                    resp = await ctx.risk_assessment()
                     print(resp)
 
                 asyncio.run(main())

@@ -649,6 +649,38 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Get the risk assessment (suitability questionnaire) result of the current
+     * member
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
+     *             RiskAssessment resp = ctx.getRiskAssessment().get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<RiskAssessment> getRiskAssessment()
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextRiskAssessment(raw(), callback);
+        });
+    }
+
+    /**
      * Get order detail
      * <p>
      * AP accounts only: US data-center accounts get a region error.

@@ -925,6 +925,25 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextMarginRa
 }
 
 #[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextRiskAssessment(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        async_util::execute(env, callback, async move {
+            Ok(crate::types::RiskAssessment::from(
+                __owned_ctx.risk_assessment().await?,
+            ))
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDetail(
     mut env: JNIEnv,
     _class: JClass,

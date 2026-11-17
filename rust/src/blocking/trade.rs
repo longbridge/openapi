@@ -11,10 +11,11 @@ use crate::{
         GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
         GetTodayOrdersOptions, GetUSAvailableHoldingOptions, GetUSHistoryOrders,
         GetUSRealizedPLOptions, GetUSTransactionHistoryOptions, MarginRatio, Order, OrderDetail,
-        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitMultiLegOrderOptions, SubmitOrderOptions, SubmitOrderResponse, TopicType,
-        TradeContext, USAssetOverview, USAvailableHolding, USCashAndBuyPower, USExchangeRates,
-        USOrderDetailResponse, USRealizedPL, USTransactionHistory,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, RiskAssessment,
+        StockPositionsResponse, SubmitMultiLegOrderOptions, SubmitOrderOptions,
+        SubmitOrderResponse, TopicType, TradeContext, USAssetOverview, USAvailableHolding,
+        USCashAndBuyPower, USExchangeRates, USOrderDetailResponse, USRealizedPL,
+        USTransactionHistory,
     },
 };
 
@@ -464,6 +465,32 @@ impl TradeContextSync {
     pub fn margin_ratio(&self, symbol: impl Into<String> + Send + 'static) -> Result<MarginRatio> {
         self.rt
             .call(move |ctx| async move { ctx.margin_ratio(symbol).await })
+    }
+
+    /// Get the risk assessment (suitability questionnaire) result of the
+    /// current member
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let resp = ctx.risk_assessment()?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn risk_assessment(&self) -> Result<RiskAssessment> {
+        self.rt
+            .call(move |ctx| async move { ctx.risk_assessment().await })
     }
 
     /// Get order detail

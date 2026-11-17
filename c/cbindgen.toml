@@ -164,6 +164,9 @@ cpp_compat = true
 "CWatchlistGroup" = "lb_watchlist_group_t"
 "CWatchlistSecurity" = "lb_watchlist_security_t"
 "CMarginRatio" = "lb_margin_ratio_t"
+"CRiskAssessment" = "lb_risk_assessment_t"
+"CRiskAssessmentApproval" = "lb_risk_assessment_approval_t"
+"CRiskAssessmentDeadline" = "lb_risk_assessment_deadline_t"
 "CSecurityBoard" = "lb_security_board_t"
 "COrderHistoryDetail" = "lb_order_history_detail_t"
 "COrderChargeFee" = "lb_order_charge_fee_t"
@@ -493,6 +496,9 @@ include = [
     "CWatchlistGroup",
     "CWatchlistSecurity",
     "CMarginRatio",
+    "CRiskAssessment",
+    "CRiskAssessmentApproval",
+    "CRiskAssessmentDeadline",
     "COrderDetail",
     # AssetContext: statements (reachable only via void* async data pointer)
     "CStatementItem",

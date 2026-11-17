@@ -941,6 +941,54 @@ impl_java_class!(
     [im_factor, mm_factor, fm_factor]
 );
 
+/// JNI-side view of [`longbridge::trade::RiskAssessment`]: the `approvals` /
+/// `deadlines` maps cross the boundary as JSON text, which the Java class
+/// parses into `Map`s with gson.
+pub(crate) struct RiskAssessment {
+    pub(crate) risk: String,
+    pub(crate) pi: i32,
+    pub(crate) approvals: serde_json::Value,
+    pub(crate) re_authentication: String,
+    pub(crate) pi_end_at: i64,
+    pub(crate) deadlines: serde_json::Value,
+    pub(crate) risk_assessment_at: String,
+    pub(crate) score: i32,
+    pub(crate) strategy_risk_levels: Vec<String>,
+}
+
+impl From<longbridge::trade::RiskAssessment> for RiskAssessment {
+    fn from(value: longbridge::trade::RiskAssessment) -> Self {
+        Self {
+            risk: value.risk,
+            pi: value.pi,
+            approvals: serde_json::to_value(value.approvals).unwrap_or_default(),
+            re_authentication: value.re_authentication,
+            pi_end_at: value.pi_end_at,
+            deadlines: serde_json::to_value(value.deadlines).unwrap_or_default(),
+            risk_assessment_at: value.risk_assessment_at,
+            score: value.score,
+            strategy_risk_levels: value.strategy_risk_levels,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/trade/RiskAssessment",
+    RiskAssessment,
+    [
+        risk,
+        pi,
+        approvals,
+        re_authentication,
+        pi_end_at,
+        deadlines,
+        risk_assessment_at,
+        score,
+        #[java(objarray)]
+        strategy_risk_levels
+    ]
+);
+
 impl_java_class!(
     "com/longbridge/trade/OrderHistoryDetail",
     longbridge::trade::OrderHistoryDetail,

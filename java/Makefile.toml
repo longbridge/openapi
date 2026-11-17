@@ -142,6 +142,7 @@ args = [
   "javasrc/src/main/java/com/longbridge/trade/GetTodayExecutionsOptions.java",
   "javasrc/src/main/java/com/longbridge/trade/GetTodayOrdersOptions.java",
   "javasrc/src/main/java/com/longbridge/trade/MarginRatio.java",
+  "javasrc/src/main/java/com/longbridge/trade/RiskAssessment.java",
   "javasrc/src/main/java/com/longbridge/trade/Order.java",
   "javasrc/src/main/java/com/longbridge/trade/OrderChangedHandler.java",
   "javasrc/src/main/java/com/longbridge/trade/OrderSide.java",
