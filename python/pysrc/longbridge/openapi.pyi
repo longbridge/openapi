@@ -7525,7 +7525,7 @@ class RiskAssessment:
 
     strategy_risk_levels: List[str]
     """
-    Strategy risk levels the member is allowed to trade
+    Strategy risk levels of the member. The server does not document what these levels permit, so do not read them as a trading entitlement.
     """
 
 class EstimateMaxPurchaseQuantityResponse:

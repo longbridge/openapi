@@ -2320,7 +2320,8 @@ struct RiskAssessment
   std::string risk_assessment_at;
   /// Questionnaire score
   int32_t score;
-  /// Strategy risk levels the member is allowed to trade
+  /// Strategy risk levels of the member. The server does not document what
+  /// these levels permit, so do not read them as a trading entitlement.
   std::vector<std::string> strategy_risk_levels;
 };
 

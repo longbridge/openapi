@@ -132,7 +132,10 @@ public class RiskAssessment {
     }
 
     /**
-     * Returns the strategy risk levels the member is allowed to trade.
+     * Returns the strategy risk levels of the member.
+     *
+     * <p>The server does not document what these levels permit, so do not read
+     * them as a trading entitlement.
      *
      * @return strategy risk levels
      */

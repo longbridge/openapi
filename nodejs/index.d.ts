@@ -8351,7 +8351,10 @@ export interface RiskAssessment {
   riskAssessmentAt: string
   /** Questionnaire score */
   score: number
-  /** Strategy risk levels the member is allowed to trade */
+  /**
+   * Strategy risk levels of the member. The server does not document what
+   * these levels permit, so do not read them as a trading entitlement.
+   */
   strategyRiskLevels: Array<string>
 }
 

@@ -1069,7 +1069,8 @@ pub struct RiskAssessment {
     /// Questionnaire score
     #[serde(default, deserialize_with = "serde_utils::int32_lenient")]
     pub score: i32,
-    /// Strategy risk levels the member is allowed to trade
+    /// Strategy risk levels of the member. The server does not document what
+    /// these levels permit, so do not read them as a trading entitlement.
     #[serde(default, deserialize_with = "serde_utils::string_vec_lenient")]
     pub strategy_risk_levels: Vec<String>,
 }

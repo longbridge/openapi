@@ -6428,9 +6428,9 @@ typedef struct lb_risk_assessment_t {
   /**
    * Date of the latest risk assessment, as returned by the server (e.g.
    * `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is not
-   * documented to be guaranteed. May be empty; a null or absent value also
-   * decodes to an empty string, so emptiness does not by itself mean
-   * "never assessed".
+   * documented to be guaranteed. May be empty; a JSON null or an absent
+   * value also decodes to an empty string, so emptiness does not by itself
+   * mean "never assessed".
    */
   const char *risk_assessment_at;
   /**
@@ -6438,7 +6438,8 @@ typedef struct lb_risk_assessment_t {
    */
   int32_t score;
   /**
-   * Strategy risk levels the member is allowed to trade
+   * Strategy risk levels of the member. The server does not document what
+   * these levels permit, so do not read them as a trading entitlement.
    */
   const char *const *strategy_risk_levels;
   /**
