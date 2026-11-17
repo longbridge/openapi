@@ -33,9 +33,11 @@ fn escape_html(s: &str) -> String {
 }
 
 /// Make redirect-supplied text safe to put in an error, a log line or a
-/// terminal: control characters (including ANSI escape sequences), line and
-/// paragraph separators, zero-width characters and bidirectional overrides
-/// become spaces, and the length is capped.
+/// terminal: control characters, line and paragraph separators, zero-width
+/// characters and bidirectional overrides become spaces — which also defuses
+/// an ANSI escape sequence, since only its leading ESC is a control character
+/// and the rest is left as literal text. The length is capped, with `…`
+/// appended when the value was truncated.
 fn sanitize(s: &str) -> String {
     let mut out: String = s
         .chars()
