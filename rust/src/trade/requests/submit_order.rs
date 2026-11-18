@@ -5,6 +5,7 @@ use time::{Date, OffsetDateTime};
 use crate::{
     serde_utils,
     trade::{AttachedOrderType, OrderSide, OrderType, OutsideRTH, TimeInForceType},
+    types::normalize_symbol_owned,
 };
 
 /// Options for submit order request
@@ -59,7 +60,7 @@ impl SubmitOrderOptions {
         time_in_force: TimeInForceType,
     ) -> Self {
         Self {
-            symbol: symbol.into(),
+            symbol: normalize_symbol_owned(symbol),
             order_type,
             side,
             submitted_quantity,

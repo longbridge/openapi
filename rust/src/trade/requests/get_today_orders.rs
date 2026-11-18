@@ -3,6 +3,7 @@ use serde::Serialize;
 use crate::{
     Market,
     trade::{OrderSide, OrderStatus},
+    types::normalize_symbol_owned,
 };
 
 /// Options for get today orders request
@@ -34,7 +35,7 @@ impl GetTodayOrdersOptions {
     #[must_use]
     pub fn symbol(self, symbol: impl Into<String>) -> Self {
         Self {
-            symbol: Some(symbol.into()),
+            symbol: Some(normalize_symbol_owned(symbol)),
             ..self
         }
     }
