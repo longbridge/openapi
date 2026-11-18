@@ -9,7 +9,10 @@ license = "MIT OR Apache-2.0"
 longbridge-proto.workspace = true
 
 tokio = { workspace = true, features = ["time", "rt", "macros", "sync", "net"] }
-tokio-tungstenite = { workspace = true, features = ["rustls-tls-webpki-roots"] }
+tokio-tungstenite = { workspace = true, features = [
+    "rustls-tls-webpki-roots",
+    "rustls-tls-native-roots",
+] }
 thiserror.workspace = true
 futures-util.workspace = true
 prost.workspace = true

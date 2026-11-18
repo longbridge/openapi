@@ -6,4 +6,7 @@ description = "Longbridge geo-detection helper (CN vs global)"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-reqwest = { workspace = true, features = ["rustls-tls"] }
+reqwest = { workspace = true, features = [
+    "rustls-tls-webpki-roots",
+    "rustls-tls-native-roots",
+] }
