@@ -1416,12 +1416,9 @@ mod symbol_normalization_tests {
         assert!(query(&GetHistoryOrdersOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
         assert!(query(&GetTodayOrdersOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
         assert!(
-            query(&GetHistoryExecutionsOptions::new().symbol("00700.HK"))
-                .contains("\"700.HK\"")
+            query(&GetHistoryExecutionsOptions::new().symbol("00700.HK")).contains("\"700.HK\"")
         );
-        assert!(
-            query(&GetTodayExecutionsOptions::new().symbol("00700.HK")).contains("\"700.HK\"")
-        );
+        assert!(query(&GetTodayExecutionsOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
         assert!(
             query(
                 &GetCashFlowOptions::new(
