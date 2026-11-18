@@ -26,10 +26,14 @@ impl_serde_for_enum_string!(Market);
 /// display, so `00700.HK` becomes `700.HK`. Symbols of every other market are
 /// returned unchanged.
 ///
-/// The gateway is inconsistent about the padded form: the quote endpoints
-/// accept it, but `/v1/asset/stock?symbol=00700.HK` silently returns **no**
-/// positions instead of an error. Normalizing on the way out makes both
-/// spellings behave the same in every SDK call.
+/// The padded form is not handled consistently. Measured against the gateway:
+/// `/v1/asset/stock?symbol=00700.HK` answers `200` with **no** positions
+/// instead of an error, while `700.HK` returns the position. The quote
+/// subscription path has always trimmed the symbol itself, and
+/// longbridge/developers#789 reports that the quote HTTP endpoints accept the
+/// padded form — that last part is the reporter's observation, not something
+/// measured here. Normalizing on the way out makes both spellings behave the
+/// same in every SDK call that goes through these builders.
 pub(crate) fn normalize_symbol(symbol: &str) -> &str {
     match symbol.split_once('.') {
         Some((code, market)) if market.eq_ignore_ascii_case("HK") => {
