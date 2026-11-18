@@ -13,6 +13,15 @@ tokio-tungstenite = { workspace = true, features = [
     "rustls-tls-webpki-roots",
     "rustls-tls-native-roots",
 ] }
+# Used to build the TLS client config once instead of letting
+# tokio-tungstenite rebuild it (and re-read the OS trust store) per connection.
+# `ring` matches the provider the rest of the workspace already resolves to
+# (via reqwest); without a provider feature `ClientConfig::builder()` panics at
+# runtime, and as a direct dependent we should not rely on another crate in the
+# graph turning one on.
+rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"] }
+rustls-native-certs = "0.8"
+webpki-roots = "0.26"
 thiserror.workspace = true
 futures-util.workspace = true
 prost.workspace = true
