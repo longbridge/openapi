@@ -86,6 +86,10 @@ pub enum OAuthError {
     LocalAddressFailed,
 
     /// CSRF token mismatch (possible CSRF attack)
+    ///
+    /// No longer returned by the browser authorization flow: a callback whose
+    /// `state` does not match is ignored and the flow keeps waiting. Kept for
+    /// compatibility (code 8).
     #[error("CSRF token mismatch")]
     CsrfTokenMismatch,
 
@@ -148,7 +152,7 @@ impl OAuthError {
     /// | 5 | [`AuthorizationFailed`](Self::AuthorizationFailed) |
     /// | 6 | [`AuthorizationTimeout`](Self::AuthorizationTimeout) |
     /// | 7 | [`ExchangeCodeFailed`](Self::ExchangeCodeFailed) |
-    /// | 8 | [`CsrfTokenMismatch`](Self::CsrfTokenMismatch) |
+    /// | 8 | [`CsrfTokenMismatch`](Self::CsrfTokenMismatch) (no longer returned) |
     /// | 9 | [`BindCallbackFailed`](Self::BindCallbackFailed) |
     /// | 10 | [`LocalAddressFailed`](Self::LocalAddressFailed) |
     /// | 11 | [`CallbackChannelClosed`](Self::CallbackChannelClosed) |
