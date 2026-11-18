@@ -1,4 +1,8 @@
-use std::{fmt, sync::Arc, time::Duration};
+use std::{
+    fmt,
+    sync::{Arc, LazyLock},
+    time::Duration,
+};
 
 use longbridge_geo::is_cn;
 use oauth2::{
@@ -410,7 +414,27 @@ fn build_oauth_client(base: &str, client_id: &str, redirect_uri: &str) -> Longbr
 }
 
 /// HTTP client for token requests.
+///
+/// Built once and cloned. `reqwest::Client` is internally reference-counted,
+/// so cloning shares the connection pool, and — since the TLS config trusts
+/// the OS certificate store — `build()` reads the platform trust store, which
+/// costs ~90ms a call and does not cache. Token refresh runs for the lifetime
+/// of the process, so building per call would pay that every time.
+///
+/// A client that failed to build is not cached as a failure: the next call
+/// retries so the caller still gets the real `reqwest::Error`.
+static TOKEN_HTTP_CLIENT: LazyLock<Option<reqwest::Client>> =
+    LazyLock::new(|| build_http_client().ok());
+
+/// HTTP client for token requests, from the process-wide cache.
 fn create_http_client() -> Result<reqwest::Client, reqwest::Error> {
+    match TOKEN_HTTP_CLIENT.as_ref() {
+        Some(client) => Ok(client.clone()),
+        None => build_http_client(),
+    }
+}
+
+fn build_http_client() -> Result<reqwest::Client, reqwest::Error> {
     reqwest::Client::builder()
         // Preserve the previous OAuth transport's protection against redirects.
         .redirect(reqwest::redirect::Policy::none())
