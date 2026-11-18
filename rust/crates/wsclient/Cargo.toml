@@ -9,10 +9,14 @@ license = "MIT OR Apache-2.0"
 longbridge-proto.workspace = true
 
 tokio = { workspace = true, features = ["time", "rt", "macros", "sync", "net"] }
-tokio-tungstenite = { workspace = true, features = [
-    "rustls-tls-webpki-roots",
-    "rustls-tls-native-roots",
-] }
+# Only `rustls-tls-native-roots` is enabled, not `rustls-tls-webpki-roots`:
+# both exist solely to gate tokio-tungstenite's own root loading, which this
+# crate never reaches because every connection passes an explicit connector.
+# Enabling the webpki one as well would pull a second, older copy of
+# `webpki-roots` into the binary, with a different CA snapshot from the one
+# the HTTP stack uses. We need one of them for `Connector::Rustls` and
+# `connect_async_tls_with_config` to exist at all.
+tokio-tungstenite = { workspace = true, features = ["rustls-tls-native-roots"] }
 # Used to build the TLS client config once instead of letting
 # tokio-tungstenite rebuild it (and re-read the OS trust store) per connection.
 # `ring` matches the provider the rest of the workspace already resolves to
@@ -21,7 +25,7 @@ tokio-tungstenite = { workspace = true, features = [
 # graph turning one on.
 rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"] }
 rustls-native-certs = "0.8"
-webpki-roots = "0.26"
+webpki-roots = "1"
 thiserror.workspace = true
 futures-util.workspace = true
 prost.workspace = true
