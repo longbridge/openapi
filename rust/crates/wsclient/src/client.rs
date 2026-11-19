@@ -2,7 +2,7 @@ use std::{
     collections::HashMap,
     fmt::Debug,
     str::FromStr,
-    sync::Arc,
+    sync::{Arc, LazyLock},
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
@@ -19,7 +19,7 @@ use tokio::{
     sync::{mpsc, oneshot},
 };
 use tokio_tungstenite::{
-    MaybeTlsStream, WebSocketStream,
+    Connector, MaybeTlsStream, WebSocketStream,
     tungstenite::{Message, client::IntoClientRequest, http::Uri},
 };
 use url::Url;
@@ -27,6 +27,39 @@ use url::Url;
 use crate::{
     WsClientError, WsClientResult, WsCloseReason, WsEvent, WsResponseErrorDetail, codec::Packet,
 };
+
+/// TLS connector shared by every WebSocket connection.
+///
+/// Without an explicit connector, `connect_async` builds a fresh
+/// `rustls::ClientConfig` per connection, and since we trust the OS
+/// certificate store as well as the bundled roots that means re-reading the
+/// platform trust store on every connect and reconnect. `rustls-native-certs`
+/// does not cache, and a measured read costs ~90ms, which a reconnect loop
+/// would pay over and over. Build the config once instead.
+///
+/// The root set is identical to what `tokio-tungstenite` assembles itself:
+/// the OS trust store plus the bundled webpki roots, unioned. A trust store
+/// that yields nothing is not fatal, exactly as upstream treats it, because
+/// the webpki roots are always added.
+static TLS_CONNECTOR: LazyLock<Connector> = LazyLock::new(|| {
+    let mut root_store = rustls::RootCertStore::empty();
+
+    let native = rustls_native_certs::load_native_certs();
+    if !native.errors.is_empty() {
+        tracing::warn!(errors = ?native.errors, "native root CA certificate loading errors");
+    }
+    let total = native.certs.len();
+    let (added, ignored) = root_store.add_parsable_certificates(native.certs);
+    tracing::debug!(added, total, ignored, "loaded native root certificates");
+
+    root_store.extend(webpki_roots::TLS_SERVER_ROOTS.iter().cloned());
+
+    Connector::Rustls(Arc::new(
+        rustls::ClientConfig::builder()
+            .with_root_certificates(root_store)
+            .with_no_client_auth(),
+    ))
+});
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
@@ -420,7 +453,13 @@ async fn do_connect(
 
     let conn = match tokio::time::timeout(
         CONNECT_TIMEOUT,
-        tokio_tungstenite::connect_async(request).map_err(WsClientError::from),
+        tokio_tungstenite::connect_async_tls_with_config(
+            request,
+            None,
+            false,
+            Some(TLS_CONNECTOR.clone()),
+        )
+        .map_err(WsClientError::from),
     )
     .map_err(|_| WsClientError::ConnectTimeout)
     .await
