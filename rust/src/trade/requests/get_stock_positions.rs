@@ -1,5 +1,7 @@
 use serde::Serialize;
 
+use crate::types::normalize_symbol_owned;
+
 /// Options for get stock positions request
 #[derive(Debug, Serialize, Default)]
 pub struct GetStockPositionsOptions {
@@ -23,7 +25,7 @@ impl GetStockPositionsOptions {
         T: Into<String>,
     {
         Self {
-            symbols: symbols.into_iter().map(Into::into).collect(),
+            symbols: symbols.into_iter().map(normalize_symbol_owned).collect(),
         }
     }
 }

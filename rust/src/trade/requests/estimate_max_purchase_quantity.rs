@@ -1,7 +1,10 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
 
-use crate::trade::{OrderSide, OrderType};
+use crate::{
+    trade::{OrderSide, OrderType},
+    types::normalize_symbol_owned,
+};
 
 /// Options for estimate maximum purchase quantity
 #[derive(Debug, Serialize, Clone)]
@@ -23,7 +26,7 @@ impl EstimateMaxPurchaseQuantityOptions {
     #[inline]
     pub fn new(symbol: impl Into<String>, order_type: OrderType, side: OrderSide) -> Self {
         Self {
-            symbol: symbol.into(),
+            symbol: normalize_symbol_owned(symbol),
             order_type,
             price: None,
             side,

@@ -1,5 +1,7 @@
 use serde::Serialize;
 
+use crate::types::normalize_symbol_owned;
+
 /// Options for get today executions request
 #[derive(Debug, Default, Serialize, Clone)]
 pub struct GetTodayExecutionsOptions {
@@ -21,7 +23,7 @@ impl GetTodayExecutionsOptions {
     #[must_use]
     pub fn symbol(self, symbol: impl Into<String>) -> Self {
         Self {
-            symbol: Some(symbol.into()),
+            symbol: Some(normalize_symbol_owned(symbol)),
             ..self
         }
     }

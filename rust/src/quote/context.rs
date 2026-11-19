@@ -38,6 +38,7 @@ use crate::{
         utils::{format_date, parse_date},
     },
     serde_utils,
+    types::normalize_symbol,
 };
 
 const RETRY_COUNT: usize = 3;
@@ -2552,13 +2553,6 @@ impl QuoteContext {
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
             .0)
-    }
-}
-
-fn normalize_symbol(symbol: &str) -> &str {
-    match symbol.split_once('.') {
-        Some((_, market)) if market.eq_ignore_ascii_case("HK") => symbol.trim_start_matches('0'),
-        _ => symbol,
     }
 }
 

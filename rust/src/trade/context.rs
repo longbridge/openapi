@@ -23,6 +23,7 @@ use crate::{
         USRealizedPL, USTransactionHistory,
         core::{Command, Core},
     },
+    types::normalize_symbol_owned,
 };
 
 #[derive(Debug, Deserialize)]
@@ -376,22 +377,50 @@ impl TradeContext {
         &self,
         options: impl Into<Option<GetHistoryOrdersOptions>>,
     ) -> Result<Vec<Order>> {
+        use std::collections::HashSet;
+
         #[derive(Deserialize)]
         struct Response {
             orders: Vec<Order>,
+            #[serde(default)]
+            has_more: bool,
         }
 
-        Ok(self
-            .0
-            .http_cli
-            .request(Method::GET, "/v1/trade/order/history")
-            .query_params(options.into().unwrap_or_default())
-            .response::<Json<Response>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?
-            .0
-            .orders)
+        // The endpoint caps each response at 1000 records and reports the
+        // overflow in `has_more`; walk the `page` param (1-based) until it is
+        // false. Dedupe by `order_id` and stop if a page adds nothing new,
+        // guarding against the gateway ignoring `page`. Bounded to 1000 pages
+        // as a runaway guard. Mirrors `history_executions`.
+        let mut options = options.into().unwrap_or_default();
+        let mut all: Vec<Order> = Vec::new();
+        let mut seen: HashSet<String> = HashSet::new();
+        for page in 1..=1000u32 {
+            options = options.with_page(page);
+            let resp = self
+                .0
+                .http_cli
+                .request(Method::GET, "/v1/trade/order/history")
+                .query_params(&options)
+                .response::<Json<Response>>()
+                .send()
+                .with_subscriber(self.0.log_subscriber.clone())
+                .await?
+                .0;
+            if resp.orders.is_empty() {
+                break;
+            }
+            let mut added = 0usize;
+            for o in resp.orders {
+                if seen.insert(o.order_id.clone()) {
+                    all.push(o);
+                    added += 1;
+                }
+            }
+            if !resp.has_more || added == 0 {
+                break;
+            }
+        }
+        Ok(all)
     }
 
     /// Get today orders
@@ -866,7 +895,7 @@ impl TradeContext {
             .request(Method::GET, "/v1/risk/margin-ratio")
             .dc_restrict(DcRegion::Ap)
             .query_params(Request {
-                symbol: symbol.into(),
+                symbol: normalize_symbol_owned(symbol),
             })
             .response::<Json<MarginRatio>>()
             .send()
@@ -1349,5 +1378,69 @@ mod dc_restrict_tests {
         assert_ap_restricted(ctx.margin_ratio("700.HK").await, "/v1/risk/margin-ratio");
         assert_ap_restricted(ctx.order_detail("1").await, "/v1/trade/order");
         assert_ap_restricted(ctx.all_executions(None).await, "/v3/trade/execution/all");
+    }
+}
+
+#[cfg(test)]
+mod symbol_normalization_tests {
+    use time::macros::datetime;
+
+    use super::*;
+    use crate::trade::{
+        GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
+        OrderType, SubmitOrderOptions, TimeInForceType,
+    };
+
+    fn query(value: &impl Serialize) -> String {
+        serde_json::to_string(&serde_json::to_value(value).unwrap()).unwrap()
+    }
+
+    /// `/v1/asset/stock?symbol=00700.HK` answers `200` with **no** positions
+    /// rather than an error, so a padded HK symbol has to be canonicalized
+    /// before it leaves the SDK. Checked against the gateway on 2026-11-18:
+    /// `700.HK` returned the position, `00700.HK` returned none.
+    #[test]
+    fn stock_positions_strips_hk_padding() {
+        let opts = GetStockPositionsOptions::new().symbols(["00700.HK", "AAPL.US", "000001.SZ"]);
+        let q = query(&opts);
+        assert!(q.contains("700.HK"), "{q}");
+        assert!(!q.contains("00700.HK"), "{q}");
+        // Every other market keeps its symbol verbatim.
+        assert!(q.contains("AAPL.US"), "{q}");
+        assert!(q.contains("000001.SZ"), "{q}");
+    }
+
+    #[test]
+    fn every_symbol_filter_is_normalized() {
+        assert!(query(&GetHistoryOrdersOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
+        assert!(query(&GetTodayOrdersOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
+        assert!(
+            query(&GetHistoryExecutionsOptions::new().symbol("00700.HK")).contains("\"700.HK\"")
+        );
+        assert!(query(&GetTodayExecutionsOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
+        assert!(
+            query(
+                &GetCashFlowOptions::new(
+                    datetime!(2026-01-01 0:00 UTC),
+                    datetime!(2026-01-31 0:00 UTC)
+                )
+                .symbol("00700.HK")
+            )
+            .contains("\"700.HK\"")
+        );
+    }
+
+    #[test]
+    fn submit_order_normalizes_the_symbol() {
+        let opts = SubmitOrderOptions::new(
+            "00700.HK",
+            OrderType::LO,
+            OrderSide::Buy,
+            decimal!(100i32),
+            TimeInForceType::Day,
+        );
+        let body = serde_json::to_value(&opts).unwrap();
+        assert_eq!(body["symbol"], "700.HK");
     }
 }

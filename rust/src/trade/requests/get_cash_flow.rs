@@ -1,7 +1,7 @@
 use serde::Serialize;
 use time::OffsetDateTime;
 
-use crate::{serde_utils, trade::BalanceType};
+use crate::{serde_utils, trade::BalanceType, types::normalize_symbol_owned};
 
 /// Options for cash flow request
 #[derive(Debug, Serialize, Clone)]
@@ -45,7 +45,7 @@ impl GetCashFlowOptions {
     #[must_use]
     pub fn symbol(self, symbol: impl Into<String>) -> Self {
         Self {
-            symbol: Some(symbol.into()),
+            symbol: Some(normalize_symbol_owned(symbol)),
             ..self
         }
     }

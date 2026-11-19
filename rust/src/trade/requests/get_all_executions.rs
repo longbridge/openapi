@@ -1,7 +1,7 @@
 use serde::Serialize;
 use time::OffsetDateTime;
 
-use crate::serde_utils;
+use crate::{serde_utils, types::normalize_symbol_owned};
 
 /// Options for get all executions request
 #[derive(Debug, Serialize, Default, Clone)]
@@ -36,7 +36,7 @@ impl GetAllExecutionsOptions {
     #[must_use]
     pub fn symbol(self, symbol: impl Into<String>) -> Self {
         Self {
-            symbol: Some(symbol.into()),
+            symbol: Some(normalize_symbol_owned(symbol)),
             ..self
         }
     }
