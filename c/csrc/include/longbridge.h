@@ -10747,11 +10747,11 @@ typedef struct lb_valuation_metric_data_t {
    */
   const char *desc;
   /**
-   * Highest value of the metric over the series.
+   * Upper bound of the fair-value band (not the period maximum; the series can rise above it).
    */
   const char *high;
   /**
-   * Lowest value of the metric over the series.
+   * Lower bound of the fair-value band (not the period minimum; the series can fall below it).
    */
   const char *low;
   /**

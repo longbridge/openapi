@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 public class ValuationHistoryMetric {
     /** Human-readable description. */
     public String desc;
-    /** Historical high over the period. */
+    /** Upper bound of the fair-value band (not the period maximum; the series can rise above it). */
     public BigDecimal high;
-    /** Historical low over the period. */
+    /** Lower bound of the fair-value band (not the period minimum; the series can fall below it). */
     public BigDecimal low;
     /** Historical median over the period. */
     public BigDecimal median;

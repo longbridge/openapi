@@ -9929,9 +9929,9 @@ export interface ValuationHistoryResponse {
 export interface ValuationMetricData {
   /** Description */
   desc: string
-  /** Historical high */
+  /** Upper bound of the fair-value band (not the period maximum; the series can rise above it) */
   high?: string
-  /** Historical low */
+  /** Lower bound of the fair-value band (not the period minimum; the series can fall below it) */
   low?: string
   /** Historical median */
   median?: string

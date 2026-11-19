@@ -360,10 +360,10 @@ pub struct ValuationMetricsData {
 pub struct ValuationMetricData {
     /// Human-readable description with current value and percentile
     pub desc: String,
-    /// Historical high value
+    /// Upper bound of the fair-value band (not the period maximum; the series can rise above it)
     #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub high: Option<Decimal>,
-    /// Historical low value
+    /// Lower bound of the fair-value band (not the period minimum; the series can fall below it)
     #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub low: Option<Decimal>,
     /// Historical median value
@@ -416,10 +416,10 @@ pub struct ValuationHistoryMetrics {
 pub struct ValuationHistoryMetric {
     /// Human-readable description
     pub desc: String,
-    /// Historical high over the period
+    /// Upper bound of the fair-value band (not the period maximum; the series can rise above it)
     #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub high: Option<Decimal>,
-    /// Historical low over the period
+    /// Lower bound of the fair-value band (not the period minimum; the series can fall below it)
     #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub low: Option<Decimal>,
     /// Historical median over the period
