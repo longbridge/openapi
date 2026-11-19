@@ -6,6 +6,20 @@ on:
       - main
   pull_request: {}
 
+# Cancel a pull request's earlier runs when a new commit supersedes them.
+#
+# `head_ref` is set only for pull_request events, so a PR groups by its branch
+# and a new push cancels the run for the commit it replaced. For a push to
+# main the fallback is `run_id`, which is unique per run, so those never share
+# a group: they are neither cancelled nor made to queue behind each other.
+#
+# Without this, every push queued another full matrix and the superseded runs
+# kept their place in line. With a scarce runner pool that is how the queue
+# fills with work for commits nobody is waiting on any more.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   check-format:
     runs-on: ubuntu-22.04
