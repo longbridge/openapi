@@ -2841,7 +2841,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/fundamental/BusinessSegmentItem",
     longbridge::fundamental::BusinessSegmentItem,
-    [name, percent]
+    [name, percent, value, id, yoy]
 );
 
 impl_java_class!(
@@ -2851,8 +2851,14 @@ impl_java_class!(
         date,
         total,
         currency,
+        report_txt,
+        fp_start,
+        fp_end,
+        yoy,
         #[java(objarray)]
-        business
+        business,
+        #[java(objarray)]
+        regionals
     ]
 );
 

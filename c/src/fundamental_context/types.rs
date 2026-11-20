@@ -3102,18 +3102,30 @@ impl ToFFI for CValuationComparisonResponseOwned {
 
 // ── BusinessSegments ──────────────────────────────────────────────
 
-/// One business segment item (latest snapshot).
+/// One business or regional segment item (latest snapshot).
 #[repr(C)]
 pub struct CBusinessSegmentItem {
     /// Segment name.
     pub name: *const c_char,
     /// Percentage of total revenue.
     pub percent: *const c_char,
+    /// Absolute value, in the response's currency. Empty when the server does
+    /// not supply one.
+    pub value: *const c_char,
+    /// Stable identifier for the segment. Empty when the server does not
+    /// supply one.
+    pub id: *const c_char,
+    /// Year-on-year change for this segment. Empty when the server does not
+    /// supply one.
+    pub yoy: *const c_char,
 }
 
 pub(crate) struct CBusinessSegmentItemOwned {
     name: CString,
     percent: CString,
+    value: CString,
+    id: CString,
+    yoy: CString,
 }
 
 impl From<longbridge::fundamental::BusinessSegmentItem> for CBusinessSegmentItemOwned {
@@ -3121,6 +3133,9 @@ impl From<longbridge::fundamental::BusinessSegmentItem> for CBusinessSegmentItem
         Self {
             name: v.name.into(),
             percent: v.percent.into(),
+            value: v.value.into(),
+            id: v.id.into(),
+            yoy: v.yoy.into(),
         }
     }
 }
@@ -3131,6 +3146,9 @@ impl ToFFI for CBusinessSegmentItemOwned {
         CBusinessSegmentItem {
             name: self.name.to_ffi_type(),
             percent: self.percent.to_ffi_type(),
+            value: self.value.to_ffi_type(),
+            id: self.id.to_ffi_type(),
+            yoy: self.yoy.to_ffi_type(),
         }
     }
 }
@@ -3138,23 +3156,42 @@ impl ToFFI for CBusinessSegmentItemOwned {
 /// Current business segment breakdown for a security.
 #[repr(C)]
 pub struct CBusinessSegments {
-    /// Report date.
+    /// Report date, `YYYYMMDD`.
     pub date: *const c_char,
     /// Total revenue.
     pub total: *const c_char,
     /// Reporting currency.
     pub currency: *const c_char,
+    /// Fiscal period label, e.g. `2026.Q2`. Follows the issuer's own fiscal
+    /// calendar, so it does not always match the calendar year of `fp_end`.
+    pub report_txt: *const c_char,
+    /// First day of the reported period, `YYYY.MM.DD`.
+    pub fp_start: *const c_char,
+    /// Last day of the reported period, `YYYY.MM.DD`.
+    pub fp_end: *const c_char,
+    /// Year-on-year change of `total`. Empty when the server does not supply
+    /// one.
+    pub yoy: *const c_char,
     /// Pointer to business segment items.
     pub business: *const CBusinessSegmentItem,
     /// Number of items in `business`.
     pub num_business: usize,
+    /// Pointer to regional segment items, in the same shape as `business`.
+    pub regionals: *const CBusinessSegmentItem,
+    /// Number of items in `regionals`.
+    pub num_regionals: usize,
 }
 
 pub(crate) struct CBusinessSegmentsOwned {
     date: CString,
     total: CString,
     currency: CString,
+    report_txt: CString,
+    fp_start: CString,
+    fp_end: CString,
+    yoy: CString,
     business: CVec<CBusinessSegmentItemOwned>,
+    regionals: CVec<CBusinessSegmentItemOwned>,
 }
 
 impl From<longbridge::fundamental::BusinessSegments> for CBusinessSegmentsOwned {
@@ -3163,7 +3200,12 @@ impl From<longbridge::fundamental::BusinessSegments> for CBusinessSegmentsOwned 
             date: v.date.into(),
             total: v.total.into(),
             currency: v.currency.into(),
+            report_txt: v.report_txt.into(),
+            fp_start: v.fp_start.into(),
+            fp_end: v.fp_end.into(),
+            yoy: v.yoy.into(),
             business: v.business.into(),
+            regionals: v.regionals.into(),
         }
     }
 }
@@ -3175,8 +3217,14 @@ impl ToFFI for CBusinessSegmentsOwned {
             date: self.date.to_ffi_type(),
             total: self.total.to_ffi_type(),
             currency: self.currency.to_ffi_type(),
+            report_txt: self.report_txt.to_ffi_type(),
+            fp_start: self.fp_start.to_ffi_type(),
+            fp_end: self.fp_end.to_ffi_type(),
+            yoy: self.yoy.to_ffi_type(),
             business: self.business.to_ffi_type(),
             num_business: self.business.len(),
+            regionals: self.regionals.to_ffi_type(),
+            num_regionals: self.regionals.len(),
         }
     }
 }

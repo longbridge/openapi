@@ -4128,11 +4128,20 @@ struct StockRatings
   std::vector<RatingCategory> ratings;
 };
 
-/// One business segment item (latest snapshot).
+/// One business or regional segment item (latest snapshot).
 struct BusinessSegmentItem
 {
   std::string name;
   std::string percent;
+  /// Absolute value, in the response's currency. Empty when the server does
+  /// not supply one.
+  std::string value;
+  /// Stable identifier for the segment. Empty when the server does not
+  /// supply one.
+  std::string id;
+  /// Year-on-year change for this segment. Empty when the server does not
+  /// supply one.
+  std::string yoy;
 };
 
 /// Business segments response.
@@ -4141,7 +4150,19 @@ struct BusinessSegments
   std::string date;
   std::string total;
   std::string currency;
+  /// Fiscal period label, e.g. `2026.Q2`. Follows the issuer's own fiscal
+  /// calendar, so it does not always match the calendar year of `fp_end`.
+  std::string report_txt;
+  /// First day of the reported period, `YYYY.MM.DD`.
+  std::string fp_start;
+  /// Last day of the reported period, `YYYY.MM.DD`.
+  std::string fp_end;
+  /// Year-on-year change of `total`. Empty when the server does not supply one.
+  std::string yoy;
   std::vector<BusinessSegmentItem> business;
+  /// Regional breakdown, same shape as `business`. Empty for issuers that do
+  /// not report one.
+  std::vector<BusinessSegmentItem> regionals;
 };
 
 /// One business/regional segment item in a historical snapshot.

@@ -11853,7 +11853,7 @@ typedef struct lb_stock_ratings_t {
 } lb_stock_ratings_t;
 
 /**
- * One business segment item (latest snapshot).
+ * One business or regional segment item (latest snapshot).
  */
 typedef struct lb_business_segment_item_t {
   /**
@@ -11864,6 +11864,21 @@ typedef struct lb_business_segment_item_t {
    * Percentage of total revenue.
    */
   const char *percent;
+  /**
+   * Absolute value, in the response's currency. Empty when the server does
+   * not supply one.
+   */
+  const char *value;
+  /**
+   * Stable identifier for the segment. Empty when the server does not
+   * supply one.
+   */
+  const char *id;
+  /**
+   * Year-on-year change for this segment. Empty when the server does not
+   * supply one.
+   */
+  const char *yoy;
 } lb_business_segment_item_t;
 
 /**
@@ -11871,7 +11886,7 @@ typedef struct lb_business_segment_item_t {
  */
 typedef struct lb_business_segments_t {
   /**
-   * Report date.
+   * Report date, `YYYYMMDD`.
    */
   const char *date;
   /**
@@ -11883,6 +11898,24 @@ typedef struct lb_business_segments_t {
    */
   const char *currency;
   /**
+   * Fiscal period label, e.g. `2026.Q2`. Follows the issuer's own fiscal
+   * calendar, so it does not always match the calendar year of `fp_end`.
+   */
+  const char *report_txt;
+  /**
+   * First day of the reported period, `YYYY.MM.DD`.
+   */
+  const char *fp_start;
+  /**
+   * Last day of the reported period, `YYYY.MM.DD`.
+   */
+  const char *fp_end;
+  /**
+   * Year-on-year change of `total`. Empty when the server does not supply
+   * one.
+   */
+  const char *yoy;
+  /**
    * Pointer to business segment items.
    */
   const struct lb_business_segment_item_t *business;
@@ -11890,6 +11923,14 @@ typedef struct lb_business_segments_t {
    * Number of items in `business`.
    */
   uintptr_t num_business;
+  /**
+   * Pointer to regional segment items, in the same shape as `business`.
+   */
+  const struct lb_business_segment_item_t *regionals;
+  /**
+   * Number of items in `regionals`.
+   */
+  uintptr_t num_regionals;
 } lb_business_segments_t;
 
 /**
