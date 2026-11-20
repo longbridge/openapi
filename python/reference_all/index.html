@@ -2334,6 +2334,28 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.RiskAssessment">RiskAssessment</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.risk">risk</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.pi">pi</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.approvals">approvals</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.re_authentication">re_authentication</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.pi_end_at">pi_end_at</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.deadlines">deadlines</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.risk_assessment_at">risk_assessment_at</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.score">score</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RiskAssessment.strategy_risk_levels">strategy_risk_levels</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.EstimateMaxPurchaseQuantityResponse">EstimateMaxPurchaseQuantityResponse</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.EstimateMaxPurchaseQuantityResponse.cash_max_qty">cash_max_qty</a>
@@ -2379,6 +2401,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.stock_positions">stock_positions</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.margin_ratio">margin_ratio</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.risk_assessment">risk_assessment</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.order_detail">order_detail</a>
     </li>
@@ -3797,6 +3821,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.stock_positions">stock_positions</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.margin_ratio">margin_ratio</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.risk_assessment">risk_assessment</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.order_detail">order_detail</a>
     </li>
@@ -47317,6 +47343,259 @@ combination orders)</p>
 
 
 
+<h2 id="longbridge.openapi.RiskAssessment" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">RiskAssessment</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Risk assessment (suitability questionnaire) result of the current member</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.risk" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">risk</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">risk: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Risk level of the latest questionnaire (e.g. <code>A5</code>). The server does not document the scale, so do not infer an ordering between levels.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.pi" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pi</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">pi: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Professional investor (PI) status code. The server does not document the code values; treat it as opaque.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.approvals" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">approvals</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">approvals: dict[str, str]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Approval states keyed by item (e.g. <code>car</code>, <code>cka</code>, <code>risk_audit</code>). Values are strings, not booleans: <code>is_corporate_client</code> arrives as <code>"true"</code> / <code>"false"</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.re_authentication" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">re_authentication</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">re_authentication: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Re-authentication flag, as returned by the server (empty when not set)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.pi_end_at" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pi_end_at</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">pi_end_at: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Professional investor status end time, as returned by the server (<code>0</code> when not set). Raw integer: the unit (seconds or milliseconds) is not documented, so it is not converted to a timestamp.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.deadlines" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">deadlines</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">deadlines: dict[str, int]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Deadlines keyed by item, as returned by the server. Raw integers with the same undocumented unit as <code>pi_end_at</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.risk_assessment_at" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">risk_assessment_at</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">risk_assessment_at: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Date of the latest risk assessment, as returned by the server (e.g. <code>2026-10-14</code>). Kept as the server's string: the <code>yyyy-mm-dd</code> form is not documented to be guaranteed. May be empty; a null or absent value also decodes to an empty string, so emptiness does not by itself mean "never assessed".</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.score" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">score</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">score: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Questionnaire score</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.RiskAssessment.strategy_risk_levels" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">strategy_risk_levels</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">strategy_risk_levels: List[str]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Strategy risk levels of the member. The server does not document what these levels permit, so do not read them as a trading entitlement.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="longbridge.openapi.EstimateMaxPurchaseQuantityResponse" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">EstimateMaxPurchaseQuantityResponse</span>
 
@@ -49327,6 +49606,62 @@ config = Config.from_oauth(oauth)
 ctx = TradeContext(config)
 
 resp = ctx.margin_ratio("700.HK")
+print(resp)</code></pre>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.TradeContext.risk_assessment" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">risk_assessment</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">risk_assessment() -&gt; RiskAssessment</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the risk assessment (suitability questionnaire) result of the current member</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="RiskAssessment (longbridge.openapi.RiskAssessment)" href="#longbridge.openapi.RiskAssessment">RiskAssessment</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Risk assessment</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>::</p>
+<pre class="highlight"><code>from longbridge.openapi import OAuthBuilder, TradeContext, Config
+
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print("Visit:", url)
+)
+config = Config.from_oauth(oauth)
+ctx = TradeContext(config)
+
+resp = ctx.risk_assessment()
 print(resp)</code></pre>
 
 
@@ -70385,6 +70720,42 @@ asyncio.run(main())</code></pre>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="longbridge.openapi.AsyncTradeContext.risk_assessment" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">risk_assessment</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">risk_assessment() -&gt; Awaitable[RiskAssessment]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the risk assessment (suitability questionnaire) result of the current member. Returns an awaitable that resolves to risk assessment.</p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>::</p>
+<pre class="highlight"><code>import asyncio
+from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
+
+async def main():
+    oauth = await OAuthBuilder("your-client-id").build_async(
+        lambda url: print("Visit:", url)
+    )
+    config = Config.from_oauth(oauth)
+    ctx = AsyncTradeContext.create(config)
+    resp = await ctx.risk_assessment()
+    print(resp)
+
+asyncio.run(main())</code></pre>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="longbridge.openapi.AsyncTradeContext.order_detail" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">order_detail</span>
 
@@ -73448,7 +73819,7 @@ print(topic_id)</code></pre>
       <td class="field-body">
         <ul class="first simple">
             <li>
-                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<span title="TopicItem">TopicItem</span>]</code>
+                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[TopicItem]</code>
               –
               <div class="doc-md-description">
                 <p>List of topic items</p>
@@ -73528,7 +73899,7 @@ for t in topics:
       <td class="field-body">
         <ul class="first simple">
             <li>
-                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<span title="NewsItem">NewsItem</span>]</code>
+                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[NewsItem]</code>
               –
               <div class="doc-md-description">
                 <p>List of news items</p>
@@ -74393,7 +74764,7 @@ for t in topics:
       <td class="field-body">
         <ul class="first simple">
             <li>
-                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<span title="NewsItem">NewsItem</span>]</code>
+                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[NewsItem]</code>
               –
               <div class="doc-md-description">
                 <p>List of news items</p>
@@ -74560,7 +74931,7 @@ print(topic.title, topic.body)</code></pre>
       <td class="field-body">
         <ul class="first simple">
             <li>
-                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<span title="TopicItem">TopicItem</span>]</code>
+                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[TopicItem]</code>
               –
               <div class="doc-md-description">
                 <p>List of topic items</p>
@@ -78217,7 +78588,7 @@ for t in topics:
 
     <div class="doc doc-contents ">
 
-        <p>Historical high</p>
+        <p>Upper bound of the fair-value band (not the period maximum; the series can rise above it)</p>
 
     </div>
 
@@ -78240,7 +78611,7 @@ for t in topics:
 
     <div class="doc doc-contents ">
 
-        <p>Historical low</p>
+        <p>Lower bound of the fair-value band (not the period minimum; the series can fall below it)</p>
 
     </div>
 
@@ -78585,7 +78956,7 @@ for t in topics:
 
     <div class="doc doc-contents ">
 
-        <p>Historical high over the period</p>
+        <p>Upper bound of the fair-value band (not the period maximum; the series can rise above it)</p>
 
     </div>
 
@@ -78608,7 +78979,7 @@ for t in topics:
 
     <div class="doc doc-contents ">
 
-        <p>Historical low over the period</p>
+        <p>Lower bound of the fair-value band (not the period minimum; the series can fall below it)</p>
 
     </div>
 

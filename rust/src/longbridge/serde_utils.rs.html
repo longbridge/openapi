@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/serde_utils.rs`."><title>serde_utils.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-0c87338a.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.99.1 (58cf8f9c3 2026-10-13)" data-channel="1.99.1" data-search-js="search-cf4fc35e.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-9f56287d.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/</div>serde_utils.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![allow(dead_code)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/serde_utils.rs`."><title>serde_utils.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-203241e4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.100.0 (0ef1bc386 2026-11-09)" data-channel="1.100.0" data-search-js="search-b167f383.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-1814ead3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-9f56287d.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/</div>serde_utils.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![allow(dead_code)]
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">use </span>std::str::FromStr;
 <a href=#4 id=4 data-nosnippet>4</a>
@@ -637,85 +637,182 @@
 <a href=#637 id=637 data-nosnippet>637</a>    }
 <a href=#638 id=638 data-nosnippet>638</a>}
 <a href=#639 id=639 data-nosnippet>639</a>
-<a href=#640 id=640 data-nosnippet>640</a><span class="doccomment">/// Deserializer that maps a JSON `null` to the type's `Default` value.
-<a href=#641 id=641 data-nosnippet>641</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>null_as_default&lt;<span class="lifetime">'de</span>, D, T&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;T, D::Error&gt;
-<a href=#642 id=642 data-nosnippet>642</a><span class="kw">where
-<a href=#643 id=643 data-nosnippet>643</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
-<a href=#644 id=644 data-nosnippet>644</a>    T: Deserialize&lt;<span class="lifetime">'de</span>&gt; + Default,
-<a href=#645 id=645 data-nosnippet>645</a>{
-<a href=#646 id=646 data-nosnippet>646</a>    <span class="prelude-val">Ok</span>(<span class="prelude-ty">Option</span>::&lt;T&gt;::deserialize(d)<span class="question-mark">?</span>.unwrap_or_default())
-<a href=#647 id=647 data-nosnippet>647</a>}
-<a href=#648 id=648 data-nosnippet>648</a>
-<a href=#649 id=649 data-nosnippet>649</a><span class="doccomment">/// Deserializes a field that may be a JSON number, string, or null into
-<a href=#650 id=650 data-nosnippet>650</a>/// `Option&lt;String&gt;`.  Null and missing fields produce `None`; numbers are
-<a href=#651 id=651 data-nosnippet>651</a>/// converted to their decimal string representation.
-<a href=#652 id=652 data-nosnippet>652</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>value_as_opt_string {
-<a href=#653 id=653 data-nosnippet>653</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#654 id=654 data-nosnippet>654</a>
-<a href=#655 id=655 data-nosnippet>655</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize&lt;<span class="lifetime">'de</span>, D&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;, D::Error&gt;
-<a href=#656 id=656 data-nosnippet>656</a>    <span class="kw">where
-<a href=#657 id=657 data-nosnippet>657</a>        </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
-<a href=#658 id=658 data-nosnippet>658</a>    {
-<a href=#659 id=659 data-nosnippet>659</a>        <span class="kw">let </span>v = serde_json::Value::deserialize(d)<span class="question-mark">?</span>;
-<a href=#660 id=660 data-nosnippet>660</a>        <span class="prelude-val">Ok</span>(<span class="kw">match </span>v {
-<a href=#661 id=661 data-nosnippet>661</a>            serde_json::Value::Null =&gt; <span class="prelude-val">None</span>,
-<a href=#662 id=662 data-nosnippet>662</a>            serde_json::Value::String(s) <span class="kw">if </span>s.is_empty() =&gt; <span class="prelude-val">None</span>,
-<a href=#663 id=663 data-nosnippet>663</a>            serde_json::Value::String(s) =&gt; <span class="prelude-val">Some</span>(s),
-<a href=#664 id=664 data-nosnippet>664</a>            serde_json::Value::Number(n) =&gt; <span class="prelude-val">Some</span>(n.to_string()),
-<a href=#665 id=665 data-nosnippet>665</a>            other =&gt; <span class="prelude-val">Some</span>(other.to_string()),
-<a href=#666 id=666 data-nosnippet>666</a>        })
-<a href=#667 id=667 data-nosnippet>667</a>    }
-<a href=#668 id=668 data-nosnippet>668</a>
-<a href=#669 id=669 data-nosnippet>669</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(v: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;String&gt;, s: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
-<a href=#670 id=670 data-nosnippet>670</a>    <span class="kw">where
-<a href=#671 id=671 data-nosnippet>671</a>        </span>S: Serializer,
-<a href=#672 id=672 data-nosnippet>672</a>    {
-<a href=#673 id=673 data-nosnippet>673</a>        <span class="kw">match </span>v {
-<a href=#674 id=674 data-nosnippet>674</a>            <span class="prelude-val">Some</span>(val) =&gt; s.serialize_str(val),
-<a href=#675 id=675 data-nosnippet>675</a>            <span class="prelude-val">None </span>=&gt; s.serialize_none(),
-<a href=#676 id=676 data-nosnippet>676</a>        }
-<a href=#677 id=677 data-nosnippet>677</a>    }
+<a href=#640 id=640 data-nosnippet>640</a><span class="doccomment">/// Parse a JSON value as an integer: a JSON integer or an integer string
+<a href=#641 id=641 data-nosnippet>641</a>/// (proto3 JSON encodes int64 as a string). Anything else — null, floats,
+<a href=#642 id=642 data-nosnippet>642</a>/// non-numeric strings, values outside `i64` — becomes 0, so a server-side
+<a href=#643 id=643 data-nosnippet>643</a>/// change in how a number is encoded cannot fail the whole response.
+<a href=#644 id=644 data-nosnippet>644</a></span><span class="kw">fn </span>lenient_int(value: serde_json::Value) -&gt; i64 {
+<a href=#645 id=645 data-nosnippet>645</a>    <span class="kw">match </span>value {
+<a href=#646 id=646 data-nosnippet>646</a>        serde_json::Value::Number(n) =&gt; n.as_i64().unwrap_or_default(),
+<a href=#647 id=647 data-nosnippet>647</a>        serde_json::Value::String(s) =&gt; s.trim().parse().unwrap_or_default(),
+<a href=#648 id=648 data-nosnippet>648</a>        <span class="kw">_ </span>=&gt; <span class="number">0</span>,
+<a href=#649 id=649 data-nosnippet>649</a>    }
+<a href=#650 id=650 data-nosnippet>650</a>}
+<a href=#651 id=651 data-nosnippet>651</a>
+<a href=#652 id=652 data-nosnippet>652</a><span class="doccomment">/// Render a JSON value as a string: strings as-is, null as an empty string,
+<a href=#653 id=653 data-nosnippet>653</a>/// anything else as its compact JSON text.
+<a href=#654 id=654 data-nosnippet>654</a></span><span class="kw">fn </span>lenient_string(value: serde_json::Value) -&gt; String {
+<a href=#655 id=655 data-nosnippet>655</a>    <span class="kw">match </span>value {
+<a href=#656 id=656 data-nosnippet>656</a>        serde_json::Value::String(s) =&gt; s,
+<a href=#657 id=657 data-nosnippet>657</a>        serde_json::Value::Null =&gt; String::new(),
+<a href=#658 id=658 data-nosnippet>658</a>        other =&gt; other.to_string(),
+<a href=#659 id=659 data-nosnippet>659</a>    }
+<a href=#660 id=660 data-nosnippet>660</a>}
+<a href=#661 id=661 data-nosnippet>661</a>
+<a href=#662 id=662 data-nosnippet>662</a><span class="doccomment">/// Deserializes an `i32` leniently (see [`lenient_int`]); values outside
+<a href=#663 id=663 data-nosnippet>663</a>/// `i32` become 0.
+<a href=#664 id=664 data-nosnippet>664</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>int32_lenient&lt;<span class="lifetime">'de</span>, D&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;i32, D::Error&gt;
+<a href=#665 id=665 data-nosnippet>665</a><span class="kw">where
+<a href=#666 id=666 data-nosnippet>666</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#667 id=667 data-nosnippet>667</a>{
+<a href=#668 id=668 data-nosnippet>668</a>    <span class="kw">let </span>v = lenient_int(serde_json::Value::deserialize(d)<span class="question-mark">?</span>);
+<a href=#669 id=669 data-nosnippet>669</a>    <span class="prelude-val">Ok</span>(i32::try_from(v).unwrap_or_default())
+<a href=#670 id=670 data-nosnippet>670</a>}
+<a href=#671 id=671 data-nosnippet>671</a>
+<a href=#672 id=672 data-nosnippet>672</a><span class="doccomment">/// Deserializes an `i64` leniently (see [`lenient_int`]).
+<a href=#673 id=673 data-nosnippet>673</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>int64_lenient&lt;<span class="lifetime">'de</span>, D&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;i64, D::Error&gt;
+<a href=#674 id=674 data-nosnippet>674</a><span class="kw">where
+<a href=#675 id=675 data-nosnippet>675</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#676 id=676 data-nosnippet>676</a>{
+<a href=#677 id=677 data-nosnippet>677</a>    <span class="prelude-val">Ok</span>(lenient_int(serde_json::Value::deserialize(d)<span class="question-mark">?</span>))
 <a href=#678 id=678 data-nosnippet>678</a>}
 <a href=#679 id=679 data-nosnippet>679</a>
-<a href=#680 id=680 data-nosnippet>680</a><span class="attr">#[cfg(test)]
-<a href=#681 id=681 data-nosnippet>681</a></span><span class="kw">mod </span>tests {
-<a href=#682 id=682 data-nosnippet>682</a>    <span class="kw">use </span>serde::Deserialize;
-<a href=#683 id=683 data-nosnippet>683</a>
-<a href=#684 id=684 data-nosnippet>684</a>    <span class="attr">#[derive(Deserialize)]
-<a href=#685 id=685 data-nosnippet>685</a>    </span><span class="kw">struct </span>Wrap {
-<a href=#686 id=686 data-nosnippet>686</a>        <span class="attr">#[serde(with = <span class="string">"super::int64_str"</span>)]
-<a href=#687 id=687 data-nosnippet>687</a>        </span>value: i64,
-<a href=#688 id=688 data-nosnippet>688</a>    }
-<a href=#689 id=689 data-nosnippet>689</a>
-<a href=#690 id=690 data-nosnippet>690</a>    <span class="attr">#[test]
-<a href=#691 id=691 data-nosnippet>691</a>    </span><span class="kw">fn </span>int64_str_accepts_string_and_number() {
-<a href=#692 id=692 data-nosnippet>692</a>        <span class="comment">// The backend may send an int64 as a quoted string or a bare number;
-<a href=#693 id=693 data-nosnippet>693</a>        // both must deserialize to the same value.
-<a href=#694 id=694 data-nosnippet>694</a>        </span><span class="macro">assert_eq!</span>(
-<a href=#695 id=695 data-nosnippet>695</a>            serde_json::from_str::&lt;Wrap&gt;(<span class="string">r#"{"value":"123"}"#</span>)
-<a href=#696 id=696 data-nosnippet>696</a>                .unwrap()
-<a href=#697 id=697 data-nosnippet>697</a>                .value,
-<a href=#698 id=698 data-nosnippet>698</a>            <span class="number">123
-<a href=#699 id=699 data-nosnippet>699</a>        </span>);
-<a href=#700 id=700 data-nosnippet>700</a>        <span class="macro">assert_eq!</span>(
-<a href=#701 id=701 data-nosnippet>701</a>            serde_json::from_str::&lt;Wrap&gt;(<span class="string">r#"{"value":123}"#</span>)
-<a href=#702 id=702 data-nosnippet>702</a>                .unwrap()
-<a href=#703 id=703 data-nosnippet>703</a>                .value,
-<a href=#704 id=704 data-nosnippet>704</a>            <span class="number">123
-<a href=#705 id=705 data-nosnippet>705</a>        </span>);
-<a href=#706 id=706 data-nosnippet>706</a>        <span class="comment">// Negative values pass through; an unparseable string falls back to 0.
-<a href=#707 id=707 data-nosnippet>707</a>        </span><span class="macro">assert_eq!</span>(
-<a href=#708 id=708 data-nosnippet>708</a>            serde_json::from_str::&lt;Wrap&gt;(<span class="string">r#"{"value":-9}"#</span>)
-<a href=#709 id=709 data-nosnippet>709</a>                .unwrap()
-<a href=#710 id=710 data-nosnippet>710</a>                .value,
-<a href=#711 id=711 data-nosnippet>711</a>            -<span class="number">9
-<a href=#712 id=712 data-nosnippet>712</a>        </span>);
-<a href=#713 id=713 data-nosnippet>713</a>        <span class="macro">assert_eq!</span>(
-<a href=#714 id=714 data-nosnippet>714</a>            serde_json::from_str::&lt;Wrap&gt;(<span class="string">r#"{"value":""}"#</span>)
-<a href=#715 id=715 data-nosnippet>715</a>                .unwrap()
-<a href=#716 id=716 data-nosnippet>716</a>                .value,
-<a href=#717 id=717 data-nosnippet>717</a>            <span class="number">0
-<a href=#718 id=718 data-nosnippet>718</a>        </span>);
-<a href=#719 id=719 data-nosnippet>719</a>    }
-<a href=#720 id=720 data-nosnippet>720</a>}
+<a href=#680 id=680 data-nosnippet>680</a><span class="doccomment">/// Deserializes a `String` leniently (see [`lenient_string`]).
+<a href=#681 id=681 data-nosnippet>681</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>string_lenient&lt;<span class="lifetime">'de</span>, D&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;String, D::Error&gt;
+<a href=#682 id=682 data-nosnippet>682</a><span class="kw">where
+<a href=#683 id=683 data-nosnippet>683</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#684 id=684 data-nosnippet>684</a>{
+<a href=#685 id=685 data-nosnippet>685</a>    <span class="prelude-val">Ok</span>(lenient_string(serde_json::Value::deserialize(d)<span class="question-mark">?</span>))
+<a href=#686 id=686 data-nosnippet>686</a>}
+<a href=#687 id=687 data-nosnippet>687</a>
+<a href=#688 id=688 data-nosnippet>688</a><span class="doccomment">/// Deserializes a list of strings leniently: anything other than a JSON
+<a href=#689 id=689 data-nosnippet>689</a>/// array (null, an object, a scalar) becomes empty, and each element goes
+<a href=#690 id=690 data-nosnippet>690</a>/// through [`lenient_string`].
+<a href=#691 id=691 data-nosnippet>691</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>string_vec_lenient&lt;<span class="lifetime">'de</span>, D&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, D::Error&gt;
+<a href=#692 id=692 data-nosnippet>692</a><span class="kw">where
+<a href=#693 id=693 data-nosnippet>693</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#694 id=694 data-nosnippet>694</a>{
+<a href=#695 id=695 data-nosnippet>695</a>    <span class="prelude-val">Ok</span>(<span class="kw">match </span>serde_json::Value::deserialize(d)<span class="question-mark">? </span>{
+<a href=#696 id=696 data-nosnippet>696</a>        serde_json::Value::Array(items) =&gt; items.into_iter().map(lenient_string).collect(),
+<a href=#697 id=697 data-nosnippet>697</a>        <span class="kw">_ </span>=&gt; Vec::new(),
+<a href=#698 id=698 data-nosnippet>698</a>    })
+<a href=#699 id=699 data-nosnippet>699</a>}
+<a href=#700 id=700 data-nosnippet>700</a>
+<a href=#701 id=701 data-nosnippet>701</a><span class="doccomment">/// Returns the entries of a JSON object; anything else (null, an array such as
+<a href=#702 id=702 data-nosnippet>702</a>/// `[]`, a scalar) yields no entries.
+<a href=#703 id=703 data-nosnippet>703</a></span><span class="kw">fn </span>lenient_object(value: serde_json::Value) -&gt; serde_json::Map&lt;String, serde_json::Value&gt; {
+<a href=#704 id=704 data-nosnippet>704</a>    <span class="kw">match </span>value {
+<a href=#705 id=705 data-nosnippet>705</a>        serde_json::Value::Object(map) =&gt; map,
+<a href=#706 id=706 data-nosnippet>706</a>        <span class="kw">_ </span>=&gt; serde_json::Map::new(),
+<a href=#707 id=707 data-nosnippet>707</a>    }
+<a href=#708 id=708 data-nosnippet>708</a>}
+<a href=#709 id=709 data-nosnippet>709</a>
+<a href=#710 id=710 data-nosnippet>710</a><span class="doccomment">/// Deserializes a `string -&gt; string` JSON object leniently: a non-object value
+<a href=#711 id=711 data-nosnippet>711</a>/// becomes empty and each value goes through [`lenient_string`].
+<a href=#712 id=712 data-nosnippet>712</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>string_map_lenient&lt;<span class="lifetime">'de</span>, D&gt;(
+<a href=#713 id=713 data-nosnippet>713</a>    d: D,
+<a href=#714 id=714 data-nosnippet>714</a>) -&gt; <span class="prelude-ty">Result</span>&lt;std::collections::BTreeMap&lt;String, String&gt;, D::Error&gt;
+<a href=#715 id=715 data-nosnippet>715</a><span class="kw">where
+<a href=#716 id=716 data-nosnippet>716</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#717 id=717 data-nosnippet>717</a>{
+<a href=#718 id=718 data-nosnippet>718</a>    <span class="prelude-val">Ok</span>(lenient_object(serde_json::Value::deserialize(d)<span class="question-mark">?</span>)
+<a href=#719 id=719 data-nosnippet>719</a>        .into_iter()
+<a href=#720 id=720 data-nosnippet>720</a>        .map(|(k, v)| (k, lenient_string(v)))
+<a href=#721 id=721 data-nosnippet>721</a>        .collect())
+<a href=#722 id=722 data-nosnippet>722</a>}
+<a href=#723 id=723 data-nosnippet>723</a>
+<a href=#724 id=724 data-nosnippet>724</a><span class="doccomment">/// Deserializes a `string -&gt; int64` JSON object leniently: a non-object value
+<a href=#725 id=725 data-nosnippet>725</a>/// becomes empty and each value goes through [`lenient_int`].
+<a href=#726 id=726 data-nosnippet>726</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>int64_map_lenient&lt;<span class="lifetime">'de</span>, D&gt;(
+<a href=#727 id=727 data-nosnippet>727</a>    d: D,
+<a href=#728 id=728 data-nosnippet>728</a>) -&gt; <span class="prelude-ty">Result</span>&lt;std::collections::BTreeMap&lt;String, i64&gt;, D::Error&gt;
+<a href=#729 id=729 data-nosnippet>729</a><span class="kw">where
+<a href=#730 id=730 data-nosnippet>730</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#731 id=731 data-nosnippet>731</a>{
+<a href=#732 id=732 data-nosnippet>732</a>    <span class="prelude-val">Ok</span>(lenient_object(serde_json::Value::deserialize(d)<span class="question-mark">?</span>)
+<a href=#733 id=733 data-nosnippet>733</a>        .into_iter()
+<a href=#734 id=734 data-nosnippet>734</a>        .map(|(k, v)| (k, lenient_int(v)))
+<a href=#735 id=735 data-nosnippet>735</a>        .collect())
+<a href=#736 id=736 data-nosnippet>736</a>}
+<a href=#737 id=737 data-nosnippet>737</a>
+<a href=#738 id=738 data-nosnippet>738</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>null_as_default&lt;<span class="lifetime">'de</span>, D, T&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;T, D::Error&gt;
+<a href=#739 id=739 data-nosnippet>739</a><span class="kw">where
+<a href=#740 id=740 data-nosnippet>740</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#741 id=741 data-nosnippet>741</a>    T: Deserialize&lt;<span class="lifetime">'de</span>&gt; + Default,
+<a href=#742 id=742 data-nosnippet>742</a>{
+<a href=#743 id=743 data-nosnippet>743</a>    <span class="prelude-val">Ok</span>(<span class="prelude-ty">Option</span>::&lt;T&gt;::deserialize(d)<span class="question-mark">?</span>.unwrap_or_default())
+<a href=#744 id=744 data-nosnippet>744</a>}
+<a href=#745 id=745 data-nosnippet>745</a>
+<a href=#746 id=746 data-nosnippet>746</a><span class="doccomment">/// Deserializes a field that may be a JSON number, string, or null into
+<a href=#747 id=747 data-nosnippet>747</a>/// `Option&lt;String&gt;`.  Null and missing fields produce `None`; numbers are
+<a href=#748 id=748 data-nosnippet>748</a>/// converted to their decimal string representation.
+<a href=#749 id=749 data-nosnippet>749</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>value_as_opt_string {
+<a href=#750 id=750 data-nosnippet>750</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#751 id=751 data-nosnippet>751</a>
+<a href=#752 id=752 data-nosnippet>752</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize&lt;<span class="lifetime">'de</span>, D&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;, D::Error&gt;
+<a href=#753 id=753 data-nosnippet>753</a>    <span class="kw">where
+<a href=#754 id=754 data-nosnippet>754</a>        </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#755 id=755 data-nosnippet>755</a>    {
+<a href=#756 id=756 data-nosnippet>756</a>        <span class="kw">let </span>v = serde_json::Value::deserialize(d)<span class="question-mark">?</span>;
+<a href=#757 id=757 data-nosnippet>757</a>        <span class="prelude-val">Ok</span>(<span class="kw">match </span>v {
+<a href=#758 id=758 data-nosnippet>758</a>            serde_json::Value::Null =&gt; <span class="prelude-val">None</span>,
+<a href=#759 id=759 data-nosnippet>759</a>            serde_json::Value::String(s) <span class="kw">if </span>s.is_empty() =&gt; <span class="prelude-val">None</span>,
+<a href=#760 id=760 data-nosnippet>760</a>            serde_json::Value::String(s) =&gt; <span class="prelude-val">Some</span>(s),
+<a href=#761 id=761 data-nosnippet>761</a>            serde_json::Value::Number(n) =&gt; <span class="prelude-val">Some</span>(n.to_string()),
+<a href=#762 id=762 data-nosnippet>762</a>            other =&gt; <span class="prelude-val">Some</span>(other.to_string()),
+<a href=#763 id=763 data-nosnippet>763</a>        })
+<a href=#764 id=764 data-nosnippet>764</a>    }
+<a href=#765 id=765 data-nosnippet>765</a>
+<a href=#766 id=766 data-nosnippet>766</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(v: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;String&gt;, s: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+<a href=#767 id=767 data-nosnippet>767</a>    <span class="kw">where
+<a href=#768 id=768 data-nosnippet>768</a>        </span>S: Serializer,
+<a href=#769 id=769 data-nosnippet>769</a>    {
+<a href=#770 id=770 data-nosnippet>770</a>        <span class="kw">match </span>v {
+<a href=#771 id=771 data-nosnippet>771</a>            <span class="prelude-val">Some</span>(val) =&gt; s.serialize_str(val),
+<a href=#772 id=772 data-nosnippet>772</a>            <span class="prelude-val">None </span>=&gt; s.serialize_none(),
+<a href=#773 id=773 data-nosnippet>773</a>        }
+<a href=#774 id=774 data-nosnippet>774</a>    }
+<a href=#775 id=775 data-nosnippet>775</a>}
+<a href=#776 id=776 data-nosnippet>776</a>
+<a href=#777 id=777 data-nosnippet>777</a><span class="attr">#[cfg(test)]
+<a href=#778 id=778 data-nosnippet>778</a></span><span class="kw">mod </span>tests {
+<a href=#779 id=779 data-nosnippet>779</a>    <span class="kw">use </span>serde::Deserialize;
+<a href=#780 id=780 data-nosnippet>780</a>
+<a href=#781 id=781 data-nosnippet>781</a>    <span class="attr">#[derive(Deserialize)]
+<a href=#782 id=782 data-nosnippet>782</a>    </span><span class="kw">struct </span>Wrap {
+<a href=#783 id=783 data-nosnippet>783</a>        <span class="attr">#[serde(with = <span class="string">"super::int64_str"</span>)]
+<a href=#784 id=784 data-nosnippet>784</a>        </span>value: i64,
+<a href=#785 id=785 data-nosnippet>785</a>    }
+<a href=#786 id=786 data-nosnippet>786</a>
+<a href=#787 id=787 data-nosnippet>787</a>    <span class="attr">#[test]
+<a href=#788 id=788 data-nosnippet>788</a>    </span><span class="kw">fn </span>int64_str_accepts_string_and_number() {
+<a href=#789 id=789 data-nosnippet>789</a>        <span class="comment">// The backend may send an int64 as a quoted string or a bare number;
+<a href=#790 id=790 data-nosnippet>790</a>        // both must deserialize to the same value.
+<a href=#791 id=791 data-nosnippet>791</a>        </span><span class="macro">assert_eq!</span>(
+<a href=#792 id=792 data-nosnippet>792</a>            serde_json::from_str::&lt;Wrap&gt;(<span class="string">r#"{"value":"123"}"#</span>)
+<a href=#793 id=793 data-nosnippet>793</a>                .unwrap()
+<a href=#794 id=794 data-nosnippet>794</a>                .value,
+<a href=#795 id=795 data-nosnippet>795</a>            <span class="number">123
+<a href=#796 id=796 data-nosnippet>796</a>        </span>);
+<a href=#797 id=797 data-nosnippet>797</a>        <span class="macro">assert_eq!</span>(
+<a href=#798 id=798 data-nosnippet>798</a>            serde_json::from_str::&lt;Wrap&gt;(<span class="string">r#"{"value":123}"#</span>)
+<a href=#799 id=799 data-nosnippet>799</a>                .unwrap()
+<a href=#800 id=800 data-nosnippet>800</a>                .value,
+<a href=#801 id=801 data-nosnippet>801</a>            <span class="number">123
+<a href=#802 id=802 data-nosnippet>802</a>        </span>);
+<a href=#803 id=803 data-nosnippet>803</a>        <span class="comment">// Negative values pass through; an unparseable string falls back to 0.
+<a href=#804 id=804 data-nosnippet>804</a>        </span><span class="macro">assert_eq!</span>(
+<a href=#805 id=805 data-nosnippet>805</a>            serde_json::from_str::&lt;Wrap&gt;(<span class="string">r#"{"value":-9}"#</span>)
+<a href=#806 id=806 data-nosnippet>806</a>                .unwrap()
+<a href=#807 id=807 data-nosnippet>807</a>                .value,
+<a href=#808 id=808 data-nosnippet>808</a>            -<span class="number">9
+<a href=#809 id=809 data-nosnippet>809</a>        </span>);
+<a href=#810 id=810 data-nosnippet>810</a>        <span class="macro">assert_eq!</span>(
+<a href=#811 id=811 data-nosnippet>811</a>            serde_json::from_str::&lt;Wrap&gt;(<span class="string">r#"{"value":""}"#</span>)
+<a href=#812 id=812 data-nosnippet>812</a>                .unwrap()
+<a href=#813 id=813 data-nosnippet>813</a>                .value,
+<a href=#814 id=814 data-nosnippet>814</a>            <span class="number">0
+<a href=#815 id=815 data-nosnippet>815</a>        </span>);
+<a href=#816 id=816 data-nosnippet>816</a>    }
+<a href=#817 id=817 data-nosnippet>817</a>}
 </code></pre></div></section></main></body></html>

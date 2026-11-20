@@ -139,6 +139,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a187b81fba74aeea06333e5460f6c79de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63733868dd08101f12e379ac7c63501e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html#a63733868dd08101f12e379ac7c63501e">margin_ratio</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html">TradeContext</a>, <a class="el" href="structlongbridge_1_1trade_1_1_margin_ratio.html">MarginRatio</a> &gt; callback) const</td></tr>
 <tr class="separator:a63733868dd08101f12e379ac7c63501e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a616eef54027054086ab8193d48c93d7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html#a616eef54027054086ab8193d48c93d7e">risk_assessment</a> (<a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html">TradeContext</a>, <a class="el" href="structlongbridge_1_1trade_1_1_risk_assessment.html">RiskAssessment</a> &gt; callback) const</td></tr>
+<tr class="separator:a616eef54027054086ab8193d48c93d7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedb3d207a04d2a4bcde41e351b5c4f60"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html#aedb3d207a04d2a4bcde41e351b5c4f60">order_detail</a> (const std::string &amp;order_id, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html">TradeContext</a>, <a class="el" href="structlongbridge_1_1trade_1_1_order_detail.html">OrderDetail</a> &gt; callback) const</td></tr>
 <tr class="separator:aedb3d207a04d2a4bcde41e351b5c4f60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8450e8f98dc3b9a673c00dd677de7e60"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html#a8450e8f98dc3b9a673c00dd677de7e60">order_detail_attached</a> (const std::string &amp;order_id, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html">TradeContext</a>, <a class="el" href="structlongbridge_1_1trade_1_1_order_detail.html">OrderDetail</a> &gt; callback) const</td></tr>
@@ -689,6 +691,25 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Replace order. </p>
+
+</div>
+</div>
+<a id="a616eef54027054086ab8193d48c93d7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a616eef54027054086ab8193d48c93d7e">&#9670;&nbsp;</a></span>risk_assessment()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::trade::TradeContext::risk_assessment </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html">TradeContext</a>, <a class="el" href="structlongbridge_1_1trade_1_1_risk_assessment.html">RiskAssessment</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the risk assessment (suitability questionnaire) result of the current member </p>
 
 </div>
 </div>

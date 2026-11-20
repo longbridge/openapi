@@ -3413,6 +3413,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="block">Returns the final answer text; valid when <a href="com/longbridge/agent/ConversationResponse.html#getStatus()"><code>ConversationResponse.getStatus()</code></a> is
  <a href="com/longbridge/agent/ConversationStatus.html#Succeeded"><code>ConversationStatus.Succeeded</code></a>.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getApprovals()">getApprovals()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the approval states keyed by item (e.g.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/quote/PushBrokers.html#getAskBrokers()">getAskBrokers()</a></span> - Method in class com.longbridge.quote.<a href="com/longbridge/quote/PushBrokers.html" title="class in com.longbridge.quote">PushBrokers</a></dt>
 <dd>
 <div class="block">Returns the ask-side broker queue.</div>
@@ -4263,6 +4267,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Returns the number of days remaining until the option expires, updated
  daily at midnight ET.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getDeadlines()">getDeadlines()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the deadlines keyed by item, as returned by the server.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/trade/OrderDetail.html#getDeductionsAmount()">getDeductionsAmount()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/OrderDetail.html" title="class in com.longbridge.trade">OrderDetail</a></dt>
 <dd>
@@ -6452,6 +6460,15 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Returns the PE (TTM).</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getPi()">getPi()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the professional investor (PI) status code.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getPiEndAt()">getPiEndAt()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the professional investor status end time, as returned by the
+ server (<code>0</code> when not set).</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/trade/OrderDetail.html#getPlatformDeductedAmount()">getPlatformDeductedAmount()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/OrderDetail.html" title="class in com.longbridge.trade">OrderDetail</a></dt>
 <dd>
 <div class="block">Returns the platform deducted amount.</div>
@@ -6825,6 +6842,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Returns reason.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getReAuthentication()">getReAuthentication()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the re-authentication flag, as returned by the server (empty when
+ not set).</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/grid/GridOrder.html#getReboundPercent()">getReboundPercent()</a></span> - Method in class com.longbridge.grid.<a href="com/longbridge/grid/GridOrder.html" title="class in com.longbridge.grid">GridOrder</a></dt>
 <dd>
 <div class="block">Returns reboundPercent.</div>
@@ -6993,6 +7015,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Returns the rho.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getRisk()">getRisk()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the risk level of the latest questionnaire (e.g.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/fund/FundAnalysis.html#getRiskAbility()">getRiskAbility()</a></span> - Method in class com.longbridge.fund.<a href="com/longbridge/fund/FundAnalysis.html" title="class in com.longbridge.fund">FundAnalysis</a></dt>
 <dd>
 <div class="block">Returns riskAbility.</div>
@@ -7000,6 +7026,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="com/longbridge/fund/FundAnalysisDetail.html#getRiskAbility()">getRiskAbility()</a></span> - Method in class com.longbridge.fund.<a href="com/longbridge/fund/FundAnalysisDetail.html" title="class in com.longbridge.fund">FundAnalysisDetail</a></dt>
 <dd>
 <div class="block">Returns riskAbility.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/TradeContext.html#getRiskAssessment()">getRiskAssessment()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/TradeContext.html" title="class in com.longbridge.trade">TradeContext</a></dt>
+<dd>
+<div class="block">Get the risk assessment (suitability questionnaire) result of the current
+ member</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getRiskAssessmentAt()">getRiskAssessmentAt()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the date of the latest risk assessment, as returned by the server
+ (e.g.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/fund/FundBrief.html#getRiskLevel()">getRiskLevel()</a></span> - Method in class com.longbridge.fund.<a href="com/longbridge/fund/FundBrief.html" title="class in com.longbridge.fund">FundBrief</a></dt>
 <dd>
@@ -7064,6 +7100,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="com/longbridge/fund/FundOrderInfo.html#getSalesUnit()">getSalesUnit()</a></span> - Method in class com.longbridge.fund.<a href="com/longbridge/fund/FundOrderInfo.html" title="class in com.longbridge.fund">FundOrderInfo</a></dt>
 <dd>
 <div class="block">Returns salesUnit.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getScore()">getScore()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the questionnaire score.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/quote/WatchlistGroup.html#getSecurities()">getSecurities()</a></span> - Method in class com.longbridge.quote.<a href="com/longbridge/quote/WatchlistGroup.html" title="class in com.longbridge.quote">WatchlistGroup</a></dt>
 <dd>
@@ -7463,6 +7503,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="com/longbridge/trade/MultiLegInfo.html#getStrategyName()">getStrategyName()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/MultiLegInfo.html" title="class in com.longbridge.trade">MultiLegInfo</a></dt>
 <dd>
 <div class="block">Returns the strategy name.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#getStrategyRiskLevels()">getStrategyRiskLevels()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>
+<div class="block">Returns the strategy risk levels of the member.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/quote/OptionChainContract.html#getStrikePrice()">getStrikePrice()</a></span> - Method in class com.longbridge.quote.<a href="com/longbridge/quote/OptionChainContract.html" title="class in com.longbridge.quote">OptionChainContract</a></dt>
 <dd>
@@ -8956,11 +9000,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/fundamental/ValuationHistoryMetric.html#high">high</a></span> - Variable in class com.longbridge.fundamental.<a href="com/longbridge/fundamental/ValuationHistoryMetric.html" title="class in com.longbridge.fundamental">ValuationHistoryMetric</a></dt>
 <dd>
-<div class="block">Historical high over the period.</div>
+<div class="block">Upper bound of the fair-value band (not the period maximum; the series can rise above it).</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/fundamental/ValuationMetricData.html#high">high</a></span> - Variable in class com.longbridge.fundamental.<a href="com/longbridge/fundamental/ValuationMetricData.html" title="class in com.longbridge.fundamental">ValuationMetricData</a></dt>
 <dd>
-<div class="block">Historical high value.</div>
+<div class="block">Upper bound of the fair-value band (not the period maximum; the series can rise above it).</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/fundamental/RatingTarget.html#highestPrice">highestPrice</a></span> - Variable in class com.longbridge.fundamental.<a href="com/longbridge/fundamental/RatingTarget.html" title="class in com.longbridge.fundamental">RatingTarget</a></dt>
 <dd>
@@ -9986,11 +10030,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/fundamental/ValuationHistoryMetric.html#low">low</a></span> - Variable in class com.longbridge.fundamental.<a href="com/longbridge/fundamental/ValuationHistoryMetric.html" title="class in com.longbridge.fundamental">ValuationHistoryMetric</a></dt>
 <dd>
-<div class="block">Historical low over the period.</div>
+<div class="block">Lower bound of the fair-value band (not the period minimum; the series can fall below it).</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/fundamental/ValuationMetricData.html#low">low</a></span> - Variable in class com.longbridge.fundamental.<a href="com/longbridge/fundamental/ValuationMetricData.html" title="class in com.longbridge.fundamental">ValuationMetricData</a></dt>
 <dd>
-<div class="block">Historical low value.</div>
+<div class="block">Lower bound of the fair-value band (not the period minimum; the series can fall below it).</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/quote/CalcIndex.html#LowerStrikePrice">LowerStrikePrice</a></span> - com.longbridge.quote.<a href="com/longbridge/quote/CalcIndex.html" title="enum in com.longbridge.quote">CalcIndex</a></dt>
 <dd>
@@ -12127,6 +12171,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Number of constituent stocks that rose today.</div>
 </dd>
+<dt><a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade"><span class="typeNameLink">RiskAssessment</span></a> - Class in <a href="com/longbridge/trade/package-summary.html">com.longbridge.trade</a></dt>
+<dd>
+<div class="block">Risk assessment (suitability questionnaire) result of the current member</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#%3Cinit%3E()">RiskAssessment()</a></span> - Constructor for class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/fundamental/ValuationComparisonItem.html#roe">roe</a></span> - Variable in class com.longbridge.fundamental.<a href="com/longbridge/fundamental/ValuationComparisonItem.html" title="class in com.longbridge.fundamental">ValuationComparisonItem</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/grid/GridTradeRule.html#rth(int)">rth(int)</a></span> - Method in class com.longbridge.grid.<a href="com/longbridge/grid/GridTradeRule.html" title="class in com.longbridge.grid">GridTradeRule</a></dt>
@@ -14490,6 +14540,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="com/longbridge/trade/PushGridOrderChanged.html#toString()">toString()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/PushGridOrderChanged.html" title="class in com.longbridge.trade">PushGridOrderChanged</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/trade/PushOrderChanged.html#toString()">toString()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/PushOrderChanged.html" title="class in com.longbridge.trade">PushOrderChanged</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/longbridge/trade/RiskAssessment.html#toString()">toString()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/RiskAssessment.html" title="class in com.longbridge.trade">RiskAssessment</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/longbridge/trade/StockPosition.html#toString()">toString()</a></span> - Method in class com.longbridge.trade.<a href="com/longbridge/trade/StockPosition.html" title="class in com.longbridge.trade">StockPosition</a></dt>
 <dd>&nbsp;</dd>
