@@ -3745,7 +3745,9 @@ struct ValuationPoint
 struct ValuationMetricData
 {
   std::string desc;
+  /// Upper bound of the fair-value band (not the period maximum; the series can rise above it)
   std::string high;
+  /// Lower bound of the fair-value band (not the period minimum; the series can fall below it)
   std::string low;
   std::string median;
   std::vector<ValuationPoint> list;

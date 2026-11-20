@@ -793,9 +793,11 @@ impl ToFFI for CValuationPointOwned {
 pub struct CValuationMetricData {
     /// Description or label of the valuation metric.
     pub desc: *const c_char,
-    /// Highest value of the metric over the series.
+    /// Upper bound of the fair-value band (not the period maximum; the series
+    /// can rise above it).
     pub high: *const c_char,
-    /// Lowest value of the metric over the series.
+    /// Lower bound of the fair-value band (not the period minimum; the series
+    /// can fall below it).
     pub low: *const c_char,
     /// Median value of the metric over the series.
     pub median: *const c_char,

@@ -13800,9 +13800,9 @@ class ValuationMetricData:
     desc: str
     """Human-readable description with current value and percentile"""
     high: str
-    """Historical high"""
+    """Upper bound of the fair-value band (not the period maximum; the series can rise above it)"""
     low: str
-    """Historical low"""
+    """Lower bound of the fair-value band (not the period minimum; the series can fall below it)"""
     median: str
     """Historical median"""
     list: list[ValuationPoint]
@@ -13835,9 +13835,9 @@ class ValuationHistoryMetric:
     desc: str
     """Human-readable description"""
     high: str
-    """Historical high over the period"""
+    """Upper bound of the fair-value band (not the period maximum; the series can rise above it)"""
     low: str
-    """Historical low over the period"""
+    """Lower bound of the fair-value band (not the period minimum; the series can fall below it)"""
     median: str
     """Historical median over the period"""
     list: list[ValuationPoint]

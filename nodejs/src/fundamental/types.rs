@@ -589,9 +589,11 @@ impl From<lb::ValuationMetricsData> for ValuationMetricsData {
 pub struct ValuationMetricData {
     /// Description
     pub desc: String,
-    /// Historical high
+    /// Upper bound of the fair-value band (not the period maximum; the series
+    /// can rise above it)
     pub high: Option<String>,
-    /// Historical low
+    /// Lower bound of the fair-value band (not the period minimum; the series
+    /// can fall below it)
     pub low: Option<String>,
     /// Historical median
     pub median: Option<String>,
