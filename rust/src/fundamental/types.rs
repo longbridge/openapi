@@ -1201,24 +1201,54 @@ impl IndustryRankSortType {
 /// Response for [`crate::FundamentalContext::business_segments`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BusinessSegments {
-    /// Report date
+    /// Report date, `YYYYMMDD`
     pub date: String,
     /// Total revenue
     pub total: String,
     /// Reporting currency
     pub currency: String,
+    /// Fiscal period label, e.g. `2026.Q2`. Follows the issuer's own fiscal
+    /// calendar, so it does not always match the calendar year of `fp_end`.
+    #[serde(default)]
+    pub report_txt: String,
+    /// First day of the reported period, `YYYY.MM.DD`
+    #[serde(default)]
+    pub fp_start: String,
+    /// Last day of the reported period, `YYYY.MM.DD`
+    #[serde(default)]
+    pub fp_end: String,
+    /// Year-on-year change of `total`, as the server renders it. Empty when
+    /// the server does not supply one.
+    #[serde(default)]
+    pub yoy: String,
     /// Business segment breakdown
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub business: Vec<BusinessSegmentItem>,
+    /// Regional breakdown, in the same shape as `business`. Empty for issuers
+    /// that do not report one.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub regionals: Vec<BusinessSegmentItem>,
 }
 
-/// One business segment item (latest snapshot)
+/// One business or regional segment item (latest snapshot)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BusinessSegmentItem {
     /// Segment name
     pub name: String,
     /// Percentage of total revenue
     pub percent: String,
+    /// Absolute value, in the response's `currency`. Empty when the server
+    /// does not supply one.
+    #[serde(default)]
+    pub value: String,
+    /// Stable identifier for the segment, usable to align the same segment
+    /// across periods. Empty when the server does not supply one.
+    #[serde(default)]
+    pub id: String,
+    /// Year-on-year change for this segment, as the server renders it. Empty
+    /// when the server does not supply one.
+    #[serde(default)]
+    pub yoy: String,
 }
 
 /// Response for [`crate::FundamentalContext::business_segments_history`]

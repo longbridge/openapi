@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **All SDKs:** `FundamentalContext.business_segments()` now returns what the BusinessV4 gateway actually sends, instead of only a name and a percentage per segment. New on the response: `report_txt` (fiscal period label such as `2026.Q2`, which follows the issuer's own fiscal calendar and so does not always match the calendar year of `fp_end`), `fp_start` and `fp_end` (the reported period), `yoy` (year-on-year change of `total`), and `regionals` — the regional breakdown, in the same shape as `business`, which was previously unreachable from the SDK even though the gateway returns it and the history variant already exposed it. New on each segment item: `value` (the absolute amount, so a caller no longer has to multiply a percentage back out against `total`), `id` (a stable identifier for aligning the same segment across periods) and `yoy`. Every new field is `#[serde(default)]`, so a response that omits them — an issuer with no coverage returns every field empty — still decodes. C: `lb_business_segments_t` and `lb_business_segment_item_t` gain the matching members plus `num_regionals`. C++ / Java: the same fields on `BusinessSegments` and `BusinessSegmentItem`. Node.js and Python do not expose this API and are unaffected.
+
+  `rpt_date` is deliberately **not** exposed. The gateway returns it on this endpoint, but measured against the `business-segments/history` endpoint for the same symbol and the same fiscal period it disagrees — history reports `2026.08.12` for Tencent's 2026.Q2 where this endpoint reports `2025.08.13` — so it is left out rather than surfaced as a field callers would reasonably trust.
+
 ## [5.5.0] - 2026-11-20
 
 ### Added
