@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   `rpt_date` is deliberately **not** exposed. The gateway returns it on this endpoint, but measured against the `business-segments/history` endpoint for the same symbol and the same fiscal period it disagrees — history reports `2026.08.12` for Tencent's 2026.Q2 where this endpoint reports `2025.08.13` — so it is left out rather than surfaced as a field callers would reasonably trust.
 
+### Fixed
+
+- **All SDKs (docs only):** `CalendarContext.finance_calendar` docs now describe how the endpoint actually pages. `count` caps the events returned for each date, not per response; a date group holding fewer events than its `count` was truncated, and the rest is fetched with `start` = `end` = that date and `offset` = events already received. `next_date` moves past truncated dates, and `end` is not a hard bound (the server may return later dates). The previous text described `count` as a page size and `offset` as a skip from the start of the window. Reported as longbridge/developers#1339
+
 ## [5.5.0] - 2026-11-20
 
 ### Added

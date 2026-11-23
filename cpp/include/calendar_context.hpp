@@ -47,12 +47,16 @@ public:
   static CalendarContext create(const Config& config);
   /// Get financial calendar events for the given date range.
   ///
-  /// The endpoint paginates: the server caps each response (historically 10
-  /// events per page unless a larger `count` is requested) and returns a
-  /// `next_date` cursor. To page through the full window, request a larger
-  /// `count`, or re-call with the returned `next_date` as `start`. `count`,
-  /// `offset` and `next` are optional (pass `std::nullopt` to use the server
-  /// default).
+  /// Events come back grouped by date. `count` caps the events returned for
+  /// *each date* (server default when omitted), and a group's `count` field is
+  /// that date's total, so a group holding fewer events than its `count` was
+  /// truncated: fetch the rest by calling again with `start` = `end` = that
+  /// date and `offset` set to the number of events already received. The
+  /// `next_date` cursor points at the next date group and moves past truncated
+  /// dates. `end` is not a hard bound: the server may return later dates, so
+  /// filter by date on the client.
+  /// `count`, `offset` and `next` are optional (pass `std::nullopt` to use
+  /// the server default).
   void finance_calendar(CalendarCategory category, const std::string& start, const std::string& end, const std::string& market, std::optional<int32_t> count, std::optional<int32_t> offset, std::optional<CalendarPageDirection> next, AsyncCallback<CalendarContext, CalendarEventsResponse> callback) const;
 };
 

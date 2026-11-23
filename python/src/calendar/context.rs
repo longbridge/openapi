@@ -22,10 +22,14 @@ impl CalendarContext {
 
     /// Get financial calendar events.
     ///
-    /// The endpoint paginates: the server caps each response (historically 10
-    /// events per page unless a larger ``count`` is requested) and returns a
-    /// ``next_date`` cursor. To page through the full window, request a larger
-    /// ``count``, or re-call with the returned ``next_date`` as ``start``.
+    /// Events come back grouped by date. ``count`` caps the events returned for
+    /// *each date* (server default when omitted), and a group's ``count`` field
+    /// is that date's total, so a group holding fewer events than its ``count``
+    /// was truncated: fetch the rest by calling again with ``start`` = ``end``
+    /// = that date and ``offset`` set to the number of events already received.
+    /// The ``next_date`` cursor points at the next date group and moves past
+    /// truncated dates. ``end`` is not a hard bound: the server may return
+    /// later dates, so filter by date on the client.
     #[pyo3(signature = (category, start, end, market = None, count = None, offset = None, next = None))]
     fn finance_calendar(
         &self,

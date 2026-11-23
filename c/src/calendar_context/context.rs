@@ -35,6 +35,15 @@ pub unsafe extern "C" fn lb_calendar_context_release(ctx: *const CCalendarContex
 ///
 /// `count`, `offset` and `next` are optional pagination controls; pass `NULL`
 /// to omit any of them and use the server default.
+///
+/// Events come back grouped by date. `count` caps the events returned for
+/// *each date* (server default when omitted), and a group's `count` field is
+/// that date's total, so a group holding fewer events than its `count` was
+/// truncated: fetch the rest by calling again with `start` = `end` = that
+/// date and `offset` set to the number of events already received. The
+/// `next_date` cursor points at the next date group and moves past truncated
+/// dates. `end` is not a hard bound: the server may return later dates, so
+/// filter by date on the client.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_calendar_context_finance_calendar(
     ctx: *const CCalendarContext,

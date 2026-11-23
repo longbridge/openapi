@@ -253,14 +253,18 @@ export declare class CalendarContext {
    * `start` and `end` are date strings in `YYYY-MM-DD` format.
    * `market` is an optional market filter (e.g. `"HK"` or `"US"`).
    *
-   * The endpoint paginates: the server caps each response (historically 10
-   * events per page unless a larger `count` is requested) and returns a
-   * `nextDate` cursor. To page through the full window, request a larger
-   * `count`, or re-call with the returned `nextDate` as `start`.
+   * Events come back grouped by date. `count` caps the events returned for
+   * *each date* (server default when omitted), and a group's `count` field is
+   * that date's total, so a group holding fewer events than its `count` was
+   * truncated: fetch the rest by calling again with `start` = `end` = that
+   * date and `offset` set to the number of events already received. The
+   * `nextDate` cursor points at the next date group and moves past truncated
+   * dates. `end` is not a hard bound: the server may return later dates, so
+   * filter by date on the client.
    *
-   * - `count` — maximum number of events per page (server default when
+   * - `count` — maximum number of events per date (server default when
    *   omitted).
-   * - `offset` — number of events to skip from the start of the window.
+   * - `offset` — number of events to skip within a date.
    * - `next` — direction to page from the cursor.
    */
   financeCalendar(category: CalendarCategory, start: string, end: string, market?: string | undefined | null, count?: number | undefined | null, offset?: number | undefined | null, next?: CalendarPageDirection | undefined | null): Promise<CalendarEventsResponse>
