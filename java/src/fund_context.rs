@@ -17,7 +17,7 @@ use longbridge::{
 
 use crate::{
     async_util,
-    error::jni_result,
+    error::{JniError, jni_result},
     types::{FromJValue, JavaInteger, JavaLong, ObjectArray, PrimaryArray, get_field},
 };
 
@@ -79,9 +79,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextFunds(
         let __owned_ctx = context.ctx.clone();
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundsOptions::new();
-            if let Some(filter) = get_field::<_, _, Option<String>>(env, &opts, "filter")?
-                && let Ok(value) = serde_json::from_str::<serde_json::Value>(&filter)
-            {
+            if let Some(filter) = get_field::<_, _, Option<String>>(env, &opts, "filter")? {
+                let value: serde_json::Value = serde_json::from_str(&filter)
+                    .map_err(|err| JniError::Other(format!("invalid filter JSON: {err}")))?;
                 new_opts = new_opts.filter(value);
             }
             let quick_ids: PrimaryArray<i64> = get_field(env, &opts, "quickIds")?;

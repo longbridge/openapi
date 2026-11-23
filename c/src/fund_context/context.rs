@@ -54,14 +54,17 @@ pub unsafe extern "C" fn lb_fund_context_release(ctx: *const CFundContext) {
 
 // ── option builders ─────────────────────────────────────────────────────────
 
-unsafe fn build_get_funds_options(opts: *const CGetFundsOptions) -> GetFundsOptions {
+/// Fails with `Error::DecodeJSON` when `filter` is not valid JSON, rather than
+/// silently dropping it and returning the unfiltered catalogue.
+unsafe fn build_get_funds_options(
+    opts: *const CGetFundsOptions,
+) -> Result<GetFundsOptions, serde_json::Error> {
     let mut o = GetFundsOptions::new();
     if opts.is_null() {
-        return o;
+        return Ok(o);
     }
-    if !(*opts).filter.is_null()
-        && let Ok(value) = serde_json::from_str(&cstr_to_rust((*opts).filter))
-    {
+    if !(*opts).filter.is_null() {
+        let value: serde_json::Value = serde_json::from_str(&cstr_to_rust((*opts).filter))?;
         o = o.filter(value);
     }
     let quick_ids = slice_from_raw_parts((*opts).quick_ids, (*opts).num_quick_ids).to_vec();
@@ -72,7 +75,7 @@ unsafe fn build_get_funds_options(opts: *const CGetFundsOptions) -> GetFundsOpti
     if !time_interval.is_empty() {
         o = o.time_interval(time_interval);
     }
-    o
+    Ok(o)
 }
 
 unsafe fn build_analysis_options(opts: *const CGetFundAnalysisOptions) -> GetFundAnalysisOptions {
@@ -370,7 +373,7 @@ pub unsafe extern "C" fn lb_fund_context_funds(
     let ctx_inner = (*ctx).ctx.clone();
     let opts = build_get_funds_options(opts);
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CFundBriefOwned> = ctx_inner.funds(opts).await?.into();
+        let rows: CVec<CFundBriefOwned> = ctx_inner.funds(opts?).await?.into();
         Ok(rows)
     });
 }

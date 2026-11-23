@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   `rpt_date` is deliberately **not** exposed. The gateway returns it on this endpoint, but measured against the `business-segments/history` endpoint for the same symbol and the same fiscal period it disagrees — history reports `2026.08.12` for Tencent's 2026.Q2 where this endpoint reports `2025.08.13` — so it is left out rather than surfaced as a field callers would reasonably trust.
 
+### Fixed
+
+- **C / C++ / Java:** `FundContext.funds` no longer ignores a `filter` that is not valid JSON. The C and Java layers dropped an unparsable filter and sent the request without it, so the call returned the whole unfiltered fund catalogue as if the filter had been applied. It now fails instead — C / C++ with a JSON decode error through the callback, Java with a `RuntimeException` (`invalid filter JSON: …`) — matching Node.js and Python, which already rejected it.
+
 ## [5.5.0] - 2026-11-20
 
 ### Added

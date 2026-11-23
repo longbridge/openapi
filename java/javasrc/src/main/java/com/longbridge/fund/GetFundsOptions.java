@@ -12,7 +12,9 @@ public class GetFundsOptions {
     /**
      * Sets filter.
      *
-     * @param filter filter
+     * @param filter server-defined filter object as a JSON string; invalid
+     *               JSON makes {@code FundContext.funds} throw a
+     *               {@code RuntimeException} instead of being ignored
      * @return this instance for chaining
      */
     public GetFundsOptions setFilter(String filter) {
