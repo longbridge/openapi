@@ -3547,12 +3547,15 @@ inline fundamental::StockRatings convert(const lb_stock_ratings_t* r) {
 
 // ── business_segments conversions ────────────────────────────────
 inline fundamental::BusinessSegmentItem convert(const lb_business_segment_item_t* item) {
-  return { item->name, item->percent };
+  return { item->name, item->percent, item->value, item->id, item->yoy };
 }
 inline fundamental::BusinessSegments convert(const lb_business_segments_t* r) {
-  std::vector<fundamental::BusinessSegmentItem> business;
+  std::vector<fundamental::BusinessSegmentItem> business, regionals;
   for (size_t i = 0; i < r->num_business; ++i) business.push_back(convert(&r->business[i]));
-  return { r->date, r->total, r->currency, std::move(business) };
+  for (size_t i = 0; i < r->num_regionals; ++i) regionals.push_back(convert(&r->regionals[i]));
+  return { r->date,     r->total,  r->currency,       r->report_txt,
+           r->fp_start, r->fp_end, r->yoy,
+           std::move(business), std::move(regionals) };
 }
 inline fundamental::BusinessSegmentHistoryItem convert(const lb_business_segment_history_item_t* item) {
   return { item->name, item->percent, item->value };
