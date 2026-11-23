@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   `rpt_date` is deliberately **not** exposed. The gateway returns it on this endpoint, but measured against the `business-segments/history` endpoint for the same symbol and the same fiscal period it disagrees — history reports `2026.08.12` for Tencent's 2026.Q2 where this endpoint reports `2025.08.13` — so it is left out rather than surfaced as a field callers would reasonably trust.
 
+### Fixed
+
+- **All SDKs:** `TradeContext.history_executions()` and `TradeContext.history_orders()` no longer drop rows that share an id. The paging added in 5.5.0 deduplicated every row by `trade_id` / `order_id` alone, including rows on the same page, so several executions or orders reported under one id (for example the legs of a multi-leg order) silently collapsed into the first one. Rows on a page are now all kept; the dedup only discards rows a later page repeats from an earlier one, keyed by `(order_id, trade_id, symbol)` for executions and `(order_id, symbol)` for orders, and paging still stops as soon as a page adds nothing new (the guard against a gateway that ignores `page`). Both methods now share one pagination helper.
+
 ## [5.5.0] - 2026-11-20
 
 ### Added

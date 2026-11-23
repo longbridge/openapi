@@ -219,8 +219,6 @@ impl TradeContext {
         &self,
         options: impl Into<Option<GetHistoryExecutionsOptions>>,
     ) -> Result<Vec<Execution>> {
-        use std::collections::HashSet;
-
         #[derive(Deserialize)]
         struct Response {
             #[serde(default)]
@@ -229,40 +227,28 @@ impl TradeContext {
         }
 
         // The endpoint caps each response at 1000 records; walk the `page`
-        // param (1-based) until `has_more` is false. Dedupe by
-        // `trade_id` and stop if a page adds nothing new, guarding
-        // against the gateway ignoring `page`. Bounded to 1000 pages as
-        // a runaway guard.
-        let mut options = options.into().unwrap_or_default();
-        let mut all: Vec<Execution> = Vec::new();
-        let mut seen: HashSet<String> = HashSet::new();
-        for page in 1..=1000u32 {
-            options = options.with_page(page);
-            let resp = self
-                .0
-                .http_cli
-                .request(Method::GET, "/v1/trade/execution/history")
-                .query_params(&options)
-                .response::<Json<Response>>()
-                .send()
-                .with_subscriber(self.0.log_subscriber.clone())
-                .await?
-                .0;
-            if resp.trades.is_empty() {
-                break;
-            }
-            let mut added = 0usize;
-            for t in resp.trades {
-                if seen.insert(t.trade_id.clone()) {
-                    all.push(t);
-                    added += 1;
+        // param (1-based) until `has_more` is false.
+        let options = options.into().unwrap_or_default();
+        fetch_all_pages(
+            |page| {
+                let options = options.clone().with_page(page);
+                async move {
+                    let resp = self
+                        .0
+                        .http_cli
+                        .request(Method::GET, "/v1/trade/execution/history")
+                        .query_params(options)
+                        .response::<Json<Response>>()
+                        .send()
+                        .with_subscriber(self.0.log_subscriber.clone())
+                        .await?
+                        .0;
+                    Ok((resp.trades, resp.has_more))
                 }
-            }
-            if !resp.has_more || added == 0 {
-                break;
-            }
-        }
-        Ok(all)
+            },
+            |t: &Execution| (t.order_id.clone(), t.trade_id.clone(), t.symbol.clone()),
+        )
+        .await
     }
 
     /// Get today executions
@@ -377,8 +363,6 @@ impl TradeContext {
         &self,
         options: impl Into<Option<GetHistoryOrdersOptions>>,
     ) -> Result<Vec<Order>> {
-        use std::collections::HashSet;
-
         #[derive(Deserialize)]
         struct Response {
             orders: Vec<Order>,
@@ -388,39 +372,28 @@ impl TradeContext {
 
         // The endpoint caps each response at 1000 records and reports the
         // overflow in `has_more`; walk the `page` param (1-based) until it is
-        // false. Dedupe by `order_id` and stop if a page adds nothing new,
-        // guarding against the gateway ignoring `page`. Bounded to 1000 pages
-        // as a runaway guard. Mirrors `history_executions`.
-        let mut options = options.into().unwrap_or_default();
-        let mut all: Vec<Order> = Vec::new();
-        let mut seen: HashSet<String> = HashSet::new();
-        for page in 1..=1000u32 {
-            options = options.with_page(page);
-            let resp = self
-                .0
-                .http_cli
-                .request(Method::GET, "/v1/trade/order/history")
-                .query_params(&options)
-                .response::<Json<Response>>()
-                .send()
-                .with_subscriber(self.0.log_subscriber.clone())
-                .await?
-                .0;
-            if resp.orders.is_empty() {
-                break;
-            }
-            let mut added = 0usize;
-            for o in resp.orders {
-                if seen.insert(o.order_id.clone()) {
-                    all.push(o);
-                    added += 1;
+        // false.
+        let options = options.into().unwrap_or_default();
+        fetch_all_pages(
+            |page| {
+                let options = options.clone().with_page(page);
+                async move {
+                    let resp = self
+                        .0
+                        .http_cli
+                        .request(Method::GET, "/v1/trade/order/history")
+                        .query_params(options)
+                        .response::<Json<Response>>()
+                        .send()
+                        .with_subscriber(self.0.log_subscriber.clone())
+                        .await?
+                        .0;
+                    Ok((resp.orders, resp.has_more))
                 }
-            }
-            if !resp.has_more || added == 0 {
-                break;
-            }
-        }
-        Ok(all)
+            },
+            |o: &Order| (o.order_id.clone(), o.symbol.clone()),
+        )
+        .await
     }
 
     /// Get today orders
@@ -1326,6 +1299,44 @@ impl TradeContext {
     }
 }
 
+/// Upper bound on the pages [`fetch_all_pages`] requests, as a runaway guard.
+const MAX_PAGES: u32 = 1000;
+
+/// Collect every row of a `page`-paginated endpoint (1-based pages, with the
+/// server reporting `has_more`).
+///
+/// Every row of a page is kept, including rows that share a key with another
+/// row on the same page: the server can legitimately return several rows with
+/// the same id (for example one per leg of a multi-leg order). `key` is only
+/// used to drop rows a *later* page repeats from an earlier one, and paging
+/// stops as soon as a page brings no new row — the gateway answering every
+/// `page` with the same first page would otherwise loop until `MAX_PAGES`.
+async fn fetch_all_pages<T, K, F, Fut>(mut fetch: F, key: impl Fn(&T) -> K) -> Result<Vec<T>>
+where
+    K: Eq + std::hash::Hash,
+    F: FnMut(u32) -> Fut,
+    Fut: std::future::Future<Output = Result<(Vec<T>, bool)>>,
+{
+    let mut all = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for page in 1..=MAX_PAGES {
+        let (rows, has_more) = fetch(page).await?;
+        let new_rows: Vec<T> = rows
+            .into_iter()
+            .filter(|row| !seen.contains(&key(row)))
+            .collect();
+        if new_rows.is_empty() {
+            break;
+        }
+        seen.extend(new_rows.iter().map(&key));
+        all.extend(new_rows);
+        if !has_more {
+            break;
+        }
+    }
+    Ok(all)
+}
+
 #[cfg(test)]
 mod dc_restrict_tests {
     use longbridge_httpcli::HttpClientError;
@@ -1442,5 +1453,79 @@ mod symbol_normalization_tests {
         );
         let body = serde_json::to_value(&opts).unwrap();
         assert_eq!(body["symbol"], "700.HK");
+    }
+}
+
+#[cfg(test)]
+mod fetch_all_pages_tests {
+    use std::sync::Mutex;
+
+    use super::*;
+
+    /// Serve `pages` (1-based) as `(rows, has_more)`, recording each request.
+    async fn run(
+        pages: Vec<(Vec<(&'static str, u32)>, bool)>,
+    ) -> (Vec<(&'static str, u32)>, Vec<u32>) {
+        let requested = Mutex::new(Vec::new());
+        let rows = fetch_all_pages(
+            |page| {
+                requested.lock().unwrap().push(page);
+                let resp = pages
+                    .get(page as usize - 1)
+                    .cloned()
+                    .unwrap_or((Vec::new(), false));
+                async move { Ok(resp) }
+            },
+            |row: &(&'static str, u32)| row.0,
+        )
+        .await
+        .unwrap();
+        (rows, requested.into_inner().unwrap())
+    }
+
+    #[tokio::test]
+    async fn keeps_rows_that_share_a_key_within_a_page() {
+        // e.g. the legs of one multi-leg order reported under the same id
+        let (rows, requested) = run(vec![(vec![("a", 1), ("a", 2), ("b", 3)], false)]).await;
+        assert_eq!(rows, vec![("a", 1), ("a", 2), ("b", 3)]);
+        assert_eq!(requested, vec![1]);
+    }
+
+    #[tokio::test]
+    async fn walks_pages_until_has_more_is_false() {
+        let (rows, requested) = run(vec![
+            (vec![("a", 1)], true),
+            (vec![("b", 2)], true),
+            (vec![("c", 3)], false),
+        ])
+        .await;
+        assert_eq!(rows, vec![("a", 1), ("b", 2), ("c", 3)]);
+        assert_eq!(requested, vec![1, 2, 3]);
+    }
+
+    #[tokio::test]
+    async fn drops_rows_repeated_from_an_earlier_page() {
+        let (rows, _) = run(vec![
+            (vec![("a", 1), ("b", 2)], true),
+            (vec![("b", 2), ("c", 3)], false),
+        ])
+        .await;
+        assert_eq!(rows, vec![("a", 1), ("b", 2), ("c", 3)]);
+    }
+
+    #[tokio::test]
+    async fn stops_when_the_gateway_ignores_page() {
+        // Every page returns page 1 with has_more = true.
+        let page = (vec![("a", 1), ("b", 2)], true);
+        let (rows, requested) = run(vec![page.clone(), page.clone(), page]).await;
+        assert_eq!(rows, vec![("a", 1), ("b", 2)]);
+        assert_eq!(requested, vec![1, 2]);
+    }
+
+    #[tokio::test]
+    async fn stops_on_an_empty_page() {
+        let (rows, requested) = run(vec![(vec![("a", 1)], true), (vec![], true)]).await;
+        assert_eq!(rows, vec![("a", 1)]);
+        assert_eq!(requested, vec![1, 2]);
     }
 }
