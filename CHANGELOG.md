@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **C / C++ / Java:** `FundContext.funds` no longer ignores a `filter` that is not valid JSON. The C and Java layers dropped an unparsable filter and sent the request without it, so the call returned the whole unfiltered fund catalogue as if the filter had been applied. It now fails instead — C / C++ with a JSON decode error through the callback, Java with a `RuntimeException` (`invalid filter JSON: …`) — matching Node.js and Python, which already rejected it.
+- **C / C++ / Java:** `FundContext.funds` no longer ignores a `filter` that is not valid JSON. The C and Java layers dropped an unparsable filter and sent the request without it, so the call returned the whole unfiltered fund catalogue as if the filter had been applied. It now fails instead — C / C++ with a JSON decode error (`invalid filter JSON: …`) through the callback, Java with a `RuntimeException` (`invalid filter JSON: …`) thrown synchronously by `funds()` — matching Node.js and Python, which already rejected it.
 
 ## [5.5.0] - 2026-11-20
 

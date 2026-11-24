@@ -5479,7 +5479,8 @@ namespace fund {
 /// Options for the fund list request.
 struct GetFundsOptions
 {
-  /// Server-defined filter object as a raw JSON string
+  /// Server-defined filter object as a raw JSON string. Invalid JSON fails
+  /// the call with an `invalid filter JSON: …` error.
   std::optional<std::string> filter;
   /// Quick-filter ids
   std::vector<int64_t> quick_ids;

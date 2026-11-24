@@ -54,7 +54,8 @@ pub unsafe extern "C" fn lb_fund_context_release(ctx: *const CFundContext) {
 
 // ── option builders ─────────────────────────────────────────────────────────
 
-/// Fails with `Error::DecodeJSON` when `filter` is not valid JSON, rather than
+/// Fails with `Error::DecodeJSON` (`invalid filter JSON: …`, the same message
+/// the other bindings use) when `filter` is not valid JSON, rather than
 /// silently dropping it and returning the unfiltered catalogue.
 unsafe fn build_get_funds_options(
     opts: *const CGetFundsOptions,
@@ -64,7 +65,12 @@ unsafe fn build_get_funds_options(
         return Ok(o);
     }
     if !(*opts).filter.is_null() {
-        let value: serde_json::Value = serde_json::from_str(&cstr_to_rust((*opts).filter))?;
+        let value: serde_json::Value = serde_json::from_str(&cstr_to_rust((*opts).filter))
+            .map_err(|err| {
+                <serde_json::Error as serde::de::Error>::custom(format!(
+                    "invalid filter JSON: {err}"
+                ))
+            })?;
         o = o.filter(value);
     }
     let quick_ids = slice_from_raw_parts((*opts).quick_ids, (*opts).num_quick_ids).to_vec();
@@ -870,4 +876,41 @@ pub unsafe extern "C" fn lb_fund_context_cancel_order(
         ctx_inner.cancel_order(order_id).await?;
         Ok(())
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{ffi::CString, ptr};
+
+    use super::*;
+
+    fn options(filter: Option<&CString>) -> CGetFundsOptions {
+        CGetFundsOptions {
+            filter: filter.map_or(ptr::null(), |f| f.as_ptr()),
+            quick_ids: ptr::null(),
+            num_quick_ids: 0,
+            time_interval: ptr::null(),
+            num_time_interval: 0,
+        }
+    }
+
+    #[test]
+    fn invalid_filter_json_is_an_error() {
+        let filter = CString::new(r#"{"risk":1,}"#).unwrap();
+        let opts = options(Some(&filter));
+        let err = unsafe { build_get_funds_options(&opts) }.unwrap_err();
+        assert!(
+            err.to_string().starts_with("invalid filter JSON: "),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn valid_or_absent_filter_is_accepted() {
+        let filter = CString::new(r#"{"risk":1}"#).unwrap();
+        let opts = options(Some(&filter));
+        assert!(unsafe { build_get_funds_options(&opts) }.is_ok());
+        assert!(unsafe { build_get_funds_options(&options(None)) }.is_ok());
+        assert!(unsafe { build_get_funds_options(ptr::null()) }.is_ok());
+    }
 }

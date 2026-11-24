@@ -14,7 +14,9 @@ public class GetFundsOptions {
      *
      * @param filter server-defined filter object as a JSON string; invalid
      *               JSON makes {@code FundContext.funds} throw a
-     *               {@code RuntimeException} instead of being ignored
+     *               {@code RuntimeException} ({@code invalid filter JSON: ...})
+     *               synchronously from the call itself, not through the
+     *               returned future, instead of being ignored
      * @return this instance for chaining
      */
     public GetFundsOptions setFilter(String filter) {
