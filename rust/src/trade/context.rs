@@ -1305,31 +1305,32 @@ const MAX_PAGES: u32 = 1000;
 /// Collect every row of a `page`-paginated endpoint (1-based pages, with the
 /// server reporting `has_more`).
 ///
-/// Every row of a page is kept, including rows that share a key with another
-/// row on the same page: the server can legitimately return several rows with
-/// the same id (for example one per leg of a multi-leg order). `key` is only
-/// used to drop rows a *later* page repeats from an earlier one, and paging
-/// stops as soon as a page brings no new row — the gateway answering every
-/// `page` with the same first page would otherwise loop until `MAX_PAGES`.
+/// Rows are returned exactly as the server sends them — nothing is
+/// deduplicated, so rows that happen to share an id are all kept wherever the
+/// page boundary falls. `key` only identifies a page: if a page has the same
+/// keys, in the same order, as the page before it, the gateway is taken to be
+/// ignoring `page` (answering every request with the same page), that repeat
+/// is discarded and paging stops. Paging also stops on an empty page, when
+/// `has_more` is false, or after `MAX_PAGES`.
 async fn fetch_all_pages<T, K, F, Fut>(mut fetch: F, key: impl Fn(&T) -> K) -> Result<Vec<T>>
 where
-    K: Eq + std::hash::Hash,
+    K: Eq,
     F: FnMut(u32) -> Fut,
     Fut: std::future::Future<Output = Result<(Vec<T>, bool)>>,
 {
     let mut all = Vec::new();
-    let mut seen = std::collections::HashSet::new();
+    let mut prev_keys: Option<Vec<K>> = None;
     for page in 1..=MAX_PAGES {
         let (rows, has_more) = fetch(page).await?;
-        let new_rows: Vec<T> = rows
-            .into_iter()
-            .filter(|row| !seen.contains(&key(row)))
-            .collect();
-        if new_rows.is_empty() {
+        if rows.is_empty() {
             break;
         }
-        seen.extend(new_rows.iter().map(&key));
-        all.extend(new_rows);
+        let keys: Vec<K> = rows.iter().map(&key).collect();
+        if prev_keys.as_ref() == Some(&keys) {
+            break;
+        }
+        prev_keys = Some(keys);
+        all.extend(rows);
         if !has_more {
             break;
         }
@@ -1462,10 +1463,12 @@ mod fetch_all_pages_tests {
 
     use super::*;
 
+    type Row = (&'static str, u32);
+
     /// Serve `pages` (1-based) as `(rows, has_more)`, recording each request.
-    async fn run(
-        pages: Vec<(Vec<(&'static str, u32)>, bool)>,
-    ) -> (Vec<(&'static str, u32)>, Vec<u32>) {
+    /// Rows are keyed by their id (`.0`) only, so rows sharing an id are
+    /// distinct rows with the same key.
+    async fn run(pages: Vec<(Vec<Row>, bool)>) -> (Vec<Row>, Vec<u32>) {
         let requested = Mutex::new(Vec::new());
         let rows = fetch_all_pages(
             |page| {
@@ -1476,7 +1479,7 @@ mod fetch_all_pages_tests {
                     .unwrap_or((Vec::new(), false));
                 async move { Ok(resp) }
             },
-            |row: &(&'static str, u32)| row.0,
+            |row: &Row| row.0,
         )
         .await
         .unwrap();
@@ -1485,10 +1488,20 @@ mod fetch_all_pages_tests {
 
     #[tokio::test]
     async fn keeps_rows_that_share_a_key_within_a_page() {
-        // e.g. the legs of one multi-leg order reported under the same id
         let (rows, requested) = run(vec![(vec![("a", 1), ("a", 2), ("b", 3)], false)]).await;
         assert_eq!(rows, vec![("a", 1), ("a", 2), ("b", 3)]);
         assert_eq!(requested, vec![1]);
+    }
+
+    #[tokio::test]
+    async fn keeps_rows_that_share_a_key_across_a_page_boundary() {
+        // The result must not depend on where the page boundary falls.
+        let (rows, _) = run(vec![
+            (vec![("a", 1), ("b", 2)], true),
+            (vec![("b", 3)], false),
+        ])
+        .await;
+        assert_eq!(rows, vec![("a", 1), ("b", 2), ("b", 3)]);
     }
 
     #[tokio::test]
@@ -1504,18 +1517,8 @@ mod fetch_all_pages_tests {
     }
 
     #[tokio::test]
-    async fn drops_rows_repeated_from_an_earlier_page() {
-        let (rows, _) = run(vec![
-            (vec![("a", 1), ("b", 2)], true),
-            (vec![("b", 2), ("c", 3)], false),
-        ])
-        .await;
-        assert_eq!(rows, vec![("a", 1), ("b", 2), ("c", 3)]);
-    }
-
-    #[tokio::test]
     async fn stops_when_the_gateway_ignores_page() {
-        // Every page returns page 1 with has_more = true.
+        // Every request returns page 1 with has_more = true.
         let page = (vec![("a", 1), ("b", 2)], true);
         let (rows, requested) = run(vec![page.clone(), page.clone(), page]).await;
         assert_eq!(rows, vec![("a", 1), ("b", 2)]);
