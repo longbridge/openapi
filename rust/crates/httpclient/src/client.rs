@@ -40,6 +40,18 @@ impl HttpClient {
         }
     }
 
+    /// Whether paper trading was recorded on this client's configuration.
+    ///
+    /// Set through
+    /// [`HttpClientConfig::papertrading`](crate::HttpClientConfig::papertrading).
+    /// It is what
+    /// [`RequestBuilder::papertrading_restrict`](crate::RequestBuilder::papertrading_restrict)
+    /// consults, and it is exposed so a caller that builds the client itself
+    /// can assert the flag survived the plumbing.
+    pub fn is_papertrading(&self) -> bool {
+        self.config.enable_papertrading
+    }
+
     /// Set the default header
     pub fn header<K, V>(mut self, key: K, value: V) -> Self
     where

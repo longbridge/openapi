@@ -473,9 +473,9 @@ impl Config {
     /// - **The US data center (LBUS) has no paper trading environment.** There
     ///   is no paper trading account to serve, and the server answers with the
     ///   **real-money** account instead of rejecting the request. The SDK
-    ///   therefore refuses order submission and replacement locally
-    ///   ([`HttpClientError::PapertradingUnavailable`]); reads are not refused
-    ///   and return real-money data.
+    ///   therefore refuses order submission, replacement and multi-leg
+    ///   submission locally ([`HttpClientError::PapertradingUnavailable`]);
+    ///   reads are not refused and return real-money data.
     /// - **Under OAuth authentication the server does not apply the check at
     ///   all**, in any region: a real-money token is accepted and reads return
     ///   real-money data without an error.
@@ -833,6 +833,29 @@ mod tests {
     fn test_enable_papertrading_builder() {
         let config = Config::from_apikey("key", "secret", "token").enable_papertrading();
         assert!(config.enable_papertrading);
+    }
+
+    /// The guard that refuses an order lives in the HTTP client and reads the
+    /// flag from its config, so the one line that copies it across in
+    /// `create_http_client` is the whole safety chain. Without this test a
+    /// refactor could drop it and every test would still pass — which is the
+    /// exact failure mode the guard exists to prevent.
+    #[test]
+    fn papertrading_reaches_the_http_client() {
+        let enabled = Config::from_apikey("key", "secret", "token")
+            .enable_papertrading()
+            .create_http_client();
+        assert!(
+            enabled.is_papertrading(),
+            "enable_papertrading must reach the HTTP client, or the order guard never fires"
+        );
+
+        let mut set_in_place = Config::from_apikey("key", "secret", "token");
+        set_in_place.set_enable_papertrading();
+        assert!(
+            set_in_place.create_http_client().is_papertrading(),
+            "the in-place setter must reach the HTTP client too"
+        );
     }
 
     #[test]

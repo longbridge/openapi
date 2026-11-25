@@ -641,6 +641,42 @@ mod tests {
         );
     }
 
+    /// The reported failure is on the OAuth path, so cover it explicitly:
+    /// the region comes from the access token itself there, not from an
+    /// app key.
+    #[tokio::test]
+    async fn papertrading_us_order_is_refused_on_an_oauth_token() {
+        let client = HttpClient::new(
+            HttpClientConfig::from_oauth(longbridge_oauth::OAuth::from_token("us_oauth-token"))
+                .http_url("http://127.0.0.1:1")
+                .papertrading(true),
+        );
+        let err = client
+            .request(Method::POST, "/v1/trade/order")
+            .papertrading_restrict()
+            .build_request()
+            .await
+            .expect_err("a US paper-trading order must not be built under OAuth either");
+        assert!(
+            matches!(err, HttpClientError::PapertradingUnavailable { .. }),
+            "unexpected error variant: {err:?}"
+        );
+    }
+
+    #[tokio::test]
+    async fn papertrading_ap_order_is_allowed_on_an_oauth_token() {
+        HttpClient::new(
+            HttpClientConfig::from_oauth(longbridge_oauth::OAuth::from_token("ap_oauth-token"))
+                .http_url("http://127.0.0.1:1")
+                .papertrading(true),
+        )
+        .request(Method::POST, "/v1/trade/order")
+        .papertrading_restrict()
+        .build_request()
+        .await
+        .expect("an AP paper-trading order is left to the server");
+    }
+
     #[tokio::test]
     async fn papertrading_us_read_is_still_allowed() {
         client("us_key", true)

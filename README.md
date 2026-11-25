@@ -66,7 +66,7 @@ https://longbridge.github.io/openapi
   - If quotes connect but look empty, keep `LONGBRIDGE_PRINT_QUOTE_PACKAGES=true` to confirm opened quote packages.
 - Paper trading
   - If your account is a paper trading (simulation) account and you want to place orders, set `LONGBRIDGE_PAPERTRADING=true`. Every request then carries `x-papertrading: true`, asking the server to serve the paper trading account and to reject a real-money token. When `false` (the default) the server imposes no restrictions.
-  - **It is a server-side check, not a client-side guarantee.** The US data center (LBUS) has no paper trading environment at all: the server answers with the real-money account instead of rejecting the request, so the SDK refuses order submission and replacement locally while reads still return real-money data. Under OAuth authentication the server does not apply the check in any region. Do not rely on it as your only protection against trading with real money.
+  - **It is a server-side check, not a client-side guarantee.** The US data center (LBUS) has no paper trading environment at all: the server answers with the real-money account instead of rejecting the request, so the SDK refuses order submission, replacement and multi-leg submission locally while reads still return real-money data. Under OAuth authentication the server does not apply the check in any region. Do not rely on it as your only protection against trading with real money.
 
 ## Minimal Verification
 
