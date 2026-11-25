@@ -2,7 +2,10 @@ use rust_decimal::Decimal;
 use serde::Serialize;
 use time::OffsetDateTime;
 
-use crate::trade::{MultiLegStrategy, OrderSide, OrderType};
+use crate::{
+    trade::{MultiLegStrategy, OrderSide, OrderType},
+    types::normalize_symbol_owned,
+};
 
 /// A leg of a multi-leg combination order to submit
 #[derive(Debug, Serialize, Clone)]
@@ -21,7 +24,7 @@ impl SubmitMultiLegOrderLeg {
     #[inline]
     pub fn new(symbol: impl Into<String>, ratio_quantity: Decimal) -> Self {
         Self {
-            symbol: symbol.into(),
+            symbol: normalize_symbol_owned(symbol),
             ratio_quantity,
         }
     }

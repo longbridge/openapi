@@ -11,6 +11,7 @@ use crate::{
         GetGridTriggerHistoryOptions, GridOrder, GridOrderDetail, GridSymbolInfo,
         ReplaceGridOrderOptions, SubmitGridOrderOptions, TriggerOrder,
     },
+    types::normalize_symbol_owned,
 };
 
 #[derive(Debug, Deserialize)]
@@ -229,12 +230,32 @@ impl GridContext {
             .http_cli
             .request(Method::GET, "/v1/orders/info")
             .query_params(Query {
-                symbol: symbol.into(),
+                symbol: normalize_symbol_owned(symbol),
             })
             .response::<Json<GridSymbolInfo>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
             .0)
+    }
+}
+
+#[cfg(test)]
+mod symbol_normalization_tests {
+    use crate::grid::{GetGridOrdersOptions, GridTradeRule, SubmitGridOrderOptions};
+
+    /// The grid builders canonicalize a zero-padded HK symbol like the trade
+    /// builders do (see `crate::types::normalize_symbol`).
+    #[test]
+    fn grid_builders_strip_hk_padding() {
+        let submit = SubmitGridOrderOptions::new("00700.HK", "HKD", GridTradeRule::default());
+        assert_eq!(serde_json::to_value(&submit).unwrap()["symbol"], "700.HK");
+
+        let list = GetGridOrdersOptions::new().symbol("00700.HK");
+        assert_eq!(serde_json::to_value(&list).unwrap()["symbol"], "700.HK");
+
+        // Every other market keeps its symbol verbatim.
+        let list = GetGridOrdersOptions::new().symbol("AAPL.US");
+        assert_eq!(serde_json::to_value(&list).unwrap()["symbol"], "AAPL.US");
     }
 }
