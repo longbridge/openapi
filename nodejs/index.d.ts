@@ -6348,14 +6348,27 @@ export interface ExtraConfigParams {
   /**
    * Enable paper trading mode (default: `false`).
    *
-   * When `true`, all API calls target the paper trading (simulation)
-   * environment.  The server validates the token: if it belongs to a
-   * real-money account the server returns an error.
+   * When `true`, every request carries `x-papertrading: true`, which asks
+   * the server to serve the paper trading (simulation) account and to
+   * reject a token that belongs to a real-money account.
+   *
+   * This is a server-side check, not a client-side guarantee. Two limits
+   * apply today, and neither is visible in the response:
+   *
+   * - The US data center (LBUS) has no paper trading environment. There is
+   *   no paper trading account to serve, and the server answers with the
+   *   real-money account instead of rejecting the request. The SDK therefore
+   *   refuses order submission and replacement locally; reads are not
+   *   refused and return real-money data.
+   * - Under OAuth authentication the server does not apply the check at all,
+   *   in any region: a real-money token is accepted and reads return
+   *   real-money data without an error.
+   *
+   * Do not rely on this option as the only thing standing between your
+   * strategy and your real-money account.
    *
    * When `false` (the default) the server imposes no restrictions — both
    * paper trading and real-money accounts are accepted.
-   *
-   * Paper trading users should set this to `true` as a safety guard.
    */
   enablePapertrading?: boolean
 }
@@ -9929,9 +9942,15 @@ export interface ValuationHistoryResponse {
 export interface ValuationMetricData {
   /** Description */
   desc: string
-  /** Upper bound of the fair-value band (not the period maximum; the series can rise above it) */
+  /**
+   * Upper bound of the fair-value band (not the period maximum; the series
+   * can rise above it)
+   */
   high?: string
-  /** Lower bound of the fair-value band (not the period minimum; the series can fall below it) */
+  /**
+   * Lower bound of the fair-value band (not the period minimum; the series
+   * can fall below it)
+   */
   low?: string
   /** Historical median */
   median?: string

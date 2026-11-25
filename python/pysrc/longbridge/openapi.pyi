@@ -396,11 +396,19 @@ class Config:
             enable_print_quote_packages: Print opened quote packages on
                 connect (default: ``True``)
             log_path: Path for log files (default: no logs)
-            enable_papertrading: When ``True``, all API calls target the
-                paper trading (simulation) environment.  The server validates
-                the token: if it belongs to a real-money account the server
-                returns an error.  Default: ``False`` (no restriction imposed
-                by server).
+            enable_papertrading: When ``True``, every request carries
+                ``x-papertrading: true``, asking the server to serve the paper
+                trading (simulation) account and to reject a token that
+                belongs to a real-money account.  **This is a server-side
+                check, not a client-side guarantee.**  The US data center
+                (LBUS) has no paper trading environment: the server answers
+                with the **real-money** account instead of rejecting the
+                request, so the SDK refuses order submission and replacement
+                locally while reads still return real-money data.  Under OAuth
+                authentication the server does not apply the check at all, in
+                any region.  Do not rely on this option as the only thing
+                standing between your strategy and your real-money account.
+                Default: ``False`` (no restriction imposed by server).
             quote_transport: Transport used by the quote pull APIs (reads
                 ``LONGBRIDGE_QUOTE_TRANSPORT`` from env if omitted; default:
                 ``QuoteTransport.WebSocket``)
@@ -480,11 +488,19 @@ class Config:
             enable_print_quote_packages: Print opened quote packages on
                 connect (optional)
             log_path: Path for log files (optional)
-            enable_papertrading: When ``True``, all API calls target the
-                paper trading (simulation) environment.  The server validates
-                the token: if it belongs to a real-money account the server
-                returns an error.  Default: ``None`` (no restriction imposed
-                by server).
+            enable_papertrading: When ``True``, every request carries
+                ``x-papertrading: true``, asking the server to serve the paper
+                trading (simulation) account and to reject a token that
+                belongs to a real-money account.  **This is a server-side
+                check, not a client-side guarantee.**  The US data center
+                (LBUS) has no paper trading environment: the server answers
+                with the **real-money** account instead of rejecting the
+                request, so the SDK refuses order submission and replacement
+                locally while reads still return real-money data.  Under OAuth
+                authentication the server does not apply the check at all, in
+                any region.  Do not rely on this option as the only thing
+                standing between your strategy and your real-money account.
+                Default: ``None`` (no restriction imposed by server).
             quote_transport: Transport used by the quote pull APIs (optional)
 
         Returns:

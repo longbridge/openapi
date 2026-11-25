@@ -191,14 +191,27 @@ pub unsafe extern "C" fn lb_config_disable_print_quote_packages(config: *mut CCo
 
 /// Enable paper trading mode.
 ///
-/// When enabled, all API calls target the paper trading (simulation)
-/// environment.  The server validates the token: if it belongs to a real-money
-/// account the server returns an error.
+/// Every request then carries `x-papertrading: true`, which asks the server to
+/// serve the paper trading (simulation) account and to reject a token that
+/// belongs to a real-money account.
+///
+/// This is a server-side check, not a client-side guarantee. Two limits apply
+/// today, and neither is visible in the response:
+///
+/// - The US data center (LBUS) has no paper trading environment. There is no
+///   paper trading account to serve, and the server answers with the real-money
+///   account instead of rejecting the request. The SDK therefore refuses order
+///   submission and replacement locally; reads are not refused and return
+///   real-money data.
+/// - Under OAuth authentication the server does not apply the check at all, in
+///   any region: a real-money token is accepted and reads return real-money
+///   data without an error.
+///
+/// Do not rely on this option as the only thing standing between your strategy
+/// and your real-money account.
 ///
 /// When disabled (the default) the server imposes no restrictions — both
 /// paper trading and real-money accounts are accepted.
-///
-/// Paper trading users should call this function as a safety guard.
 ///
 /// @param config  Config object
 #[unsafe(no_mangle)]

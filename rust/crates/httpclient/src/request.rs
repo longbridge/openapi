@@ -129,6 +129,7 @@ pub struct RequestBuilder<'a, T, Q, R> {
     body: Option<T>,
     query_params: Option<Q>,
     dc_restrict: Option<DcRegion>,
+    papertrading_restrict: bool,
     timeout: Option<Duration>,
     mark_resp: PhantomData<R>,
 }
@@ -143,6 +144,7 @@ impl<'a> RequestBuilder<'a, (), (), ()> {
             body: None,
             query_params: None,
             dc_restrict: None,
+            papertrading_restrict: false,
             timeout: None,
             mark_resp: PhantomData,
         }
@@ -164,6 +166,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             body: Some(body),
             query_params: self.query_params,
             dc_restrict: self.dc_restrict,
+            papertrading_restrict: self.papertrading_restrict,
             timeout: self.timeout,
             mark_resp: self.mark_resp,
         }
@@ -197,6 +200,24 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
         self
     }
 
+    /// Refuse this request when paper trading is enabled on a credential whose
+    /// data center has no paper trading accounts.
+    ///
+    /// Only the US data center (LBUS) is in that position today: it has no
+    /// paper trading environment, so `x-papertrading: true` cannot be honoured
+    /// there and the gateway currently answers with the real-money account
+    /// instead of rejecting the request. Order call sites mark themselves here
+    /// so such an order fails locally rather than reaching the real account.
+    ///
+    /// Reads are deliberately **not** marked: they return real-money data,
+    /// which is misleading but not destructive, and refusing them would break
+    /// callers that only inspect the account.
+    #[must_use]
+    pub fn papertrading_restrict(mut self) -> Self {
+        self.papertrading_restrict = true;
+        self
+    }
+
     /// Override the default request timeout ([`REQUEST_TIMEOUT`], 30s) for
     /// this call. Most endpoints respond quickly and should stick with the
     /// default; this exists for the rare domain where a slower backend (e.g.
@@ -222,6 +243,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             body: self.body,
             query_params: Some(params),
             dc_restrict: self.dc_restrict,
+            papertrading_restrict: self.papertrading_restrict,
             timeout: self.timeout,
             mark_resp: self.mark_resp,
         }
@@ -241,6 +263,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             body: self.body,
             query_params: self.query_params,
             dc_restrict: self.dc_restrict,
+            papertrading_restrict: self.papertrading_restrict,
             timeout: self.timeout,
             mark_resp: PhantomData,
         }
@@ -337,6 +360,17 @@ where
                 path: self.path.clone(),
                 required,
                 current: dc_region,
+            });
+        }
+
+        // Paper trading cannot be honoured in a data center that has no paper
+        // trading accounts (LBUS), and the gateway does not yet reject it, so
+        // an order marked by `papertrading_restrict` would land on the
+        // real-money account. Refuse it here instead.
+        if self.papertrading_restrict && config.enable_papertrading && dc_region == DcRegion::Us {
+            return Err(HttpClientError::PapertradingUnavailable {
+                path: self.path.clone(),
+                region: dc_region,
             });
         }
 
@@ -572,10 +606,69 @@ where
 
 #[cfg(test)]
 mod tests {
-    use reqwest::{StatusCode, header::HeaderMap};
+    use reqwest::{Method, StatusCode, header::HeaderMap};
 
     use super::is_too_many_requests;
-    use crate::HttpClientError;
+    use crate::{HttpClient, HttpClientConfig, HttpClientError};
+
+    /// A client whose credentials put it in the US (`us_`) or AP data center,
+    /// with paper trading on or off. The URL is pinned so building a request
+    /// never probes the network.
+    fn client(credential: &str, papertrading: bool) -> HttpClient {
+        HttpClient::new(
+            HttpClientConfig::from_apikey(credential, "secret", credential)
+                .http_url("http://127.0.0.1:1")
+                .papertrading(papertrading),
+        )
+    }
+
+    #[tokio::test]
+    async fn papertrading_us_order_is_refused_before_it_is_sent() {
+        let err = client("us_key", true)
+            .request(Method::POST, "/v1/trade/order")
+            .papertrading_restrict()
+            .build_request()
+            .await
+            .expect_err("a US paper-trading order must not be built");
+        let HttpClientError::PapertradingUnavailable { path, region } = &err else {
+            panic!("unexpected error variant: {err:?}");
+        };
+        assert_eq!(path, "/v1/trade/order");
+        assert_eq!(*region, longbridge_geo::DcRegion::Us);
+        assert!(
+            err.to_string().contains("real-money"),
+            "the message must say the order would have hit the real account: {err}"
+        );
+    }
+
+    #[tokio::test]
+    async fn papertrading_us_read_is_still_allowed() {
+        client("us_key", true)
+            .request(Method::GET, "/v1/asset/account")
+            .build_request()
+            .await
+            .expect("reads are not guarded, only orders are");
+    }
+
+    #[tokio::test]
+    async fn papertrading_ap_order_is_allowed() {
+        client("ap_key", true)
+            .request(Method::POST, "/v1/trade/order")
+            .papertrading_restrict()
+            .build_request()
+            .await
+            .expect("the AP data center does have paper trading accounts");
+    }
+
+    #[tokio::test]
+    async fn us_order_without_papertrading_is_allowed() {
+        client("us_key", false)
+            .request(Method::POST, "/v1/trade/order")
+            .papertrading_restrict()
+            .build_request()
+            .await
+            .expect("a real-money US order is unaffected");
+    }
 
     #[test]
     fn unexpected_http_response_preserves_original_context() {

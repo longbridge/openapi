@@ -163,13 +163,27 @@ setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ## Paper Trading
 
 If your account is a **paper trading** (simulation) account and you want to
-place orders, you must explicitly enable paper trading mode.  When enabled, all
-API calls target the paper trading environment and the server validates the
-token — if the token belongs to a real-money account the server returns an
-error.
+place orders, you must explicitly enable paper trading mode.  Every request
+then carries `x-papertrading: true`, which asks the server to serve the paper
+trading account and to reject a token that belongs to a real-money account.
 
 By default this option is **off**: the server imposes no restrictions and
 accepts requests from both paper trading and real-money accounts.
+
+> **This is a server-side check, not a client-side guarantee.** Two limits
+> apply today, and neither is visible in the response:
+>
+> - **The US data center (LBUS) has no paper trading environment.** There is no
+>   paper trading account to serve, and the server answers with the
+>   **real-money** account instead of rejecting the request. The SDK therefore
+>   refuses order submission and replacement locally; reads are not refused and
+>   return real-money data.
+> - **Under OAuth authentication the server does not apply the check at all**,
+>   in any region: a real-money token is accepted and reads return real-money
+>   data without an error.
+>
+> Do not rely on this option as the only thing standing between your strategy
+> and your real-money account.
 
 **Via environment variable** (applies automatically to all constructor methods):
 

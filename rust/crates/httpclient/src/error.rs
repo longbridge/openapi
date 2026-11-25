@@ -53,6 +53,24 @@ pub enum HttpClientError {
         current: DcRegion,
     },
 
+    /// An order request was refused locally because paper trading is enabled
+    /// on a credential whose data center has no paper trading accounts.
+    ///
+    /// The US data center (LBUS) has no paper trading environment, so such an
+    /// order would be placed on the real-money account. The server does not
+    /// currently reject this combination, so the SDK does.
+    #[error(
+        "paper trading is enabled, but the {region} data center has no paper trading accounts, \
+         so this order ({path}) was not sent — it would have been placed on your real-money \
+         account. Disable paper trading to trade with real money."
+    )]
+    PapertradingUnavailable {
+        /// The order API path that was refused.
+        path: String,
+        /// The session's data-center region.
+        region: DcRegion,
+    },
+
     /// OpenAPI error
     #[error("openapi error: code={code}: {message}")]
     OpenApi {

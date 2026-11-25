@@ -41,6 +41,9 @@ pub struct HttpClientConfig {
     pub(crate) http_url: Option<String>,
     /// Authentication configuration
     pub(crate) auth: AuthConfig,
+    /// Whether the caller asked for paper trading (the `x-papertrading`
+    /// header is sent with every request).
+    pub(crate) enable_papertrading: bool,
 }
 
 impl HttpClientConfig {
@@ -67,6 +70,7 @@ impl HttpClientConfig {
                 app_secret: app_secret.into(),
                 access_token: access_token.into(),
             },
+            enable_papertrading: false,
         }
     }
 
@@ -87,6 +91,7 @@ impl HttpClientConfig {
         Self {
             http_url: env_var("HTTP_URL"),
             auth: AuthConfig::OAuth(oauth),
+            enable_papertrading: false,
         }
     }
 
@@ -118,6 +123,7 @@ impl HttpClientConfig {
                 app_secret,
                 access_token,
             },
+            enable_papertrading: false,
         })
     }
 
@@ -129,6 +135,20 @@ impl HttpClientConfig {
     pub fn http_url(self, url: impl Into<String>) -> Self {
         Self {
             http_url: Some(url.into()),
+            ..self
+        }
+    }
+
+    /// Records that paper trading mode is enabled for this client.
+    ///
+    /// The flag itself changes no request; it is what
+    /// [`RequestBuilder::papertrading_restrict`](crate::RequestBuilder::papertrading_restrict)
+    /// consults to refuse an order on a credential whose data center has no
+    /// paper trading accounts at all.
+    #[must_use]
+    pub fn papertrading(self, enabled: bool) -> Self {
+        Self {
+            enable_papertrading: enabled,
             ..self
         }
     }

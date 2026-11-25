@@ -481,6 +481,17 @@ impl TradeContext {
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/order/replace>
     ///
+    /// # Paper trading
+    ///
+    /// This call is refused locally with
+    /// [`HttpClientError::PapertradingUnavailable`] when paper trading is
+    /// enabled on a US (LBUS) credential, because that data center has no
+    /// paper trading accounts and the order would otherwise reach the
+    /// real-money account. See [`Config::enable_papertrading`].
+    ///
+    /// [`HttpClientError::PapertradingUnavailable`]: longbridge_httpcli::HttpClientError::PapertradingUnavailable
+    /// [`Config::enable_papertrading`]: crate::Config::enable_papertrading
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -511,6 +522,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::PUT, "/v1/trade/order")
+            .papertrading_restrict()
             .body(Json(options))
             .response::<Json<EmptyResponse>>()
             .send()
@@ -522,6 +534,17 @@ impl TradeContext {
     /// Submit order
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/order/submit>
+    ///
+    /// # Paper trading
+    ///
+    /// This call is refused locally with
+    /// [`HttpClientError::PapertradingUnavailable`] when paper trading is
+    /// enabled on a US (LBUS) credential, because that data center has no
+    /// paper trading accounts and the order would otherwise reach the
+    /// real-money account. See [`Config::enable_papertrading`].
+    ///
+    /// [`HttpClientError::PapertradingUnavailable`]: longbridge_httpcli::HttpClientError::PapertradingUnavailable
+    /// [`Config::enable_papertrading`]: crate::Config::enable_papertrading
     ///
     /// # Examples
     ///
@@ -559,6 +582,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::POST, "/v1/trade/order")
+            .papertrading_restrict()
             .body(Json(options))
             .response::<Json<_>>()
             .send()
@@ -574,6 +598,17 @@ impl TradeContext {
     /// Submit a multi-leg option combination order (such as vertical spreads,
     /// straddles, strangles, collars, etc.). All legs are submitted together
     /// as a single strategy order.
+    ///
+    /// # Paper trading
+    ///
+    /// This call is refused locally with
+    /// [`HttpClientError::PapertradingUnavailable`] when paper trading is
+    /// enabled on a US (LBUS) credential, because that data center has no
+    /// paper trading accounts and the order would otherwise reach the
+    /// real-money account. See [`Config::enable_papertrading`].
+    ///
+    /// [`HttpClientError::PapertradingUnavailable`]: longbridge_httpcli::HttpClientError::PapertradingUnavailable
+    /// [`Config::enable_papertrading`]: crate::Config::enable_papertrading
     ///
     /// # Examples
     ///
@@ -620,6 +655,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::POST, "/v1/trade/order/multileg")
+            .papertrading_restrict()
             .body(Json(options))
             .response::<Json<_>>()
             .send()
