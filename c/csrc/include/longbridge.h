@@ -3264,7 +3264,8 @@ typedef struct lb_alert_item_t {
  */
 typedef struct lb_get_funds_options_t {
   /**
-   * Server-defined filter object as a JSON string (can be null)
+   * Server-defined filter object as a JSON string (can be null). Invalid
+   * JSON fails the call with a JSON decode error.
    */
   const char *filter;
   /**

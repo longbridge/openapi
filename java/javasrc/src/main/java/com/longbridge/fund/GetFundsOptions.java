@@ -12,7 +12,11 @@ public class GetFundsOptions {
     /**
      * Sets filter.
      *
-     * @param filter filter
+     * @param filter server-defined filter object as a JSON string; invalid
+     *               JSON completes the future returned by
+     *               {@code FundContext.funds} exceptionally with an
+     *               {@code OpenApiException} ({@code invalid filter JSON: ...})
+     *               instead of being ignored
      * @return this instance for chaining
      */
     public GetFundsOptions setFilter(String filter) {

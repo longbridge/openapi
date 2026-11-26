@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **All SDKs (docs only):** `CalendarContext.finance_calendar` docs now describe how the endpoint actually pages. `count` caps the events returned for each date, not per response; a date group holding fewer events than its `count` was truncated, and the rest is fetched with `start` = `end` = that date and `offset` = events already received. `next_date` moves past truncated dates, and `end` is not a hard bound (the server may return later dates). The previous text described `count` as a page size and `offset` as a skip from the start of the window. Reported as longbridge/developers#1339
+- **All SDKs:** the grid-trading and multi-leg builders now canonicalize zero-padded HK symbols too. 5.5.0 canonicalized `00700.HK` → `700.HK` in the trade and asset builders but not in `SubmitGridOrderOptions`, `GetGridOrdersOptions.symbol`, `GridContext.symbol_info` or `SubmitMultiLegOrderLeg`, so those passed the padded form to the gateway unchanged. Other markets are still sent verbatim.
+- **C / C++ / Java:** `FundContext.funds` no longer ignores a `filter` that is not valid JSON. The C and Java layers dropped an unparsable filter and sent the request without it, so the call returned the whole unfiltered fund catalogue as if the filter had been applied. It now fails instead — C / C++ with a JSON decode error (`invalid filter JSON: …`) through the callback, Java by completing the returned future exceptionally with an `OpenApiException` (`invalid filter JSON: …`) — matching Node.js and Python, which already rejected it.
 
 ## [5.5.0] - 2026-11-20
 

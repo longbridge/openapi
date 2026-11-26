@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::grid::GridTradeRule;
+use crate::{grid::GridTradeRule, types::normalize_symbol_owned};
 
 /// Options for submit grid trading order request
 #[derive(Debug, Serialize, Clone)]
@@ -19,7 +19,7 @@ impl SubmitGridOrderOptions {
         grid_trading_rule: GridTradeRule,
     ) -> Self {
         Self {
-            symbol: symbol.into(),
+            symbol: normalize_symbol_owned(symbol),
             settlement_currency: settlement_currency.into(),
             grid_trading_rule,
         }

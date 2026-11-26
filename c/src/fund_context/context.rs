@@ -54,14 +54,23 @@ pub unsafe extern "C" fn lb_fund_context_release(ctx: *const CFundContext) {
 
 // ── option builders ─────────────────────────────────────────────────────────
 
-unsafe fn build_get_funds_options(opts: *const CGetFundsOptions) -> GetFundsOptions {
+/// Fails with `Error::DecodeJSON` (`invalid filter JSON: …`, the same message
+/// the other bindings use) when `filter` is not valid JSON, rather than
+/// silently dropping it and returning the unfiltered catalogue.
+unsafe fn build_get_funds_options(
+    opts: *const CGetFundsOptions,
+) -> Result<GetFundsOptions, serde_json::Error> {
     let mut o = GetFundsOptions::new();
     if opts.is_null() {
-        return o;
+        return Ok(o);
     }
-    if !(*opts).filter.is_null()
-        && let Ok(value) = serde_json::from_str(&cstr_to_rust((*opts).filter))
-    {
+    if !(*opts).filter.is_null() {
+        let value: serde_json::Value = serde_json::from_str(&cstr_to_rust((*opts).filter))
+            .map_err(|err| {
+                <serde_json::Error as serde::de::Error>::custom(format!(
+                    "invalid filter JSON: {err}"
+                ))
+            })?;
         o = o.filter(value);
     }
     let quick_ids = slice_from_raw_parts((*opts).quick_ids, (*opts).num_quick_ids).to_vec();
@@ -72,7 +81,7 @@ unsafe fn build_get_funds_options(opts: *const CGetFundsOptions) -> GetFundsOpti
     if !time_interval.is_empty() {
         o = o.time_interval(time_interval);
     }
-    o
+    Ok(o)
 }
 
 unsafe fn build_analysis_options(opts: *const CGetFundAnalysisOptions) -> GetFundAnalysisOptions {
@@ -370,7 +379,7 @@ pub unsafe extern "C" fn lb_fund_context_funds(
     let ctx_inner = (*ctx).ctx.clone();
     let opts = build_get_funds_options(opts);
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CFundBriefOwned> = ctx_inner.funds(opts).await?.into();
+        let rows: CVec<CFundBriefOwned> = ctx_inner.funds(opts?).await?.into();
         Ok(rows)
     });
 }
@@ -867,4 +876,41 @@ pub unsafe extern "C" fn lb_fund_context_cancel_order(
         ctx_inner.cancel_order(order_id).await?;
         Ok(())
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{ffi::CString, ptr};
+
+    use super::*;
+
+    fn options(filter: Option<&CString>) -> CGetFundsOptions {
+        CGetFundsOptions {
+            filter: filter.map_or(ptr::null(), |f| f.as_ptr()),
+            quick_ids: ptr::null(),
+            num_quick_ids: 0,
+            time_interval: ptr::null(),
+            num_time_interval: 0,
+        }
+    }
+
+    #[test]
+    fn invalid_filter_json_is_an_error() {
+        let filter = CString::new(r#"{"risk":1,}"#).unwrap();
+        let opts = options(Some(&filter));
+        let err = unsafe { build_get_funds_options(&opts) }.unwrap_err();
+        assert!(
+            err.to_string().starts_with("invalid filter JSON: "),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn valid_or_absent_filter_is_accepted() {
+        let filter = CString::new(r#"{"risk":1}"#).unwrap();
+        let opts = options(Some(&filter));
+        assert!(unsafe { build_get_funds_options(&opts) }.is_ok());
+        assert!(unsafe { build_get_funds_options(&options(None)) }.is_ok());
+        assert!(unsafe { build_get_funds_options(ptr::null()) }.is_ok());
+    }
 }

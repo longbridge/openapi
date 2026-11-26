@@ -1389,7 +1389,7 @@ mod symbol_normalization_tests {
     use crate::trade::{
         GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderType, SubmitOrderOptions, TimeInForceType,
+        OrderType, SubmitMultiLegOrderLeg, SubmitOrderOptions, TimeInForceType,
     };
 
     fn query(value: &impl Serialize) -> String {
@@ -1442,5 +1442,16 @@ mod symbol_normalization_tests {
         );
         let body = serde_json::to_value(&opts).unwrap();
         assert_eq!(body["symbol"], "700.HK");
+    }
+
+    #[test]
+    fn submit_multileg_normalizes_leg_symbols() {
+        let leg = SubmitMultiLegOrderLeg::new("00700.HK", decimal!(1i32));
+        assert_eq!(serde_json::to_value(&leg).unwrap()["symbol"], "700.HK");
+        let leg = SubmitMultiLegOrderLeg::new("QQQ260731C764000.US", decimal!(1i32));
+        assert_eq!(
+            serde_json::to_value(&leg).unwrap()["symbol"],
+            "QQQ260731C764000.US"
+        );
     }
 }

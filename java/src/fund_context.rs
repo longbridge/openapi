@@ -77,12 +77,22 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextFunds(
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
+        // An invalid filter is reported through the returned future as an
+        // `OpenApiException`, like every other failure of this call.
+        let mut filter_error = None;
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundsOptions::new();
-            if let Some(filter) = get_field::<_, _, Option<String>>(env, &opts, "filter")?
-                && let Ok(value) = serde_json::from_str::<serde_json::Value>(&filter)
-            {
-                new_opts = new_opts.filter(value);
+            if let Some(filter) = get_field::<_, _, Option<String>>(env, &opts, "filter")? {
+                match serde_json::from_str::<serde_json::Value>(&filter) {
+                    Ok(value) => new_opts = new_opts.filter(value),
+                    Err(err) => {
+                        filter_error = Some(longbridge::Error::DecodeJSON(
+                            <serde_json::Error as serde::de::Error>::custom(format!(
+                                "invalid filter JSON: {err}"
+                            )),
+                        ))
+                    }
+                }
             }
             let quick_ids: PrimaryArray<i64> = get_field(env, &opts, "quickIds")?;
             if !quick_ids.0.is_empty() {
@@ -97,6 +107,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextFunds(
             None
         };
         async_util::execute(env, callback, async move {
+            if let Some(err) = filter_error {
+                return Err(err.into());
+            }
             Ok(ObjectArray(__owned_ctx.funds(opts).await?))
         })?;
         Ok(())

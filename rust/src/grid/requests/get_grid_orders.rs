@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::Market;
+use crate::{Market, types::normalize_symbol_owned};
 
 /// Options for get grid trading orders (list) request
 #[derive(Debug, Default, Serialize, Clone)]
@@ -74,7 +74,7 @@ impl GetGridOrdersOptions {
     #[must_use]
     pub fn symbol(self, symbol: impl Into<String>) -> Self {
         Self {
-            symbol: Some(symbol.into()),
+            symbol: Some(normalize_symbol_owned(symbol)),
             ..self
         }
     }
