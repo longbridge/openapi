@@ -1,34 +1,39 @@
 use std::sync::Arc;
 
-use longbridge::blocking::AssetContextSync;
+use longbridge::{asset::StockTransferStateFilter, blocking::AssetContextSync};
 use pyo3::prelude::*;
 
 use crate::{
     asset::types::{
         BankCard, CouponOrder, CouponOrderType, CouponsResponse, Deposit, DepositState,
         EddaApplication, GetStatementListResponse, GetStatementResponse, RewardRecordsResponse,
-        RewardType, StatementType, StockTransferInResponse, StockTransferOut, WithdrawalsResponse,
+        RewardType, StatementType, StockTransferInResponse, StockTransferInState, StockTransferOut,
+        StockTransferOutState, WithdrawalsResponse,
     },
     config::Config,
     error::ErrorNewType,
-    time::PyOffsetDateTimeWrapper,
+    time::PyInstantWrapper,
 };
 
 /// Builds the stock transfer list options from keyword arguments.
-pub(crate) fn stock_transfers_options(
+pub(crate) fn stock_transfers_options<S, C>(
     market: Option<String>,
-    state: Option<i32>,
-    start: Option<PyOffsetDateTimeWrapper>,
-    end: Option<PyOffsetDateTimeWrapper>,
+    state: Option<S>,
+    start: Option<PyInstantWrapper>,
+    end: Option<PyInstantWrapper>,
     page: Option<i32>,
     size: Option<i32>,
-) -> longbridge::asset::GetStockTransfersOptions {
+) -> longbridge::asset::GetStockTransfersOptions<C>
+where
+    S: Into<C>,
+    C: StockTransferStateFilter,
+{
     let mut opts = longbridge::asset::GetStockTransfersOptions::new();
     if let Some(market) = market {
         opts = opts.market(market);
     }
     if let Some(state) = state {
-        opts = opts.state(state);
+        opts = opts.state(state.into());
     }
     if let Some(start) = start {
         opts = opts.start(start.0);
@@ -90,8 +95,8 @@ pub(crate) fn deposits_options(
     size: Option<i32>,
     states: Option<Vec<DepositState>>,
     currencies: Option<Vec<String>>,
-    start: Option<PyOffsetDateTimeWrapper>,
-    end: Option<PyOffsetDateTimeWrapper>,
+    start: Option<PyInstantWrapper>,
+    end: Option<PyInstantWrapper>,
 ) -> longbridge::asset::GetDepositsOptions {
     let mut opts = longbridge::asset::GetDepositsOptions::new();
     if let Some(page) = page {
@@ -119,8 +124,8 @@ pub(crate) fn deposits_options(
 pub(crate) fn withdrawals_options(
     page: Option<i32>,
     size: Option<i32>,
-    start: Option<PyOffsetDateTimeWrapper>,
-    end: Option<PyOffsetDateTimeWrapper>,
+    start: Option<PyInstantWrapper>,
+    end: Option<PyInstantWrapper>,
 ) -> longbridge::asset::GetWithdrawalsOptions {
     let mut opts = longbridge::asset::GetWithdrawalsOptions::new();
     if let Some(page) = page {
@@ -209,9 +214,9 @@ impl AssetContext {
     fn stock_transfers_in(
         &self,
         market: Option<String>,
-        state: Option<i32>,
-        start: Option<PyOffsetDateTimeWrapper>,
-        end: Option<PyOffsetDateTimeWrapper>,
+        state: Option<StockTransferInState>,
+        start: Option<PyInstantWrapper>,
+        end: Option<PyInstantWrapper>,
         page: Option<i32>,
         size: Option<i32>,
     ) -> PyResult<StockTransferInResponse> {
@@ -227,9 +232,9 @@ impl AssetContext {
     fn stock_transfers_out(
         &self,
         market: Option<String>,
-        state: Option<i32>,
-        start: Option<PyOffsetDateTimeWrapper>,
-        end: Option<PyOffsetDateTimeWrapper>,
+        state: Option<StockTransferOutState>,
+        start: Option<PyInstantWrapper>,
+        end: Option<PyInstantWrapper>,
         page: Option<i32>,
         size: Option<i32>,
     ) -> PyResult<Vec<StockTransferOut>> {
@@ -243,6 +248,9 @@ impl AssetContext {
     }
 
     /// Get reward records from the reward center
+    ///
+    /// The route has no date filter: page through the records and filter on
+    /// their times.
     #[pyo3(signature = (page = None, page_size = None, reward_type = None))]
     fn reward_records(
         &self,
@@ -292,8 +300,8 @@ impl AssetContext {
         size: Option<i32>,
         states: Option<Vec<DepositState>>,
         currencies: Option<Vec<String>>,
-        start: Option<PyOffsetDateTimeWrapper>,
-        end: Option<PyOffsetDateTimeWrapper>,
+        start: Option<PyInstantWrapper>,
+        end: Option<PyInstantWrapper>,
     ) -> PyResult<Vec<Deposit>> {
         let opts = deposits_options(page, size, states, currencies, start, end);
         self.ctx
@@ -310,8 +318,8 @@ impl AssetContext {
         &self,
         page: Option<i32>,
         size: Option<i32>,
-        start: Option<PyOffsetDateTimeWrapper>,
-        end: Option<PyOffsetDateTimeWrapper>,
+        start: Option<PyInstantWrapper>,
+        end: Option<PyInstantWrapper>,
     ) -> PyResult<WithdrawalsResponse> {
         let opts = withdrawals_options(page, size, start, end);
         self.ctx.withdrawals(opts).map_err(ErrorNewType)?.try_into()

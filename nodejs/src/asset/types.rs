@@ -53,279 +53,320 @@ impl From<longbridge::asset::GetStatementResponse> for GetStatementDownloadUrlRe
 }
 
 /// Verification status of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::BankCardStatus")]
 pub enum BankCardStatus {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Not verified
+    /// Not verified (server code 0)
     Unverified,
-    /// Under review
+    /// Under review (server code 1)
     UnderReview,
-    /// Verified
+    /// Verified (server code 2)
     Verified,
 }
 
 /// Witness (in-person / video verification) state of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::BankCardWitnessState")]
 pub enum BankCardWitnessState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Witnessing not required
+    /// Witnessing not required (server code 1)
     NotRequired,
-    /// Witnessing pending
+    /// Witnessing pending (server code 2)
     Pending,
-    /// Witnessed
+    /// Witnessed (server code 3)
     Witnessed,
 }
 
 /// Binding state of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::BankCardBindState")]
 pub enum BankCardBindState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Binding in progress
+    /// Binding in progress (server code 0)
     Binding,
-    /// Bound
+    /// Bound (server code 1)
     Bound,
-    /// Binding failed
+    /// Binding failed (server code 2)
     Failed,
 }
 
 /// Status of a bank-card authorization (eDDA, bank securities account, FPS) or
 /// of an eDDA application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::AuthorizationStatus")]
 pub enum AuthorizationStatus {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Not authorized
+    /// Not authorized (server code 0)
     Unauthorized,
-    /// Authorized
+    /// Authorized (server code 1)
     Authorized,
-    /// Authorization in progress
+    /// Authorization in progress (server code 2)
     Authorizing,
-    /// Authorization failed (see the message field for the reason)
+    /// Authorization failed (see the message field for the reason) (server code
+    /// 3)
     Failed,
 }
 
 /// State of a stock transfer-in application (another broker to this account)
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::StockTransferInState")]
 pub enum StockTransferInState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Submitted
+    /// Submitted (server code 0)
     Submitted,
-    /// Cancelled
+    /// Cancelled (server code 1)
     Cancelled,
-    /// Completed
+    /// Completed (server code 3)
     Completed,
-    /// Processing
+    /// Processing (server code 5)
     Processing,
-    /// Partially completed
+    /// Partially completed (server code 7)
     PartiallyCompleted,
-    /// Failed
+    /// Failed (server code 8)
     Failed,
 }
 
 /// State of a stock transfer-out application (this account to another broker)
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::StockTransferOutState")]
 pub enum StockTransferOutState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
     /// Submitted (the only state in which the application can still be
-    /// cancelled)
+    /// cancelled) (server code 0)
     Submitted,
-    /// Processing
+    /// Processing (server code 1)
     Processing,
-    /// Executing
+    /// Executing (server code 2)
     Executing,
-    /// Completed
+    /// Completed (server code 3)
     Completed,
-    /// Cancelled
+    /// Cancelled (server code 4)
     Cancelled,
-    /// Partially completed
+    /// Partially completed (server code 5)
     PartiallyCompleted,
-    /// Failed
+    /// Failed (server code 6)
     Failed,
-    /// Rejected
+    /// Rejected (server code 7)
     Rejected,
 }
 
 /// State of one stock inside a stock transfer application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::TransferStockState")]
 pub enum TransferStockState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Processing
+    /// Processing (server code 0)
     Processing,
-    /// Succeeded
+    /// Succeeded (server code 1)
     Succeeded,
-    /// Failed
+    /// Failed (server code 2)
     Failed,
 }
 
 /// Type of a reward record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::RewardType")]
 pub enum RewardType {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Cash reward
+    /// Cash reward (server code 0)
     Cash,
-    /// Gift (prize)
+    /// Gift (prize) (server code 1)
     Gift,
-    /// Coupon
+    /// Coupon (server code 2)
     Coupon,
-    /// Task reward
+    /// Task reward (server code 3)
     Task,
 }
 
 /// Status of a reward record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::RewardStatus")]
 pub enum RewardStatus {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Upcoming
+    /// Upcoming (server code 0)
     Upcoming,
-    /// Cancelled
+    /// Cancelled (server code 1)
     Cancelled,
-    /// The user exited the activity
+    /// The user exited the activity (server code 2)
     ExitedActivity,
-    /// Not claimed yet
+    /// Not claimed yet (server code 8)
     Unclaimed,
-    /// Being issued
+    /// Being issued (server code 10)
     Issuing,
-    /// Issued
+    /// Issued (server code 12)
     Issued,
-    /// Issuing failed
+    /// Issuing failed (server code 13)
     Failed,
-    /// Exchanged
+    /// Exchanged (server code 16)
     Exchanged,
-    /// Expired
+    /// Expired (server code 17)
     Expired,
-    /// Refunded
+    /// Refunded (server code 18)
     Refunded,
 }
 
 /// Delivery status of an issued prize (only meaningful for issued gift rewards)
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::RewardDeliverStatus")]
 pub enum RewardDeliverStatus {
-    /// Unknown (an undocumented code, or no delivery status)
+    /// Unknown: an undocumented code, or no delivery status (never sent to the
+    /// server)
     Unknown,
-    /// Not activated
+    /// Not activated (server code 0)
     NotActivated,
-    /// Activated, or shipping
+    /// Activated, or shipping (server code 1)
     ActivatedOrShipping,
-    /// Consumed
+    /// Consumed (server code 2)
     Consumed,
-    /// E-voucher activating
+    /// E-voucher activating (server code 5)
     EVoucherActivating,
-    /// E-voucher expired before activation
+    /// E-voucher expired before activation (server code 6)
     EVoucherExpired,
-    /// E-voucher invalid
+    /// E-voucher invalid (server code 7)
     EVoucherInvalid,
-    /// Shipping address missing
+    /// Shipping address missing (server code 8)
     AddressMissing,
-    /// Shipping address filled
+    /// Shipping address filled (server code 9)
     AddressFilled,
-    /// Shipping
+    /// Shipping (server code 10)
     Shipping,
 }
 
 /// Status of a coupon
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::CouponStatus")]
 pub enum CouponStatus {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Unused
+    /// Unused (server code 0)
     Unused,
-    /// Used
+    /// Used (server code 1)
     Used,
-    /// Expired
+    /// Expired (server code 2)
     Expired,
-    /// Being redeemed
+    /// Being redeemed (server code 3)
     Redeeming,
-    /// In use
+    /// In use (server code 4)
     InUse,
-    /// Processing
+    /// Processing (server code 5)
     Processing,
 }
 
 /// State of a deposit record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::DepositState")]
 pub enum DepositState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Processing
+    /// Processing (server code 0)
     Processing,
-    /// Credited to the account
+    /// Credited to the account (server code 1)
     Credited,
-    /// Failed
+    /// Failed (server code 2)
     Failed,
-    /// Cancelled
+    /// Cancelled (server code 3)
     Cancelled,
-    /// Invalidated
+    /// Invalidated (server code 4)
     Invalidated,
-    /// Rejected
+    /// Rejected (server code 5)
     Rejected,
 }
 
 /// State of a withdrawal record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::asset::WithdrawalState")]
 pub enum WithdrawalState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// Submitted
+    /// Submitted (server code 0)
     Submitted,
-    /// Processing
+    /// Processing (server code 1)
     Processing,
-    /// Rejected
+    /// Rejected (server code 2)
     Rejected,
-    /// Cancelled
+    /// Cancelled (server code 3)
     Cancelled,
-    /// Remitted
+    /// Remitted (server code 4)
     Remitted,
-    /// Failed
+    /// Failed (server code 5)
     Failed,
-    /// Refunded
+    /// Refunded (server code 6)
     Refunded,
-    /// Approved, awaiting payout
+    /// Approved, awaiting payout (server code 7)
     ApprovedAwaitingPayout,
-    /// Large-amount review
+    /// Large-amount review (server code 8)
     LargeAmountReview,
-    /// Change pending approval
+    /// Change pending approval (server code 9)
     ChangePendingApproval,
-    /// Deletion pending approval
+    /// Deletion pending approval (server code 10)
     DeletionPendingApproval,
-    /// Deleted
+    /// Deleted (server code 11)
     Deleted,
-    /// Rejection pending approval
+    /// Rejection pending approval (server code 12)
     RejectionPendingApproval,
-    /// Awaiting confirmation
+    /// Awaiting confirmation (server code 15)
     AwaitingConfirmation,
 }
 
@@ -369,8 +410,9 @@ pub struct BankCardAuthorization {
     daily_max_count: Option<i64>,
     /// Whether the daily debit count is unlimited
     daily_max_count_unlimited: bool,
-    /// Expiry date of the authorization (none when not set). A long-term
-    /// authorization carries the server's 9999-12-31 sentinel here.
+    /// Expiry date of the authorization (none when not set and for a
+    /// long-term authorization: the server's 9999-12-31 "never expires"
+    /// sentinel is none; see `long_term_valid`)
     #[js(opt, datetime)]
     expiry_date: Option<DateTime<Utc>>,
     /// Whether the authorization never expires
@@ -466,8 +508,8 @@ pub struct TransferStock {
     /// Cost price
     #[js(opt)]
     cost: Option<Decimal>,
-    /// State of this stock in the transfer
-    state: TransferStockState,
+    /// State code of this stock in the transfer
+    state_code: TransferStockState,
     /// Position side
     position_side: String,
 }
@@ -485,6 +527,8 @@ pub struct StockTransferIn {
     market: String,
     /// Name of the other broker
     broker: String,
+    /// ID of the other broker
+    broker_id: String,
     /// English name of the other broker
     broker_en: String,
     /// Broker code of the other broker
@@ -548,6 +592,8 @@ pub struct StockTransferOut {
     market: String,
     /// Name of the other broker
     broker: String,
+    /// ID of the other broker
+    broker_id: String,
     /// English name of the other broker
     broker_en: String,
     /// Broker code of the other broker
@@ -559,6 +605,10 @@ pub struct StockTransferOut {
     state: String,
     /// State code. Only `Submitted` applications can be cancelled
     state_code: StockTransferOutState,
+    /// App-side state: `noticed` means the user tapped "I have notified the
+    /// broker" in the app (the user's own confirmation, not a Longbridge
+    /// action); `default` otherwise
+    app_state: String,
     /// Created time
     #[js(opt, datetime)]
     created_at: Option<DateTime<Utc>>,
@@ -606,8 +656,8 @@ pub struct RewardRecord {
     description: String,
     /// Coupon type (coupon rewards), e.g. `commission`
     card_type: String,
-    /// Coupon status code (coupon rewards), as returned by the server
-    card_status: i32,
+    /// Coupon status (coupon rewards; `CouponStatus.Unknown` otherwise)
+    card_status: CouponStatus,
     /// Prize type code (gift rewards; `0` = physical goods), none when not set
     #[js(opt)]
     prize_type: Option<i32>,
@@ -706,10 +756,13 @@ pub struct Coupon {
     /// Start of validity
     #[js(opt, datetime)]
     start_time: Option<DateTime<Utc>>,
-    /// End of validity (none when not set). A date after 2100 means the coupon
-    /// never expires.
+    /// End of validity (none when not set or when the coupon never expires;
+    /// see `noExpiry`)
     #[js(opt, datetime)]
     end_time: Option<DateTime<Utc>>,
+    /// Whether the coupon never expires (the server's end time is in or after
+    /// 2100)
+    no_expiry: bool,
     /// Activation time (none when not activated)
     #[js(opt, datetime)]
     activate_time: Option<DateTime<Utc>>,
@@ -834,11 +887,11 @@ pub struct Withdrawal {
     /// Amount paid out
     #[js(opt)]
     settlement_amount: Option<Decimal>,
-    /// State
-    state: WithdrawalState,
+    /// State code
+    state_code: WithdrawalState,
     /// Raw state, as returned by the server
     raw_state: String,
-    /// State description, as returned by the server
+    /// State display text, as returned by the server
     state_description: String,
     /// Receiving bank account number, as returned by the server (not masked)
     bank_account: String,

@@ -12,13 +12,13 @@ use crate::{
         types::{
             BankCard, CouponOrder, CouponOrderType, CouponsResponse, Deposit, DepositState,
             EddaApplication, GetStatementListResponse, GetStatementResponse, RewardRecordsResponse,
-            RewardType, StatementType, StockTransferInResponse, StockTransferOut,
-            WithdrawalsResponse,
+            RewardType, StatementType, StockTransferInResponse, StockTransferInState,
+            StockTransferOut, StockTransferOutState, WithdrawalsResponse,
         },
     },
     config::Config,
     error::ErrorNewType,
-    time::PyOffsetDateTimeWrapper,
+    time::PyInstantWrapper,
 };
 
 /// Async asset context.
@@ -114,9 +114,9 @@ impl AsyncAssetContext {
         &self,
         py: Python<'_>,
         market: Option<String>,
-        state: Option<i32>,
-        start: Option<PyOffsetDateTimeWrapper>,
-        end: Option<PyOffsetDateTimeWrapper>,
+        state: Option<StockTransferInState>,
+        start: Option<PyInstantWrapper>,
+        end: Option<PyInstantWrapper>,
         page: Option<i32>,
         size: Option<i32>,
     ) -> PyResult<Py<PyAny>> {
@@ -140,9 +140,9 @@ impl AsyncAssetContext {
         &self,
         py: Python<'_>,
         market: Option<String>,
-        state: Option<i32>,
-        start: Option<PyOffsetDateTimeWrapper>,
-        end: Option<PyOffsetDateTimeWrapper>,
+        state: Option<StockTransferOutState>,
+        start: Option<PyInstantWrapper>,
+        end: Option<PyInstantWrapper>,
         page: Option<i32>,
         size: Option<i32>,
     ) -> PyResult<Py<PyAny>> {
@@ -160,6 +160,9 @@ impl AsyncAssetContext {
     }
 
     /// Get reward records from the reward center. Returns awaitable.
+    ///
+    /// The route has no date filter: page through the records and filter on
+    /// their times.
     #[pyo3(signature = (page = None, page_size = None, reward_type = None))]
     fn reward_records(
         &self,
@@ -230,8 +233,8 @@ impl AsyncAssetContext {
         size: Option<i32>,
         states: Option<Vec<DepositState>>,
         currencies: Option<Vec<String>>,
-        start: Option<PyOffsetDateTimeWrapper>,
-        end: Option<PyOffsetDateTimeWrapper>,
+        start: Option<PyInstantWrapper>,
+        end: Option<PyInstantWrapper>,
     ) -> PyResult<Py<PyAny>> {
         let opts = deposits_options(page, size, states, currencies, start, end);
         let ctx = self.ctx.clone();
@@ -253,8 +256,8 @@ impl AsyncAssetContext {
         py: Python<'_>,
         page: Option<i32>,
         size: Option<i32>,
-        start: Option<PyOffsetDateTimeWrapper>,
-        end: Option<PyOffsetDateTimeWrapper>,
+        start: Option<PyInstantWrapper>,
+        end: Option<PyInstantWrapper>,
     ) -> PyResult<Py<PyAny>> {
         let opts = withdrawals_options(page, size, start, end);
         let ctx = self.ctx.clone();

@@ -235,7 +235,7 @@ export declare class AssetContext {
    * console.log(resp);
    * ```
    */
-  stockTransfersIn(opts?: GetStockTransfersOptions | undefined | null): Promise<StockTransferInResponse>
+  stockTransfersIn(opts?: GetStockTransfersInOptions | undefined | null): Promise<StockTransferInResponse>
   /**
    * Get stock transfer-out applications (this account to another broker)
    *
@@ -252,12 +252,15 @@ export declare class AssetContext {
    * console.log(resp);
    * ```
    */
-  stockTransfersOut(opts?: GetStockTransfersOptions | undefined | null): Promise<Array<StockTransferOut>>
+  stockTransfersOut(opts?: GetStockTransfersOutOptions | undefined | null): Promise<Array<StockTransferOut>>
   /**
    * Get reward records from the reward center (cash, gifts, coupons, task
    * rewards)
    *
    * AP accounts only: US data-center accounts get a region error.
+   *
+   * The route has no date filter: to find rewards in a time range, page
+   * through the records and filter on their times.
    *
    * #### Example
    *
@@ -447,11 +450,17 @@ export declare class BankCard {
   get authList(): Array<BankCardAuthorization>
 }
 
-/** An authorization attached to a bank card (eDDA, bank securities account, FPS, ...) */
+/**
+ * An authorization attached to a bank card (eDDA, bank securities account,
+ * FPS, ...)
+ */
 export declare class BankCardAuthorization {
   toString(): string
   toJSON(): any
-  /** Authorization flow: `hk_edda` / `hk_sdda` (eDDA), `hk_bank_sec`, `hk_fps`, ... */
+  /**
+   * Authorization flow: `hk_edda` / `hk_sdda` (eDDA), `hk_bank_sec`,
+   * `hk_fps`, ...
+   */
   get flowId(): string
   /** Display name of the authorization */
   get name(): string
@@ -472,8 +481,9 @@ export declare class BankCardAuthorization {
   /** Whether the daily debit count is unlimited */
   get dailyMaxCountUnlimited(): boolean
   /**
-   * Expiry date of the authorization (none when not set). A long-term authorization carries the
-   * server's 9999-12-31 sentinel here.
+   * Expiry date of the authorization (none when not set and for a
+   * long-term authorization: the server's 9999-12-31 "never expires"
+   * sentinel is none; see `long_term_valid`)
    */
   get expiryDate(): Date | null
   /** Whether the authorization never expires */
@@ -731,7 +741,10 @@ export declare class Coupon {
   toJSON(): any
   /** Coupon ID (32 hex characters; pass to coupon_orders) */
   get cardId(): string
-  /** Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`, `cash` */
+  /**
+   * Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`,
+   * `cash`
+   */
   get cardType(): string
   /** Title */
   get title(): string
@@ -745,8 +758,16 @@ export declare class Coupon {
   get cardStatus(): CouponStatus
   /** Start of validity */
   get startTime(): Date | null
-  /** End of validity (none when not set). A date after 2100 means the coupon never expires. */
+  /**
+   * End of validity (none when not set or when the coupon never expires;
+   * see `noExpiry`)
+   */
   get endTime(): Date | null
+  /**
+   * Whether the coupon never expires (the server's end time is in or after
+   * 2100)
+   */
+  get noExpiry(): boolean
   /** Activation time (none when not activated) */
   get activateTime(): Date | null
   /** Amount */
@@ -768,8 +789,8 @@ export declare class CouponCommission {
   /** Rebate rate, as returned by the server */
   get rebateRate(): string
   /**
-   * Instrument types the coupon applies to: `0` stocks, `1` options, `2` warrants, `3` ETF, `4`
-   * LOF
+   * Instrument types the coupon applies to: `0` stocks, `1` options, `2`
+   * warrants, `3` ETF, `4` LOF
    */
   get bzTypes(): Array<number>
   /** Remaining commission balance */
@@ -4310,8 +4331,8 @@ export declare class RewardRecord {
   get description(): string
   /** Coupon type (coupon rewards), e.g. `commission` */
   get cardType(): string
-  /** Coupon status code (coupon rewards), as returned by the server */
-  get cardStatus(): number
+  /** Coupon status (coupon rewards; `CouponStatus.Unknown` otherwise) */
+  get cardStatus(): CouponStatus
   /** Prize type code (gift rewards; `0` = physical goods), none when not set */
   get prizeType(): number | null
   /** Amount */
@@ -4665,19 +4686,25 @@ export declare class StockTransferIn {
   get market(): string
   /** Name of the other broker */
   get broker(): string
+  /** ID of the other broker */
+  get brokerId(): string
   /** English name of the other broker */
   get brokerEn(): string
   /** Broker code of the other broker */
   get brokerCode(): string
-  /** Account number at the other broker, as returned by the server (not masked) */
+  /**
+   * Account number at the other broker, as returned by the server (not
+   * masked)
+   */
   get account(): string
   /** State text, as returned by the server */
   get state(): string
   /** State code */
   get stateCode(): StockTransferInState
   /**
-   * App-side state: `noticed` means the user tapped "I have notified the broker" in the app (the
-   * user's own confirmation, not a Longbridge action); `default` otherwise
+   * App-side state: `noticed` means the user tapped "I have notified the
+   * broker" in the app (the user's own confirmation, not a Longbridge
+   * action); `default` otherwise
    */
   get appState(): string
   /** Whether the application can still be cancelled or changed */
@@ -4720,16 +4747,27 @@ export declare class StockTransferOut {
   get market(): string
   /** Name of the other broker */
   get broker(): string
+  /** ID of the other broker */
+  get brokerId(): string
   /** English name of the other broker */
   get brokerEn(): string
   /** Broker code of the other broker */
   get brokerCode(): string
-  /** Account number at the other broker, as returned by the server (not masked) */
+  /**
+   * Account number at the other broker, as returned by the server (not
+   * masked)
+   */
   get account(): string
   /** State text, as returned by the server */
   get state(): string
   /** State code. Only `Submitted` applications can be cancelled */
   get stateCode(): StockTransferOutState
+  /**
+   * App-side state: `noticed` means the user tapped "I have notified the
+   * broker" in the app (the user's own confirmation, not a Longbridge
+   * action); `default` otherwise
+   */
+  get appState(): string
   /** Created time */
   get createdAt(): Date | null
   /** Updated time */
@@ -5317,8 +5355,8 @@ export declare class TransferStock {
   get currency(): string
   /** Cost price */
   get cost(): Decimal | null
-  /** State of this stock in the transfer */
-  get state(): TransferStockState
+  /** State code of this stock in the transfer */
+  get stateCode(): TransferStockState
   /** Position side */
   get positionSide(): string
 }
@@ -5523,11 +5561,11 @@ export declare class Withdrawal {
   get fee(): Decimal | null
   /** Amount paid out */
   get settlementAmount(): Decimal | null
-  /** State */
-  get state(): WithdrawalState
+  /** State code */
+  get stateCode(): WithdrawalState
   /** Raw state, as returned by the server */
   get rawState(): string
-  /** State description, as returned by the server */
+  /** State display text, as returned by the server */
   get stateDescription(): string
   /** Receiving bank account number, as returned by the server (not masked) */
   get bankAccount(): string
@@ -5890,19 +5928,25 @@ export declare const enum AttachedOrderType {
 }
 
 /**
- * Status of a bank-card authorization (eDDA, bank securities account, FPS) or of an eDDA
- * application
+ * Status of a bank-card authorization (eDDA, bank securities account, FPS) or
+ * of an eDDA application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 export declare const enum AuthorizationStatus {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Not authorized */
+  /** Not authorized (server code 0) */
   Unauthorized = 1,
-  /** Authorized */
+  /** Authorized (server code 1) */
   Authorized = 2,
-  /** Authorization in progress */
+  /** Authorization in progress (server code 2) */
   Authorizing = 3,
-  /** Authorization failed (see the message field for the reason) */
+  /**
+   * Authorization failed (see the message field for the reason) (server code
+   * 3)
+   */
   Failed = 4
 }
 
@@ -5917,39 +5961,54 @@ export declare const enum BalanceType {
   Fund = 3
 }
 
-/** Binding state of a bank card */
+/**
+ * Binding state of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum BankCardBindState {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Binding in progress */
+  /** Binding in progress (server code 0) */
   Binding = 1,
-  /** Bound */
+  /** Bound (server code 1) */
   Bound = 2,
-  /** Binding failed */
+  /** Binding failed (server code 2) */
   Failed = 3
 }
 
-/** Verification status of a bank card */
+/**
+ * Verification status of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum BankCardStatus {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Not verified */
+  /** Not verified (server code 0) */
   Unverified = 1,
-  /** Under review */
+  /** Under review (server code 1) */
   UnderReview = 2,
-  /** Verified */
+  /** Verified (server code 2) */
   Verified = 3
 }
 
-/** Witness (in-person / video verification) state of a bank card */
+/**
+ * Witness (in-person / video verification) state of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum BankCardWitnessState {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Witnessing not required */
+  /** Witnessing not required (server code 1) */
   NotRequired = 1,
-  /** Witnessing pending */
+  /** Witnessing pending (server code 2) */
   Pending = 2,
-  /** Witnessed */
+  /** Witnessed (server code 3) */
   Witnessed = 3
 }
 
@@ -6700,21 +6759,26 @@ export declare const enum CouponOrderType {
   Settled = 1
 }
 
-/** Status of a coupon */
+/**
+ * Status of a coupon
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum CouponStatus {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Unused */
+  /** Unused (server code 0) */
   Unused = 1,
-  /** Used */
+  /** Used (server code 1) */
   Used = 2,
-  /** Expired */
+  /** Expired (server code 2) */
   Expired = 3,
-  /** Being redeemed */
+  /** Being redeemed (server code 3) */
   Redeeming = 4,
-  /** In use */
+  /** In use (server code 4) */
   InUse = 5,
-  /** Processing */
+  /** Processing (server code 5) */
   Processing = 6
 }
 
@@ -6914,21 +6978,26 @@ export interface DeleteWatchlistGroup {
   purge: boolean
 }
 
-/** State of a deposit record */
+/**
+ * State of a deposit record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum DepositState {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Processing */
+  /** Processing (server code 0) */
   Processing = 1,
-  /** Credited to the account */
+  /** Credited to the account (server code 1) */
   Credited = 2,
-  /** Failed */
+  /** Failed (server code 2) */
   Failed = 3,
-  /** Cancelled */
+  /** Cancelled (server code 3) */
   Cancelled = 4,
-  /** Invalidated */
+  /** Invalidated (server code 4) */
   Invalidated = 5,
-  /** Rejected */
+  /** Rejected (server code 5) */
   Rejected = 6
 }
 
@@ -7519,7 +7588,10 @@ export interface GetRewardRecordsOptions {
   page?: number
   /** Page size (max 50) */
   pageSize?: number
-  /** Filter by reward type (default: all types) */
+  /**
+   * Filter by reward type (default: all types; `RewardType.Unknown` is
+   * ignored)
+   */
   rewardType?: RewardType
 }
 
@@ -7551,16 +7623,34 @@ export interface GetStatementListResponse {
   list: Array<StatementItem>
 }
 
-/** Options for the stock transfer-in and transfer-out lists */
-export interface GetStockTransfersOptions {
+/** Options for the stock transfer-in list */
+export interface GetStockTransfersInOptions {
   /** Filter by market (`HK`, `US`, `CN`, `SG`) */
   market?: string
   /**
-   * Filter by state code: a `StockTransferInState` code for the
-   * transfer-in list, a `StockTransferOutState` code for the transfer-out
-   * list (see the Rust SDK for the numeric codes)
+   * Filter by state (sent to the server as the state's server code;
+   * `StockTransferInState.Unknown` is ignored)
    */
-  state?: number
+  state?: StockTransferInState
+  /** Only applications created at or after this time */
+  start?: Date
+  /** Only applications created at or before this time */
+  end?: Date
+  /** Page number (default 1) */
+  page?: number
+  /** Page size (default 20, max 50) */
+  size?: number
+}
+
+/** Options for the stock transfer-out list */
+export interface GetStockTransfersOutOptions {
+  /** Filter by market (`HK`, `US`, `CN`, `SG`) */
+  market?: string
+  /**
+   * Filter by state (sent to the server as the state's server code;
+   * `StockTransferOutState.Unknown` is ignored)
+   */
+  state?: StockTransferOutState
   /** Only applications created at or after this time */
   start?: Date
   /** Only applications created at or before this time */
@@ -9104,67 +9194,85 @@ export interface ReplaceOrderOptions {
   clearDelayedUntil?: boolean
 }
 
-/** Delivery status of an issued prize (only meaningful for issued gift rewards) */
+/**
+ * Delivery status of an issued prize (only meaningful for issued gift rewards)
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum RewardDeliverStatus {
-  /** Unknown (an undocumented code, or no delivery status) */
+  /**
+   * Unknown: an undocumented code, or no delivery status (never sent to the
+   * server)
+   */
   Unknown = 0,
-  /** Not activated */
+  /** Not activated (server code 0) */
   NotActivated = 1,
-  /** Activated, or shipping */
+  /** Activated, or shipping (server code 1) */
   ActivatedOrShipping = 2,
-  /** Consumed */
+  /** Consumed (server code 2) */
   Consumed = 3,
-  /** E-voucher activating */
+  /** E-voucher activating (server code 5) */
   EVoucherActivating = 4,
-  /** E-voucher expired before activation */
+  /** E-voucher expired before activation (server code 6) */
   EVoucherExpired = 5,
-  /** E-voucher invalid */
+  /** E-voucher invalid (server code 7) */
   EVoucherInvalid = 6,
-  /** Shipping address missing */
+  /** Shipping address missing (server code 8) */
   AddressMissing = 7,
-  /** Shipping address filled */
+  /** Shipping address filled (server code 9) */
   AddressFilled = 8,
-  /** Shipping */
+  /** Shipping (server code 10) */
   Shipping = 9
 }
 
-/** Status of a reward record */
+/**
+ * Status of a reward record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum RewardStatus {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Upcoming */
+  /** Upcoming (server code 0) */
   Upcoming = 1,
-  /** Cancelled */
+  /** Cancelled (server code 1) */
   Cancelled = 2,
-  /** The user exited the activity */
+  /** The user exited the activity (server code 2) */
   ExitedActivity = 3,
-  /** Not claimed yet */
+  /** Not claimed yet (server code 8) */
   Unclaimed = 4,
-  /** Being issued */
+  /** Being issued (server code 10) */
   Issuing = 5,
-  /** Issued */
+  /** Issued (server code 12) */
   Issued = 6,
-  /** Issuing failed */
+  /** Issuing failed (server code 13) */
   Failed = 7,
-  /** Exchanged */
+  /** Exchanged (server code 16) */
   Exchanged = 8,
-  /** Expired */
+  /** Expired (server code 17) */
   Expired = 9,
-  /** Refunded */
+  /** Refunded (server code 18) */
   Refunded = 10
 }
 
-/** Type of a reward record */
+/**
+ * Type of a reward record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum RewardType {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Cash reward */
+  /** Cash reward (server code 0) */
   Cash = 1,
-  /** Gift (prize) */
+  /** Gift (prize) (server code 1) */
   Gift = 2,
-  /** Coupon */
+  /** Coupon (server code 2) */
   Coupon = 3,
-  /** Task reward */
+  /** Task reward (server code 3) */
   Task = 4
 }
 
@@ -9566,43 +9674,56 @@ export interface StockRatings {
   ratingsJson: string
 }
 
-/** State of a stock transfer-in application (another broker to this account) */
+/**
+ * State of a stock transfer-in application (another broker to this account)
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum StockTransferInState {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Submitted */
+  /** Submitted (server code 0) */
   Submitted = 1,
-  /** Cancelled */
+  /** Cancelled (server code 1) */
   Cancelled = 2,
-  /** Completed */
+  /** Completed (server code 3) */
   Completed = 3,
-  /** Processing */
+  /** Processing (server code 5) */
   Processing = 4,
-  /** Partially completed */
+  /** Partially completed (server code 7) */
   PartiallyCompleted = 5,
-  /** Failed */
+  /** Failed (server code 8) */
   Failed = 6
 }
 
-/** State of a stock transfer-out application (this account to another broker) */
+/**
+ * State of a stock transfer-out application (this account to another broker)
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum StockTransferOutState {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Submitted (the only state in which the application can still be cancelled) */
+  /**
+   * Submitted (the only state in which the application can still be
+   * cancelled) (server code 0)
+   */
   Submitted = 1,
-  /** Processing */
+  /** Processing (server code 1) */
   Processing = 2,
-  /** Executing */
+  /** Executing (server code 2) */
   Executing = 3,
-  /** Completed */
+  /** Completed (server code 3) */
   Completed = 4,
-  /** Cancelled */
+  /** Cancelled (server code 4) */
   Cancelled = 5,
-  /** Partially completed */
+  /** Partially completed (server code 5) */
   PartiallyCompleted = 6,
-  /** Failed */
+  /** Failed (server code 6) */
   Failed = 7,
-  /** Rejected */
+  /** Rejected (server code 7) */
   Rejected = 8
 }
 
@@ -10039,15 +10160,20 @@ export declare const enum TradeStatus {
   Suspend = 10
 }
 
-/** State of one stock inside a stock transfer application */
+/**
+ * State of one stock inside a stock transfer application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum TransferStockState {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Processing */
+  /** Processing (server code 0) */
   Processing = 1,
-  /** Succeeded */
+  /** Succeeded (server code 1) */
   Succeeded = 2,
-  /** Failed */
+  /** Failed (server code 2) */
   Failed = 3
 }
 
@@ -10951,37 +11077,42 @@ export declare const enum WarrantType {
   Inline = 5
 }
 
-/** State of a withdrawal record */
+/**
+ * State of a withdrawal record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
 export declare const enum WithdrawalState {
-  /** Unknown (an undocumented code) */
+  /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** Submitted */
+  /** Submitted (server code 0) */
   Submitted = 1,
-  /** Processing */
+  /** Processing (server code 1) */
   Processing = 2,
-  /** Rejected */
+  /** Rejected (server code 2) */
   Rejected = 3,
-  /** Cancelled */
+  /** Cancelled (server code 3) */
   Cancelled = 4,
-  /** Remitted */
+  /** Remitted (server code 4) */
   Remitted = 5,
-  /** Failed */
+  /** Failed (server code 5) */
   Failed = 6,
-  /** Refunded */
+  /** Refunded (server code 6) */
   Refunded = 7,
-  /** Approved, awaiting payout */
+  /** Approved, awaiting payout (server code 7) */
   ApprovedAwaitingPayout = 8,
-  /** Large-amount review */
+  /** Large-amount review (server code 8) */
   LargeAmountReview = 9,
-  /** Change pending approval */
+  /** Change pending approval (server code 9) */
   ChangePendingApproval = 10,
-  /** Deletion pending approval */
+  /** Deletion pending approval (server code 10) */
   DeletionPendingApproval = 11,
-  /** Deleted */
+  /** Deleted (server code 11) */
   Deleted = 12,
-  /** Rejection pending approval */
+  /** Rejection pending approval (server code 12) */
   RejectionPendingApproval = 13,
-  /** Awaiting confirmation */
+  /** Awaiting confirmation (server code 15) */
   AwaitingConfirmation = 14
 }
 

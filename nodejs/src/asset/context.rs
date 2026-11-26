@@ -6,8 +6,8 @@ use crate::{
     asset::{
         requests::{
             GetCouponsOptions, GetDepositsOptions, GetRewardRecordsOptions,
-            GetStatementDownloadUrlRequest, GetStatementListRequest, GetStockTransfersOptions,
-            GetWithdrawalsOptions, StatementType,
+            GetStatementDownloadUrlRequest, GetStatementListRequest, GetStockTransfersInOptions,
+            GetStockTransfersOutOptions, GetWithdrawalsOptions, StatementType,
         },
         types::{
             BankCard, CouponOrder, CouponOrderType, CouponsResponse, Deposit, EddaApplication,
@@ -149,7 +149,7 @@ impl AssetContext {
     #[napi]
     pub async fn stock_transfers_in(
         &self,
-        opts: Option<GetStockTransfersOptions>,
+        opts: Option<GetStockTransfersInOptions>,
     ) -> Result<StockTransferInResponse> {
         self.ctx
             .stock_transfers_in(opts.map(Into::into))
@@ -175,7 +175,7 @@ impl AssetContext {
     #[napi]
     pub async fn stock_transfers_out(
         &self,
-        opts: Option<GetStockTransfersOptions>,
+        opts: Option<GetStockTransfersOutOptions>,
     ) -> Result<Vec<StockTransferOut>> {
         self.ctx
             .stock_transfers_out(opts.map(Into::into))
@@ -190,6 +190,9 @@ impl AssetContext {
     /// rewards)
     ///
     /// AP accounts only: US data-center accounts get a region error.
+    ///
+    /// The route has no date filter: to find rewards in a time range, page
+    /// through the records and filter on their times.
     ///
     /// #### Example
     ///

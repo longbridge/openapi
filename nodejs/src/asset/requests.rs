@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 
 use crate::{
-    asset::types::{DepositState, RewardType},
+    asset::types::{DepositState, RewardType, StockTransferInState, StockTransferOutState},
     utils::from_datetime,
 };
 
@@ -44,16 +44,15 @@ pub struct GetStatementDownloadUrlRequest {
     pub file_key: String,
 }
 
-/// Options for the stock transfer-in and transfer-out lists
+/// Options for the stock transfer-in list
 #[napi_derive::napi(object)]
 #[derive(Debug, Default)]
-pub struct GetStockTransfersOptions {
+pub struct GetStockTransfersInOptions {
     /// Filter by market (`HK`, `US`, `CN`, `SG`)
     pub market: Option<String>,
-    /// Filter by state code: a `StockTransferInState` code for the
-    /// transfer-in list, a `StockTransferOutState` code for the transfer-out
-    /// list (see the Rust SDK for the numeric codes)
-    pub state: Option<i32>,
+    /// Filter by state (sent to the server as the state's server code;
+    /// `StockTransferInState.Unknown` is ignored)
+    pub state: Option<StockTransferInState>,
     /// Only applications created at or after this time
     pub start: Option<DateTime<Utc>>,
     /// Only applications created at or before this time
@@ -64,14 +63,58 @@ pub struct GetStockTransfersOptions {
     pub size: Option<i32>,
 }
 
-impl From<GetStockTransfersOptions> for longbridge::asset::GetStockTransfersOptions {
-    fn from(opts: GetStockTransfersOptions) -> Self {
-        let mut opts2 = longbridge::asset::GetStockTransfersOptions::new();
+impl From<GetStockTransfersInOptions> for longbridge::asset::GetStockTransfersInOptions {
+    fn from(opts: GetStockTransfersInOptions) -> Self {
+        let mut opts2 = longbridge::asset::GetStockTransfersInOptions::new();
         if let Some(market) = opts.market {
             opts2 = opts2.market(market);
         }
         if let Some(state) = opts.state {
-            opts2 = opts2.state(state);
+            opts2 = opts2.state(state.into());
+        }
+        if let Some(start) = opts.start {
+            opts2 = opts2.start(from_datetime(start));
+        }
+        if let Some(end) = opts.end {
+            opts2 = opts2.end(from_datetime(end));
+        }
+        if let Some(page) = opts.page {
+            opts2 = opts2.page(page);
+        }
+        if let Some(size) = opts.size {
+            opts2 = opts2.size(size);
+        }
+        opts2
+    }
+}
+
+/// Options for the stock transfer-out list
+#[napi_derive::napi(object)]
+#[derive(Debug, Default)]
+pub struct GetStockTransfersOutOptions {
+    /// Filter by market (`HK`, `US`, `CN`, `SG`)
+    pub market: Option<String>,
+    /// Filter by state (sent to the server as the state's server code;
+    /// `StockTransferOutState.Unknown` is ignored)
+    pub state: Option<StockTransferOutState>,
+    /// Only applications created at or after this time
+    pub start: Option<DateTime<Utc>>,
+    /// Only applications created at or before this time
+    pub end: Option<DateTime<Utc>>,
+    /// Page number (default 1)
+    pub page: Option<i32>,
+    /// Page size (default 20, max 50)
+    pub size: Option<i32>,
+}
+
+impl From<GetStockTransfersOutOptions> for longbridge::asset::GetStockTransfersOutOptions {
+    fn from(opts: GetStockTransfersOutOptions) -> Self {
+        let mut opts2 = longbridge::asset::GetStockTransfersOutOptions::new();
+        if let Some(market) = opts.market {
+            opts2 = opts2.market(market);
+        }
+        if let Some(state) = opts.state {
+            opts2 = opts2.state(state.into());
         }
         if let Some(start) = opts.start {
             opts2 = opts2.start(from_datetime(start));
@@ -97,7 +140,8 @@ pub struct GetRewardRecordsOptions {
     pub page: Option<i32>,
     /// Page size (max 50)
     pub page_size: Option<i32>,
-    /// Filter by reward type (default: all types)
+    /// Filter by reward type (default: all types; `RewardType.Unknown` is
+    /// ignored)
     pub reward_type: Option<RewardType>,
 }
 

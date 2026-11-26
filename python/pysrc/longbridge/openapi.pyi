@@ -12466,711 +12466,855 @@ class GetStatementResponse:
 class BankCardStatus:
     """
     Verification status of a bank card
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(BankCardStatus):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Unverified(BankCardStatus):
         """
-        Not verified
+        Not verified (server code 0)
         """
 
         ...
 
     class UnderReview(BankCardStatus):
         """
-        Under review
+        Under review (server code 1)
         """
 
         ...
 
     class Verified(BankCardStatus):
         """
-        Verified
+        Verified (server code 2)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class BankCardWitnessState:
     """
     Witness (in-person / video verification) state of a bank card
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(BankCardWitnessState):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class NotRequired(BankCardWitnessState):
         """
-        Witnessing not required
+        Witnessing not required (server code 1)
         """
 
         ...
 
     class Pending(BankCardWitnessState):
         """
-        Witnessing pending
+        Witnessing pending (server code 2)
         """
 
         ...
 
     class Witnessed(BankCardWitnessState):
         """
-        Witnessed
+        Witnessed (server code 3)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class BankCardBindState:
     """
     Binding state of a bank card
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(BankCardBindState):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Binding(BankCardBindState):
         """
-        Binding in progress
+        Binding in progress (server code 0)
         """
 
         ...
 
     class Bound(BankCardBindState):
         """
-        Bound
+        Bound (server code 1)
         """
 
         ...
 
     class Failed(BankCardBindState):
         """
-        Binding failed
+        Binding failed (server code 2)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class AuthorizationStatus:
     """
     Status of a bank-card authorization (eDDA, bank securities account, FPS) or of
     an eDDA application
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(AuthorizationStatus):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Unauthorized(AuthorizationStatus):
         """
-        Not authorized
+        Not authorized (server code 0)
         """
 
         ...
 
     class Authorized(AuthorizationStatus):
         """
-        Authorized
+        Authorized (server code 1)
         """
 
         ...
 
     class Authorizing(AuthorizationStatus):
         """
-        Authorization in progress
+        Authorization in progress (server code 2)
         """
 
         ...
 
     class Failed(AuthorizationStatus):
         """
-        Authorization failed (see the message field for the reason)
+        Authorization failed (see the message field for the reason) (server code 3)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class StockTransferInState:
     """
     State of a stock transfer-in application (another broker to this account)
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(StockTransferInState):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Submitted(StockTransferInState):
         """
-        Submitted
+        Submitted (server code 0)
         """
 
         ...
 
     class Cancelled(StockTransferInState):
         """
-        Cancelled
+        Cancelled (server code 1)
         """
 
         ...
 
     class Completed(StockTransferInState):
         """
-        Completed
+        Completed (server code 3)
         """
 
         ...
 
     class Processing(StockTransferInState):
         """
-        Processing
+        Processing (server code 5)
         """
 
         ...
 
     class PartiallyCompleted(StockTransferInState):
         """
-        Partially completed
+        Partially completed (server code 7)
         """
 
         ...
 
     class Failed(StockTransferInState):
         """
-        Failed
+        Failed (server code 8)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class StockTransferOutState:
     """
     State of a stock transfer-out application (this account to another broker)
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(StockTransferOutState):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Submitted(StockTransferOutState):
         """
-        Submitted (the only state in which the application can still be cancelled)
+        Submitted (the only state in which the application can still be cancelled) (server code 0)
         """
 
         ...
 
     class Processing(StockTransferOutState):
         """
-        Processing
+        Processing (server code 1)
         """
 
         ...
 
     class Executing(StockTransferOutState):
         """
-        Executing
+        Executing (server code 2)
         """
 
         ...
 
     class Completed(StockTransferOutState):
         """
-        Completed
+        Completed (server code 3)
         """
 
         ...
 
     class Cancelled(StockTransferOutState):
         """
-        Cancelled
+        Cancelled (server code 4)
         """
 
         ...
 
     class PartiallyCompleted(StockTransferOutState):
         """
-        Partially completed
+        Partially completed (server code 5)
         """
 
         ...
 
     class Failed(StockTransferOutState):
         """
-        Failed
+        Failed (server code 6)
         """
 
         ...
 
     class Rejected(StockTransferOutState):
         """
-        Rejected
+        Rejected (server code 7)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class TransferStockState:
     """
     State of one stock inside a stock transfer application
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(TransferStockState):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Processing(TransferStockState):
         """
-        Processing
+        Processing (server code 0)
         """
 
         ...
 
     class Succeeded(TransferStockState):
         """
-        Succeeded
+        Succeeded (server code 1)
         """
 
         ...
 
     class Failed(TransferStockState):
         """
-        Failed
+        Failed (server code 2)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class RewardType:
     """
     Type of a reward record
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(RewardType):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Cash(RewardType):
         """
-        Cash reward
+        Cash reward (server code 0)
         """
 
         ...
 
     class Gift(RewardType):
         """
-        Gift (prize)
+        Gift (prize) (server code 1)
         """
 
         ...
 
     class Coupon(RewardType):
         """
-        Coupon
+        Coupon (server code 2)
         """
 
         ...
 
     class Task(RewardType):
         """
-        Task reward
+        Task reward (server code 3)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class RewardStatus:
     """
     Status of a reward record
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(RewardStatus):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Upcoming(RewardStatus):
         """
-        Upcoming
+        Upcoming (server code 0)
         """
 
         ...
 
     class Cancelled(RewardStatus):
         """
-        Cancelled
+        Cancelled (server code 1)
         """
 
         ...
 
     class ExitedActivity(RewardStatus):
         """
-        The user exited the activity
+        The user exited the activity (server code 2)
         """
 
         ...
 
     class Unclaimed(RewardStatus):
         """
-        Not claimed yet
+        Not claimed yet (server code 8)
         """
 
         ...
 
     class Issuing(RewardStatus):
         """
-        Being issued
+        Being issued (server code 10)
         """
 
         ...
 
     class Issued(RewardStatus):
         """
-        Issued
+        Issued (server code 12)
         """
 
         ...
 
     class Failed(RewardStatus):
         """
-        Issuing failed
+        Issuing failed (server code 13)
         """
 
         ...
 
     class Exchanged(RewardStatus):
         """
-        Exchanged
+        Exchanged (server code 16)
         """
 
         ...
 
     class Expired(RewardStatus):
         """
-        Expired
+        Expired (server code 17)
         """
 
         ...
 
     class Refunded(RewardStatus):
         """
-        Refunded
+        Refunded (server code 18)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class RewardDeliverStatus:
     """
     Delivery status of an issued prize (only meaningful for issued gift rewards)
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(RewardDeliverStatus):
         """
-        Unknown (an undocumented code, or no delivery status)
+        Unknown: an undocumented code, or no delivery status (never sent to the
+        server)
         """
 
         ...
 
     class NotActivated(RewardDeliverStatus):
         """
-        Not activated
+        Not activated (server code 0)
         """
 
         ...
 
     class ActivatedOrShipping(RewardDeliverStatus):
         """
-        Activated, or shipping
+        Activated, or shipping (server code 1)
         """
 
         ...
 
     class Consumed(RewardDeliverStatus):
         """
-        Consumed
+        Consumed (server code 2)
         """
 
         ...
 
     class EVoucherActivating(RewardDeliverStatus):
         """
-        E-voucher activating
+        E-voucher activating (server code 5)
         """
 
         ...
 
     class EVoucherExpired(RewardDeliverStatus):
         """
-        E-voucher expired before activation
+        E-voucher expired before activation (server code 6)
         """
 
         ...
 
     class EVoucherInvalid(RewardDeliverStatus):
         """
-        E-voucher invalid
+        E-voucher invalid (server code 7)
         """
 
         ...
 
     class AddressMissing(RewardDeliverStatus):
         """
-        Shipping address missing
+        Shipping address missing (server code 8)
         """
 
         ...
 
     class AddressFilled(RewardDeliverStatus):
         """
-        Shipping address filled
+        Shipping address filled (server code 9)
         """
 
         ...
 
     class Shipping(RewardDeliverStatus):
         """
-        Shipping
+        Shipping (server code 10)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class CouponStatus:
     """
     Status of a coupon
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(CouponStatus):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Unused(CouponStatus):
         """
-        Unused
+        Unused (server code 0)
         """
 
         ...
 
     class Used(CouponStatus):
         """
-        Used
+        Used (server code 1)
         """
 
         ...
 
     class Expired(CouponStatus):
         """
-        Expired
+        Expired (server code 2)
         """
 
         ...
 
     class Redeeming(CouponStatus):
         """
-        Being redeemed
+        Being redeemed (server code 3)
         """
 
         ...
 
     class InUse(CouponStatus):
         """
-        In use
+        In use (server code 4)
         """
 
         ...
 
     class Processing(CouponStatus):
         """
-        Processing
+        Processing (server code 5)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class DepositState:
     """
     State of a deposit record
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(DepositState):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Processing(DepositState):
         """
-        Processing
+        Processing (server code 0)
         """
 
         ...
 
     class Credited(DepositState):
         """
-        Credited to the account
+        Credited to the account (server code 1)
         """
 
         ...
 
     class Failed(DepositState):
         """
-        Failed
+        Failed (server code 2)
         """
 
         ...
 
     class Cancelled(DepositState):
         """
-        Cancelled
+        Cancelled (server code 3)
         """
 
         ...
 
     class Invalidated(DepositState):
         """
-        Invalidated
+        Invalidated (server code 4)
         """
 
         ...
 
     class Rejected(DepositState):
         """
-        Rejected
+        Rejected (server code 5)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class WithdrawalState:
     """
     State of a withdrawal record
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
     """
 
     class Unknown(WithdrawalState):
         """
-        Unknown (an undocumented code)
+        Unknown: an undocumented code (never sent to the server)
         """
 
         ...
 
     class Submitted(WithdrawalState):
         """
-        Submitted
+        Submitted (server code 0)
         """
 
         ...
 
     class Processing(WithdrawalState):
         """
-        Processing
+        Processing (server code 1)
         """
 
         ...
 
     class Rejected(WithdrawalState):
         """
-        Rejected
+        Rejected (server code 2)
         """
 
         ...
 
     class Cancelled(WithdrawalState):
         """
-        Cancelled
+        Cancelled (server code 3)
         """
 
         ...
 
     class Remitted(WithdrawalState):
         """
-        Remitted
+        Remitted (server code 4)
         """
 
         ...
 
     class Failed(WithdrawalState):
         """
-        Failed
+        Failed (server code 5)
         """
 
         ...
 
     class Refunded(WithdrawalState):
         """
-        Refunded
+        Refunded (server code 6)
         """
 
         ...
 
     class ApprovedAwaitingPayout(WithdrawalState):
         """
-        Approved, awaiting payout
+        Approved, awaiting payout (server code 7)
         """
 
         ...
 
     class LargeAmountReview(WithdrawalState):
         """
-        Large-amount review
+        Large-amount review (server code 8)
         """
 
         ...
 
     class ChangePendingApproval(WithdrawalState):
         """
-        Change pending approval
+        Change pending approval (server code 9)
         """
 
         ...
 
     class DeletionPendingApproval(WithdrawalState):
         """
-        Deletion pending approval
+        Deletion pending approval (server code 10)
         """
 
         ...
 
     class Deleted(WithdrawalState):
         """
-        Deleted
+        Deleted (server code 11)
         """
 
         ...
 
     class RejectionPendingApproval(WithdrawalState):
         """
-        Rejection pending approval
+        Rejection pending approval (server code 12)
         """
 
         ...
 
     class AwaitingConfirmation(WithdrawalState):
         """
-        Awaiting confirmation
+        Awaiting confirmation (server code 15)
         """
 
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
         ...
 
 class CouponOrderType:
@@ -13250,8 +13394,9 @@ class BankCardAuthorization:
 
     expiry_date: Optional[datetime]
     """
-    Expiry date of the authorization (none when not set). A long-term authorization
-    carries the server's 9999-12-31 sentinel here.
+    Expiry date of the authorization (none when not set, and for a long-term
+    authorization: the server's 9999-12-31 "never expires" sentinel, like any
+    date in or after 2100, is none; check ``long_term_valid``)
     """
 
     long_term_valid: bool
@@ -13439,9 +13584,9 @@ class TransferStock:
     Cost price
     """
 
-    state: Type[TransferStockState]
+    state_code: Type[TransferStockState]
     """
-    State of this stock in the transfer
+    State code of this stock in the transfer
     """
 
     position_side: str
@@ -13472,6 +13617,11 @@ class StockTransferIn:
     broker: str
     """
     Name of the other broker
+    """
+
+    broker_id: str
+    """
+    ID of the other broker
     """
 
     broker_en: str
@@ -13586,6 +13736,11 @@ class StockTransferOut:
     Name of the other broker
     """
 
+    broker_id: str
+    """
+    ID of the other broker
+    """
+
     broker_en: str
     """
     English name of the other broker
@@ -13609,6 +13764,13 @@ class StockTransferOut:
     state_code: Type[StockTransferOutState]
     """
     State code. Only `Submitted` applications can be cancelled
+    """
+
+    app_state: str
+    """
+    App-side state: ``noticed`` means the user tapped "I have notified the
+    broker" in the app (the user's own confirmation, not a Longbridge action);
+    ``default`` otherwise
     """
 
     created_at: Optional[datetime]
@@ -13696,9 +13858,9 @@ class RewardRecord:
     Coupon type (coupon rewards), e.g. `commission`
     """
 
-    card_status: int
+    card_status: Type[CouponStatus]
     """
-    Coupon status code (coupon rewards), as returned by the server
+    Coupon status (coupon rewards; ``CouponStatus.Unknown`` otherwise)
     """
 
     prize_type: Optional[int]
@@ -13874,8 +14036,13 @@ class Coupon:
 
     end_time: Optional[datetime]
     """
-    End of validity (none when not set). A date after 2100 means the coupon never
-    expires.
+    End of validity (none when not set or when the coupon never expires; see
+    ``no_expiry``)
+    """
+
+    no_expiry: bool
+    """
+    Whether the coupon never expires (the server's end time is in or after 2100)
     """
 
     activate_time: Optional[datetime]
@@ -14098,9 +14265,9 @@ class Withdrawal:
     Amount paid out
     """
 
-    state: Type[WithdrawalState]
+    state_code: Type[WithdrawalState]
     """
-    State
+    State code
     """
 
     raw_state: str
@@ -14110,7 +14277,7 @@ class Withdrawal:
 
     state_description: str
     """
-    State description, as returned by the server
+    State display text, as returned by the server
     """
 
     bank_account: str
@@ -14274,7 +14441,7 @@ class AssetContext:
     def stock_transfers_in(
         self,
         market: Optional[str] = None,
-        state: Optional[int] = None,
+        state: Optional[Type[StockTransferInState]] = None,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None,
         page: Optional[int] = None,
@@ -14287,9 +14454,10 @@ class AssetContext:
 
         Args:
             market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
-            state: Filter by state code: 0 submitted, 1 cancelled, 3 completed, 5 processing, 7 partially completed, 8 failed
-            start: Only applications created at or after this time
-            end: Only applications created at or before this time
+            state: Filter by state (sent to the server as its server code,
+                ``StockTransferInState.X.code``; ``StockTransferInState.Unknown`` is ignored)
+            start: Only applications created at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only applications created at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
             page: Page number (default 1)
             size: Page size (default 20, max 50)
 
@@ -14316,7 +14484,7 @@ class AssetContext:
     def stock_transfers_out(
         self,
         market: Optional[str] = None,
-        state: Optional[int] = None,
+        state: Optional[Type[StockTransferOutState]] = None,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None,
         page: Optional[int] = None,
@@ -14329,9 +14497,10 @@ class AssetContext:
 
         Args:
             market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
-            state: Filter by state code: 0 submitted, 1 processing, 2 executing, 3 completed, 4 cancelled, 5 partially completed, 6 failed, 7 rejected
-            start: Only applications created at or after this time
-            end: Only applications created at or before this time
+            state: Filter by state (sent to the server as its server code,
+                ``StockTransferOutState.X.code``; ``StockTransferOutState.Unknown`` is ignored)
+            start: Only applications created at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only applications created at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
             page: Page number (default 1)
             size: Page size (default 20, max 50)
 
@@ -14364,12 +14533,16 @@ class AssetContext:
         """
         Get reward records from the reward center (cash, gifts, coupons, task rewards).
 
+        The route has no date filter: to find rewards in a time range, page through
+        the records and filter on their times.
+
         AP accounts only: US data-center accounts get a region error.
 
         Args:
             page: Page number (default 1)
             page_size: Page size (max 50)
-            reward_type: Filter by reward type (default: all types)
+            reward_type: Filter by reward type (default: all types; ``RewardType.Unknown``
+                is ignored)
 
         Returns:
             RewardRecordsResponse
@@ -14477,8 +14650,8 @@ class AssetContext:
             size: Page size
             states: Filter by states (``DepositState.Unknown`` is ignored)
             currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
-            start: Only deposits applied at or after this time
-            end: Only deposits applied at or before this time
+            start: Only deposits applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only deposits applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
 
         Returns:
             List[Deposit]
@@ -14515,8 +14688,8 @@ class AssetContext:
         Args:
             page: Page number (default 1)
             size: Page size
-            start: Only withdrawals applied at or after this time
-            end: Only withdrawals applied at or before this time
+            start: Only withdrawals applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only withdrawals applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
 
         Returns:
             WithdrawalsResponse
@@ -14704,7 +14877,7 @@ class AsyncAssetContext:
     def stock_transfers_in(
         self,
         market: Optional[str] = None,
-        state: Optional[int] = None,
+        state: Optional[Type[StockTransferInState]] = None,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None,
         page: Optional[int] = None,
@@ -14717,9 +14890,10 @@ class AsyncAssetContext:
 
         Args:
             market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
-            state: Filter by state code: 0 submitted, 1 cancelled, 3 completed, 5 processing, 7 partially completed, 8 failed
-            start: Only applications created at or after this time
-            end: Only applications created at or before this time
+            state: Filter by state (sent to the server as its server code,
+                ``StockTransferInState.X.code``; ``StockTransferInState.Unknown`` is ignored)
+            start: Only applications created at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only applications created at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
             page: Page number (default 1)
             size: Page size (default 20, max 50)
 
@@ -14749,7 +14923,7 @@ class AsyncAssetContext:
     def stock_transfers_out(
         self,
         market: Optional[str] = None,
-        state: Optional[int] = None,
+        state: Optional[Type[StockTransferOutState]] = None,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None,
         page: Optional[int] = None,
@@ -14762,9 +14936,10 @@ class AsyncAssetContext:
 
         Args:
             market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
-            state: Filter by state code: 0 submitted, 1 processing, 2 executing, 3 completed, 4 cancelled, 5 partially completed, 6 failed, 7 rejected
-            start: Only applications created at or after this time
-            end: Only applications created at or before this time
+            state: Filter by state (sent to the server as its server code,
+                ``StockTransferOutState.X.code``; ``StockTransferOutState.Unknown`` is ignored)
+            start: Only applications created at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only applications created at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
             page: Page number (default 1)
             size: Page size (default 20, max 50)
 
@@ -14800,12 +14975,16 @@ class AsyncAssetContext:
         """
         Get reward records from the reward center (cash, gifts, coupons, task rewards).
 
+        The route has no date filter: to find rewards in a time range, page through
+        the records and filter on their times.
+
         AP accounts only: US data-center accounts get a region error. Returns an awaitable.
 
         Args:
             page: Page number (default 1)
             page_size: Page size (max 50)
-            reward_type: Filter by reward type (default: all types)
+            reward_type: Filter by reward type (default: all types; ``RewardType.Unknown``
+                is ignored)
 
         Returns:
             RewardRecordsResponse
@@ -14922,8 +15101,8 @@ class AsyncAssetContext:
             size: Page size
             states: Filter by states (``DepositState.Unknown`` is ignored)
             currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
-            start: Only deposits applied at or after this time
-            end: Only deposits applied at or before this time
+            start: Only deposits applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only deposits applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
 
         Returns:
             List[Deposit]
@@ -14963,8 +15142,8 @@ class AsyncAssetContext:
         Args:
             page: Page number (default 1)
             size: Page size
-            start: Only withdrawals applied at or after this time
-            end: Only withdrawals applied at or before this time
+            start: Only withdrawals applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only withdrawals applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
 
         Returns:
             WithdrawalsResponse
