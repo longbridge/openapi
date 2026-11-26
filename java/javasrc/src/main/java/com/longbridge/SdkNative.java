@@ -80,6 +80,30 @@ public class SdkNative {
 
         public static native void assetContextDownloadUrl(long context, String fileKey, AsyncCallback callback);
 
+        public static native void assetContextBankCards(long context, AsyncCallback callback);
+
+        public static native void assetContextEddaApplications(long context, String cardId, String currency,
+                        AsyncCallback callback);
+
+        public static native void assetContextStockTransfersIn(long context, GetStockTransfersOptions opts,
+                        AsyncCallback callback);
+
+        public static native void assetContextStockTransfersOut(long context, GetStockTransfersOptions opts,
+                        AsyncCallback callback);
+
+        public static native void assetContextRewardRecords(long context, GetRewardRecordsOptions opts,
+                        AsyncCallback callback);
+
+        public static native void assetContextCoupons(long context, GetCouponsOptions opts, AsyncCallback callback);
+
+        public static native void assetContextCouponOrders(long context, String cardId, CouponOrderType orderType,
+                        AsyncCallback callback);
+
+        public static native void assetContextDeposits(long context, GetDepositsOptions opts, AsyncCallback callback);
+
+        public static native void assetContextWithdrawals(long context, GetWithdrawalsOptions opts,
+                        AsyncCallback callback);
+
         public static native long newContentContext(long config);
 
         public static native void freeContentContext(long context);

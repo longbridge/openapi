@@ -4507,3 +4507,298 @@ impl_java_class!(
         action, amount, counter_id, created_at, fund_name, id, msg, status, units
     ]
 );
+
+impl_java_class!(
+    "com/longbridge/asset/BankCardAuthorization",
+    longbridge::asset::BankCardAuthorization,
+    [
+        flow_id,
+        name,
+        currency,
+        status,
+        message,
+        is_support,
+        max_amount,
+        max_amount_unlimited,
+        #[java(set_as_opt = crate::types::JavaLong)]
+        daily_max_count,
+        daily_max_count_unlimited,
+        expiry_date,
+        long_term_valid,
+        doc_reviewing,
+        no_prior_deposit_reviewing
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/BankCard",
+    longbridge::asset::BankCard,
+    [
+        id,
+        bank_id,
+        bank,
+        bank_en,
+        bank_code,
+        account,
+        account_type,
+        country,
+        region,
+        region_name,
+        swift_code,
+        remark,
+        status,
+        witness_state,
+        support_witness,
+        bind_state,
+        bind_tip,
+        withdraw_fee,
+        created_at,
+        #[java(objarray)]
+        auth_list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/EddaApplication",
+    longbridge::asset::EddaApplication,
+    [id, status, message]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/TransferStock",
+    longbridge::asset::TransferStock,
+    [
+        code,
+        name,
+        name_en,
+        market,
+        counter_id,
+        amount,
+        currency,
+        cost,
+        state,
+        position_side
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/StockTransferIn",
+    longbridge::asset::StockTransferIn,
+    [
+        id,
+        order_id,
+        market,
+        broker,
+        broker_en,
+        broker_code,
+        account,
+        state,
+        state_code,
+        app_state,
+        can_modify,
+        created_at,
+        updated_at,
+        process_at,
+        exec_at,
+        remark,
+        reason,
+        #[java(objarray)]
+        stocks
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/StockTransferInResponse",
+    longbridge::asset::StockTransferInResponse,
+    [
+        #[java(objarray)]
+        records,
+        total
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/StockTransferOut",
+    longbridge::asset::StockTransferOut,
+    [
+        id,
+        order_id,
+        market,
+        broker,
+        broker_en,
+        broker_code,
+        account,
+        state,
+        state_code,
+        created_at,
+        updated_at,
+        process_at,
+        exec_at,
+        agree_at,
+        refuse_at,
+        cancel_at,
+        remark,
+        reason,
+        #[java(objarray)]
+        stocks
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/RewardRecord",
+    longbridge::asset::RewardRecord,
+    [
+        reward_type,
+        record_id,
+        activity_title,
+        title,
+        description,
+        card_type,
+        card_status,
+        #[java(set_as_opt = crate::types::JavaInteger)]
+        prize_type,
+        amount,
+        currency,
+        status,
+        deliver_status,
+        exit_status,
+        send_time,
+        start_time,
+        end_time,
+        effective_time,
+        receive_deadline
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/RewardRecordsResponse",
+    longbridge::asset::RewardRecordsResponse,
+    [
+        #[java(objarray)]
+        list,
+        total
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCommission",
+    longbridge::asset::CouponCommission,
+    [
+        #[java(objarray)]
+        markets,
+        rebate_rate,
+        #[java(priarray)]
+        bz_types,
+        commission_balance,
+        commission_duration,
+        unlimited,
+        commission_expired_time,
+        usage_count,
+        lave_usage_count,
+        settlement_model
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/Coupon",
+    longbridge::asset::Coupon,
+    [
+        card_id,
+        card_type,
+        title,
+        title_sec,
+        description,
+        detail,
+        card_status,
+        start_time,
+        end_time,
+        activate_time,
+        amount,
+        currency,
+        available_trade_session,
+        commission
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponsResponse",
+    longbridge::asset::CouponsResponse,
+    [
+        #[java(objarray)]
+        top_list,
+        #[java(objarray)]
+        list,
+        #[java(objarray)]
+        bottom_list,
+        total,
+        expired_count
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponOrder",
+    longbridge::asset::CouponOrder,
+    [
+        order_id,
+        state,
+        state_val,
+        executed_price,
+        executed_quantity,
+        currency,
+        settlement_currency,
+        rebate,
+        rebate_dt
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/Deposit",
+    longbridge::asset::Deposit,
+    [
+        id,
+        created_at,
+        updated_at,
+        currency,
+        amount,
+        receivable_amount,
+        state,
+        state_code,
+        sub_state_code,
+        bank_operation_type_id,
+        bank_operation_type_name,
+        reference_no,
+        can_cancel,
+        user_bank_swift_code
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/Withdrawal",
+    longbridge::asset::Withdrawal,
+    [
+        id,
+        order_id,
+        created_at,
+        currency,
+        amount,
+        fee,
+        settlement_amount,
+        state,
+        raw_state,
+        state_description,
+        bank_account,
+        display_bank_account,
+        user_bank_swift_code,
+        account_channel
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/WithdrawalsResponse",
+    longbridge::asset::WithdrawalsResponse,
+    [
+        #[java(objarray)]
+        list,
+        total
+    ]
+);

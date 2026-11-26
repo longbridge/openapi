@@ -623,6 +623,78 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextOrderDetail
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextEstimateMaxPurchaseQuantity
   (JNIEnv *, jclass, jlong, jobject, jobject);
 
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextBankCards
+ * Signature: (JLcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextBankCards
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextEddaApplications
+ * Signature: (JLjava/lang/String;Ljava/lang/String;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextEddaApplications
+  (JNIEnv *, jclass, jlong, jstring, jstring, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextStockTransfersIn
+ * Signature: (JLcom/longbridge/asset/GetStockTransfersOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextStockTransfersIn
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextStockTransfersOut
+ * Signature: (JLcom/longbridge/asset/GetStockTransfersOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextStockTransfersOut
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextRewardRecords
+ * Signature: (JLcom/longbridge/asset/GetRewardRecordsOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextRewardRecords
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextCoupons
+ * Signature: (JLcom/longbridge/asset/GetCouponsOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextCoupons
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextCouponOrders
+ * Signature: (JLjava/lang/String;Lcom/longbridge/asset/CouponOrderType;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextCouponOrders
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextDeposits
+ * Signature: (JLcom/longbridge/asset/GetDepositsOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextDeposits
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    assetContextWithdrawals
+ * Signature: (JLcom/longbridge/asset/GetWithdrawalsOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextWithdrawals
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
 #ifdef __cplusplus
 }
 #endif

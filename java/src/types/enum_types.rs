@@ -845,3 +845,152 @@ impl IntoJValue for longbridge::grid::GridTimeInForce {
         env.get_static_field(&cls, name, "Lcom/longbridge/grid/GridTimeInForce;")
     }
 }
+
+impl_java_enum!(
+    "com/longbridge/asset/BankCardStatus",
+    longbridge::asset::BankCardStatus,
+    [Unknown, Unverified, UnderReview, Verified]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/BankCardWitnessState",
+    longbridge::asset::BankCardWitnessState,
+    [Unknown, NotRequired, Pending, Witnessed]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/BankCardBindState",
+    longbridge::asset::BankCardBindState,
+    [Unknown, Binding, Bound, Failed]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/AuthorizationStatus",
+    longbridge::asset::AuthorizationStatus,
+    [Unknown, Unauthorized, Authorized, Authorizing, Failed]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/StockTransferInState",
+    longbridge::asset::StockTransferInState,
+    [
+        Unknown,
+        Submitted,
+        Cancelled,
+        Completed,
+        Processing,
+        PartiallyCompleted,
+        Failed
+    ]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/StockTransferOutState",
+    longbridge::asset::StockTransferOutState,
+    [
+        Unknown,
+        Submitted,
+        Processing,
+        Executing,
+        Completed,
+        Cancelled,
+        PartiallyCompleted,
+        Failed,
+        Rejected
+    ]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/TransferStockState",
+    longbridge::asset::TransferStockState,
+    [Unknown, Processing, Succeeded, Failed]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/RewardType",
+    longbridge::asset::RewardType,
+    [Unknown, Cash, Gift, Coupon, Task]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/RewardStatus",
+    longbridge::asset::RewardStatus,
+    [
+        Unknown,
+        Upcoming,
+        Cancelled,
+        ExitedActivity,
+        Unclaimed,
+        Issuing,
+        Issued,
+        Failed,
+        Exchanged,
+        Expired,
+        Refunded
+    ]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/RewardDeliverStatus",
+    longbridge::asset::RewardDeliverStatus,
+    [
+        Unknown,
+        NotActivated,
+        ActivatedOrShipping,
+        Consumed,
+        EVoucherActivating,
+        EVoucherExpired,
+        EVoucherInvalid,
+        AddressMissing,
+        AddressFilled,
+        Shipping
+    ]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/CouponStatus",
+    longbridge::asset::CouponStatus,
+    [Unknown, Unused, Used, Expired, Redeeming, InUse, Processing]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/DepositState",
+    longbridge::asset::DepositState,
+    [
+        Unknown,
+        Processing,
+        Credited,
+        Failed,
+        Cancelled,
+        Invalidated,
+        Rejected
+    ]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/WithdrawalState",
+    longbridge::asset::WithdrawalState,
+    [
+        Unknown,
+        Submitted,
+        Processing,
+        Rejected,
+        Cancelled,
+        Remitted,
+        Failed,
+        Refunded,
+        ApprovedAwaitingPayout,
+        LargeAmountReview,
+        ChangePendingApproval,
+        DeletionPendingApproval,
+        Deleted,
+        RejectionPendingApproval,
+        AwaitingConfirmation
+    ]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/CouponOrderType",
+    longbridge::asset::CouponOrderType,
+    [Locked, Settled]
+);
