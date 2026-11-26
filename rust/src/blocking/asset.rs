@@ -8,8 +8,9 @@ use crate::{
         AssetContext, BankCard, CouponOrder, CouponOrderType, CouponsResponse, Deposit,
         EddaApplication, GetCouponsOptions, GetDepositsOptions, GetRewardRecordsOptions,
         GetStatementListOptions, GetStatementListResponse, GetStatementOptions,
-        GetStatementResponse, GetStockTransfersOptions, GetWithdrawalsOptions,
-        RewardRecordsResponse, StockTransferInResponse, StockTransferOut, WithdrawalsResponse,
+        GetStatementResponse, GetStockTransfersInOptions, GetStockTransfersOutOptions,
+        GetWithdrawalsOptions, RewardRecordsResponse, StockTransferInResponse, StockTransferOut,
+        WithdrawalsResponse,
     },
     blocking::runtime::BlockingRuntime,
 };
@@ -92,7 +93,7 @@ impl AssetContextSync {
     /// Get stock transfer-in applications (another broker → this account)
     pub fn stock_transfers_in(
         &self,
-        options: impl Into<Option<GetStockTransfersOptions>>,
+        options: impl Into<Option<GetStockTransfersInOptions>>,
     ) -> Result<StockTransferInResponse> {
         let options = options.into();
         self.rt
@@ -102,7 +103,7 @@ impl AssetContextSync {
     /// Get stock transfer-out applications (this account → another broker)
     pub fn stock_transfers_out(
         &self,
-        options: impl Into<Option<GetStockTransfersOptions>>,
+        options: impl Into<Option<GetStockTransfersOutOptions>>,
     ) -> Result<Vec<StockTransferOut>> {
         let options = options.into();
         self.rt
@@ -110,6 +111,9 @@ impl AssetContextSync {
     }
 
     /// Get reward records from the reward center
+    ///
+    /// The route has no date filter: to find rewards in a time range, page
+    /// through the records and filter on their times.
     pub fn reward_records(
         &self,
         options: impl Into<Option<GetRewardRecordsOptions>>,

@@ -11,9 +11,9 @@ use crate::{
         CouponsResponse, Deposit, DepositsResponse, EddaApplication, EddaApplicationsResponse,
         GetCouponsOptions, GetDepositsOptions, GetRewardRecordsOptions, GetStatementListOptions,
         GetStatementListResponse, GetStatementOptions, GetStatementResponse,
-        GetStockTransfersOptions, GetWithdrawalsOptions, RewardRecordsResponse,
-        StockTransferInResponse, StockTransferOut, StockTransferOutResponse, WithdrawalsResponse,
-        core,
+        GetStockTransfersInOptions, GetStockTransfersOutOptions, GetWithdrawalsOptions,
+        RewardRecordsResponse, StockTransferInResponse, StockTransferOut, StockTransferOutResponse,
+        WithdrawalsResponse, core,
         requests::{GetCouponOrdersQuery, GetEddaApplicationsQuery},
     },
 };
@@ -194,7 +194,7 @@ impl AssetContext {
     /// Path: `GET /v1/account/stock-transfers/in`
     pub async fn stock_transfers_in(
         &self,
-        options: impl Into<Option<GetStockTransfersOptions>>,
+        options: impl Into<Option<GetStockTransfersInOptions>>,
     ) -> Result<StockTransferInResponse> {
         self.get_account(
             core::STOCK_TRANSFERS_IN_PATH,
@@ -210,7 +210,7 @@ impl AssetContext {
     /// Path: `GET /v1/account/stock-transfers/out`
     pub async fn stock_transfers_out(
         &self,
-        options: impl Into<Option<GetStockTransfersOptions>>,
+        options: impl Into<Option<GetStockTransfersOutOptions>>,
     ) -> Result<Vec<StockTransferOut>> {
         Ok(self
             .get_account::<StockTransferOutResponse, _>(
@@ -223,6 +223,9 @@ impl AssetContext {
 
     /// Get reward records from the reward center (cash, gifts, coupons, task
     /// rewards)
+    ///
+    /// The route has no date filter: to find rewards in a time range, page
+    /// through the records and filter on their times.
     ///
     /// AP accounts only: US data-center accounts get a region error.
     ///
@@ -319,7 +322,7 @@ mod tests {
     use super::*;
     use crate::{
         Error,
-        asset::{DepositState, RewardType},
+        asset::{DepositState, RewardType, StockTransferInState, StockTransferOutState},
     };
 
     fn query(value: &impl Serialize) -> serde_json::Value {
@@ -333,9 +336,9 @@ mod tests {
     #[test]
     fn account_options_serialize_upstream_names() {
         let q = query(
-            &GetStockTransfersOptions::new()
+            &GetStockTransfersInOptions::new()
                 .market(" hk ")
-                .state(3)
+                .state(StockTransferInState::Completed)
                 .start(datetime!(2026-01-01 0:00 +8))
                 .page(2)
                 .size(50),
@@ -378,6 +381,32 @@ mod tests {
             q,
             json(r#"{"current":1,"page_size":20,"reward_type":2}"#),
             "reward options"
+        );
+
+        let q = query(
+            &GetStockTransfersOutOptions::new()
+                .state(StockTransferOutState::Failed)
+                .end(datetime!(2026-01-01 23:59:59 +8)),
+        );
+        assert_eq!(
+            q,
+            json(r#"{"state":6,"end":1767283199}"#),
+            "transfer-out state sent as its server code"
+        );
+        assert_eq!(
+            query(&GetStockTransfersInOptions::new().state(StockTransferInState::Failed)),
+            json(r#"{"state":8}"#),
+            "transfer-in failed is code 8"
+        );
+        assert_eq!(
+            query(&GetStockTransfersInOptions::new().state(StockTransferInState::Unknown)),
+            json("{}"),
+            "unknown state is not sent"
+        );
+        assert_eq!(
+            query(&GetRewardRecordsOptions::new().reward_type(RewardType::Unknown)),
+            json("{}"),
+            "unknown reward type is not sent"
         );
 
         assert_eq!(

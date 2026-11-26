@@ -910,11 +910,14 @@ const ACCOUNT_TIME_MIN: i64 = 946_684_800;
 /// (253402214400 seconds) stays below it.
 const ACCOUNT_TIME_MS_THRESHOLD: i64 = 1_000_000_000_000;
 
-/// Parse an account-record time: unix seconds (or milliseconds) as a number
-/// or a numeric string, or an RFC 3339 string. Placeholders — null, empty,
-/// `0` / `"0"`, negative values, anything before 2000 — and unparseable
-/// values are `None`.
-pub(crate) fn account_time(value: &serde_json::Value) -> Option<OffsetDateTime> {
+/// Unix seconds of 2100-01-01T00:00:00Z: account records mark "never expires"
+/// with a far-future date (e.g. the 9999-12-31 sentinel `253402214400`), never
+/// with a real date this late.
+const ACCOUNT_TIME_MAX: i64 = 4_102_444_800;
+
+/// Unix seconds of an account-record time value (see [`account_time`]),
+/// before any placeholder filtering; milliseconds are converted to seconds.
+fn account_time_seconds(value: &serde_json::Value) -> Option<i64> {
     let seconds = match value {
         serde_json::Value::Number(n) => n.as_i64().or_else(|| n.as_f64().map(|f| f as i64)),
         serde_json::Value::String(s) => {
@@ -928,12 +931,27 @@ pub(crate) fn account_time(value: &serde_json::Value) -> Option<OffsetDateTime> 
         }
         _ => None,
     }?;
-    let seconds = if seconds > ACCOUNT_TIME_MS_THRESHOLD {
+    Some(if seconds > ACCOUNT_TIME_MS_THRESHOLD {
         seconds / 1000
     } else {
         seconds
-    };
-    if seconds < ACCOUNT_TIME_MIN {
+    })
+}
+
+/// Whether an account-record time is a "never expires" marker: a date in or
+/// after 2100, such as the server's 9999-12-31 sentinel.
+pub(crate) fn account_time_is_far_future(value: &serde_json::Value) -> bool {
+    account_time_seconds(value).is_some_and(|seconds| seconds >= ACCOUNT_TIME_MAX)
+}
+
+/// Parse an account-record time: unix seconds (or milliseconds) as a number
+/// or a numeric string, or an RFC 3339 string. Placeholders — null, empty,
+/// `0` / `"0"`, negative values, anything before 2000 — far-future "never
+/// expires" markers (anything in or after 2100, e.g. 9999-12-31) and
+/// unparseable values are `None`.
+pub(crate) fn account_time(value: &serde_json::Value) -> Option<OffsetDateTime> {
+    let seconds = account_time_seconds(value)?;
+    if !(ACCOUNT_TIME_MIN..ACCOUNT_TIME_MAX).contains(&seconds) {
         return None;
     }
     OffsetDateTime::from_unix_timestamp(seconds).ok()
@@ -993,5 +1011,41 @@ mod tests {
                 .value,
             0
         );
+    }
+
+    #[test]
+    fn account_time_drops_placeholders_and_never_expires_markers() {
+        use serde_json::json;
+
+        use super::{account_time, account_time_is_far_future};
+
+        for value in [
+            json!(0),
+            json!("0"),
+            json!(-2006054656),
+            json!(253402214400_i64),
+            json!("253402214400"),
+            json!(4102444800_i64),
+            json!("9999-12-31T00:00:00Z"),
+        ] {
+            assert!(account_time(&value).is_none(), "{value} is not a real time");
+        }
+        assert!(
+            account_time(&json!(4102444799_i64)).is_some(),
+            "the last second of 2099 is a real time"
+        );
+        assert!(
+            account_time_is_far_future(&json!(253402214400_i64)),
+            "9999-12-31 sentinel"
+        );
+        assert!(
+            account_time_is_far_future(&json!("8061747303000")),
+            "milliseconds past 2100"
+        );
+        assert!(
+            !account_time_is_far_future(&json!(1798732800)),
+            "a 2026 date"
+        );
+        assert!(!account_time_is_far_future(&json!("0")), "placeholder");
     }
 }

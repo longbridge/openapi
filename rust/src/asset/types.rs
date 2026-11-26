@@ -386,9 +386,10 @@ pub struct BankCardAuthorization {
     /// Whether the daily debit count is unlimited
     #[serde(deserialize_with = "serde_utils::bool_lenient")]
     pub daily_max_count_unlimited: bool,
-    /// Expiry date of the authorization (`None` when not set). A long-term
-    /// authorization ([`Self::long_term_valid`]) carries the server's
-    /// 9999-12-31 sentinel here.
+    /// Expiry date of the authorization (`None` when not set, and for a
+    /// long-term authorization: the server's 9999-12-31 "never expires"
+    /// sentinel, like any date in or after 2100, is `None`; check
+    /// [`Self::long_term_valid`])
     #[serde(with = "serde_utils::account_time_opt")]
     pub expiry_date: Option<OffsetDateTime>,
     /// Whether the authorization never expires
@@ -545,12 +546,18 @@ pub struct TransferStock {
     /// Cost price
     #[serde(with = "serde_utils::decimal_opt_lenient")]
     pub cost: Option<Decimal>,
-    /// State of this stock in the transfer
-    pub state: TransferStockState,
+    /// State code of this stock in the transfer (the server's `state`)
+    #[serde(rename(deserialize = "state"), alias = "state_code")]
+    pub state_code: TransferStockState,
     /// Position side
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub position_side: String,
 }
+
+/// The `app_state` of a stock transfer application when the user tapped "I
+/// have notified the broker" in the app (the user's own confirmation, not a
+/// Longbridge action)
+pub const APP_STATE_NOTICED: &str = "noticed";
 
 /// A stock transfer-in application (another broker → this account)
 ///
@@ -571,6 +578,9 @@ pub struct StockTransferIn {
     /// Name of the other broker
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub broker: String,
+    /// ID of the other broker
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub broker_id: String,
     /// English name of the other broker
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub broker_en: String,
@@ -586,9 +596,10 @@ pub struct StockTransferIn {
     pub state: String,
     /// State code
     pub state_code: StockTransferInState,
-    /// App-side state: `noticed` means the user tapped "I have notified the
-    /// broker" in the app (the user's own confirmation, not a Longbridge
-    /// action); `default` otherwise
+    /// App-side state: [`APP_STATE_NOTICED`] (`noticed`) means the user
+    /// tapped "I have notified the broker" in the app (the user's own
+    /// confirmation, not a Longbridge action); `default` otherwise. See
+    /// [`Self::user_notified_broker`].
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub app_state: String,
     /// Whether the application can still be cancelled or changed
@@ -648,6 +659,9 @@ pub struct StockTransferOut {
     /// Name of the other broker
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub broker: String,
+    /// ID of the other broker
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub broker_id: String,
     /// English name of the other broker (the server's `name_en`)
     #[serde(rename = "name_en", deserialize_with = "serde_utils::string_lenient")]
     pub broker_en: String,
@@ -665,6 +679,12 @@ pub struct StockTransferOut {
     /// be cancelled (the server's `can_modify` is not reliable here, so it is
     /// not modelled).
     pub state_code: StockTransferOutState,
+    /// App-side state: [`APP_STATE_NOTICED`] (`noticed`) means the user
+    /// tapped "I have notified the broker" in the app (the user's own
+    /// confirmation, not a Longbridge action); `default` otherwise. See
+    /// [`Self::user_notified_broker`].
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub app_state: String,
     /// Created time
     #[serde(with = "serde_utils::account_time_opt")]
     pub created_at: Option<OffsetDateTime>,
@@ -697,6 +717,31 @@ pub struct StockTransferOut {
     pub stocks: Vec<TransferStock>,
 }
 
+impl StockTransferIn {
+    /// Whether the user confirmed in the app that the other broker was
+    /// notified (`app_state` is [`APP_STATE_NOTICED`])
+    #[inline]
+    pub fn user_notified_broker(&self) -> bool {
+        self.app_state == APP_STATE_NOTICED
+    }
+}
+
+impl StockTransferOut {
+    /// Whether the user confirmed in the app that the other broker was
+    /// notified (`app_state` is [`APP_STATE_NOTICED`])
+    #[inline]
+    pub fn user_notified_broker(&self) -> bool {
+        self.app_state == APP_STATE_NOTICED
+    }
+
+    /// Whether the application can still be cancelled (only
+    /// [`StockTransferOutState::Submitted`] applications can)
+    #[inline]
+    pub fn cancellable(&self) -> bool {
+        self.state_code == StockTransferOutState::Submitted
+    }
+}
+
 #[derive(Debug, Default, Deserialize)]
 pub(crate) struct StockTransferOutResponse {
     #[serde(default, deserialize_with = "serde_utils::null_as_default")]
@@ -723,8 +768,8 @@ pub struct RewardRecord {
     pub description: String,
     /// Coupon type (coupon rewards), e.g. `commission`
     pub card_type: String,
-    /// Coupon status code (coupon rewards), as returned by the server
-    pub card_status: i32,
+    /// Coupon status (coupon rewards; [`CouponStatus::Unknown`] otherwise)
+    pub card_status: CouponStatus,
     /// Prize type code (gift rewards; `0` = physical goods), `None` when not
     /// set
     pub prize_type: Option<i32>,
@@ -768,8 +813,7 @@ struct RawRewardDetail {
     description: String,
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     card_type: String,
-    #[serde(deserialize_with = "serde_utils::int32_lenient")]
-    card_status: i32,
+    card_status: CouponStatus,
     prize_type: serde_json::Value,
     #[serde(with = "serde_utils::decimal_opt_lenient")]
     amount: Option<Decimal>,
@@ -919,10 +963,14 @@ pub struct Coupon {
     /// Start of validity
     #[serde(with = "serde_utils::account_time_opt")]
     pub start_time: Option<OffsetDateTime>,
-    /// End of validity (`None` when not set). A date after 2100 means the
-    /// coupon never expires.
+    /// End of validity (`None` when not set or when the coupon never
+    /// expires; see [`Self::no_expiry`])
     #[serde(with = "serde_utils::account_time_opt")]
     pub end_time: Option<OffsetDateTime>,
+    /// Whether the coupon never expires (the server's end time is in or after
+    /// 2100)
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub no_expiry: bool,
     /// Activation time (`None` when not activated)
     #[serde(with = "serde_utils::account_time_opt")]
     pub activate_time: Option<OffsetDateTime>,
@@ -945,13 +993,13 @@ pub struct Coupon {
 #[serde(default)]
 pub struct CouponsResponse {
     /// Pinned coupons shown above the list (repeated on every page)
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    #[serde(deserialize_with = "coupon_list")]
     pub top_list: Vec<Coupon>,
     /// Coupons on this page
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    #[serde(deserialize_with = "coupon_list")]
     pub list: Vec<Coupon>,
     /// Pinned coupons shown below the list (repeated on every page)
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    #[serde(deserialize_with = "coupon_list")]
     pub bottom_list: Vec<Coupon>,
     /// Total number of coupons
     #[serde(deserialize_with = "serde_utils::int64_lenient")]
@@ -959,6 +1007,29 @@ pub struct CouponsResponse {
     /// Number of expired coupons
     #[serde(deserialize_with = "serde_utils::int64_lenient")]
     pub expired_count: i64,
+}
+
+/// Decodes a coupon list, setting [`Coupon::no_expiry`] from the server's raw
+/// `end_time` (which [`Coupon::end_time`] drops when it is past 2100).
+fn coupon_list<'de, D>(deserializer: D) -> Result<Vec<Coupon>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let items = match serde_json::Value::deserialize(deserializer)? {
+        serde_json::Value::Array(items) => items,
+        _ => return Ok(Vec::new()),
+    };
+    items
+        .into_iter()
+        .map(|item| {
+            let never_expires = item
+                .get("end_time")
+                .is_some_and(serde_utils::account_time_is_far_future);
+            let mut coupon: Coupon = serde_json::from_value(item).map_err(D::Error::custom)?;
+            coupon.no_expiry |= never_expires;
+            Ok(coupon)
+        })
+        .collect()
 }
 
 /// An order a coupon was applied to
@@ -1080,12 +1151,13 @@ pub struct Withdrawal {
     /// Amount paid out
     #[serde(with = "serde_utils::decimal_opt_lenient")]
     pub settlement_amount: Option<Decimal>,
-    /// State
-    pub state: WithdrawalState,
+    /// State code (the server's `state`)
+    #[serde(rename(deserialize = "state"), alias = "state_code")]
+    pub state_code: WithdrawalState,
     /// Raw state, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub raw_state: String,
-    /// State description, as returned by the server
+    /// State display text, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub state_description: String,
     /// Receiving bank account number, as returned by the server (not masked)
@@ -1172,11 +1244,11 @@ mod tests {
         let fps = &card.auth_list[1];
         assert_eq!(fps.max_amount, Some(dec("50000")), "amount");
         assert_eq!(fps.daily_max_count, Some(3), "count");
-        assert_eq!(
-            fps.expiry_date.map(|d| d.year()),
-            Some(9999),
-            "sentinel kept"
+        assert!(
+            fps.expiry_date.is_none(),
+            "9999-12-31 never-expires sentinel is None"
         );
+        assert!(fps.long_term_valid, "long-term flag");
     }
 
     #[test]
@@ -1208,7 +1280,7 @@ mod tests {
     fn stock_transfer_in_decode_handles_placeholders() {
         let resp: StockTransferInResponse = serde_json::from_str(
             r#"{"records":[{"id":"7053","order_id":"o1","market":"US","broker":"B",
-                "broker_en":"B Ltd","code":"B01","account":"11222333444555",
+                "broker_id":88,"broker_en":"B Ltd","code":"B01","account":"11222333444555",
                 "name":"CHAN TAI MAN","contact_phone":"12345678","attachments":"[\"ai/x\"]",
                 "state":"已提交","state_code":0,"app_state":"noticed","can_modify":1,
                 "created_at":1764064746,"updated_at":"1764064746","process_at":0,
@@ -1221,13 +1293,15 @@ mod tests {
         assert_eq!(resp.total, 1, "string total");
         let record = &resp.records[0];
         assert_eq!(record.broker_code, "B01", "broker code from `code`");
+        assert_eq!(record.broker_id, "88", "numeric broker id as text");
+        assert!(record.user_notified_broker(), "noticed app state");
         assert_eq!(record.state_code, StockTransferInState::Submitted, "state");
         assert!(record.can_modify, "can_modify");
         assert!(record.created_at.is_some(), "created");
         assert!(record.process_at.is_none(), "0 placeholder");
         assert!(record.exec_at.is_none(), "\"0\" placeholder");
         assert_eq!(
-            record.stocks[0].state,
+            record.stocks[0].state_code,
             TransferStockState::Succeeded,
             "stock"
         );
@@ -1242,6 +1316,7 @@ mod tests {
     fn stock_transfer_out_decode() {
         let resp: StockTransferOutResponse = serde_json::from_str(
             r#"{"records":[{"id":"1","name_en":"Futu Securities","state_code":7,
+                "app_state":"default","broker_id":"12",
                 "created_at":"2026-11-25T09:59:06Z","exec_at":"1970-01-01T00:00:00Z",
                 "cancel_at":-2006054656,"refuse_at":1764064746,"stocks":null}]}"#,
         )
@@ -1249,6 +1324,10 @@ mod tests {
         let record = &resp.records[0];
         assert_eq!(record.broker_en, "Futu Securities", "name_en is the broker");
         assert_eq!(record.state_code, StockTransferOutState::Rejected, "state");
+        assert_eq!(record.broker_id, "12", "broker id");
+        assert_eq!(record.app_state, "default", "app state");
+        assert!(!record.user_notified_broker(), "not noticed");
+        assert!(!record.cancellable(), "rejected cannot be cancelled");
         assert_eq!(
             record.created_at,
             Some(datetime!(2026-11-25 09:59:06 UTC)),
@@ -1271,7 +1350,8 @@ mod tests {
                     "express_info":{"phone":"12345678"},"addresses":[{"detail":"x"}]}},
                 {"reward_type":0,"cash":{"amount":"38.5","currency":"HKD","status":"12",
                     "send_time":"0"}},
-                {"card":{"title":"Commission card","card_type":"commission","status":8}},
+                {"card":{"title":"Commission card","card_type":"commission","status":8,
+                    "card_status":"2"}},
                 {"reward_type":3}
             ],"total":4}"#,
         )
@@ -1304,6 +1384,12 @@ mod tests {
             "typed after the detail"
         );
         assert_eq!(card.status, RewardStatus::Unclaimed, "unclaimed");
+        assert_eq!(
+            card.card_status,
+            CouponStatus::Expired,
+            "coupon status enum"
+        );
+        assert_eq!(cash.card_status, CouponStatus::Unknown, "not a coupon");
         assert_eq!(resp.list[3].reward_type, RewardType::Task, "task kept");
     }
 
@@ -1324,10 +1410,8 @@ mod tests {
         assert_eq!(resp.expired_count, 5, "expired count");
         let lifetime = &resp.list[0];
         assert_eq!(lifetime.card_status, CouponStatus::InUse, "status");
-        assert!(
-            lifetime.end_time.is_some_and(|t| t.year() > 2100),
-            "far future means never expires"
-        );
+        assert!(lifetime.end_time.is_none(), "far future end time is None");
+        assert!(lifetime.no_expiry, "far future means never expires");
         assert!(lifetime.activate_time.is_none(), "\"0\" placeholder");
         assert_eq!(lifetime.commission.bz_types, vec![0, 2, 3], "targets");
         assert!(lifetime.commission.unlimited, "unlimited");
@@ -1342,7 +1426,12 @@ mod tests {
             Some(datetime!(2026-12-31 16:00 UTC)),
             "milliseconds converted"
         );
+        assert!(!ms.no_expiry, "a real end time expires");
         assert!(ms.commission.markets.is_empty(), "no commission terms");
+        let json = serde_json::to_value(lifetime).expect("serialize");
+        assert_eq!(json["no_expiry"], true, "no_expiry serialized");
+        let back: Coupon = serde_json::from_value(json).expect("round trip");
+        assert!(back.no_expiry, "no_expiry survives a round trip");
     }
 
     #[test]
@@ -1368,15 +1457,24 @@ mod tests {
         );
 
         let withdrawals: WithdrawalsResponse = serde_json::from_str(
-            r#"{"list":[{"id":"w1","state":15,"amount":"100","fee":"0",
+            r#"{"list":[{"id":"w1","state":15,"state_description":"待确认","amount":"100","fee":"0",
                 "bank_account":"012345678901","display_bank_account":"尾号 8901"}],"total":1}"#,
         )
         .expect("withdrawals decode");
         let withdrawal = &withdrawals.list[0];
         assert_eq!(
-            withdrawal.state,
+            withdrawal.state_code,
             WithdrawalState::AwaitingConfirmation,
             "state 15"
+        );
+        assert_eq!(withdrawal.state_description, "待确认", "display text");
+        let json = serde_json::to_value(withdrawal).expect("serialize");
+        assert_eq!(json["state_code"], 15, "serialized as state_code");
+        let back: Withdrawal = serde_json::from_value(json).expect("round trip");
+        assert_eq!(
+            back.state_code,
+            WithdrawalState::AwaitingConfirmation,
+            "state_code survives a round trip"
         );
         assert_eq!(withdrawal.bank_account, "012345678901", "not masked");
         assert_eq!(withdrawal.fee, Some(dec("0")), "zero fee kept");

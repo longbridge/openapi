@@ -1,7 +1,7 @@
 use serde::{Serialize, Serializer};
 use time::OffsetDateTime;
 
-use crate::asset::{DepositState, RewardType};
+use crate::asset::{DepositState, RewardType, StockTransferInState, StockTransferOutState};
 
 fn unix_seconds_opt<S>(value: &Option<OffsetDateTime>, serializer: S) -> Result<S::Ok, S::Error>
 where
@@ -14,12 +14,21 @@ where
 }
 
 /// Options for the stock transfer-in and transfer-out lists
+///
+/// `S` is the state enum of the list: use [`GetStockTransfersInOptions`] for
+/// [`crate::AssetContext::stock_transfers_in`] and
+/// [`GetStockTransfersOutOptions`] for
+/// [`crate::AssetContext::stock_transfers_out`]. The two lists use different
+/// state codes, so a state of one list cannot be passed to the other.
 #[derive(Debug, Default, Serialize, Clone)]
-pub struct GetStockTransfersOptions {
+pub struct GetStockTransfersOptions<S>
+where
+    S: Serialize,
+{
     #[serde(skip_serializing_if = "Option::is_none")]
     market: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    state: Option<i32>,
+    state: Option<S>,
     #[serde(
         skip_serializing_if = "Option::is_none",
         serialize_with = "unix_seconds_opt"
@@ -36,8 +45,34 @@ pub struct GetStockTransfersOptions {
     size: Option<i32>,
 }
 
-impl GetStockTransfersOptions {
-    /// Create a new `GetStockTransfersOptions`
+mod sealed {
+    pub trait Sealed {}
+
+    impl Sealed for crate::asset::StockTransferInState {}
+    impl Sealed for crate::asset::StockTransferOutState {}
+}
+
+/// The state enum of a stock transfer list: [`StockTransferInState`] or
+/// [`StockTransferOutState`] (sealed)
+pub trait StockTransferStateFilter:
+    Serialize + Default + PartialEq + Copy + sealed::Sealed
+{
+}
+
+impl StockTransferStateFilter for StockTransferInState {}
+impl StockTransferStateFilter for StockTransferOutState {}
+
+/// Options for [`crate::AssetContext::stock_transfers_in`]
+pub type GetStockTransfersInOptions = GetStockTransfersOptions<StockTransferInState>;
+
+/// Options for [`crate::AssetContext::stock_transfers_out`]
+pub type GetStockTransfersOutOptions = GetStockTransfersOptions<StockTransferOutState>;
+
+impl<S> GetStockTransfersOptions<S>
+where
+    S: StockTransferStateFilter,
+{
+    /// Create new options (no filters)
     #[inline]
     pub fn new() -> Self {
         Self::default()
@@ -53,14 +88,13 @@ impl GetStockTransfersOptions {
         }
     }
 
-    /// Filter by state code: a [`crate::asset::StockTransferInState`] code
-    /// for the transfer-in list, a [`crate::asset::StockTransferOutState`]
-    /// code for the transfer-out list
+    /// Filter by state; it is sent as the state's server code. The `Unknown`
+    /// state is not a server code, so it clears the filter instead.
     #[inline]
     #[must_use]
-    pub fn state(self, state: i32) -> Self {
+    pub fn state(self, state: S) -> Self {
         Self {
-            state: Some(state),
+            state: (state != S::default()).then_some(state),
             ..self
         }
     }
@@ -144,12 +178,13 @@ impl GetRewardRecordsOptions {
         }
     }
 
-    /// Filter by reward type (default: all types)
+    /// Filter by reward type (default: all types). [`RewardType::Unknown`] is
+    /// not a server code, so it clears the filter instead.
     #[inline]
     #[must_use]
     pub fn reward_type(self, reward_type: RewardType) -> Self {
         Self {
-            reward_type: Some(reward_type),
+            reward_type: (reward_type != RewardType::Unknown).then_some(reward_type),
             ..self
         }
     }
