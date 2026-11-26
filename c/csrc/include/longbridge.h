@@ -3994,7 +3994,7 @@ typedef struct lb_get_deposits_options_t {
    */
   const int32_t *page;
   /**
-   * Page size (can be null)
+   * Page size (can be null; max 20, larger values are sent as 20)
    */
   const int32_t *size;
   /**

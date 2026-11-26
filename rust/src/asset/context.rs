@@ -305,6 +305,7 @@ impl AssetContext {
     ///
     /// The server's `total` follows the page size rather than the record
     /// count, so it is not returned; a full page means there may be more.
+    /// The page size is at most 20 (see [`GetDepositsOptions::size`]).
     ///
     /// AP accounts only: US data-center accounts get a region error.
     ///
@@ -388,6 +389,16 @@ mod tests {
                 r#"{"states":"0,2","currencies":"USD,HKD","from_date":1767196800,"to_date":1767283199}"#
             ),
             "deposit options"
+        );
+        assert_eq!(
+            query(&GetDepositsOptions::new().size(50)),
+            json(r#"{"size":20}"#),
+            "deposit page size clamped to 20"
+        );
+        assert_eq!(
+            query(&GetDepositsOptions::new().size(15)),
+            json(r#"{"size":15}"#),
+            "smaller deposit page size kept"
         );
 
         let q = query(&GetWithdrawalsOptions::new().start(datetime!(2026-01-01 0:00 +8)));

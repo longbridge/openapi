@@ -202,7 +202,8 @@ impl From<GetCouponsOptions> for longbridge::asset::GetCouponsOptions {
 pub struct GetDepositsOptions {
     /// Page number (default 1)
     pub page: Option<i32>,
-    /// Page size
+    /// Page size (max 20; larger values are sent as 20, because the deposit
+    /// list returns a short 10-record page for them)
     pub size: Option<i32>,
     /// Filter by states (`Unknown` is ignored)
     pub states: Option<Vec<DepositState>>,

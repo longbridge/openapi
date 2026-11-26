@@ -2942,7 +2942,7 @@ pub struct CGetCouponsOptions {
 pub struct CGetDepositsOptions {
     /// Page number (can be null, default 1)
     pub page: *const i32,
-    /// Page size (can be null)
+    /// Page size (can be null; max 20, larger values are sent as 20)
     pub size: *const i32,
     /// State filter (can be null)
     pub states: *const CDepositState,

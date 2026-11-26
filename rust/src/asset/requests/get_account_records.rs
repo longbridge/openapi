@@ -292,6 +292,9 @@ pub(crate) struct GetEddaApplicationsQuery {
     pub(crate) currency: String,
 }
 
+/// Largest page size the deposit list honours.
+pub(crate) const MAX_DEPOSITS_PAGE_SIZE: i32 = 20;
+
 /// Options for the deposit list
 #[derive(Debug, Default, Serialize, Clone)]
 pub struct GetDepositsOptions {
@@ -332,12 +335,16 @@ impl GetDepositsOptions {
         }
     }
 
-    /// Set the page size
+    /// Set the page size (default 20, max 20; larger values are sent as 20)
+    ///
+    /// The deposit list honours a page size of at most 20: a larger one
+    /// silently returns a 10-record page, which would read as the last page
+    /// and hide records, so it is clamped here.
     #[inline]
     #[must_use]
     pub fn size(self, size: i32) -> Self {
         Self {
-            size: Some(size),
+            size: Some(size.min(MAX_DEPOSITS_PAGE_SIZE)),
             ..self
         }
     }

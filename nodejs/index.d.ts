@@ -7888,7 +7888,7 @@ export interface GetCouponsOptions {
 export interface GetDepositsOptions {
   /** Page number (default 1) */
   page?: number
-  /** Page size */
+  /** Page size (max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them) */
   size?: number
   /** Filter by states (`Unknown` is ignored) */
   states?: Array<DepositState>

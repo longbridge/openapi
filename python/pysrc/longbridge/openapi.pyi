@@ -15573,7 +15573,7 @@ class AssetContext:
 
         Args:
             page: Page number (default 1)
-            size: Page size
+            size: Page size (max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them)
             states: Filter by states (``DepositState.Unknown`` is ignored)
             currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
             start: Only deposits applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
@@ -16024,7 +16024,7 @@ class AsyncAssetContext:
 
         Args:
             page: Page number (default 1)
-            size: Page size
+            size: Page size (max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them)
             states: Filter by states (``DepositState.Unknown`` is ignored)
             currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
             start: Only deposits applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset

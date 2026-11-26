@@ -26,7 +26,8 @@ public class GetDepositsOptions {
     }
 
     /**
-     * Sets the page size.
+     * Sets the page size (max 20; larger values are sent as 20, because the
+     * deposit list returns a short 10-record page for them).
      *
      * @param size page size
      * @return this instance for chaining
