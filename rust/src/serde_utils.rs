@@ -774,6 +774,186 @@ pub(crate) mod value_as_opt_string {
     }
 }
 
+/// Deserializes a `bool` leniently: a JSON bool, a number (non-zero is
+/// `true`), or a string (`"true"` / `"1"` are `true`). Anything else — null,
+/// an empty string, other text — is `false`.
+pub(crate) fn bool_lenient<'de, D>(d: D) -> Result<bool, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(match serde_json::Value::deserialize(d)? {
+        serde_json::Value::Bool(b) => b,
+        serde_json::Value::Number(n) => n.as_f64().is_some_and(|n| n != 0.0),
+        serde_json::Value::String(s) => {
+            let s = s.trim();
+            s.eq_ignore_ascii_case("true") || s.parse::<f64>().is_ok_and(|n| n != 0.0)
+        }
+        _ => false,
+    })
+}
+
+/// Deserializes a list of `i32` leniently: anything other than a JSON array
+/// becomes empty, and each element goes through [`lenient_int`].
+pub(crate) fn int32_vec_lenient<'de, D>(d: D) -> Result<Vec<i32>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(match serde_json::Value::deserialize(d)? {
+        serde_json::Value::Array(items) => items
+            .into_iter()
+            .map(|v| i32::try_from(lenient_int(v)).unwrap_or_default())
+            .collect(),
+        _ => Vec::new(),
+    })
+}
+
+/// Parse a JSON value as an integer when it is one: a JSON integer or an
+/// integer string. Anything else is `None`.
+pub(crate) fn lenient_int_opt(value: &serde_json::Value) -> Option<i64> {
+    match value {
+        serde_json::Value::Number(n) => n.as_i64(),
+        serde_json::Value::String(s) => s.trim().parse().ok(),
+        _ => None,
+    }
+}
+
+/// Lenient optional `i64` where `0` means "not set": a JSON integer or an
+/// integer string; null, `0`, and anything unparseable become `None`.
+pub(crate) mod int64_opt_lenient_0_is_none {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(d: D) -> Result<Option<i64>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(lenient_int_opt(&serde_json::Value::deserialize(d)?).filter(|v| *v != 0))
+    }
+
+    pub(crate) fn serialize<S>(value: &Option<i64>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serializer.serialize_i64(*value),
+            None => serializer.serialize_none(),
+        }
+    }
+}
+
+fn lenient_decimal(value: &serde_json::Value) -> Option<rust_decimal::Decimal> {
+    match value {
+        serde_json::Value::Number(n) => {
+            let s = n.to_string();
+            rust_decimal::Decimal::from_str(&s)
+                .or_else(|_| rust_decimal::Decimal::from_scientific(&s))
+                .ok()
+        }
+        serde_json::Value::String(s) => {
+            let s = s.trim().replace(',', "");
+            rust_decimal::Decimal::from_str(&s)
+                .or_else(|_| rust_decimal::Decimal::from_scientific(&s))
+                .ok()
+        }
+        _ => None,
+    }
+}
+
+/// Lenient optional decimal: a JSON number or a numeric string (thousands
+/// separators allowed). Null, an empty string, and anything unparseable
+/// become `None`; `0` stays `Some(0)`.
+pub(crate) mod decimal_opt_lenient {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(d: D) -> Result<Option<rust_decimal::Decimal>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(lenient_decimal(&serde_json::Value::deserialize(d)?))
+    }
+
+    pub(crate) fn serialize<S>(
+        value: &Option<rust_decimal::Decimal>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serializer.collect_str(value),
+            None => serializer.serialize_none(),
+        }
+    }
+}
+
+/// Like [`decimal_opt_lenient`], but `0` (the server's "not set" value) is
+/// `None` too.
+pub(crate) mod decimal_opt_lenient_0_is_none {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(d: D) -> Result<Option<rust_decimal::Decimal>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(lenient_decimal(&serde_json::Value::deserialize(d)?).filter(|v| !v.is_zero()))
+    }
+
+    pub(crate) use super::decimal_opt_lenient::serialize;
+}
+
+/// Unix seconds before 2000-01-01T00:00:00Z: account records fill unset times
+/// with `0` (1970) or a negative value (e.g. 1906), never with a real date
+/// this early.
+const ACCOUNT_TIME_MIN: i64 = 946_684_800;
+
+/// Values above this are milliseconds rather than seconds: as seconds it is
+/// year 33658, as milliseconds 2001-09-09. The server's 9999-12-31 sentinel
+/// (253402214400 seconds) stays below it.
+const ACCOUNT_TIME_MS_THRESHOLD: i64 = 1_000_000_000_000;
+
+/// Parse an account-record time: unix seconds (or milliseconds) as a number
+/// or a numeric string, or an RFC 3339 string. Placeholders — null, empty,
+/// `0` / `"0"`, negative values, anything before 2000 — and unparseable
+/// values are `None`.
+pub(crate) fn account_time(value: &serde_json::Value) -> Option<OffsetDateTime> {
+    let seconds = match value {
+        serde_json::Value::Number(n) => n.as_i64().or_else(|| n.as_f64().map(|f| f as i64)),
+        serde_json::Value::String(s) => {
+            let s = s.trim();
+            match s.parse::<i64>() {
+                Ok(v) => Some(v),
+                Err(_) => OffsetDateTime::parse(s, &time::format_description::well_known::Rfc3339)
+                    .ok()
+                    .map(OffsetDateTime::unix_timestamp),
+            }
+        }
+        _ => None,
+    }?;
+    let seconds = if seconds > ACCOUNT_TIME_MS_THRESHOLD {
+        seconds / 1000
+    } else {
+        seconds
+    };
+    if seconds < ACCOUNT_TIME_MIN {
+        return None;
+    }
+    OffsetDateTime::from_unix_timestamp(seconds).ok()
+}
+
+/// Optional account-record timestamp (see [`account_time`]); serialized back
+/// as unix seconds.
+pub(crate) mod account_time_opt {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(d: D) -> Result<Option<OffsetDateTime>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(account_time(&serde_json::Value::deserialize(d)?))
+    }
+
+    pub(crate) use super::timestamp_opt::serialize;
+}
+
 #[cfg(test)]
 mod tests {
     use serde::Deserialize;
