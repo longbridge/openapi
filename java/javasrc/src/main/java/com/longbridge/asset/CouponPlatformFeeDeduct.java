@@ -7,6 +7,7 @@ import java.util.Arrays;
  */
 public class CouponPlatformFeeDeduct {
     private CouponTargetType[] bzTypes;
+    private int[] bzTypesRaw;
     private String counterId;
     private String counterName;
     private String[] markets;
@@ -21,6 +22,16 @@ public class CouponPlatformFeeDeduct {
      */
     public CouponTargetType[] getBzTypes() {
         return bzTypes;
+    }
+
+    /**
+     * The server's numeric codes of bz_types, in order, including codes this
+     * SDK does not know (which are Unknown in bz_types)
+     *
+     * @return the raw codes
+     */
+    public int[] getBzTypesRaw() {
+        return bzTypesRaw;
     }
 
     /**
@@ -79,6 +90,6 @@ public class CouponPlatformFeeDeduct {
 
     @Override
     public String toString() {
-        return "CouponPlatformFeeDeduct [" + "bzTypes=" + Arrays.toString(bzTypes) + ", " + "counterId=" + counterId + ", " + "counterName=" + counterName + ", " + "markets=" + Arrays.toString(markets) + ", " + "usageCount=" + usageCount + ", " + "laveUsageCount=" + laveUsageCount + ", " + "superposition=" + superposition + "]";
+        return "CouponPlatformFeeDeduct [" + "bzTypes=" + Arrays.toString(bzTypes) + ", " + "bzTypesRaw=" + Arrays.toString(bzTypesRaw) + ", " + "counterId=" + counterId + ", " + "counterName=" + counterName + ", " + "markets=" + Arrays.toString(markets) + ", " + "usageCount=" + usageCount + ", " + "laveUsageCount=" + laveUsageCount + ", " + "superposition=" + superposition + "]";
     }
 }

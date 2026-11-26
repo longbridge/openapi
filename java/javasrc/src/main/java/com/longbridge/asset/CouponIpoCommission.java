@@ -7,6 +7,7 @@ import java.util.Arrays;
  */
 public class CouponIpoCommission {
     private IpoCouponTargetType[] bzTypes;
+    private int[] bzTypesRaw;
     private String counterId;
     private String counterName;
     private String financingLimit;
@@ -18,6 +19,16 @@ public class CouponIpoCommission {
      */
     public IpoCouponTargetType[] getBzTypes() {
         return bzTypes;
+    }
+
+    /**
+     * The server's numeric codes of bz_types, in order, including codes this
+     * SDK does not know (which are Unknown in bz_types)
+     *
+     * @return the raw codes
+     */
+    public int[] getBzTypesRaw() {
+        return bzTypesRaw;
     }
 
     /**
@@ -49,6 +60,6 @@ public class CouponIpoCommission {
 
     @Override
     public String toString() {
-        return "CouponIpoCommission [" + "bzTypes=" + Arrays.toString(bzTypes) + ", " + "counterId=" + counterId + ", " + "counterName=" + counterName + ", " + "financingLimit=" + financingLimit + "]";
+        return "CouponIpoCommission [" + "bzTypes=" + Arrays.toString(bzTypes) + ", " + "bzTypesRaw=" + Arrays.toString(bzTypesRaw) + ", " + "counterId=" + counterId + ", " + "counterName=" + counterName + ", " + "financingLimit=" + financingLimit + "]";
     }
 }

@@ -3,7 +3,8 @@ package com.longbridge.asset;
 import java.math.BigDecimal;
 
 /**
- * Terms of a finance interest coupon ({@code finance_interest})
+ * Terms of a finance interest coupon ({@code finance_interest}). The meaning
+ * of these fields is not confirmed; they are returned as the server sends them.
  */
 public class CouponFinanceInterest {
     private int discountMode;

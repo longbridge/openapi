@@ -15,6 +15,7 @@ use crate::{
         RewardRecordsResponse, StockTransferInResponse, StockTransferOut, StockTransferOutResponse,
         WithdrawalsResponse, core,
         requests::{GetCouponOrdersQuery, GetEddaApplicationsQuery},
+        token,
     },
 };
 
@@ -81,18 +82,39 @@ impl AssetContext {
 
     /// `GET` an account (ATM / reward-center) route. These routes are served
     /// by the AP data center only, so a US-account session fails fast with a
-    /// region error instead of reaching a server that rejects it.
+    /// region error instead of reaching a server that rejects it. The
+    /// account channel read from the access token is sent as
+    /// `account_channel`, as the app does (left out when the token does not
+    /// decode).
     async fn get_account<R, Q>(&self, path: &'static str, query: Q) -> Result<R>
     where
         R: DeserializeOwned + Send + Sync + 'static,
         Q: Serialize + Send + Sync,
     {
+        #[derive(Serialize)]
+        struct AccountQuery<Q> {
+            #[serde(flatten)]
+            query: Q,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            account_channel: Option<String>,
+        }
+
+        let account_channel = self
+            .0
+            .http_cli
+            .access_token()
+            .await
+            .ok()
+            .and_then(|token| token::account_channel(&token));
         Ok(self
             .0
             .http_cli
             .request(Method::GET, path)
             .dc_restrict(DcRegion::Ap)
-            .query_params(query)
+            .query_params(AccountQuery {
+                query,
+                account_channel,
+            })
             .response::<Json<R>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
@@ -422,6 +444,49 @@ mod tests {
             ),
             json(r#"{"card_status":2,"card_type":"commission"}"#),
             "expired coupons"
+        );
+    }
+
+    /// Every account route sends the token's account channel.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn account_routes_send_the_account_channel() {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind a local port");
+        let addr = listener.local_addr().expect("local address");
+        let server = tokio::spawn(async move {
+            let (mut socket, _) = listener.accept().await.expect("accept");
+            let mut buf = vec![0u8; 8192];
+            let n = socket.read(&mut buf).await.expect("read request");
+            let body = r#"{"code":0,"message":"","data":{"orders":[]}}"#;
+            let reply = format!(
+                "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",
+                body.len()
+            );
+            socket.write_all(reply.as_bytes()).await.expect("reply");
+            String::from_utf8_lossy(&buf[..n]).to_string()
+        });
+        // A synthetic unsigned JWT: {"alg":"none"} . {"ac":"lb_test"} . sig
+        let token = "eyJhbGciOiJub25lIn0.eyJhYyI6ImxiX3Rlc3QifQ.sig";
+        let config = Arc::new(
+            Config::from_apikey("app_key", "app_secret", token).http_url(format!("http://{addr}")),
+        );
+        let ctx = AssetContext::new(config);
+        let orders = ctx
+            .coupon_orders("c1", CouponOrderType::Locked)
+            .await
+            .expect("coupon orders");
+        assert!(orders.is_empty(), "empty list");
+        let request = server.await.expect("server task");
+        let line = request.lines().next().unwrap_or_default();
+        assert!(line.starts_with("GET /v1/account/card-orders?"), "{line}");
+        assert!(line.contains("card_id=c1"), "own query kept: {line}");
+        assert!(line.contains("order_type=locked"), "own query kept: {line}");
+        assert!(
+            line.contains("account_channel=lb_test"),
+            "channel sent: {line}"
         );
     }
 

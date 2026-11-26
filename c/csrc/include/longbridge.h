@@ -2269,7 +2269,9 @@ typedef enum lb_coupon_target_type_t {
 } lb_coupon_target_type_t;
 
 /**
- * The server's `unlimited` code of a commission coupon
+ * Kind of commission coupon (the server's `unlimited` code). The meanings are
+ * the ones the Longbridge app gives the codes; the proto names are given in
+ * brackets.
  *
  * The numeric values of this enum are not the server codes; each
  * member's description names its server code.
@@ -2280,23 +2282,25 @@ typedef enum lb_commission_unlimited_type_t {
    */
   CommissionUnlimitedTypeUnknown,
   /**
-   * `Proportionate` (server code 0)
+   * Time-limited free commission (`Proportionate`, server code 0)
    */
   CommissionUnlimitedTypeProportionate,
   /**
-   * `Full` (server code 1)
+   * Commission rebate (`Full`, server code 1)
    */
   CommissionUnlimitedTypeFull,
   /**
-   * `Lifetime` (server code 2)
+   * Commission deduction (`Lifetime`, server code 2)
    */
   CommissionUnlimitedTypeLifetime,
   /**
-   * `ByAmountPer` (server code 6)
+   * Per-use card with a fixed amount per use: `amount / usage_count`
+   * (`ByAmountPer`, server code 6)
    */
   CommissionUnlimitedTypeByAmountPer,
   /**
-   * `ByRatePer` (server code 7)
+   * Per-use discount card, capped at `amount_limit` per use (`ByRatePer`,
+   * server code 7)
    */
   CommissionUnlimitedTypeByRatePer,
 } lb_commission_unlimited_type_t;
@@ -7555,6 +7559,12 @@ typedef struct lb_bank_card_authorization_t {
    */
   enum lb_authorization_status_t status;
   /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *status_raw;
+  /**
    * Failure reason (empty unless the authorization failed)
    */
   const char *message;
@@ -7655,9 +7665,21 @@ typedef struct lb_bank_card_t {
    */
   enum lb_bank_card_status_t status;
   /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *status_raw;
+  /**
    * Witness state
    */
   enum lb_bank_card_witness_state_t witness_state;
+  /**
+   * The server's numeric code of `witness_state`, also when it is a code
+   * this SDK does not know (`witness_state` is then `Unknown`); null when
+   * the server sent none
+   */
+  const int32_t *witness_state_raw;
   /**
    * Whether the card supports witnessing
    */
@@ -7666,6 +7688,12 @@ typedef struct lb_bank_card_t {
    * Binding state
    */
   enum lb_bank_card_bind_state_t bind_state;
+  /**
+   * The server's numeric code of `bind_state`, also when it is a code
+   * this SDK does not know (`bind_state` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *bind_state_raw;
   /**
    * Binding hint text
    */
@@ -7713,6 +7741,12 @@ typedef struct lb_edda_application_t {
    * Application status
    */
   enum lb_authorization_status_t status;
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *status_raw;
   /**
    * Failure reason (empty unless the application failed)
    */
@@ -7770,6 +7804,12 @@ typedef struct lb_transfer_stock_t {
    */
   enum lb_transfer_stock_state_t state_code;
   /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *state_code_raw;
+  /**
    * Position side
    */
   const char *position_side;
@@ -7820,6 +7860,12 @@ typedef struct lb_stock_transfer_in_t {
    * State code
    */
   enum lb_stock_transfer_in_state_t state_code;
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *state_code_raw;
   /**
    * App-side state: `noticed` means the user tapped "I have notified the
    * broker" in the app; `default` otherwise
@@ -7927,6 +7973,12 @@ typedef struct lb_stock_transfer_out_t {
    */
   enum lb_stock_transfer_out_state_t state_code;
   /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *state_code_raw;
+  /**
    * App-side state: `noticed` means the user tapped "I have notified the
    * broker" in the app (the user's own confirmation, not a Longbridge
    * action); `default` otherwise
@@ -7980,14 +8032,23 @@ typedef struct lb_stock_transfer_out_t {
 } lb_stock_transfer_out_t;
 
 /**
- * A reward record from the reward center (prize secrets and shipping contacts
- * are not modelled)
+ * A reward record from the reward center (prize redemption secrets
+ * `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are
+ * not modelled)
  */
 typedef struct lb_reward_record_t {
   /**
-   * Reward type
+   * Reward type: named after the first detail object the server sent
+   * (`cash`, `card`, `prize`, in that order), else the server's
+   * `reward_type` code
    */
   enum lb_reward_type_t reward_type;
+  /**
+   * The server's numeric code of `reward_type`, also when it is a code
+   * this SDK does not know (`reward_type` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *reward_type_raw;
   /**
    * Record ID
    */
@@ -8013,6 +8074,12 @@ typedef struct lb_reward_record_t {
    */
   enum lb_coupon_status_t card_status;
   /**
+   * The server's numeric code of `card_status`, also when it is a code
+   * this SDK does not know (`card_status` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *card_status_raw;
+  /**
    * Prize type code (gift rewards; `0` = physical goods), null when not set
    */
   const int32_t *prize_type;
@@ -8029,9 +8096,22 @@ typedef struct lb_reward_record_t {
    */
   enum lb_reward_status_t status;
   /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *status_raw;
+  /**
    * Delivery status (issued gift rewards only)
    */
   enum lb_reward_deliver_status_t deliver_status;
+  /**
+   * The server's numeric code of `deliver_status` (e.g. 11 where
+   * `deliver_status` reads `AddressFilled`), also when it is a code this SDK
+   * does not know (`deliver_status` is then `Unknown`); null when the server
+   * sent none
+   */
+  const int32_t *deliver_status_raw;
   /**
    * Exit status code, as returned by the server
    */
@@ -8101,17 +8181,33 @@ typedef struct lb_coupon_commission_t {
    */
   uintptr_t num_bz_types;
   /**
+   * The server's numeric codes of `bz_types`, in order, including codes this
+   * SDK does not know (which are `Unknown` in `bz_types`)
+   */
+  const int32_t *bz_types_raw;
+  /**
+   * Number of `bz_types_raw`
+   */
+  uintptr_t num_bz_types_raw;
+  /**
    * Remaining commission balance (null when not set)
    */
   const struct lb_decimal_t *commission_balance;
   /**
-   * Commission duration, as returned by the server
+   * Commission duration in seconds (the app reads 200 years or more as
+   * lifetime free commission)
    */
   int64_t commission_duration;
   /**
-   * The server's `unlimited` code
+   * Kind of commission coupon (the server's `unlimited` code)
    */
   enum lb_commission_unlimited_type_t unlimited;
+  /**
+   * The server's numeric code of `unlimited`, also when it is a code
+   * this SDK does not know (`unlimited` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *unlimited_raw;
   /**
    * Commission expiry time as a unix timestamp (null when not set)
    */
@@ -8129,7 +8225,8 @@ typedef struct lb_coupon_commission_t {
    */
   const char *settlement_model;
   /**
-   * Amount limit, as returned by the server
+   * Amount cap per use of a per-use discount card (`ByRatePer`), as returned
+   * by the server
    */
   int64_t amount_limit;
   /**
@@ -8143,7 +8240,7 @@ typedef struct lb_coupon_commission_t {
  */
 typedef struct lb_coupon_ai_benefit_t {
   /**
-   * Benefit days, as returned by the server
+   * Length of the benefit in days
    */
   int32_t benefit_days;
   /**
@@ -8165,7 +8262,8 @@ typedef struct lb_coupon_ai_benefit_t {
  */
 typedef struct lb_coupon_cash_t {
   /**
-   * Receive duration, as returned by the server
+   * Receive duration, as returned by the server (its unit and meaning are
+   * not confirmed)
    */
   int64_t receive_duration;
 } lb_coupon_cash_t;
@@ -8197,7 +8295,7 @@ typedef struct lb_coupon_coffee_t {
    */
   const char *coupon_id;
   /**
-   * Coupon number, as returned by the server
+   * Voucher template code, e.g. `coffee-50` (not a personal redemption code)
    */
   const char *coupon_no;
   /**
@@ -8281,7 +8379,8 @@ typedef struct lb_coupon_crypto_t {
 } lb_coupon_crypto_t;
 
 /**
- * Terms of a finance interest coupon (`finance_interest`)
+ * Terms of a finance interest coupon (`finance_interest`). The meaning of
+ * these fields is not confirmed; they are returned as the server sends them.
  */
 typedef struct lb_coupon_finance_interest_t {
   /**
@@ -8358,6 +8457,12 @@ typedef struct lb_coupon_quote_t {
    */
   enum lb_quote_investor_type_t investor_type;
   /**
+   * The server's numeric code of `investor_type`, also when it is a code
+   * this SDK does not know (`investor_type` is then `Unknown`); null when
+   * the server sent none
+   */
+  const int32_t *investor_type_raw;
+  /**
    * Whether the coupon is activated manually
    */
   bool manual_activate;
@@ -8378,7 +8483,7 @@ typedef struct lb_coupon_quote_t {
    */
   const char *pair_spu_no;
   /**
-   * Quote duration, as returned by the server
+   * Quote duration in seconds (the app reads 200 years or more as lifetime)
    */
   int64_t quote_duration;
   /**
@@ -8422,6 +8527,15 @@ typedef struct lb_coupon_ipo_commission_t {
    */
   uintptr_t num_bz_types;
   /**
+   * The server's numeric codes of `bz_types`, in order, including codes this
+   * SDK does not know (which are `Unknown` in `bz_types`)
+   */
+  const int32_t *bz_types_raw;
+  /**
+   * Number of `bz_types_raw`
+   */
+  uintptr_t num_bz_types_raw;
+  /**
    * Counter ID
    */
   const char *counter_id;
@@ -8440,7 +8554,8 @@ typedef struct lb_coupon_ipo_commission_t {
  */
 typedef struct lb_coupon_ipo_interest_t {
   /**
-   * Discount rate, as returned by the server
+   * Annual interest discount rate, as returned by the server (the app
+   * computes the daily discount as rate × financed amount / 365)
    */
   const char *discount_rate;
 } lb_coupon_ipo_interest_t;
@@ -8457,6 +8572,15 @@ typedef struct lb_coupon_platform_fee_deduct_t {
    * Number of `bz_types`
    */
   uintptr_t num_bz_types;
+  /**
+   * The server's numeric codes of `bz_types`, in order, including codes this
+   * SDK does not know (which are `Unknown` in `bz_types`)
+   */
+  const int32_t *bz_types_raw;
+  /**
+   * Number of `bz_types_raw`
+   */
+  uintptr_t num_bz_types_raw;
   /**
    * Counter ID
    */
@@ -8606,6 +8730,12 @@ typedef struct lb_coupon_stock_fragment_t {
    */
   enum lb_coupon_target_type_t underlying_type;
   /**
+   * The server's numeric code of `underlying_type`, also when it is a code
+   * this SDK does not know (`underlying_type` is then `Unknown`); null when
+   * the server sent none
+   */
+  const int32_t *underlying_type_raw;
+  /**
    * Amounts, as returned by the server, key-sorted
    */
   const struct lb_coupon_stock_fragment_amount_t *amounts;
@@ -8648,6 +8778,12 @@ typedef struct lb_coupon_t {
    * Status
    */
   enum lb_coupon_status_t card_status;
+  /**
+   * The server's numeric code of `card_status`, also when it is a code
+   * this SDK does not know (`card_status` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *card_status_raw;
   /**
    * Start of validity as a unix timestamp (null when not set)
    */
@@ -8870,6 +9006,12 @@ typedef struct lb_deposit_t {
    */
   enum lb_deposit_state_t state_code;
   /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *state_code_raw;
+  /**
    * Sub-state code, as returned by the server
    */
   int32_t sub_state_code;
@@ -8935,6 +9077,12 @@ typedef struct lb_withdrawal_t {
    * State code
    */
   enum lb_withdrawal_state_t state_code;
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  const int32_t *state_code_raw;
   /**
    * Raw state, as returned by the server
    */

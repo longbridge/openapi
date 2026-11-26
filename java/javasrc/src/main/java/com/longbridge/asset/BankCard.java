@@ -20,9 +20,12 @@ public class BankCard {
     private String swiftCode;
     private String remark;
     private BankCardStatus status;
+    private Integer statusRaw;
     private BankCardWitnessState witnessState;
+    private Integer witnessStateRaw;
     private boolean supportWitness;
     private BankCardBindState bindState;
+    private Integer bindStateRaw;
     private String bindTip;
     private String withdrawFee;
     private OffsetDateTime createdAt;
@@ -146,12 +149,34 @@ public class BankCard {
     }
 
     /**
+     * The server's numeric code of status, also when it is a code
+     * this SDK does not know (status is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getStatusRaw() {
+        return statusRaw;
+    }
+
+    /**
      * Returns the witness state.
      *
      * @return the witness state
      */
     public BankCardWitnessState getWitnessState() {
         return witnessState;
+    }
+
+    /**
+     * The server's numeric code of witness_state, also when it is a code
+     * this SDK does not know (witness_state is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getWitnessStateRaw() {
+        return witnessStateRaw;
     }
 
     /**
@@ -170,6 +195,17 @@ public class BankCard {
      */
     public BankCardBindState getBindState() {
         return bindState;
+    }
+
+    /**
+     * The server's numeric code of bind_state, also when it is a code
+     * this SDK does not know (bind_state is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getBindStateRaw() {
+        return bindStateRaw;
     }
 
     /**
@@ -210,6 +246,6 @@ public class BankCard {
 
     @Override
     public String toString() {
-        return "BankCard [" + "id=" + id + ", " + "bankId=" + bankId + ", " + "bank=" + bank + ", " + "bankEn=" + bankEn + ", " + "bankCode=" + bankCode + ", " + "account=" + account + ", " + "accountType=" + accountType + ", " + "country=" + country + ", " + "region=" + region + ", " + "regionName=" + regionName + ", " + "swiftCode=" + swiftCode + ", " + "remark=" + remark + ", " + "status=" + status + ", " + "witnessState=" + witnessState + ", " + "supportWitness=" + supportWitness + ", " + "bindState=" + bindState + ", " + "bindTip=" + bindTip + ", " + "withdrawFee=" + withdrawFee + ", " + "createdAt=" + createdAt + ", " + "authList=" + Arrays.toString(authList) + "]";
+        return "BankCard [" + "id=" + id + ", " + "bankId=" + bankId + ", " + "bank=" + bank + ", " + "bankEn=" + bankEn + ", " + "bankCode=" + bankCode + ", " + "account=" + account + ", " + "accountType=" + accountType + ", " + "country=" + country + ", " + "region=" + region + ", " + "regionName=" + regionName + ", " + "swiftCode=" + swiftCode + ", " + "remark=" + remark + ", " + "status=" + status + ", " + "statusRaw=" + statusRaw + ", " + "witnessState=" + witnessState + ", " + "witnessStateRaw=" + witnessStateRaw + ", " + "supportWitness=" + supportWitness + ", " + "bindState=" + bindState + ", " + "bindStateRaw=" + bindStateRaw + ", " + "bindTip=" + bindTip + ", " + "withdrawFee=" + withdrawFee + ", " + "createdAt=" + createdAt + ", " + "authList=" + Arrays.toString(authList) + "]";
     }
 }

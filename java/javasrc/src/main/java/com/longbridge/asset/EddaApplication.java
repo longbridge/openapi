@@ -11,6 +11,7 @@ public class EddaApplication {
     private String name;
     private String currency;
     private AuthorizationStatus status;
+    private Integer statusRaw;
     private String message;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -62,6 +63,17 @@ public class EddaApplication {
     }
 
     /**
+     * The server's numeric code of status, also when it is a code
+     * this SDK does not know (status is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getStatusRaw() {
+        return statusRaw;
+    }
+
+    /**
      * Returns the failure reason (empty unless the application failed).
      *
      * @return the failure reason
@@ -90,6 +102,6 @@ public class EddaApplication {
 
     @Override
     public String toString() {
-        return "EddaApplication [" + "id=" + id + ", " + "flowId=" + flowId + ", " + "name=" + name + ", " + "currency=" + currency + ", " + "status=" + status + ", " + "message=" + message + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + "]";
+        return "EddaApplication [" + "id=" + id + ", " + "flowId=" + flowId + ", " + "name=" + name + ", " + "currency=" + currency + ", " + "status=" + status + ", " + "statusRaw=" + statusRaw + ", " + "message=" + message + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + "]";
     }
 }

@@ -434,12 +434,30 @@ export declare class BankCard {
   get remark(): string
   /** Verification status */
   get status(): BankCardStatus
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * server sent none
+   */
+  get statusRaw(): number | null
   /** Witness state */
   get witnessState(): BankCardWitnessState
+  /**
+   * The server's numeric code of `witness_state`, also when it is a code
+   * this SDK does not know (`witness_state` is then `Unknown`); null when
+   * the server sent none
+   */
+  get witnessStateRaw(): number | null
   /** Whether the card supports witnessing */
   get supportWitness(): boolean
   /** Binding state */
   get bindState(): BankCardBindState
+  /**
+   * The server's numeric code of `bind_state`, also when it is a code
+   * this SDK does not know (`bind_state` is then `Unknown`); null when the
+   * server sent none
+   */
+  get bindStateRaw(): number | null
   /** Binding hint text */
   get bindTip(): string
   /** Withdrawal fee text, as returned by the server */
@@ -468,6 +486,12 @@ export declare class BankCardAuthorization {
   get currency(): string
   /** Authorization status */
   get status(): AuthorizationStatus
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * server sent none
+   */
+  get statusRaw(): number | null
   /** Failure reason (empty unless the authorization failed) */
   get message(): string
   /** Whether this authorization is supported for the card */
@@ -756,6 +780,12 @@ export declare class Coupon {
   get detail(): string
   /** Status */
   get cardStatus(): CouponStatus
+  /**
+   * The server's numeric code of `card_status`, also when it is a code
+   * this SDK does not know (`card_status` is then `Unknown`); null when the
+   * server sent none
+   */
+  get cardStatusRaw(): number | null
   /** Start of validity */
   get startTime(): Date | null
   /**
@@ -816,7 +846,7 @@ export declare class Coupon {
 export declare class CouponAiBenefit {
   toString(): string
   toJSON(): any
-  /** Benefit days, as returned by the server */
+  /** Length of the benefit in days */
   get benefitDays(): number
   /** Start of the benefit (none when not set) */
   get benefitStart(): Date | null
@@ -830,7 +860,10 @@ export declare class CouponAiBenefit {
 export declare class CouponCash {
   toString(): string
   toJSON(): any
-  /** Receive duration, as returned by the server */
+  /**
+   * Receive duration, as returned by the server (its unit and meaning are
+   * not confirmed)
+   */
   get receiveDuration(): number
 }
 
@@ -842,7 +875,7 @@ export declare class CouponCoffee {
   get couponChannel(): string
   /** Coupon ID, as returned by the server */
   get couponId(): string
-  /** Coupon number, as returned by the server */
+  /** Voucher template code, e.g. `coffee-50` (not a personal redemption code) */
   get couponNo(): string
   /** Whether the coupon can be used at every store */
   get isAvailableAllStore(): boolean
@@ -880,12 +913,26 @@ export declare class CouponCommission {
   get rebateRate(): string
   /** Instrument types the coupon applies to */
   get bzTypes(): Array<CouponTargetType>
+  /**
+   * The server's numeric codes of `bz_types`, in order, including codes this
+   * SDK does not know (which are `Unknown` in `bz_types`)
+   */
+  get bzTypesRaw(): Array<number>
   /** Remaining commission balance */
   get commissionBalance(): Decimal | null
-  /** Commission duration, as returned by the server */
+  /**
+   * Commission duration in seconds (the app reads 200 years or more as
+   * lifetime free commission)
+   */
   get commissionDuration(): number
-  /** The server's `unlimited` code */
+  /** Kind of commission coupon (the server's `unlimited` code) */
   get unlimited(): CommissionUnlimitedType
+  /**
+   * The server's numeric code of `unlimited`, also when it is a code
+   * this SDK does not know (`unlimited` is then `Unknown`); null when the
+   * server sent none
+   */
+  get unlimitedRaw(): number | null
   /** Commission expiry time (none when not set) */
   get commissionExpiredTime(): Date | null
   /** Number of times used */
@@ -894,7 +941,10 @@ export declare class CouponCommission {
   get laveUsageCount(): number
   /** Settlement model, as returned by the server */
   get settlementModel(): string
-  /** Amount limit, as returned by the server */
+  /**
+   * Amount cap per use of a per-use discount card (`ByRatePer`), as returned
+   * by the server
+   */
   get amountLimit(): number
   /** Whether the coupon can be combined with other coupons */
   get superposition(): boolean
@@ -928,7 +978,10 @@ export declare class CouponCryptoFallback {
   get counterId(): string
 }
 
-/** Terms of a finance interest coupon (`finance_interest`) */
+/**
+ * Terms of a finance interest coupon (`finance_interest`). The meaning of
+ * these fields is not confirmed; they are returned as the server sends them.
+ */
 export declare class CouponFinanceInterest {
   toString(): string
   toJSON(): any
@@ -972,6 +1025,11 @@ export declare class CouponIpoCommission {
   toJSON(): any
   /** IPO subscription types the coupon applies to */
   get bzTypes(): Array<IpoCouponTargetType>
+  /**
+   * The server's numeric codes of `bz_types`, in order, including codes this
+   * SDK does not know (which are `Unknown` in `bz_types`)
+   */
+  get bzTypesRaw(): Array<number>
   /** Counter ID */
   get counterId(): string
   /** Counter name */
@@ -984,7 +1042,10 @@ export declare class CouponIpoCommission {
 export declare class CouponIpoInterest {
   toString(): string
   toJSON(): any
-  /** Discount rate, as returned by the server */
+  /**
+   * Annual interest discount rate, as returned by the server (the app
+   * computes the daily discount as rate × financed amount / 365)
+   */
   get discountRate(): string
 }
 
@@ -1018,6 +1079,11 @@ export declare class CouponPlatformFeeDeduct {
   toJSON(): any
   /** Instrument types the coupon applies to */
   get bzTypes(): Array<CouponTargetType>
+  /**
+   * The server's numeric codes of `bz_types`, in order, including codes this
+   * SDK does not know (which are `Unknown` in `bz_types`)
+   */
+  get bzTypesRaw(): Array<number>
   /** Counter ID */
   get counterId(): string
   /** Counter name */
@@ -1045,6 +1111,12 @@ export declare class CouponQuote {
   get inapplicable(): boolean
   /** Investor type the coupon applies to */
   get investorType(): QuoteInvestorType
+  /**
+   * The server's numeric code of `investor_type`, also when it is a code
+   * this SDK does not know (`investor_type` is then `Unknown`); null when
+   * the server sent none
+   */
+  get investorTypeRaw(): number | null
   /** Whether the coupon is activated manually */
   get manualActivate(): boolean
   /** Markets */
@@ -1053,7 +1125,7 @@ export declare class CouponQuote {
   get memberInvestorType(): number
   /** Paired SPU number, as returned by the server */
   get pairSpuNo(): string
-  /** Quote duration, as returned by the server */
+  /** Quote duration in seconds (the app reads 200 years or more as lifetime) */
   get quoteDuration(): number
   /** Quote market */
   get quoteMarket(): string
@@ -1143,6 +1215,12 @@ export declare class CouponStockFragment {
   get markets(): Array<string>
   /** Instrument type the coupon applies to */
   get underlyingType(): CouponTargetType
+  /**
+   * The server's numeric code of `underlying_type`, also when it is a code
+   * this SDK does not know (`underlying_type` is then `Unknown`); null when
+   * the server sent none
+   */
+  get underlyingTypeRaw(): number | null
   /** Amounts, as returned by the server (an object of strings) */
   get amounts(): Record<string, string>
 }
@@ -1369,6 +1447,12 @@ export declare class Deposit {
   get state(): string
   /** State code */
   get stateCode(): DepositState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  get stateCodeRaw(): number | null
   /** Sub-state code, as returned by the server */
   get subStateCode(): number
   /** Deposit method ID */
@@ -1416,6 +1500,12 @@ export declare class EddaApplication {
   get currency(): string
   /** Application status */
   get status(): AuthorizationStatus
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * server sent none
+   */
+  get statusRaw(): number | null
   /** Failure reason (empty unless the application failed) */
   get message(): string
   /** Time the application was filed */
@@ -4628,12 +4718,26 @@ export declare class RealtimeQuote {
   get tradeStatus(): TradeStatus
 }
 
-/** A reward record from the reward center */
+/**
+ * A reward record from the reward center (prize redemption secrets
+ * `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are
+ * not modelled)
+ */
 export declare class RewardRecord {
   toString(): string
   toJSON(): any
-  /** Reward type */
+  /**
+   * Reward type: named after the first detail object the server sent
+   * (`cash`, `card`, `prize`, in that order), else the server's
+   * `reward_type` code
+   */
   get rewardType(): RewardType
+  /**
+   * The server's numeric code of `reward_type`, also when it is a code
+   * this SDK does not know (`reward_type` is then `Unknown`); null when the
+   * server sent none
+   */
+  get rewardTypeRaw(): number | null
   /** Record ID */
   get recordId(): string
   /** Title of the activity that granted the reward */
@@ -4646,6 +4750,12 @@ export declare class RewardRecord {
   get cardType(): string
   /** Coupon status (coupon rewards; `CouponStatus.Unknown` otherwise) */
   get cardStatus(): CouponStatus
+  /**
+   * The server's numeric code of `card_status`, also when it is a code
+   * this SDK does not know (`card_status` is then `Unknown`); null when the
+   * server sent none
+   */
+  get cardStatusRaw(): number | null
   /** Prize type code (gift rewards; `0` = physical goods), none when not set */
   get prizeType(): number | null
   /** Amount */
@@ -4654,8 +4764,21 @@ export declare class RewardRecord {
   get currency(): string
   /** Reward status */
   get status(): RewardStatus
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * server sent none
+   */
+  get statusRaw(): number | null
   /** Delivery status (issued gift rewards only) */
   get deliverStatus(): RewardDeliverStatus
+  /**
+   * The server's numeric code of `deliver_status` (e.g. 11 where
+   * `deliver_status` reads `AddressFilled`), also when it is a code this SDK
+   * does not know (`deliver_status` is then `Unknown`); null when the server
+   * sent none
+   */
+  get deliverStatusRaw(): number | null
   /** Exit status code, as returned by the server */
   get exitStatus(): number
   /** Time the reward was sent */
@@ -5015,6 +5138,12 @@ export declare class StockTransferIn {
   /** State code */
   get stateCode(): StockTransferInState
   /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  get stateCodeRaw(): number | null
+  /**
    * App-side state: `noticed` means the user tapped "I have notified the
    * broker" in the app (the user's own confirmation, not a Longbridge
    * action); `default` otherwise
@@ -5075,6 +5204,12 @@ export declare class StockTransferOut {
   get state(): string
   /** State code. Only `Submitted` applications can be cancelled */
   get stateCode(): StockTransferOutState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  get stateCodeRaw(): number | null
   /**
    * App-side state: `noticed` means the user tapped "I have notified the
    * broker" in the app (the user's own confirmation, not a Longbridge
@@ -5670,6 +5805,12 @@ export declare class TransferStock {
   get cost(): Decimal | null
   /** State code of this stock in the transfer */
   get stateCode(): TransferStockState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  get stateCodeRaw(): number | null
   /** Position side */
   get positionSide(): string
 }
@@ -5876,6 +6017,12 @@ export declare class Withdrawal {
   get settlementAmount(): Decimal | null
   /** State code */
   get stateCode(): WithdrawalState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * server sent none
+   */
+  get stateCodeRaw(): number | null
   /** Raw state, as returned by the server */
   get rawState(): string
   /** State display text, as returned by the server */
@@ -6696,7 +6843,9 @@ export declare const enum CommissionFreeStatus {
 }
 
 /**
- * The server's `unlimited` code of a commission coupon
+ * Kind of commission coupon (the server's `unlimited` code). The meanings are
+ * the ones the Longbridge app gives the codes; the proto names are given in
+ * brackets.
  *
  * The numeric values of this enum are not the server codes; each
  * member's description names its server code.
@@ -6704,15 +6853,21 @@ export declare const enum CommissionFreeStatus {
 export declare const enum CommissionUnlimitedType {
   /** Unknown: an undocumented code (never sent to the server) */
   Unknown = 0,
-  /** `Proportionate` (server code 0) */
+  /** Time-limited free commission (`Proportionate`, server code 0) */
   Proportionate = 1,
-  /** `Full` (server code 1) */
+  /** Commission rebate (`Full`, server code 1) */
   Full = 2,
-  /** `Lifetime` (server code 2) */
+  /** Commission deduction (`Lifetime`, server code 2) */
   Lifetime = 3,
-  /** `ByAmountPer` (server code 6) */
+  /**
+   * Per-use card with a fixed amount per use: `amount / usage_count`
+   * (`ByAmountPer`, server code 6)
+   */
   ByAmountPer = 4,
-  /** `ByRatePer` (server code 7) */
+  /**
+   * Per-use discount card, capped at `amount_limit` per use (`ByRatePer`,
+   * server code 7)
+   */
   ByRatePer = 5
 }
 

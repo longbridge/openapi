@@ -354,7 +354,7 @@ impl_account_code_enum!(
 /// An authorization attached to a bank card (eDDA, bank securities account,
 /// FPS, …)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct BankCardAuthorization {
     /// Authorization flow: `hk_edda` / `hk_sdda` (eDDA), `hk_bank_sec`,
     /// `hk_fps`, …
@@ -368,6 +368,10 @@ pub struct BankCardAuthorization {
     pub currency: String,
     /// Authorization status
     pub status: AuthorizationStatus,
+    /// The server's numeric code of `status`, also when it is a code this SDK
+    /// does not know (`status` is then `Unknown`); `None` when the server sent
+    /// none
+    pub status_raw: Option<i32>,
     /// Failure reason (empty unless the authorization failed)
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub message: String,
@@ -409,7 +413,7 @@ pub struct BankCardAuthorization {
 /// storage keys of uploaded ID documents; those are intentionally not
 /// modelled.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct BankCard {
     /// Bank card ID (pass to [`crate::AssetContext::edda_applications`])
     #[serde(deserialize_with = "serde_utils::string_lenient")]
@@ -449,13 +453,25 @@ pub struct BankCard {
     pub remark: String,
     /// Verification status
     pub status: BankCardStatus,
+    /// The server's numeric code of `status`, also when it is a code this SDK
+    /// does not know (`status` is then `Unknown`); `None` when the server sent
+    /// none
+    pub status_raw: Option<i32>,
     /// Witness state
     pub witness_state: BankCardWitnessState,
+    /// The server's numeric code of `witness_state`, also when it is a code
+    /// this SDK does not know (`witness_state` is then `Unknown`); `None` when
+    /// the server sent none
+    pub witness_state_raw: Option<i32>,
     /// Whether the card supports witnessing
     #[serde(deserialize_with = "serde_utils::bool_lenient")]
     pub support_witness: bool,
     /// Binding state
     pub bind_state: BankCardBindState,
+    /// The server's numeric code of `bind_state`, also when it is a code this
+    /// SDK does not know (`bind_state` is then `Unknown`); `None` when the
+    /// server sent none
+    pub bind_state_raw: Option<i32>,
     /// Binding hint text
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub bind_tip: String,
@@ -478,7 +494,7 @@ pub(crate) struct BankCardsResponse {
 
 /// An eDDA authorization application of a bank card
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct EddaApplication {
     /// Application ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
@@ -495,6 +511,10 @@ pub struct EddaApplication {
     pub currency: String,
     /// Application status
     pub status: AuthorizationStatus,
+    /// The server's numeric code of `status`, also when it is a code this SDK
+    /// does not know (`status` is then `Unknown`); `None` when the server sent
+    /// none
+    pub status_raw: Option<i32>,
     /// Failure reason (empty unless the application failed)
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub message: String,
@@ -536,7 +556,7 @@ impl<'de> Deserialize<'de> for EddaApplicationsResponse {
 ///
 /// Storage keys of uploaded proof documents are intentionally not modelled.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct TransferStock {
     /// Stock code
     #[serde(deserialize_with = "serde_utils::string_lenient")]
@@ -565,6 +585,10 @@ pub struct TransferStock {
     /// State code of this stock in the transfer (the server's `state`)
     #[serde(rename(deserialize = "state"), alias = "state_code")]
     pub state_code: TransferStockState,
+    /// The server's numeric code of `state_code`, also when it is a code this
+    /// SDK does not know (`state_code` is then `Unknown`); `None` when the
+    /// server sent none
+    pub state_code_raw: Option<i32>,
     /// Position side
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub position_side: String,
@@ -580,7 +604,7 @@ pub const APP_STATE_NOTICED: &str = "noticed";
 /// The account holder's name and contact details at the other broker and the
 /// storage keys of uploaded proof documents are intentionally not modelled.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct StockTransferIn {
     /// Record ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
@@ -612,6 +636,10 @@ pub struct StockTransferIn {
     pub state: String,
     /// State code
     pub state_code: StockTransferInState,
+    /// The server's numeric code of `state_code`, also when it is a code this
+    /// SDK does not know (`state_code` is then `Unknown`); `None` when the
+    /// server sent none
+    pub state_code_raw: Option<i32>,
     /// App-side state: [`APP_STATE_NOTICED`] (`noticed`) means the user
     /// tapped "I have notified the broker" in the app (the user's own
     /// confirmation, not a Longbridge action); `default` otherwise. See
@@ -661,7 +689,7 @@ pub struct StockTransferInResponse {
 /// The account holder's name and contact details at the other broker and the
 /// storage keys of uploaded proof documents are intentionally not modelled.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct StockTransferOut {
     /// Record ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
@@ -695,6 +723,10 @@ pub struct StockTransferOut {
     /// be cancelled (the server's `can_modify` is not reliable here, so it is
     /// not modelled).
     pub state_code: StockTransferOutState,
+    /// The server's numeric code of `state_code`, also when it is a code this
+    /// SDK does not know (`state_code` is then `Unknown`); `None` when the
+    /// server sent none
+    pub state_code_raw: Option<i32>,
     /// App-side state: [`APP_STATE_NOTICED`] (`noticed`) means the user
     /// tapped "I have notified the broker" in the app (the user's own
     /// confirmation, not a Longbridge action); `default` otherwise. See
@@ -767,13 +799,19 @@ pub(crate) struct StockTransferOutResponse {
 /// A reward record from the reward center
 ///
 /// The server nests the details in one of `cash` / `card` / `prize`; this
-/// type flattens them. Redemption secrets, voucher codes and shipping contact
-/// details of prizes are intentionally not modelled.
+/// type flattens them. Prize redemption secrets (`coupon_secret`), cash card
+/// codes (`cash_card_code`) and shipping contact details of prizes are
+/// intentionally not modelled.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(from = "RawRewardRecord")]
 pub struct RewardRecord {
-    /// Reward type
+    /// Reward type: named after the detail object the server sent (`cash`,
+    /// `card` or `prize`, checked in that order), or the server's
+    /// `reward_type` code when it sent no detail object
     pub reward_type: RewardType,
+    /// The server's numeric `reward_type` code, also when it is a code this
+    /// SDK does not know; `None` when the server sent none
+    pub reward_type_raw: Option<i32>,
     /// Record ID
     pub record_id: String,
     /// Title of the activity that granted the reward
@@ -786,6 +824,9 @@ pub struct RewardRecord {
     pub card_type: String,
     /// Coupon status (coupon rewards; [`CouponStatus::Unknown`] otherwise)
     pub card_status: CouponStatus,
+    /// The server's numeric `card_status` code, also when it is a code this
+    /// SDK does not know; `None` when the server sent none
+    pub card_status_raw: Option<i32>,
     /// Prize type code (gift rewards; `0` = physical goods), `None` when not
     /// set
     pub prize_type: Option<i32>,
@@ -795,8 +836,17 @@ pub struct RewardRecord {
     pub currency: String,
     /// Reward status
     pub status: RewardStatus,
-    /// Delivery status (issued gift rewards only)
+    /// The server's numeric `status` code, also when it is a code this SDK
+    /// does not know; `None` when the server sent none
+    pub status_raw: Option<i32>,
+    /// Delivery status (issued gift rewards only). The server uses both 9
+    /// and 11 for [`RewardDeliverStatus::AddressFilled`];
+    /// [`Self::deliver_status_raw`] tells them apart.
     pub deliver_status: RewardDeliverStatus,
+    /// The server's numeric `deliver_status` code (e.g. 11 where
+    /// `deliver_status` reads `AddressFilled`), also when it is a code this
+    /// SDK does not know; `None` when the server sent none
+    pub deliver_status_raw: Option<i32>,
     /// Exit status code, as returned by the server
     pub exit_status: i32,
     /// Time the reward was sent
@@ -829,14 +879,14 @@ struct RawRewardDetail {
     description: String,
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     card_type: String,
-    card_status: CouponStatus,
+    card_status: serde_json::Value,
     prize_type: serde_json::Value,
     #[serde(with = "serde_utils::decimal_opt_lenient")]
     amount: Option<Decimal>,
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     currency: String,
-    status: RewardStatus,
-    deliver_status: RewardDeliverStatus,
+    status: serde_json::Value,
+    deliver_status: serde_json::Value,
     #[serde(deserialize_with = "serde_utils::int32_lenient")]
     exit_status: i32,
     #[serde(with = "serde_utils::account_time_opt")]
@@ -855,42 +905,60 @@ struct RawRewardDetail {
 #[serde(default)]
 struct RawRewardRecord {
     reward_type: serde_json::Value,
+    #[serde(deserialize_with = "object_opt")]
     cash: Option<RawRewardDetail>,
+    #[serde(deserialize_with = "object_opt")]
     card: Option<RawRewardDetail>,
+    #[serde(deserialize_with = "object_opt")]
     prize: Option<RawRewardDetail>,
+}
+
+/// A typed code and the server's numeric code, decoded from a wire value.
+fn typed_and_raw<T>(wire: &serde_json::Value) -> (T, Option<i32>)
+where
+    T: serde::de::DeserializeOwned + Into<i32> + Copy + Default + PartialEq,
+{
+    let typed: T = serde_json::from_value(wire.clone()).unwrap_or_default();
+    let present = !wire.is_null();
+    (
+        typed,
+        present.then(|| raw_code(typed, Some(wire))).flatten(),
+    )
 }
 
 impl From<RawRewardRecord> for RewardRecord {
     fn from(raw: RawRewardRecord) -> Self {
-        let code = serde_utils::lenient_int_opt(&raw.reward_type)
-            .and_then(|v| i32::try_from(v).ok())
-            .map(RewardType::from);
-        // Prefer the detail object the type names; otherwise take whichever
-        // one is present and name the type after it.
-        let (reward_type, detail) = match (code, raw.cash, raw.card, raw.prize) {
-            (Some(RewardType::Cash), Some(d), _, _) => (RewardType::Cash, d),
-            (Some(RewardType::Coupon), _, Some(d), _) => (RewardType::Coupon, d),
-            (Some(RewardType::Gift), _, _, Some(d)) => (RewardType::Gift, d),
-            (code, Some(d), _, _) => (code.unwrap_or(RewardType::Cash), d),
-            (code, None, Some(d), _) => (code.unwrap_or(RewardType::Coupon), d),
-            (code, None, None, Some(d)) => (code.unwrap_or(RewardType::Gift), d),
-            (code, None, None, None) => (code.unwrap_or_default(), RawRewardDetail::default()),
+        let (code, reward_type_raw) = typed_and_raw::<RewardType>(&raw.reward_type);
+        // Like the app, read the first detail object present and name the
+        // type after it; without one, fall back to the server's code.
+        let (reward_type, detail) = match (raw.cash, raw.card, raw.prize) {
+            (Some(d), _, _) => (RewardType::Cash, d),
+            (None, Some(d), _) => (RewardType::Coupon, d),
+            (None, None, Some(d)) => (RewardType::Gift, d),
+            (None, None, None) => (code, RawRewardDetail::default()),
         };
         let prize_type =
             serde_utils::lenient_int_opt(&detail.prize_type).and_then(|v| i32::try_from(v).ok());
+        let (card_status, card_status_raw) = typed_and_raw(&detail.card_status);
+        let (status, status_raw) = typed_and_raw(&detail.status);
+        let (deliver_status, deliver_status_raw) = typed_and_raw(&detail.deliver_status);
         Self {
             reward_type,
+            reward_type_raw,
             record_id: detail.record_id,
             activity_title: detail.activity_title,
             title: detail.title,
             description: detail.description,
             card_type: detail.card_type,
-            card_status: detail.card_status,
+            card_status,
+            card_status_raw,
             prize_type,
             amount: detail.amount,
             currency: detail.currency,
-            status: detail.status,
-            deliver_status: detail.deliver_status,
+            status,
+            status_raw,
+            deliver_status,
+            deliver_status_raw,
             exit_status: detail.exit_status,
             send_time: detail.send_time,
             start_time: detail.start_time,
@@ -979,22 +1047,27 @@ pub enum IpoCouponTargetType {
     Cash = 2,
 }
 
-/// The server's `unlimited` code of a commission coupon
+/// Kind of commission coupon (the server's `unlimited` code)
+///
+/// The meanings are the ones the Longbridge app gives the codes; the proto
+/// names, which read differently, are given in brackets.
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Default, FromPrimitive, IntoPrimitive)]
 #[repr(i32)]
 pub enum CommissionUnlimitedType {
     /// Unknown (an undocumented code)
     #[default]
     Unknown = -1,
-    /// `Proportionate`
+    /// Time-limited free commission (`Proportionate`, code 0)
     Proportionate = 0,
-    /// `Full`
+    /// Commission rebate (`Full`, code 1)
     Full = 1,
-    /// `Lifetime`
+    /// Commission deduction (`Lifetime`, code 2)
     Lifetime = 2,
-    /// `ByAmountPer`
+    /// Per-use card with a fixed amount per use: `amount / usage_count`
+    /// (`ByAmountPer`, code 6)
     ByAmountPer = 6,
-    /// `ByRatePer`
+    /// Per-use discount card, capped at `amount_limit` per use (`ByRatePer`,
+    /// code 7)
     ByRatePer = 7,
 }
 
@@ -1072,6 +1145,34 @@ where
     }
 }
 
+/// Decodes a list of nested objects: anything other than a JSON array becomes
+/// empty, and elements that are not JSON objects are skipped.
+fn object_vec<'de, D, T>(deserializer: D) -> Result<Vec<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: serde::de::DeserializeOwned,
+{
+    match serde_json::Value::deserialize(deserializer)? {
+        serde_json::Value::Array(items) => items
+            .into_iter()
+            .filter(serde_json::Value::is_object)
+            .map(serde_json::from_value)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(D::Error::custom),
+        _ => Ok(Vec::new()),
+    }
+}
+
+/// Decodes a nested object, or its default when the value is `null` or not a
+/// JSON object.
+fn object_or_default<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: serde::de::DeserializeOwned + Default,
+{
+    Ok(object_opt(deserializer)?.unwrap_or_default())
+}
+
 /// Decodes a list of 64-bit integers leniently (numbers or integer strings);
 /// anything other than a JSON array becomes empty.
 fn int64_vec<'de, D>(deserializer: D) -> Result<Vec<i64>, D::Error>
@@ -1089,7 +1190,7 @@ where
 
 /// Commission terms of a commission coupon (`commission`)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct CouponCommission {
     /// Markets the coupon applies to
     #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
@@ -1100,14 +1201,22 @@ pub struct CouponCommission {
     /// Instrument types the coupon applies to
     #[serde(deserialize_with = "enum_vec")]
     pub bz_types: Vec<CouponTargetType>,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    pub bz_types_raw: Vec<i32>,
     /// Remaining commission balance
     #[serde(with = "serde_utils::decimal_opt_lenient")]
     pub commission_balance: Option<Decimal>,
-    /// Commission duration, as returned by the server
+    /// Commission duration in seconds (the app reads 200 years or more as
+    /// lifetime free commission)
     #[serde(deserialize_with = "serde_utils::int64_lenient")]
     pub commission_duration: i64,
-    /// The server's `unlimited` code
+    /// Kind of commission coupon (the server's `unlimited` code)
     pub unlimited: CommissionUnlimitedType,
+    /// The server's numeric code of `unlimited`, also when it is a code this
+    /// SDK does not know (`unlimited` is then `Unknown`); `None` when the
+    /// server sent none
+    pub unlimited_raw: Option<i32>,
     /// Commission expiry time (`None` when not set)
     #[serde(with = "serde_utils::account_time_opt")]
     pub commission_expired_time: Option<OffsetDateTime>,
@@ -1120,7 +1229,8 @@ pub struct CouponCommission {
     /// Settlement model, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub settlement_model: String,
-    /// Amount limit, as returned by the server
+    /// Amount cap per use of a per-use discount card
+    /// ([`CommissionUnlimitedType::ByRatePer`]), as returned by the server
     #[serde(deserialize_with = "serde_utils::int64_lenient")]
     pub amount_limit: i64,
     /// Whether the coupon can be combined with other coupons
@@ -1132,7 +1242,7 @@ pub struct CouponCommission {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CouponAiBenefit {
-    /// Benefit days, as returned by the server
+    /// Length of the benefit in days
     #[serde(deserialize_with = "serde_utils::int32_lenient")]
     pub benefit_days: i32,
     /// Start of the benefit (`None` when not set)
@@ -1150,7 +1260,8 @@ pub struct CouponAiBenefit {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CouponCash {
-    /// Receive duration, as returned by the server
+    /// Receive duration, as returned by the server (its unit and meaning are
+    /// not confirmed)
     #[serde(deserialize_with = "serde_utils::int64_lenient")]
     pub receive_duration: i64,
 }
@@ -1177,7 +1288,8 @@ pub struct CouponCoffee {
     /// Coupon ID, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub coupon_id: String,
-    /// Coupon number, as returned by the server
+    /// Voucher template code, e.g. `coffee-50` (not a personal redemption
+    /// code)
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub coupon_no: String,
     /// Whether the coupon can be used at every store
@@ -1193,7 +1305,7 @@ pub struct CouponCoffee {
     #[serde(deserialize_with = "int64_vec")]
     pub store_id_list: Vec<i64>,
     /// Stores the coupon can be used at
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    #[serde(deserialize_with = "object_vec")]
     pub store_list: Vec<CouponCoffeeStore>,
     /// Threshold, as returned by the server
     #[serde(deserialize_with = "serde_utils::int64_lenient")]
@@ -1229,14 +1341,17 @@ pub struct CouponCryptoFallback {
 #[serde(default)]
 pub struct CouponCrypto {
     /// Fallback
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    #[serde(deserialize_with = "object_or_default")]
     pub fallback: CouponCryptoFallback,
     /// Optional counters
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    #[serde(deserialize_with = "object_vec")]
     pub optional_counters: Vec<CouponCryptoCounter>,
 }
 
 /// Terms of a finance interest coupon (`finance_interest`)
+///
+/// The meaning of these fields is not confirmed; they are returned as the
+/// server sends them.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CouponFinanceInterest {
@@ -1278,7 +1393,7 @@ pub struct CouponFundDeduct {
 /// Terms of a quote (market data) or fundamental-data coupon (`quote` /
 /// `fundamental`)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct CouponQuote {
     /// Current end time (`None` when not set)
     #[serde(with = "serde_utils::account_time_opt")]
@@ -1288,6 +1403,10 @@ pub struct CouponQuote {
     pub inapplicable: bool,
     /// Investor type the coupon applies to
     pub investor_type: QuoteInvestorType,
+    /// The server's numeric code of `investor_type`, also when it is a code
+    /// this SDK does not know (`investor_type` is then `Unknown`); `None` when
+    /// the server sent none
+    pub investor_type_raw: Option<i32>,
     /// Whether the coupon is activated manually
     #[serde(deserialize_with = "serde_utils::bool_lenient")]
     pub manual_activate: bool,
@@ -1300,7 +1419,8 @@ pub struct CouponQuote {
     /// Paired SPU number, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub pair_spu_no: String,
-    /// Quote duration, as returned by the server
+    /// Quote duration in seconds (the app reads 200 years or more as
+    /// lifetime)
     #[serde(deserialize_with = "serde_utils::int64_lenient")]
     pub quote_duration: i64,
     /// Quote market
@@ -1325,11 +1445,14 @@ pub struct CouponIpo {
 
 /// Terms of an IPO commission coupon (`ipo_commission`)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct CouponIpoCommission {
     /// IPO subscription types the coupon applies to
     #[serde(deserialize_with = "enum_vec")]
     pub bz_types: Vec<IpoCouponTargetType>,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    pub bz_types_raw: Vec<i32>,
     /// Counter ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub counter_id: String,
@@ -1345,18 +1468,22 @@ pub struct CouponIpoCommission {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CouponIpoInterest {
-    /// Discount rate, as returned by the server
+    /// Annual interest discount rate, as returned by the server (the app
+    /// computes the daily discount as rate × financed amount / 365)
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub discount_rate: String,
 }
 
 /// Terms of a platform fee deduction coupon (`platform_fee_deduct`)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct CouponPlatformFeeDeduct {
     /// Instrument types the coupon applies to
     #[serde(deserialize_with = "enum_vec")]
     pub bz_types: Vec<CouponTargetType>,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    pub bz_types_raw: Vec<i32>,
     /// Counter ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub counter_id: String,
@@ -1433,16 +1560,16 @@ pub struct CouponStock {
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub send_way: String,
     /// Optional counters
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    #[serde(deserialize_with = "object_vec")]
     pub optional_counters: Vec<CouponStockCounter>,
     /// Fallback
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    #[serde(deserialize_with = "object_or_default")]
     pub fallback: CouponStockFallback,
 }
 
 /// Terms of a stock fragment coupon (`stock_fragment`)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct CouponStockFragment {
     /// Counter ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
@@ -1458,6 +1585,10 @@ pub struct CouponStockFragment {
     pub markets: Vec<String>,
     /// Instrument type the coupon applies to
     pub underlying_type: CouponTargetType,
+    /// The server's numeric code of `underlying_type`, also when it is a code
+    /// this SDK does not know (`underlying_type` is then `Unknown`); `None`
+    /// when the server sent none
+    pub underlying_type_raw: Option<i32>,
     /// Amounts, as returned by the server (key-ordered)
     #[serde(deserialize_with = "serde_utils::string_map_lenient")]
     pub amounts: std::collections::BTreeMap<String, String>,
@@ -1471,7 +1602,7 @@ pub struct CouponStockFragment {
 /// top-level duplicates of the commission terms are not modelled, nor is the
 /// `fund_interest` object, which the server does not describe.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct Coupon {
     /// Coupon ID (32 hex characters; pass to
     /// [`crate::AssetContext::coupon_orders`])
@@ -1495,6 +1626,10 @@ pub struct Coupon {
     pub detail: String,
     /// Status
     pub card_status: CouponStatus,
+    /// The server's numeric code of `card_status`, also when it is a code this
+    /// SDK does not know (`card_status` is then `Unknown`); `None` when the
+    /// server sent none
+    pub card_status_raw: Option<i32>,
     /// Start of validity
     #[serde(with = "serde_utils::account_time_opt")]
     pub start_time: Option<OffsetDateTime>,
@@ -1659,7 +1794,7 @@ pub(crate) struct CouponOrdersResponse {
 /// Receipt images uploaded with the deposit are intentionally not modelled;
 /// only their number is ([`Self::voucher_count`]).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct Deposit {
     /// Record ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
@@ -1684,6 +1819,10 @@ pub struct Deposit {
     pub state: String,
     /// State code
     pub state_code: DepositState,
+    /// The server's numeric code of `state_code`, also when it is a code this
+    /// SDK does not know (`state_code` is then `Unknown`); `None` when the
+    /// server sent none
+    pub state_code_raw: Option<i32>,
     /// Sub-state code, as returned by the server
     #[serde(deserialize_with = "serde_utils::int32_lenient")]
     pub sub_state_code: i32,
@@ -1733,7 +1872,7 @@ pub(crate) struct DepositsResponse {
 
 /// A withdrawal record
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, remote = "Self")]
 pub struct Withdrawal {
     /// Record ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
@@ -1759,6 +1898,10 @@ pub struct Withdrawal {
     /// State code (the server's `state`)
     #[serde(rename(deserialize = "state"), alias = "state_code")]
     pub state_code: WithdrawalState,
+    /// The server's numeric code of `state_code`, also when it is a code this
+    /// SDK does not know (`state_code` is then `Unknown`); `None` when the
+    /// server sent none
+    pub state_code_raw: Option<i32>,
     /// Raw state, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub raw_state: String,
@@ -1790,6 +1933,134 @@ pub struct WithdrawalsResponse {
     #[serde(deserialize_with = "serde_utils::int64_lenient")]
     pub total: i64,
 }
+
+/// The server's numeric code behind a typed value: the wire value when it is
+/// a number or an integer string, else the typed value's code when it is a
+/// known one (the server sent its name), else `None`.
+fn raw_code<T>(typed: T, wire: Option<&serde_json::Value>) -> Option<i32>
+where
+    T: Into<i32> + Copy + Default + PartialEq,
+{
+    wire.and_then(serde_utils::lenient_int_opt)
+        .and_then(|v| i32::try_from(v).ok())
+        .or_else(|| (typed != T::default()).then(|| typed.into()))
+}
+
+/// [`raw_code`] for each element of a list; elements with no numeric code
+/// are left out.
+fn raw_codes<T>(typed: &[T], wire: Option<&serde_json::Value>) -> Vec<i32>
+where
+    T: Into<i32> + Copy + Default + PartialEq,
+{
+    match wire {
+        Some(serde_json::Value::Array(items)) => items
+            .iter()
+            .zip(typed.iter().copied().chain(std::iter::repeat(T::default())))
+            .filter_map(|(item, typed)| raw_code(typed, Some(item)))
+            .collect(),
+        _ => Vec::new(),
+    }
+}
+
+/// Implements `Serialize` / `Deserialize` for a record decoded with
+/// `#[serde(remote = "Self")]`, filling each `*_raw` companion field with the
+/// server's numeric code read from the record's own keys (the first key
+/// present wins). A record that already carries the `*_raw` key (one this SDK
+/// serialized) keeps that value, so a round trip loses nothing.
+macro_rules! impl_raw_codes {
+    (@one $out:ident $value:ident $field:ident $raw:ident [$($key:literal),+] scalar) => {
+        if $value.get(stringify!($raw)).is_none() {
+            $out.$raw = raw_code($out.$field, [$($key),+].iter().find_map(|k| $value.get(*k)));
+        }
+    };
+    (@one $out:ident $value:ident $field:ident $raw:ident [$($key:literal),+] vec) => {
+        if $value.get(stringify!($raw)).is_none() {
+            $out.$raw = raw_codes(&$out.$field, [$($key),+].iter().find_map(|k| $value.get(*k)));
+        }
+    };
+    (@kind $out:ident $value:ident [$field:ident] => $raw:ident [$($key:literal),+]) => {
+        impl_raw_codes!(@one $out $value $field $raw [$($key),+] vec);
+    };
+    (@kind $out:ident $value:ident $field:ident => $raw:ident [$($key:literal),+]) => {
+        impl_raw_codes!(@one $out $value $field $raw [$($key),+] scalar);
+    };
+    ($($ty:ident { $($spec:tt)* })*) => {
+        $(
+            impl Serialize for $ty {
+                fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                    $ty::serialize(self, serializer)
+                }
+            }
+
+            impl<'de> Deserialize<'de> for $ty {
+                fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+                    let value = serde_json::Value::deserialize(deserializer)?;
+                    #[allow(unused_mut)]
+                    let mut out = $ty::deserialize(&value).map_err(D::Error::custom)?;
+                    impl_raw_codes!(@fields out value $($spec)*);
+                    Ok(out)
+                }
+            }
+        )*
+    };
+    (@fields $out:ident $value:ident) => {};
+    (@fields $out:ident $value:ident [$field:ident] => $raw:ident [$($key:literal),+], $($rest:tt)*) => {
+        impl_raw_codes!(@kind $out $value [$field] => $raw [$($key),+]);
+        impl_raw_codes!(@fields $out $value $($rest)*);
+    };
+    (@fields $out:ident $value:ident $field:ident => $raw:ident [$($key:literal),+], $($rest:tt)*) => {
+        impl_raw_codes!(@kind $out $value $field => $raw [$($key),+]);
+        impl_raw_codes!(@fields $out $value $($rest)*);
+    };
+}
+
+impl_raw_codes!(
+    BankCardAuthorization {
+        status => status_raw ["status"],
+    }
+    BankCard {
+        status => status_raw ["status"],
+        witness_state => witness_state_raw ["witness_state"],
+        bind_state => bind_state_raw ["bind_state"],
+    }
+    EddaApplication {
+        status => status_raw ["status"],
+    }
+    TransferStock {
+        state_code => state_code_raw ["state", "state_code"],
+    }
+    StockTransferIn {
+        state_code => state_code_raw ["state_code"],
+    }
+    StockTransferOut {
+        state_code => state_code_raw ["state_code"],
+    }
+    CouponCommission {
+        [bz_types] => bz_types_raw ["bz_types"],
+        unlimited => unlimited_raw ["unlimited"],
+    }
+    CouponQuote {
+        investor_type => investor_type_raw ["investor_type"],
+    }
+    CouponIpoCommission {
+        [bz_types] => bz_types_raw ["bz_types"],
+    }
+    CouponPlatformFeeDeduct {
+        [bz_types] => bz_types_raw ["bz_types"],
+    }
+    CouponStockFragment {
+        underlying_type => underlying_type_raw ["underlying_type"],
+    }
+    Coupon {
+        card_status => card_status_raw ["card_status"],
+    }
+    Deposit {
+        state_code => state_code_raw ["state_code"],
+    }
+    Withdrawal {
+        state_code => state_code_raw ["state", "state_code"],
+    }
+);
 
 #[cfg(test)]
 mod tests {
@@ -2222,6 +2493,150 @@ mod tests {
         );
         assert_eq!(withdrawal.bank_account, "012345678901", "not masked");
         assert_eq!(withdrawal.fee, Some(dec("0")), "zero fee kept");
+    }
+
+    #[test]
+    fn raw_codes_keep_undocumented_values() {
+        let withdrawals: WithdrawalsResponse = serde_json::from_str(
+            r#"{"list":[{"id":"w1","state":"42"},{"id":"w2","state":4},{"id":"w3"}]}"#,
+        )
+        .expect("withdrawals decode");
+        assert_eq!(
+            withdrawals.list[0].state_code,
+            WithdrawalState::Unknown,
+            "undocumented"
+        );
+        assert_eq!(withdrawals.list[0].state_code_raw, Some(42), "raw kept");
+        assert_eq!(withdrawals.list[1].state_code_raw, Some(4), "known code");
+        assert_eq!(withdrawals.list[2].state_code_raw, None, "absent");
+        let json = serde_json::to_value(&withdrawals.list[0]).expect("serialize");
+        let back: Withdrawal = serde_json::from_value(json).expect("round trip");
+        assert_eq!(back.state_code_raw, Some(42), "raw survives a round trip");
+
+        let cards: BankCardsResponse = serde_json::from_str(
+            r#"{"list":[{"id":1,"status":9,"witness_state":"2","bind_state":null,
+                "auth_list":[{"status":7}]}]}"#,
+        )
+        .expect("cards decode");
+        let card = &cards.list[0];
+        assert_eq!(card.status, BankCardStatus::Unknown, "undocumented");
+        assert_eq!(card.status_raw, Some(9), "card status raw");
+        assert_eq!(card.witness_state_raw, Some(2), "string code");
+        assert_eq!(card.bind_state_raw, None, "null is absent");
+        assert_eq!(card.auth_list[0].status_raw, Some(7), "auth raw");
+
+        let coupon: Coupon = serde_json::from_str(
+            r#"{"card_id":"c","card_status":9,
+                "commission":{"bz_types":[0,"LOF",9,"Other"],"unlimited":"ByRatePer"},
+                "stock_fragment":{"underlying_type":"12"},
+                "quote":{"investor_type":5}}"#,
+        )
+        .expect("coupon decodes");
+        assert_eq!(coupon.card_status_raw, Some(9), "coupon status raw");
+        let commission = coupon.commission.expect("commission");
+        assert_eq!(
+            commission.bz_types_raw,
+            vec![0, 4, 9],
+            "names mapped, unknown name left out"
+        );
+        assert_eq!(commission.unlimited_raw, Some(7), "name mapped to its code");
+        assert_eq!(
+            coupon.stock_fragment.and_then(|f| f.underlying_type_raw),
+            Some(12),
+            "raw underlying type"
+        );
+        assert_eq!(
+            coupon.quote.and_then(|q| q.investor_type_raw),
+            Some(5),
+            "raw investor type"
+        );
+
+        let transfers: StockTransferInResponse =
+            serde_json::from_str(r#"{"records":[{"state_code":11,"stocks":[{"state":"6"}]}]}"#)
+                .expect("transfers decode");
+        assert_eq!(transfers.records[0].state_code_raw, Some(11), "record");
+        assert_eq!(
+            transfers.records[0].stocks[0].state_code_raw,
+            Some(6),
+            "stock"
+        );
+        let deposit: Deposit = serde_json::from_str(r#"{"state_code":8}"#).expect("deposit");
+        assert_eq!(deposit.state_code_raw, Some(8), "deposit");
+        let app: EddaApplication = serde_json::from_str(r#"{"status":5}"#).expect("edda");
+        assert_eq!(app.status_raw, Some(5), "edda");
+    }
+
+    #[test]
+    fn reward_raw_codes_and_detail_kind() {
+        let resp: RewardRecordsResponse = serde_json::from_str(
+            r#"{"list":[
+                {"reward_type":1,"prize":{"status":12,"deliver_status":11,"card_status":"9"}},
+                {"reward_type":7,"cash":{"status":99}},
+                {"card":{"status":12}},
+                {"reward_type":1,"cash":{"status":12},"prize":{"status":12}},
+                {"reward_type":3,"cash":[],"card":"x"}
+            ]}"#,
+        )
+        .expect("rewards decode");
+        let prize = &resp.list[0];
+        assert_eq!(
+            prize.deliver_status,
+            RewardDeliverStatus::AddressFilled,
+            "11 reads as address filled"
+        );
+        assert_eq!(prize.deliver_status_raw, Some(11), "and keeps its own code");
+        assert_eq!(prize.card_status_raw, Some(9), "card status raw");
+        let unknown = &resp.list[1];
+        assert_eq!(
+            unknown.reward_type,
+            RewardType::Cash,
+            "named after the detail"
+        );
+        assert_eq!(unknown.reward_type_raw, Some(7), "raw type kept");
+        assert_eq!(unknown.status, RewardStatus::Unknown, "undocumented status");
+        assert_eq!(unknown.status_raw, Some(99), "raw status kept");
+        assert_eq!(resp.list[2].reward_type_raw, None, "no type sent");
+        assert_eq!(resp.list[2].deliver_status_raw, None, "no delivery sent");
+        assert_eq!(
+            resp.list[3].reward_type,
+            RewardType::Cash,
+            "first detail object wins, as in the app"
+        );
+        assert_eq!(
+            resp.list[4].reward_type,
+            RewardType::Task,
+            "non-object details skipped"
+        );
+    }
+
+    #[test]
+    fn coupon_lists_skip_malformed_elements() {
+        let coupon: Coupon = serde_json::from_str(
+            r#"{"coffee_coupon":{"store_list":[{"store_id":"1"},"x",null,2]},
+                "crypto":{"fallback":"x","optional_counters":[{"counter_id":"C"},[]]},
+                "stock":{"fallback":[1],"optional_counters":{"a":1}}}"#,
+        )
+        .expect("malformed nested elements do not fail the coupon");
+        assert_eq!(
+            coupon.coffee_coupon.map(|c| c.store_list.len()),
+            Some(1),
+            "non-object stores skipped"
+        );
+        let crypto = coupon.crypto.expect("crypto");
+        assert!(
+            !crypto.fallback.enabled,
+            "malformed fallback is the default"
+        );
+        assert_eq!(
+            crypto.optional_counters.len(),
+            1,
+            "non-object counter skipped"
+        );
+        let stock = coupon.stock.expect("stock");
+        assert!(
+            stock.optional_counters.is_empty(),
+            "non-array counters are empty"
+        );
     }
 
     #[test]

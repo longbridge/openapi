@@ -4516,6 +4516,7 @@ impl_java_class!(
         name,
         currency,
         status,
+        status_raw,
         message,
         is_support,
         max_amount,
@@ -4547,9 +4548,12 @@ impl_java_class!(
         swift_code,
         remark,
         status,
+        status_raw,
         witness_state,
+        witness_state_raw,
         support_witness,
         bind_state,
+        bind_state_raw,
         bind_tip,
         withdraw_fee,
         created_at,
@@ -4562,7 +4566,7 @@ impl_java_class!(
     "com/longbridge/asset/EddaApplication",
     longbridge::asset::EddaApplication,
     [
-        id, flow_id, name, currency, status, message, created_at, updated_at
+        id, flow_id, name, currency, status, status_raw, message, created_at, updated_at
     ]
 );
 
@@ -4579,6 +4583,7 @@ impl_java_class!(
         currency,
         cost,
         state_code,
+        state_code_raw,
         position_side
     ]
 );
@@ -4597,6 +4602,7 @@ impl_java_class!(
         account,
         state,
         state_code,
+        state_code_raw,
         app_state,
         can_modify,
         created_at,
@@ -4634,6 +4640,7 @@ impl_java_class!(
         account,
         state,
         state_code,
+        state_code_raw,
         app_state,
         created_at,
         updated_at,
@@ -4654,18 +4661,22 @@ impl_java_class!(
     longbridge::asset::RewardRecord,
     [
         reward_type,
+        reward_type_raw,
         record_id,
         activity_title,
         title,
         description,
         card_type,
         card_status,
+        card_status_raw,
         #[java(set_as_opt = crate::types::JavaInteger)]
         prize_type,
         amount,
         currency,
         status,
+        status_raw,
         deliver_status,
+        deliver_status_raw,
         exit_status,
         send_time,
         start_time,
@@ -4694,9 +4705,12 @@ impl_java_class!(
         rebate_rate,
         #[java(objarray)]
         bz_types,
+        #[java(priarray)]
+        bz_types_raw,
         commission_balance,
         commission_duration,
         unlimited,
+        unlimited_raw,
         commission_expired_time,
         usage_count,
         lave_usage_count,
@@ -4794,6 +4808,7 @@ impl_java_class!(
         current_end_time,
         inapplicable,
         investor_type,
+        investor_type_raw,
         manual_activate,
         #[java(objarray)]
         markets,
@@ -4819,6 +4834,8 @@ impl_java_class!(
     [
         #[java(objarray)]
         bz_types,
+        #[java(priarray)]
+        bz_types_raw,
         counter_id,
         counter_name,
         financing_limit
@@ -4837,6 +4854,8 @@ impl_java_class!(
     [
         #[java(objarray)]
         bz_types,
+        #[java(priarray)]
+        bz_types_raw,
         counter_id,
         counter_name,
         #[java(objarray)]
@@ -4883,6 +4902,7 @@ pub(crate) struct CouponStockFragment {
     pub(crate) market: String,
     pub(crate) markets: Vec<String>,
     pub(crate) underlying_type: longbridge::asset::CouponTargetType,
+    pub(crate) underlying_type_raw: Option<i32>,
     pub(crate) amounts: serde_json::Value,
 }
 
@@ -4894,6 +4914,7 @@ impl From<longbridge::asset::CouponStockFragment> for CouponStockFragment {
             market: value.market,
             markets: value.markets,
             underlying_type: value.underlying_type,
+            underlying_type_raw: value.underlying_type_raw,
             amounts: serde_json::to_value(value.amounts).unwrap_or_default(),
         }
     }
@@ -4909,6 +4930,7 @@ impl_java_class!(
         #[java(objarray)]
         markets,
         underlying_type,
+        underlying_type_raw,
         amounts
     ]
 );
@@ -4924,6 +4946,7 @@ impl_java_class!(
         description,
         detail,
         card_status,
+        card_status_raw,
         start_time,
         end_time,
         no_expiry,
@@ -4996,6 +5019,7 @@ impl_java_class!(
         receivable_amount,
         state,
         state_code,
+        state_code_raw,
         sub_state_code,
         bank_operation_type_id,
         bank_operation_type_name,
@@ -5018,6 +5042,7 @@ impl_java_class!(
         fee,
         settlement_amount,
         state_code,
+        state_code_raw,
         raw_state,
         state_description,
         bank_account,

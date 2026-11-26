@@ -15,6 +15,7 @@ public class Deposit {
     private BigDecimal receivableAmount;
     private String state;
     private DepositState stateCode;
+    private Integer stateCodeRaw;
     private int subStateCode;
     private String bankOperationTypeId;
     private String bankOperationTypeName;
@@ -96,6 +97,17 @@ public class Deposit {
     }
 
     /**
+     * The server's numeric code of state_code, also when it is a code
+     * this SDK does not know (state_code is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getStateCodeRaw() {
+        return stateCodeRaw;
+    }
+
+    /**
      * Returns the sub-state code, as returned by the server.
      *
      * @return the sub-state code, as returned by the server
@@ -160,6 +172,6 @@ public class Deposit {
 
     @Override
     public String toString() {
-        return "Deposit [" + "id=" + id + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "currency=" + currency + ", " + "amount=" + amount + ", " + "receivableAmount=" + receivableAmount + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "subStateCode=" + subStateCode + ", " + "bankOperationTypeId=" + bankOperationTypeId + ", " + "bankOperationTypeName=" + bankOperationTypeName + ", " + "referenceNo=" + referenceNo + ", " + "canCancel=" + canCancel + ", " + "userBankSwiftCode=" + userBankSwiftCode + ", " + "voucherCount=" + voucherCount + "]";
+        return "Deposit [" + "id=" + id + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "currency=" + currency + ", " + "amount=" + amount + ", " + "receivableAmount=" + receivableAmount + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "stateCodeRaw=" + stateCodeRaw + ", " + "subStateCode=" + subStateCode + ", " + "bankOperationTypeId=" + bankOperationTypeId + ", " + "bankOperationTypeName=" + bankOperationTypeName + ", " + "referenceNo=" + referenceNo + ", " + "canCancel=" + canCancel + ", " + "userBankSwiftCode=" + userBankSwiftCode + ", " + "voucherCount=" + voucherCount + "]";
     }
 }

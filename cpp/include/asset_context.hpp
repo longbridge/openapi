@@ -270,7 +270,7 @@ enum class IpoCouponTargetType
   Cash,
 };
 
-/// The server's `unlimited` code of a commission coupon
+/// Kind of commission coupon (the server's `unlimited` code). The meanings are the ones the Longbridge app gives the codes; the proto names are given in brackets.
 ///
 /// The numeric values of this enum are not the server codes; each
 /// member's description names its server code.
@@ -278,15 +278,15 @@ enum class CommissionUnlimitedType
 {
   /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// `Proportionate` (server code 0)
+  /// Time-limited free commission (`Proportionate`, server code 0)
   Proportionate,
-  /// `Full` (server code 1)
+  /// Commission rebate (`Full`, server code 1)
   Full,
-  /// `Lifetime` (server code 2)
+  /// Commission deduction (`Lifetime`, server code 2)
   Lifetime,
-  /// `ByAmountPer` (server code 6)
+  /// Per-use card with a fixed amount per use: `amount / usage_count` (`ByAmountPer`, server code 6)
   ByAmountPer,
-  /// `ByRatePer` (server code 7)
+  /// Per-use discount card, capped at `amount_limit` per use (`ByRatePer`, server code 7)
   ByRatePer,
 };
 
@@ -408,6 +408,10 @@ struct BankCardAuthorization
   std::string currency;
   /// Authorization status
   AuthorizationStatus status;
+  /// The server's numeric code of `status`, also when it is a code
+  /// this SDK does not know (`status` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> status_raw;
   /// Failure reason (empty unless the authorization failed)
   std::string message;
   /// Whether this authorization is supported for the card
@@ -461,12 +465,24 @@ struct BankCard
   std::string remark;
   /// Verification status
   BankCardStatus status;
+  /// The server's numeric code of `status`, also when it is a code
+  /// this SDK does not know (`status` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> status_raw;
   /// Witness state
   BankCardWitnessState witness_state;
+  /// The server's numeric code of `witness_state`, also when it is a code
+  /// this SDK does not know (`witness_state` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> witness_state_raw;
   /// Whether the card supports witnessing
   bool support_witness;
   /// Binding state
   BankCardBindState bind_state;
+  /// The server's numeric code of `bind_state`, also when it is a code
+  /// this SDK does not know (`bind_state` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> bind_state_raw;
   /// Binding hint text
   std::string bind_tip;
   /// Withdrawal fee text, as returned by the server
@@ -491,6 +507,10 @@ struct EddaApplication
   std::string currency;
   /// Application status
   AuthorizationStatus status;
+  /// The server's numeric code of `status`, also when it is a code
+  /// this SDK does not know (`status` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> status_raw;
   /// Failure reason (empty unless the application failed)
   std::string message;
   /// Time the application was filed as a unix timestamp (null when not set)
@@ -521,6 +541,10 @@ struct TransferStock
   std::optional<Decimal> cost;
   /// State code of this stock in the transfer
   TransferStockState state_code;
+  /// The server's numeric code of `state_code`, also when it is a code
+  /// this SDK does not know (`state_code` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> state_code_raw;
   /// Position side
   std::string position_side;
 };
@@ -548,6 +572,10 @@ struct StockTransferIn
   std::string state;
   /// State code
   StockTransferInState state_code;
+  /// The server's numeric code of `state_code`, also when it is a code
+  /// this SDK does not know (`state_code` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> state_code_raw;
   /// App-side state: `noticed` means the user tapped "I have notified the
   /// broker" in the app (the user's own confirmation, not a Longbridge
   /// action); `default` otherwise
@@ -602,6 +630,10 @@ struct StockTransferOut
   std::string state;
   /// State code (only `Submitted` applications can be cancelled)
   StockTransferOutState state_code;
+  /// The server's numeric code of `state_code`, also when it is a code
+  /// this SDK does not know (`state_code` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> state_code_raw;
   /// App-side state: `noticed` means the user tapped "I have notified the
   /// broker" in the app (the user's own confirmation, not a Longbridge
   /// action); `default` otherwise
@@ -628,11 +660,15 @@ struct StockTransferOut
   std::vector<TransferStock> stocks;
 };
 
-/// A reward record from the reward center (prize secrets and shipping contacts are not modelled)
+/// A reward record from the reward center (prize redemption secrets `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are not modelled)
 struct RewardRecord
 {
-  /// Reward type
+  /// Reward type: named after the first detail object the server sent (`cash`, `card`, `prize`, in that order), else the server's `reward_type` code
   RewardType reward_type;
+  /// The server's numeric code of `reward_type`, also when it is a code
+  /// this SDK does not know (`reward_type` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> reward_type_raw;
   /// Record ID
   std::string record_id;
   /// Title of the activity that granted the reward
@@ -645,6 +681,10 @@ struct RewardRecord
   std::string card_type;
   /// Coupon status (coupon rewards; `CouponStatus::Unknown` otherwise)
   CouponStatus card_status;
+  /// The server's numeric code of `card_status`, also when it is a code
+  /// this SDK does not know (`card_status` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> card_status_raw;
   /// Prize type code (gift rewards; `0` = physical goods), null when not set
   std::optional<int32_t> prize_type;
   /// Amount (null when not set)
@@ -653,8 +693,16 @@ struct RewardRecord
   std::string currency;
   /// Reward status
   RewardStatus status;
+  /// The server's numeric code of `status`, also when it is a code
+  /// this SDK does not know (`status` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> status_raw;
   /// Delivery status (issued gift rewards only)
   RewardDeliverStatus deliver_status;
+  /// The server's numeric code of `deliver_status` (e.g. 11 where `deliver_status` reads `AddressFilled`), also when it is a code
+  /// this SDK does not know (`deliver_status` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> deliver_status_raw;
   /// Exit status code, as returned by the server
   int32_t exit_status;
   /// Time the reward was sent as a unix timestamp (null when not set)
@@ -687,12 +735,19 @@ struct CouponCommission
   std::string rebate_rate;
   /// Instrument types the coupon applies to
   std::vector<CouponTargetType> bz_types;
+  /// The server's numeric codes of `bz_types`, in order, including codes this
+  /// SDK does not know (which are `Unknown` in `bz_types`)
+  std::vector<int32_t> bz_types_raw;
   /// Remaining commission balance (null when not set)
   std::optional<Decimal> commission_balance;
-  /// Commission duration, as returned by the server
+  /// Commission duration in seconds (the app reads 200 years or more as lifetime free commission)
   int64_t commission_duration;
-  /// The server's `unlimited` code
+  /// Kind of commission coupon (the server's `unlimited` code)
   CommissionUnlimitedType unlimited;
+  /// The server's numeric code of `unlimited`, also when it is a code
+  /// this SDK does not know (`unlimited` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> unlimited_raw;
   /// Commission expiry time as a unix timestamp (null when not set)
   std::optional<int64_t> commission_expired_time;
   /// Number of times used
@@ -701,7 +756,7 @@ struct CouponCommission
   int64_t lave_usage_count;
   /// Settlement model, as returned by the server
   std::string settlement_model;
-  /// Amount limit, as returned by the server
+  /// Amount cap per use of a per-use discount card (`ByRatePer`), as returned by the server
   int64_t amount_limit;
   /// Whether the coupon can be combined with other coupons
   bool superposition;
@@ -710,7 +765,7 @@ struct CouponCommission
 /// Terms of an AI benefit coupon (`ai_benefit`)
 struct CouponAiBenefit
 {
-  /// Benefit days, as returned by the server
+  /// Length of the benefit in days
   int32_t benefit_days;
   /// Start of the benefit as a unix timestamp (null when not set)
   std::optional<int64_t> benefit_start;
@@ -723,7 +778,7 @@ struct CouponAiBenefit
 /// Terms of a cash coupon (`cash`)
 struct CouponCash
 {
-  /// Receive duration, as returned by the server
+  /// Receive duration, as returned by the server (its unit and meaning are not confirmed)
   int64_t receive_duration;
 };
 
@@ -743,7 +798,7 @@ struct CouponCoffee
   std::string coupon_channel;
   /// Coupon ID, as returned by the server
   std::string coupon_id;
-  /// Coupon number, as returned by the server
+  /// Voucher template code, e.g. `coffee-50` (not a personal redemption code)
   std::string coupon_no;
   /// Whether the coupon can be used at every store
   bool is_available_all_store;
@@ -786,7 +841,7 @@ struct CouponCrypto
   std::vector<CouponCryptoCounter> optional_counters;
 };
 
-/// Terms of a finance interest coupon (`finance_interest`)
+/// Terms of a finance interest coupon (`finance_interest`). The meaning of these fields is not confirmed; they are returned as the server sends them.
 struct CouponFinanceInterest
 {
   /// Discount mode, as returned by the server
@@ -824,6 +879,10 @@ struct CouponQuote
   bool inapplicable;
   /// Investor type the coupon applies to
   QuoteInvestorType investor_type;
+  /// The server's numeric code of `investor_type`, also when it is a code
+  /// this SDK does not know (`investor_type` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> investor_type_raw;
   /// Whether the coupon is activated manually
   bool manual_activate;
   /// Markets
@@ -832,7 +891,7 @@ struct CouponQuote
   int32_t member_investor_type;
   /// Paired SPU number, as returned by the server
   std::string pair_spu_no;
-  /// Quote duration, as returned by the server
+  /// Quote duration in seconds (the app reads 200 years or more as lifetime)
   int64_t quote_duration;
   /// Quote market
   std::string quote_market;
@@ -854,6 +913,9 @@ struct CouponIpoCommission
 {
   /// IPO subscription types the coupon applies to
   std::vector<IpoCouponTargetType> bz_types;
+  /// The server's numeric codes of `bz_types`, in order, including codes this
+  /// SDK does not know (which are `Unknown` in `bz_types`)
+  std::vector<int32_t> bz_types_raw;
   /// Counter ID
   std::string counter_id;
   /// Counter name
@@ -865,7 +927,7 @@ struct CouponIpoCommission
 /// Terms of an IPO interest coupon (`ipo_interest`)
 struct CouponIpoInterest
 {
-  /// Discount rate, as returned by the server
+  /// Annual interest discount rate, as returned by the server (the app computes the daily discount as rate × financed amount / 365)
   std::string discount_rate;
 };
 
@@ -874,6 +936,9 @@ struct CouponPlatformFeeDeduct
 {
   /// Instrument types the coupon applies to
   std::vector<CouponTargetType> bz_types;
+  /// The server's numeric codes of `bz_types`, in order, including codes this
+  /// SDK does not know (which are `Unknown` in `bz_types`)
+  std::vector<int32_t> bz_types_raw;
   /// Counter ID
   std::string counter_id;
   /// Counter name
@@ -942,6 +1007,10 @@ struct CouponStockFragment
   std::vector<std::string> markets;
   /// Instrument type the coupon applies to
   CouponTargetType underlying_type;
+  /// The server's numeric code of `underlying_type`, also when it is a code
+  /// this SDK does not know (`underlying_type` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> underlying_type_raw;
   /// Amounts, as returned by the server
   std::map<std::string, std::string> amounts;
 };
@@ -963,6 +1032,10 @@ struct Coupon
   std::string detail;
   /// Status
   CouponStatus card_status;
+  /// The server's numeric code of `card_status`, also when it is a code
+  /// this SDK does not know (`card_status` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> card_status_raw;
   /// Start of validity as a unix timestamp (null when not set)
   std::optional<int64_t> start_time;
   /// End of validity (none when not set or when the coupon never expires; see `no_expiry`) as a unix timestamp (null when not set)
@@ -1070,6 +1143,10 @@ struct Deposit
   std::string state;
   /// State code
   DepositState state_code;
+  /// The server's numeric code of `state_code`, also when it is a code
+  /// this SDK does not know (`state_code` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> state_code_raw;
   /// Sub-state code, as returned by the server
   int32_t sub_state_code;
   /// Deposit method ID
@@ -1105,6 +1182,10 @@ struct Withdrawal
   std::optional<Decimal> settlement_amount;
   /// State code
   WithdrawalState state_code;
+  /// The server's numeric code of `state_code`, also when it is a code
+  /// this SDK does not know (`state_code` is then `Unknown`); null when the
+  /// server sent none
+  std::optional<int32_t> state_code_raw;
   /// Raw state, as returned by the server
   std::string raw_state;
   /// State display text, as returned by the server

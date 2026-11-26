@@ -22,6 +22,7 @@ public class CouponStockFragment {
     private String market;
     private String[] markets;
     private CouponTargetType underlyingType;
+    private Integer underlyingTypeRaw;
     // JSON object text, parsed on access
     private String amounts;
     private transient Map<String, String> amountsMap;
@@ -72,6 +73,17 @@ public class CouponStockFragment {
     }
 
     /**
+     * The server's numeric code of underlying_type, also when it is a code
+     * this SDK does not know (underlying_type is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getUnderlyingTypeRaw() {
+        return underlyingTypeRaw;
+    }
+
+    /**
      * Returns the amounts, as returned by the server.
      *
      * @return the amounts, in key order (read-only); empty when the server returns none
@@ -86,6 +98,6 @@ public class CouponStockFragment {
 
     @Override
     public String toString() {
-        return "CouponStockFragment [" + "counterId=" + counterId + ", " + "counterName=" + counterName + ", " + "market=" + market + ", " + "markets=" + Arrays.toString(markets) + ", " + "underlyingType=" + underlyingType + ", " + "amounts=" + getAmounts() + "]";
+        return "CouponStockFragment [" + "counterId=" + counterId + ", " + "counterName=" + counterName + ", " + "market=" + market + ", " + "markets=" + Arrays.toString(markets) + ", " + "underlyingType=" + underlyingType + ", " + "underlyingTypeRaw=" + underlyingTypeRaw + ", " + "amounts=" + getAmounts() + "]";
     }
 }

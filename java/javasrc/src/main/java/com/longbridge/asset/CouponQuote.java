@@ -10,6 +10,7 @@ public class CouponQuote {
     private OffsetDateTime currentEndTime;
     private boolean inapplicable;
     private QuoteInvestorType investorType;
+    private Integer investorTypeRaw;
     private boolean manualActivate;
     private String[] markets;
     private int memberInvestorType;
@@ -44,6 +45,17 @@ public class CouponQuote {
      */
     public QuoteInvestorType getInvestorType() {
         return investorType;
+    }
+
+    /**
+     * The server's numeric code of investor_type, also when it is a code
+     * this SDK does not know (investor_type is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getInvestorTypeRaw() {
+        return investorTypeRaw;
     }
 
     /**
@@ -83,9 +95,9 @@ public class CouponQuote {
     }
 
     /**
-     * Returns the quote duration, as returned by the server.
+     * Returns the quote duration in seconds (the app reads 200 years or more as lifetime).
      *
-     * @return the quote duration, as returned by the server
+     * @return the quote duration in seconds (the app reads 200 years or more as lifetime)
      */
     public long getQuoteDuration() {
         return quoteDuration;
@@ -120,6 +132,6 @@ public class CouponQuote {
 
     @Override
     public String toString() {
-        return "CouponQuote [" + "currentEndTime=" + currentEndTime + ", " + "inapplicable=" + inapplicable + ", " + "investorType=" + investorType + ", " + "manualActivate=" + manualActivate + ", " + "markets=" + Arrays.toString(markets) + ", " + "memberInvestorType=" + memberInvestorType + ", " + "pairSpuNo=" + pairSpuNo + ", " + "quoteDuration=" + quoteDuration + ", " + "quoteMarket=" + quoteMarket + ", " + "quoteTags=" + Arrays.toString(quoteTags) + ", " + "superposition=" + superposition + "]";
+        return "CouponQuote [" + "currentEndTime=" + currentEndTime + ", " + "inapplicable=" + inapplicable + ", " + "investorType=" + investorType + ", " + "investorTypeRaw=" + investorTypeRaw + ", " + "manualActivate=" + manualActivate + ", " + "markets=" + Arrays.toString(markets) + ", " + "memberInvestorType=" + memberInvestorType + ", " + "pairSpuNo=" + pairSpuNo + ", " + "quoteDuration=" + quoteDuration + ", " + "quoteMarket=" + quoteMarket + ", " + "quoteTags=" + Arrays.toString(quoteTags) + ", " + "superposition=" + superposition + "]";
     }
 }

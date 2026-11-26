@@ -307,22 +307,26 @@ pub(crate) enum IpoCouponTargetType {
     Cash,
 }
 
-/// The server's `unlimited` code of a commission coupon
+/// Kind of commission coupon (the server's `unlimited` code). The meanings are
+/// the ones the Longbridge app gives the codes; the proto names are given in
+/// brackets.
 #[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::asset::CommissionUnlimitedType")]
 pub(crate) enum CommissionUnlimitedType {
     /// Unknown: an undocumented code (never sent to the server)
     Unknown,
-    /// `Proportionate` (server code 0)
+    /// Time-limited free commission (`Proportionate`, server code 0)
     Proportionate,
-    /// `Full` (server code 1)
+    /// Commission rebate (`Full`, server code 1)
     Full,
-    /// `Lifetime` (server code 2)
+    /// Commission deduction (`Lifetime`, server code 2)
     Lifetime,
-    /// `ByAmountPer` (server code 6)
+    /// Per-use card with a fixed amount per use: `amount / usage_count`
+    /// (`ByAmountPer`, server code 6)
     ByAmountPer,
-    /// `ByRatePer` (server code 7)
+    /// Per-use discount card, capped at `amount_limit` per use (`ByRatePer`,
+    /// server code 7)
     ByRatePer,
 }
 
@@ -447,6 +451,11 @@ pub(crate) struct BankCardAuthorization {
     currency: String,
     /// Authorization status
     status: AuthorizationStatus,
+    /// The server's numeric code of `status`, also when it is a code
+    /// this SDK does not know (`status` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    status_raw: Option<i32>,
     /// Failure reason (empty unless the authorization failed)
     message: String,
     /// Whether this authorization is supported for the card
@@ -505,12 +514,27 @@ pub(crate) struct BankCard {
     remark: String,
     /// Verification status
     status: BankCardStatus,
+    /// The server's numeric code of `status`, also when it is a code
+    /// this SDK does not know (`status` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    status_raw: Option<i32>,
     /// Witness state
     witness_state: BankCardWitnessState,
+    /// The server's numeric code of `witness_state`, also when it is a code
+    /// this SDK does not know (`witness_state` is then `Unknown`); none when
+    /// the server sent none
+    #[py(opt)]
+    witness_state_raw: Option<i32>,
     /// Whether the card supports witnessing
     support_witness: bool,
     /// Binding state
     bind_state: BankCardBindState,
+    /// The server's numeric code of `bind_state`, also when it is a code
+    /// this SDK does not know (`bind_state` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    bind_state_raw: Option<i32>,
     /// Binding hint text
     bind_tip: String,
     /// Withdrawal fee text, as returned by the server
@@ -539,6 +563,11 @@ pub(crate) struct EddaApplication {
     currency: String,
     /// Application status
     status: AuthorizationStatus,
+    /// The server's numeric code of `status`, also when it is a code
+    /// this SDK does not know (`status` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    status_raw: Option<i32>,
     /// Failure reason (empty unless the application failed)
     message: String,
     /// Time the application was filed
@@ -574,6 +603,11 @@ pub(crate) struct TransferStock {
     cost: Option<PyDecimal>,
     /// State code of this stock in the transfer
     state_code: TransferStockState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    state_code_raw: Option<i32>,
     /// Position side
     position_side: String,
 }
@@ -604,6 +638,11 @@ pub(crate) struct StockTransferIn {
     state: String,
     /// State code
     state_code: StockTransferInState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    state_code_raw: Option<i32>,
     /// App-side state: `noticed` means the user tapped "I have notified the
     /// broker" in the app (the user's own confirmation, not a Longbridge
     /// action); `default` otherwise
@@ -669,6 +708,11 @@ pub(crate) struct StockTransferOut {
     state: String,
     /// State code. Only `Submitted` applications can be cancelled
     state_code: StockTransferOutState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    state_code_raw: Option<i32>,
     /// App-side state: `noticed` means the user tapped "I have notified the
     /// broker" in the app (the user's own confirmation, not a Longbridge
     /// action); `default` otherwise
@@ -703,13 +747,22 @@ pub(crate) struct StockTransferOut {
     stocks: Vec<TransferStock>,
 }
 
-/// A reward record from the reward center
+/// A reward record from the reward center (prize redemption secrets
+/// `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are
+/// not modelled)
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::asset::RewardRecord")]
 pub(crate) struct RewardRecord {
-    /// Reward type
+    /// Reward type: named after the first detail object the server sent
+    /// (`cash`, `card`, `prize`, in that order), else the server's
+    /// `reward_type` code
     reward_type: RewardType,
+    /// The server's numeric code of `reward_type`, also when it is a code
+    /// this SDK does not know (`reward_type` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    reward_type_raw: Option<i32>,
     /// Record ID
     record_id: String,
     /// Title of the activity that granted the reward
@@ -722,6 +775,11 @@ pub(crate) struct RewardRecord {
     card_type: String,
     /// Coupon status (coupon rewards; `CouponStatus.Unknown` otherwise)
     card_status: CouponStatus,
+    /// The server's numeric code of `card_status`, also when it is a code
+    /// this SDK does not know (`card_status` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    card_status_raw: Option<i32>,
     /// Prize type code (gift rewards; `0` = physical goods), none when not set
     #[py(opt)]
     prize_type: Option<i32>,
@@ -732,8 +790,19 @@ pub(crate) struct RewardRecord {
     currency: String,
     /// Reward status
     status: RewardStatus,
+    /// The server's numeric code of `status`, also when it is a code
+    /// this SDK does not know (`status` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    status_raw: Option<i32>,
     /// Delivery status (issued gift rewards only)
     deliver_status: RewardDeliverStatus,
+    /// The server's numeric code of `deliver_status` (e.g. 11 where
+    /// `deliver_status` reads `AddressFilled`), also when it is a code this SDK
+    /// does not know (`deliver_status` is then `Unknown`); none when the server
+    /// sent none
+    #[py(opt)]
+    deliver_status_raw: Option<i32>,
     /// Exit status code, as returned by the server
     exit_status: i32,
     /// Time the reward was sent
@@ -777,13 +846,22 @@ pub(crate) struct CouponCommission {
     /// Instrument types the coupon applies to
     #[py(array)]
     bz_types: Vec<CouponTargetType>,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    bz_types_raw: Vec<i32>,
     /// Remaining commission balance
     #[py(opt)]
     commission_balance: Option<PyDecimal>,
-    /// Commission duration, as returned by the server
+    /// Commission duration in seconds (the app reads 200 years or more as
+    /// lifetime free commission)
     commission_duration: i64,
-    /// The server's `unlimited` code
+    /// Kind of commission coupon (the server's `unlimited` code)
     unlimited: CommissionUnlimitedType,
+    /// The server's numeric code of `unlimited`, also when it is a code
+    /// this SDK does not know (`unlimited` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    unlimited_raw: Option<i32>,
     /// Commission expiry time (none when not set)
     #[py(opt)]
     commission_expired_time: Option<PyOffsetDateTimeWrapper>,
@@ -793,7 +871,8 @@ pub(crate) struct CouponCommission {
     lave_usage_count: i64,
     /// Settlement model, as returned by the server
     settlement_model: String,
-    /// Amount limit, as returned by the server
+    /// Amount cap per use of a per-use discount card (`ByRatePer`), as returned
+    /// by the server
     amount_limit: i64,
     /// Whether the coupon can be combined with other coupons
     superposition: bool,
@@ -804,7 +883,7 @@ pub(crate) struct CouponCommission {
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::asset::CouponAiBenefit")]
 pub(crate) struct CouponAiBenefit {
-    /// Benefit days, as returned by the server
+    /// Length of the benefit in days
     benefit_days: i32,
     /// Start of the benefit (none when not set)
     #[py(opt)]
@@ -821,7 +900,8 @@ pub(crate) struct CouponAiBenefit {
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::asset::CouponCash")]
 pub(crate) struct CouponCash {
-    /// Receive duration, as returned by the server
+    /// Receive duration, as returned by the server (its unit and meaning are
+    /// not confirmed)
     receive_duration: i64,
 }
 
@@ -845,7 +925,7 @@ pub(crate) struct CouponCoffee {
     coupon_channel: String,
     /// Coupon ID, as returned by the server
     coupon_id: String,
-    /// Coupon number, as returned by the server
+    /// Voucher template code, e.g. `coffee-50` (not a personal redemption code)
     coupon_no: String,
     /// Whether the coupon can be used at every store
     is_available_all_store: bool,
@@ -896,7 +976,8 @@ pub(crate) struct CouponCrypto {
     optional_counters: Vec<CouponCryptoCounter>,
 }
 
-/// Terms of a finance interest coupon (`finance_interest`)
+/// Terms of a finance interest coupon (`finance_interest`). The meaning of
+/// these fields is not confirmed; they are returned as the server sends them.
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::asset::CouponFinanceInterest")]
@@ -942,6 +1023,11 @@ pub(crate) struct CouponQuote {
     inapplicable: bool,
     /// Investor type the coupon applies to
     investor_type: QuoteInvestorType,
+    /// The server's numeric code of `investor_type`, also when it is a code
+    /// this SDK does not know (`investor_type` is then `Unknown`); none when
+    /// the server sent none
+    #[py(opt)]
+    investor_type_raw: Option<i32>,
     /// Whether the coupon is activated manually
     manual_activate: bool,
     /// Markets
@@ -950,7 +1036,7 @@ pub(crate) struct CouponQuote {
     member_investor_type: i32,
     /// Paired SPU number, as returned by the server
     pair_spu_no: String,
-    /// Quote duration, as returned by the server
+    /// Quote duration in seconds (the app reads 200 years or more as lifetime)
     quote_duration: i64,
     /// Quote market
     quote_market: String,
@@ -977,6 +1063,9 @@ pub(crate) struct CouponIpoCommission {
     /// IPO subscription types the coupon applies to
     #[py(array)]
     bz_types: Vec<IpoCouponTargetType>,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    bz_types_raw: Vec<i32>,
     /// Counter ID
     counter_id: String,
     /// Counter name
@@ -990,7 +1079,8 @@ pub(crate) struct CouponIpoCommission {
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::asset::CouponIpoInterest")]
 pub(crate) struct CouponIpoInterest {
-    /// Discount rate, as returned by the server
+    /// Annual interest discount rate, as returned by the server (the app
+    /// computes the daily discount as rate × financed amount / 365)
     discount_rate: String,
 }
 
@@ -1002,6 +1092,9 @@ pub(crate) struct CouponPlatformFeeDeduct {
     /// Instrument types the coupon applies to
     #[py(array)]
     bz_types: Vec<CouponTargetType>,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    bz_types_raw: Vec<i32>,
     /// Counter ID
     counter_id: String,
     /// Counter name
@@ -1082,6 +1175,11 @@ pub(crate) struct CouponStockFragment {
     markets: Vec<String>,
     /// Instrument type the coupon applies to
     underlying_type: CouponTargetType,
+    /// The server's numeric code of `underlying_type`, also when it is a code
+    /// this SDK does not know (`underlying_type` is then `Unknown`); none when
+    /// the server sent none
+    #[py(opt)]
+    underlying_type_raw: Option<i32>,
     /// Amounts, as returned by the server (a `dict` of strings)
     amounts: std::collections::BTreeMap<String, String>,
 }
@@ -1106,6 +1204,11 @@ pub(crate) struct Coupon {
     detail: String,
     /// Status
     card_status: CouponStatus,
+    /// The server's numeric code of `card_status`, also when it is a code
+    /// this SDK does not know (`card_status` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    card_status_raw: Option<i32>,
     /// Start of validity
     #[py(opt)]
     start_time: Option<PyOffsetDateTimeWrapper>,
@@ -1250,6 +1353,11 @@ pub(crate) struct Deposit {
     state: String,
     /// State code
     state_code: DepositState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    state_code_raw: Option<i32>,
     /// Sub-state code, as returned by the server
     sub_state_code: i32,
     /// Deposit method ID
@@ -1291,6 +1399,11 @@ pub(crate) struct Withdrawal {
     settlement_amount: Option<PyDecimal>,
     /// State code
     state_code: WithdrawalState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); none when the
+    /// server sent none
+    #[py(opt)]
+    state_code_raw: Option<i32>,
     /// Raw state, as returned by the server
     raw_state: String,
     /// State display text, as returned by the server

@@ -349,7 +349,9 @@ pub enum CIpoCouponTargetType {
     IpoCouponTargetTypeCash,
 }
 
-/// The server's `unlimited` code of a commission coupon
+/// Kind of commission coupon (the server's `unlimited` code). The meanings are
+/// the ones the Longbridge app gives the codes; the proto names are given in
+/// brackets.
 ///
 /// The numeric values of this enum are not the server codes; each
 /// member's description names its server code.
@@ -361,19 +363,21 @@ pub enum CCommissionUnlimitedType {
     /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     CommissionUnlimitedTypeUnknown,
-    /// `Proportionate` (server code 0)
+    /// Time-limited free commission (`Proportionate`, server code 0)
     #[c(remote = "Proportionate")]
     CommissionUnlimitedTypeProportionate,
-    /// `Full` (server code 1)
+    /// Commission rebate (`Full`, server code 1)
     #[c(remote = "Full")]
     CommissionUnlimitedTypeFull,
-    /// `Lifetime` (server code 2)
+    /// Commission deduction (`Lifetime`, server code 2)
     #[c(remote = "Lifetime")]
     CommissionUnlimitedTypeLifetime,
-    /// `ByAmountPer` (server code 6)
+    /// Per-use card with a fixed amount per use: `amount / usage_count`
+    /// (`ByAmountPer`, server code 6)
     #[c(remote = "ByAmountPer")]
     CommissionUnlimitedTypeByAmountPer,
-    /// `ByRatePer` (server code 7)
+    /// Per-use discount card, capped at `amount_limit` per use (`ByRatePer`,
+    /// server code 7)
     #[c(remote = "ByRatePer")]
     CommissionUnlimitedTypeByRatePer,
 }

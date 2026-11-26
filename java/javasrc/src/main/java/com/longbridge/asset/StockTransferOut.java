@@ -17,6 +17,7 @@ public class StockTransferOut {
     private String account;
     private String state;
     private StockTransferOutState stateCode;
+    private Integer stateCodeRaw;
     private String appState;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -117,6 +118,17 @@ public class StockTransferOut {
      */
     public StockTransferOutState getStateCode() {
         return stateCode;
+    }
+
+    /**
+     * The server's numeric code of state_code, also when it is a code
+     * this SDK does not know (state_code is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getStateCodeRaw() {
+        return stateCodeRaw;
     }
 
     /**
@@ -242,6 +254,6 @@ public class StockTransferOut {
 
     @Override
     public String toString() {
-        return "StockTransferOut [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "market=" + market + ", " + "broker=" + broker + ", " + "brokerId=" + brokerId + ", " + "brokerEn=" + brokerEn + ", " + "brokerCode=" + brokerCode + ", " + "account=" + account + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "appState=" + appState + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "processAt=" + processAt + ", " + "execAt=" + execAt + ", " + "agreeAt=" + agreeAt + ", " + "refuseAt=" + refuseAt + ", " + "cancelAt=" + cancelAt + ", " + "remark=" + remark + ", " + "reason=" + reason + ", " + "stocks=" + Arrays.toString(stocks) + "]";
+        return "StockTransferOut [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "market=" + market + ", " + "broker=" + broker + ", " + "brokerId=" + brokerId + ", " + "brokerEn=" + brokerEn + ", " + "brokerCode=" + brokerCode + ", " + "account=" + account + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "stateCodeRaw=" + stateCodeRaw + ", " + "appState=" + appState + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "processAt=" + processAt + ", " + "execAt=" + execAt + ", " + "agreeAt=" + agreeAt + ", " + "refuseAt=" + refuseAt + ", " + "cancelAt=" + cancelAt + ", " + "remark=" + remark + ", " + "reason=" + reason + ", " + "stocks=" + Arrays.toString(stocks) + "]";
     }
 }

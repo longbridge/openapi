@@ -11,9 +11,11 @@ public class CouponCommission {
     private String[] markets;
     private String rebateRate;
     private CouponTargetType[] bzTypes;
+    private int[] bzTypesRaw;
     private BigDecimal commissionBalance;
     private long commissionDuration;
     private CommissionUnlimitedType unlimited;
+    private Integer unlimitedRaw;
     private OffsetDateTime commissionExpiredTime;
     private long usageCount;
     private long laveUsageCount;
@@ -49,6 +51,16 @@ public class CouponCommission {
     }
 
     /**
+     * The server's numeric codes of bz_types, in order, including codes this
+     * SDK does not know (which are Unknown in bz_types)
+     *
+     * @return the raw codes
+     */
+    public int[] getBzTypesRaw() {
+        return bzTypesRaw;
+    }
+
+    /**
      * Returns the remaining commission balance ({@code null} when not set).
      *
      * @return the remaining commission balance
@@ -58,21 +70,32 @@ public class CouponCommission {
     }
 
     /**
-     * Returns the commission duration, as returned by the server.
+     * Returns the commission duration in seconds (the app reads 200 years or more as lifetime free commission).
      *
-     * @return the commission duration, as returned by the server
+     * @return the commission duration in seconds (the app reads 200 years or more as lifetime free commission)
      */
     public long getCommissionDuration() {
         return commissionDuration;
     }
 
     /**
-     * Returns the the server's {@code unlimited} code.
+     * Returns the kind of commission coupon (the server's {@code unlimited} code).
      *
-     * @return the the server's {@code unlimited} code
+     * @return the kind of commission coupon (the server's {@code unlimited} code)
      */
     public CommissionUnlimitedType getUnlimited() {
         return unlimited;
+    }
+
+    /**
+     * The server's numeric code of unlimited, also when it is a code
+     * this SDK does not know (unlimited is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getUnlimitedRaw() {
+        return unlimitedRaw;
     }
 
     /**
@@ -112,9 +135,9 @@ public class CouponCommission {
     }
 
     /**
-     * Returns the amount limit, as returned by the server.
+     * Returns the amount cap per use of a per-use discount card ({@code ByRatePer}), as returned by the server.
      *
-     * @return the amount limit, as returned by the server
+     * @return the amount cap per use of a per-use discount card ({@code ByRatePer}), as returned by the server
      */
     public long getAmountLimit() {
         return amountLimit;
@@ -131,6 +154,6 @@ public class CouponCommission {
 
     @Override
     public String toString() {
-        return "CouponCommission [" + "markets=" + Arrays.toString(markets) + ", " + "rebateRate=" + rebateRate + ", " + "bzTypes=" + Arrays.toString(bzTypes) + ", " + "commissionBalance=" + commissionBalance + ", " + "commissionDuration=" + commissionDuration + ", " + "unlimited=" + unlimited + ", " + "commissionExpiredTime=" + commissionExpiredTime + ", " + "usageCount=" + usageCount + ", " + "laveUsageCount=" + laveUsageCount + ", " + "settlementModel=" + settlementModel + ", " + "amountLimit=" + amountLimit + ", " + "superposition=" + superposition + "]";
+        return "CouponCommission [" + "markets=" + Arrays.toString(markets) + ", " + "rebateRate=" + rebateRate + ", " + "bzTypes=" + Arrays.toString(bzTypes) + ", " + "bzTypesRaw=" + Arrays.toString(bzTypesRaw) + ", " + "commissionBalance=" + commissionBalance + ", " + "commissionDuration=" + commissionDuration + ", " + "unlimited=" + unlimited + ", " + "unlimitedRaw=" + unlimitedRaw + ", " + "commissionExpiredTime=" + commissionExpiredTime + ", " + "usageCount=" + usageCount + ", " + "laveUsageCount=" + laveUsageCount + ", " + "settlementModel=" + settlementModel + ", " + "amountLimit=" + amountLimit + ", " + "superposition=" + superposition + "]";
     }
 }

@@ -7,9 +7,9 @@ public class CouponIpoInterest {
     private String discountRate;
 
     /**
-     * Returns the discount rate, as returned by the server.
+     * Returns the annual interest discount rate, as returned by the server (the app computes the daily discount as rate × financed amount / 365).
      *
-     * @return the discount rate, as returned by the server
+     * @return the annual interest discount rate, as returned by the server (the app computes the daily discount as rate × financed amount / 365)
      */
     public String getDiscountRate() {
         return discountRate;

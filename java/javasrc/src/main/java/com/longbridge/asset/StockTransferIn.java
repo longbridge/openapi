@@ -17,6 +17,7 @@ public class StockTransferIn {
     private String account;
     private String state;
     private StockTransferInState stateCode;
+    private Integer stateCodeRaw;
     private String appState;
     private boolean canModify;
     private OffsetDateTime createdAt;
@@ -118,6 +119,17 @@ public class StockTransferIn {
     }
 
     /**
+     * The server's numeric code of state_code, also when it is a code
+     * this SDK does not know (state_code is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getStateCodeRaw() {
+        return stateCodeRaw;
+    }
+
+    /**
      * Returns the app-side state: {@code noticed} means the user tapped "I
      * have notified the broker" in the app (the user's own confirmation, not a
      * Longbridge action); {@code default} otherwise.
@@ -212,6 +224,6 @@ public class StockTransferIn {
 
     @Override
     public String toString() {
-        return "StockTransferIn [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "market=" + market + ", " + "broker=" + broker + ", " + "brokerId=" + brokerId + ", " + "brokerEn=" + brokerEn + ", " + "brokerCode=" + brokerCode + ", " + "account=" + account + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "appState=" + appState + ", " + "canModify=" + canModify + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "processAt=" + processAt + ", " + "execAt=" + execAt + ", " + "remark=" + remark + ", " + "reason=" + reason + ", " + "stocks=" + Arrays.toString(stocks) + "]";
+        return "StockTransferIn [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "market=" + market + ", " + "broker=" + broker + ", " + "brokerId=" + brokerId + ", " + "brokerEn=" + brokerEn + ", " + "brokerCode=" + brokerCode + ", " + "account=" + account + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "stateCodeRaw=" + stateCodeRaw + ", " + "appState=" + appState + ", " + "canModify=" + canModify + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "processAt=" + processAt + ", " + "execAt=" + execAt + ", " + "remark=" + remark + ", " + "reason=" + reason + ", " + "stocks=" + Arrays.toString(stocks) + "]";
     }
 }

@@ -7,9 +7,9 @@ public class CouponCash {
     private long receiveDuration;
 
     /**
-     * Returns the receive duration, as returned by the server.
+     * Returns the receive duration, as returned by the server (its unit and meaning are not confirmed).
      *
-     * @return the receive duration, as returned by the server
+     * @return the receive duration, as returned by the server (its unit and meaning are not confirmed)
      */
     public long getReceiveDuration() {
         return receiveDuration;

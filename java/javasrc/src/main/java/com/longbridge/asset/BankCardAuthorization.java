@@ -11,6 +11,7 @@ public class BankCardAuthorization {
     private String name;
     private String currency;
     private AuthorizationStatus status;
+    private Integer statusRaw;
     private String message;
     private boolean isSupport;
     private BigDecimal maxAmount;
@@ -56,6 +57,17 @@ public class BankCardAuthorization {
      */
     public AuthorizationStatus getStatus() {
         return status;
+    }
+
+    /**
+     * The server's numeric code of status, also when it is a code
+     * this SDK does not know (status is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getStatusRaw() {
+        return statusRaw;
     }
 
     /**
@@ -152,6 +164,6 @@ public class BankCardAuthorization {
 
     @Override
     public String toString() {
-        return "BankCardAuthorization [" + "flowId=" + flowId + ", " + "name=" + name + ", " + "currency=" + currency + ", " + "status=" + status + ", " + "message=" + message + ", " + "isSupport=" + isSupport + ", " + "maxAmount=" + maxAmount + ", " + "maxAmountUnlimited=" + maxAmountUnlimited + ", " + "dailyMaxCount=" + dailyMaxCount + ", " + "dailyMaxCountUnlimited=" + dailyMaxCountUnlimited + ", " + "expiryDate=" + expiryDate + ", " + "longTermValid=" + longTermValid + ", " + "docReviewing=" + docReviewing + ", " + "noPriorDepositReviewing=" + noPriorDepositReviewing + "]";
+        return "BankCardAuthorization [" + "flowId=" + flowId + ", " + "name=" + name + ", " + "currency=" + currency + ", " + "status=" + status + ", " + "statusRaw=" + statusRaw + ", " + "message=" + message + ", " + "isSupport=" + isSupport + ", " + "maxAmount=" + maxAmount + ", " + "maxAmountUnlimited=" + maxAmountUnlimited + ", " + "dailyMaxCount=" + dailyMaxCount + ", " + "dailyMaxCountUnlimited=" + dailyMaxCountUnlimited + ", " + "expiryDate=" + expiryDate + ", " + "longTermValid=" + longTermValid + ", " + "docReviewing=" + docReviewing + ", " + "noPriorDepositReviewing=" + noPriorDepositReviewing + "]";
     }
 }

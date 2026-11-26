@@ -72,6 +72,10 @@ pub struct CBankCardAuthorization {
     pub currency: *const c_char,
     /// Authorization status
     pub status: CAuthorizationStatus,
+    /// The server's numeric code of `status`, also when it is a code
+    /// this SDK does not know (`status` is then `Unknown`); null when the
+    /// server sent none
+    pub status_raw: *const i32,
     /// Failure reason (empty unless the authorization failed)
     pub message: *const c_char,
     /// Whether this authorization is supported for the card
@@ -102,6 +106,7 @@ pub(crate) struct CBankCardAuthorizationOwned {
     name: CString,
     currency: CString,
     status: AuthorizationStatus,
+    status_raw: Option<i32>,
     message: CString,
     is_support: bool,
     max_amount: Option<CDecimal>,
@@ -121,6 +126,7 @@ impl From<BankCardAuthorization> for CBankCardAuthorizationOwned {
             name: v.name.into(),
             currency: v.currency.into(),
             status: v.status,
+            status_raw: v.status_raw,
             message: v.message.into(),
             is_support: v.is_support,
             max_amount: v.max_amount.map(Into::into),
@@ -144,6 +150,11 @@ impl ToFFI for CBankCardAuthorizationOwned {
             name: self.name.to_ffi_type(),
             currency: self.currency.to_ffi_type(),
             status: self.status.into(),
+            status_raw: self
+                .status_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             message: self.message.to_ffi_type(),
             is_support: self.is_support,
             max_amount: self
@@ -199,12 +210,24 @@ pub struct CBankCard {
     pub remark: *const c_char,
     /// Verification status
     pub status: CBankCardStatus,
+    /// The server's numeric code of `status`, also when it is a code
+    /// this SDK does not know (`status` is then `Unknown`); null when the
+    /// server sent none
+    pub status_raw: *const i32,
     /// Witness state
     pub witness_state: CBankCardWitnessState,
+    /// The server's numeric code of `witness_state`, also when it is a code
+    /// this SDK does not know (`witness_state` is then `Unknown`); null when
+    /// the server sent none
+    pub witness_state_raw: *const i32,
     /// Whether the card supports witnessing
     pub support_witness: bool,
     /// Binding state
     pub bind_state: CBankCardBindState,
+    /// The server's numeric code of `bind_state`, also when it is a code
+    /// this SDK does not know (`bind_state` is then `Unknown`); null when the
+    /// server sent none
+    pub bind_state_raw: *const i32,
     /// Binding hint text
     pub bind_tip: *const c_char,
     /// Withdrawal fee text, as returned by the server
@@ -232,9 +255,12 @@ pub(crate) struct CBankCardOwned {
     swift_code: CString,
     remark: CString,
     status: BankCardStatus,
+    status_raw: Option<i32>,
     witness_state: BankCardWitnessState,
+    witness_state_raw: Option<i32>,
     support_witness: bool,
     bind_state: BankCardBindState,
+    bind_state_raw: Option<i32>,
     bind_tip: CString,
     withdraw_fee: CString,
     created_at: Option<i64>,
@@ -257,9 +283,12 @@ impl From<BankCard> for CBankCardOwned {
             swift_code: v.swift_code.into(),
             remark: v.remark.into(),
             status: v.status,
+            status_raw: v.status_raw,
             witness_state: v.witness_state,
+            witness_state_raw: v.witness_state_raw,
             support_witness: v.support_witness,
             bind_state: v.bind_state,
+            bind_state_raw: v.bind_state_raw,
             bind_tip: v.bind_tip.into(),
             withdraw_fee: v.withdraw_fee.into(),
             created_at: v.created_at.map(OffsetDateTime::unix_timestamp),
@@ -286,9 +315,24 @@ impl ToFFI for CBankCardOwned {
             swift_code: self.swift_code.to_ffi_type(),
             remark: self.remark.to_ffi_type(),
             status: self.status.into(),
+            status_raw: self
+                .status_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             witness_state: self.witness_state.into(),
+            witness_state_raw: self
+                .witness_state_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             support_witness: self.support_witness,
             bind_state: self.bind_state.into(),
+            bind_state_raw: self
+                .bind_state_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             bind_tip: self.bind_tip.to_ffi_type(),
             withdraw_fee: self.withdraw_fee.to_ffi_type(),
             created_at: self
@@ -316,6 +360,10 @@ pub struct CEddaApplication {
     pub currency: *const c_char,
     /// Application status
     pub status: CAuthorizationStatus,
+    /// The server's numeric code of `status`, also when it is a code
+    /// this SDK does not know (`status` is then `Unknown`); null when the
+    /// server sent none
+    pub status_raw: *const i32,
     /// Failure reason (empty unless the application failed)
     pub message: *const c_char,
     /// Time the application was filed as a unix timestamp (null when not
@@ -333,6 +381,7 @@ pub(crate) struct CEddaApplicationOwned {
     name: CString,
     currency: CString,
     status: AuthorizationStatus,
+    status_raw: Option<i32>,
     message: CString,
     created_at: Option<i64>,
     updated_at: Option<i64>,
@@ -346,6 +395,7 @@ impl From<EddaApplication> for CEddaApplicationOwned {
             name: v.name.into(),
             currency: v.currency.into(),
             status: v.status,
+            status_raw: v.status_raw,
             message: v.message.into(),
             created_at: v.created_at.map(OffsetDateTime::unix_timestamp),
             updated_at: v.updated_at.map(OffsetDateTime::unix_timestamp),
@@ -363,6 +413,11 @@ impl ToFFI for CEddaApplicationOwned {
             name: self.name.to_ffi_type(),
             currency: self.currency.to_ffi_type(),
             status: self.status.into(),
+            status_raw: self
+                .status_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             message: self.message.to_ffi_type(),
             created_at: self
                 .created_at
@@ -399,6 +454,10 @@ pub struct CTransferStock {
     pub cost: *const CDecimal,
     /// State code of this stock in the transfer
     pub state_code: CTransferStockState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); null when the
+    /// server sent none
+    pub state_code_raw: *const i32,
     /// Position side
     pub position_side: *const c_char,
 }
@@ -414,6 +473,7 @@ pub(crate) struct CTransferStockOwned {
     currency: CString,
     cost: Option<CDecimal>,
     state_code: TransferStockState,
+    state_code_raw: Option<i32>,
     position_side: CString,
 }
 
@@ -429,6 +489,7 @@ impl From<TransferStock> for CTransferStockOwned {
             currency: v.currency.into(),
             cost: v.cost.map(Into::into),
             state_code: v.state_code,
+            state_code_raw: v.state_code_raw,
             position_side: v.position_side.into(),
         }
     }
@@ -456,6 +517,11 @@ impl ToFFI for CTransferStockOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             state_code: self.state_code.into(),
+            state_code_raw: self
+                .state_code_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             position_side: self.position_side.to_ffi_type(),
         }
     }
@@ -485,6 +551,10 @@ pub struct CStockTransferIn {
     pub state: *const c_char,
     /// State code
     pub state_code: CStockTransferInState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); null when the
+    /// server sent none
+    pub state_code_raw: *const i32,
     /// App-side state: `noticed` means the user tapped "I have notified the
     /// broker" in the app; `default` otherwise
     pub app_state: *const c_char,
@@ -520,6 +590,7 @@ pub(crate) struct CStockTransferInOwned {
     account: CString,
     state: CString,
     state_code: StockTransferInState,
+    state_code_raw: Option<i32>,
     app_state: CString,
     can_modify: bool,
     created_at: Option<i64>,
@@ -544,6 +615,7 @@ impl From<StockTransferIn> for CStockTransferInOwned {
             account: v.account.into(),
             state: v.state.into(),
             state_code: v.state_code,
+            state_code_raw: v.state_code_raw,
             app_state: v.app_state.into(),
             can_modify: v.can_modify,
             created_at: v.created_at.map(OffsetDateTime::unix_timestamp),
@@ -572,6 +644,11 @@ impl ToFFI for CStockTransferInOwned {
             account: self.account.to_ffi_type(),
             state: self.state.to_ffi_type(),
             state_code: self.state_code.into(),
+            state_code_raw: self
+                .state_code_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             app_state: self.app_state.to_ffi_type(),
             can_modify: self.can_modify,
             created_at: self
@@ -664,6 +741,10 @@ pub struct CStockTransferOut {
     pub state: *const c_char,
     /// State code (only `Submitted` applications can be cancelled)
     pub state_code: CStockTransferOutState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); null when the
+    /// server sent none
+    pub state_code_raw: *const i32,
     /// App-side state: `noticed` means the user tapped "I have notified the
     /// broker" in the app (the user's own confirmation, not a Longbridge
     /// action); `default` otherwise
@@ -705,6 +786,7 @@ pub(crate) struct CStockTransferOutOwned {
     account: CString,
     state: CString,
     state_code: StockTransferOutState,
+    state_code_raw: Option<i32>,
     app_state: CString,
     created_at: Option<i64>,
     updated_at: Option<i64>,
@@ -731,6 +813,7 @@ impl From<StockTransferOut> for CStockTransferOutOwned {
             account: v.account.into(),
             state: v.state.into(),
             state_code: v.state_code,
+            state_code_raw: v.state_code_raw,
             app_state: v.app_state.into(),
             created_at: v.created_at.map(OffsetDateTime::unix_timestamp),
             updated_at: v.updated_at.map(OffsetDateTime::unix_timestamp),
@@ -761,6 +844,11 @@ impl ToFFI for CStockTransferOutOwned {
             account: self.account.to_ffi_type(),
             state: self.state.to_ffi_type(),
             state_code: self.state_code.into(),
+            state_code_raw: self
+                .state_code_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             app_state: self.app_state.to_ffi_type(),
             created_at: self
                 .created_at
@@ -805,12 +893,19 @@ impl ToFFI for CStockTransferOutOwned {
     }
 }
 
-/// A reward record from the reward center (prize secrets and shipping contacts
-/// are not modelled)
+/// A reward record from the reward center (prize redemption secrets
+/// `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are
+/// not modelled)
 #[repr(C)]
 pub struct CRewardRecord {
-    /// Reward type
+    /// Reward type: named after the first detail object the server sent
+    /// (`cash`, `card`, `prize`, in that order), else the server's
+    /// `reward_type` code
     pub reward_type: CRewardType,
+    /// The server's numeric code of `reward_type`, also when it is a code
+    /// this SDK does not know (`reward_type` is then `Unknown`); null when the
+    /// server sent none
+    pub reward_type_raw: *const i32,
     /// Record ID
     pub record_id: *const c_char,
     /// Title of the activity that granted the reward
@@ -823,6 +918,10 @@ pub struct CRewardRecord {
     pub card_type: *const c_char,
     /// Coupon status code (coupon rewards), as returned by the server
     pub card_status: CCouponStatus,
+    /// The server's numeric code of `card_status`, also when it is a code
+    /// this SDK does not know (`card_status` is then `Unknown`); null when the
+    /// server sent none
+    pub card_status_raw: *const i32,
     /// Prize type code (gift rewards; `0` = physical goods), null when not set
     pub prize_type: *const i32,
     /// Amount (null when not set)
@@ -831,8 +930,17 @@ pub struct CRewardRecord {
     pub currency: *const c_char,
     /// Reward status
     pub status: CRewardStatus,
+    /// The server's numeric code of `status`, also when it is a code
+    /// this SDK does not know (`status` is then `Unknown`); null when the
+    /// server sent none
+    pub status_raw: *const i32,
     /// Delivery status (issued gift rewards only)
     pub deliver_status: CRewardDeliverStatus,
+    /// The server's numeric code of `deliver_status` (e.g. 11 where
+    /// `deliver_status` reads `AddressFilled`), also when it is a code this SDK
+    /// does not know (`deliver_status` is then `Unknown`); null when the server
+    /// sent none
+    pub deliver_status_raw: *const i32,
     /// Exit status code, as returned by the server
     pub exit_status: i32,
     /// Time the reward was sent as a unix timestamp (null when not set)
@@ -850,17 +958,21 @@ pub struct CRewardRecord {
 #[derive(Debug)]
 pub(crate) struct CRewardRecordOwned {
     reward_type: RewardType,
+    reward_type_raw: Option<i32>,
     record_id: CString,
     activity_title: CString,
     title: CString,
     description: CString,
     card_type: CString,
     card_status: CouponStatus,
+    card_status_raw: Option<i32>,
     prize_type: Option<i32>,
     amount: Option<CDecimal>,
     currency: CString,
     status: RewardStatus,
+    status_raw: Option<i32>,
     deliver_status: RewardDeliverStatus,
+    deliver_status_raw: Option<i32>,
     exit_status: i32,
     send_time: Option<i64>,
     start_time: Option<i64>,
@@ -873,17 +985,21 @@ impl From<RewardRecord> for CRewardRecordOwned {
     fn from(v: RewardRecord) -> Self {
         Self {
             reward_type: v.reward_type,
+            reward_type_raw: v.reward_type_raw,
             record_id: v.record_id.into(),
             activity_title: v.activity_title.into(),
             title: v.title.into(),
             description: v.description.into(),
             card_type: v.card_type.into(),
             card_status: v.card_status,
+            card_status_raw: v.card_status_raw,
             prize_type: v.prize_type,
             amount: v.amount.map(Into::into),
             currency: v.currency.into(),
             status: v.status,
+            status_raw: v.status_raw,
             deliver_status: v.deliver_status,
+            deliver_status_raw: v.deliver_status_raw,
             exit_status: v.exit_status,
             send_time: v.send_time.map(OffsetDateTime::unix_timestamp),
             start_time: v.start_time.map(OffsetDateTime::unix_timestamp),
@@ -900,12 +1016,22 @@ impl ToFFI for CRewardRecordOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CRewardRecord {
             reward_type: self.reward_type.into(),
+            reward_type_raw: self
+                .reward_type_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             record_id: self.record_id.to_ffi_type(),
             activity_title: self.activity_title.to_ffi_type(),
             title: self.title.to_ffi_type(),
             description: self.description.to_ffi_type(),
             card_type: self.card_type.to_ffi_type(),
             card_status: self.card_status.into(),
+            card_status_raw: self
+                .card_status_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             prize_type: self
                 .prize_type
                 .as_ref()
@@ -918,7 +1044,17 @@ impl ToFFI for CRewardRecordOwned {
                 .unwrap_or(std::ptr::null()),
             currency: self.currency.to_ffi_type(),
             status: self.status.into(),
+            status_raw: self
+                .status_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             deliver_status: self.deliver_status.into(),
+            deliver_status_raw: self
+                .deliver_status_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             exit_status: self.exit_status,
             send_time: self
                 .send_time
@@ -1000,12 +1136,22 @@ pub struct CCouponCommission {
     pub bz_types: *const CCouponTargetType,
     /// Number of `bz_types`
     pub num_bz_types: usize,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    pub bz_types_raw: *const i32,
+    /// Number of `bz_types_raw`
+    pub num_bz_types_raw: usize,
     /// Remaining commission balance (null when not set)
     pub commission_balance: *const CDecimal,
-    /// Commission duration, as returned by the server
+    /// Commission duration in seconds (the app reads 200 years or more as
+    /// lifetime free commission)
     pub commission_duration: i64,
-    /// The server's `unlimited` code
+    /// Kind of commission coupon (the server's `unlimited` code)
     pub unlimited: CCommissionUnlimitedType,
+    /// The server's numeric code of `unlimited`, also when it is a code
+    /// this SDK does not know (`unlimited` is then `Unknown`); null when the
+    /// server sent none
+    pub unlimited_raw: *const i32,
     /// Commission expiry time as a unix timestamp (null when not set)
     pub commission_expired_time: *const i64,
     /// Number of times used
@@ -1014,7 +1160,8 @@ pub struct CCouponCommission {
     pub lave_usage_count: i64,
     /// Settlement model, as returned by the server
     pub settlement_model: *const c_char,
-    /// Amount limit, as returned by the server
+    /// Amount cap per use of a per-use discount card (`ByRatePer`), as returned
+    /// by the server
     pub amount_limit: i64,
     /// Whether the coupon can be combined with other coupons
     pub superposition: bool,
@@ -1025,9 +1172,11 @@ pub(crate) struct CCouponCommissionOwned {
     markets: CVec<CString>,
     rebate_rate: CString,
     bz_types: CVec<CCouponTargetType>,
+    bz_types_raw: CVec<i32>,
     commission_balance: Option<CDecimal>,
     commission_duration: i64,
     unlimited: CommissionUnlimitedType,
+    unlimited_raw: Option<i32>,
     commission_expired_time: Option<i64>,
     usage_count: i64,
     lave_usage_count: i64,
@@ -1042,9 +1191,11 @@ impl From<CouponCommission> for CCouponCommissionOwned {
             markets: v.markets.into(),
             rebate_rate: v.rebate_rate.into(),
             bz_types: v.bz_types.into(),
+            bz_types_raw: v.bz_types_raw.into(),
             commission_balance: v.commission_balance.map(Into::into),
             commission_duration: v.commission_duration,
             unlimited: v.unlimited,
+            unlimited_raw: v.unlimited_raw,
             commission_expired_time: v
                 .commission_expired_time
                 .map(OffsetDateTime::unix_timestamp),
@@ -1067,6 +1218,8 @@ impl ToFFI for CCouponCommissionOwned {
             rebate_rate: self.rebate_rate.to_ffi_type(),
             bz_types: self.bz_types.to_ffi_type(),
             num_bz_types: self.bz_types.len(),
+            bz_types_raw: self.bz_types_raw.to_ffi_type(),
+            num_bz_types_raw: self.bz_types_raw.len(),
             commission_balance: self
                 .commission_balance
                 .as_ref()
@@ -1074,6 +1227,11 @@ impl ToFFI for CCouponCommissionOwned {
                 .unwrap_or(std::ptr::null()),
             commission_duration: self.commission_duration,
             unlimited: self.unlimited.into(),
+            unlimited_raw: self
+                .unlimited_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             commission_expired_time: self
                 .commission_expired_time
                 .as_ref()
@@ -1091,7 +1249,7 @@ impl ToFFI for CCouponCommissionOwned {
 /// Terms of an AI benefit coupon (`ai_benefit`)
 #[repr(C)]
 pub struct CCouponAiBenefit {
-    /// Benefit days, as returned by the server
+    /// Length of the benefit in days
     pub benefit_days: i32,
     /// Start of the benefit as a unix timestamp (null when not set)
     pub benefit_start: *const i64,
@@ -1144,7 +1302,8 @@ impl ToFFI for CCouponAiBenefitOwned {
 /// Terms of a cash coupon (`cash`)
 #[repr(C)]
 pub struct CCouponCash {
-    /// Receive duration, as returned by the server
+    /// Receive duration, as returned by the server (its unit and meaning are
+    /// not confirmed)
     pub receive_duration: i64,
 }
 
@@ -1213,7 +1372,7 @@ pub struct CCouponCoffee {
     pub coupon_channel: *const c_char,
     /// Coupon ID, as returned by the server
     pub coupon_id: *const c_char,
-    /// Coupon number, as returned by the server
+    /// Voucher template code, e.g. `coffee-50` (not a personal redemption code)
     pub coupon_no: *const c_char,
     /// Whether the coupon can be used at every store
     pub is_available_all_store: bool,
@@ -1390,7 +1549,8 @@ impl ToFFI for CCouponCryptoOwned {
     }
 }
 
-/// Terms of a finance interest coupon (`finance_interest`)
+/// Terms of a finance interest coupon (`finance_interest`). The meaning of
+/// these fields is not confirmed; they are returned as the server sends them.
 #[repr(C)]
 pub struct CCouponFinanceInterest {
     /// Discount mode, as returned by the server
@@ -1508,6 +1668,10 @@ pub struct CCouponQuote {
     pub inapplicable: bool,
     /// Investor type the coupon applies to
     pub investor_type: CQuoteInvestorType,
+    /// The server's numeric code of `investor_type`, also when it is a code
+    /// this SDK does not know (`investor_type` is then `Unknown`); null when
+    /// the server sent none
+    pub investor_type_raw: *const i32,
     /// Whether the coupon is activated manually
     pub manual_activate: bool,
     /// Markets
@@ -1518,7 +1682,7 @@ pub struct CCouponQuote {
     pub member_investor_type: i32,
     /// Paired SPU number, as returned by the server
     pub pair_spu_no: *const c_char,
-    /// Quote duration, as returned by the server
+    /// Quote duration in seconds (the app reads 200 years or more as lifetime)
     pub quote_duration: i64,
     /// Quote market
     pub quote_market: *const c_char,
@@ -1535,6 +1699,7 @@ pub(crate) struct CCouponQuoteOwned {
     current_end_time: Option<i64>,
     inapplicable: bool,
     investor_type: QuoteInvestorType,
+    investor_type_raw: Option<i32>,
     manual_activate: bool,
     markets: CVec<CString>,
     member_investor_type: i32,
@@ -1551,6 +1716,7 @@ impl From<CouponQuote> for CCouponQuoteOwned {
             current_end_time: v.current_end_time.map(OffsetDateTime::unix_timestamp),
             inapplicable: v.inapplicable,
             investor_type: v.investor_type,
+            investor_type_raw: v.investor_type_raw,
             manual_activate: v.manual_activate,
             markets: v.markets.into(),
             member_investor_type: v.member_investor_type,
@@ -1575,6 +1741,11 @@ impl ToFFI for CCouponQuoteOwned {
                 .unwrap_or(std::ptr::null()),
             inapplicable: self.inapplicable,
             investor_type: self.investor_type.into(),
+            investor_type_raw: self
+                .investor_type_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             manual_activate: self.manual_activate,
             markets: self.markets.to_ffi_type(),
             num_markets: self.markets.len(),
@@ -1626,6 +1797,11 @@ pub struct CCouponIpoCommission {
     pub bz_types: *const CIpoCouponTargetType,
     /// Number of `bz_types`
     pub num_bz_types: usize,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    pub bz_types_raw: *const i32,
+    /// Number of `bz_types_raw`
+    pub num_bz_types_raw: usize,
     /// Counter ID
     pub counter_id: *const c_char,
     /// Counter name
@@ -1637,6 +1813,7 @@ pub struct CCouponIpoCommission {
 #[derive(Debug)]
 pub(crate) struct CCouponIpoCommissionOwned {
     bz_types: CVec<CIpoCouponTargetType>,
+    bz_types_raw: CVec<i32>,
     counter_id: CString,
     counter_name: CString,
     financing_limit: CString,
@@ -1646,6 +1823,7 @@ impl From<CouponIpoCommission> for CCouponIpoCommissionOwned {
     fn from(v: CouponIpoCommission) -> Self {
         Self {
             bz_types: v.bz_types.into(),
+            bz_types_raw: v.bz_types_raw.into(),
             counter_id: v.counter_id.into(),
             counter_name: v.counter_name.into(),
             financing_limit: v.financing_limit.into(),
@@ -1660,6 +1838,8 @@ impl ToFFI for CCouponIpoCommissionOwned {
         CCouponIpoCommission {
             bz_types: self.bz_types.to_ffi_type(),
             num_bz_types: self.bz_types.len(),
+            bz_types_raw: self.bz_types_raw.to_ffi_type(),
+            num_bz_types_raw: self.bz_types_raw.len(),
             counter_id: self.counter_id.to_ffi_type(),
             counter_name: self.counter_name.to_ffi_type(),
             financing_limit: self.financing_limit.to_ffi_type(),
@@ -1670,7 +1850,8 @@ impl ToFFI for CCouponIpoCommissionOwned {
 /// Terms of an IPO interest coupon (`ipo_interest`)
 #[repr(C)]
 pub struct CCouponIpoInterest {
-    /// Discount rate, as returned by the server
+    /// Annual interest discount rate, as returned by the server (the app
+    /// computes the daily discount as rate × financed amount / 365)
     pub discount_rate: *const c_char,
 }
 
@@ -1704,6 +1885,11 @@ pub struct CCouponPlatformFeeDeduct {
     pub bz_types: *const CCouponTargetType,
     /// Number of `bz_types`
     pub num_bz_types: usize,
+    /// The server's numeric codes of `bz_types`, in order, including codes this
+    /// SDK does not know (which are `Unknown` in `bz_types`)
+    pub bz_types_raw: *const i32,
+    /// Number of `bz_types_raw`
+    pub num_bz_types_raw: usize,
     /// Counter ID
     pub counter_id: *const c_char,
     /// Counter name
@@ -1723,6 +1909,7 @@ pub struct CCouponPlatformFeeDeduct {
 #[derive(Debug)]
 pub(crate) struct CCouponPlatformFeeDeductOwned {
     bz_types: CVec<CCouponTargetType>,
+    bz_types_raw: CVec<i32>,
     counter_id: CString,
     counter_name: CString,
     markets: CVec<CString>,
@@ -1735,6 +1922,7 @@ impl From<CouponPlatformFeeDeduct> for CCouponPlatformFeeDeductOwned {
     fn from(v: CouponPlatformFeeDeduct) -> Self {
         Self {
             bz_types: v.bz_types.into(),
+            bz_types_raw: v.bz_types_raw.into(),
             counter_id: v.counter_id.into(),
             counter_name: v.counter_name.into(),
             markets: v.markets.into(),
@@ -1752,6 +1940,8 @@ impl ToFFI for CCouponPlatformFeeDeductOwned {
         CCouponPlatformFeeDeduct {
             bz_types: self.bz_types.to_ffi_type(),
             num_bz_types: self.bz_types.len(),
+            bz_types_raw: self.bz_types_raw.to_ffi_type(),
+            num_bz_types_raw: self.bz_types_raw.len(),
             counter_id: self.counter_id.to_ffi_type(),
             counter_name: self.counter_name.to_ffi_type(),
             markets: self.markets.to_ffi_type(),
@@ -1962,6 +2152,10 @@ pub struct CCouponStockFragment {
     pub num_markets: usize,
     /// Instrument type the coupon applies to
     pub underlying_type: CCouponTargetType,
+    /// The server's numeric code of `underlying_type`, also when it is a code
+    /// this SDK does not know (`underlying_type` is then `Unknown`); null when
+    /// the server sent none
+    pub underlying_type_raw: *const i32,
     /// Amounts, as returned by the server, key-sorted
     pub amounts: *const CCouponStockFragmentAmount,
     /// Number of `amounts`
@@ -1975,6 +2169,7 @@ pub(crate) struct CCouponStockFragmentOwned {
     market: CString,
     markets: CVec<CString>,
     underlying_type: CouponTargetType,
+    underlying_type_raw: Option<i32>,
     amounts: CVec<CCouponStockFragmentAmountOwned>,
 }
 
@@ -1986,6 +2181,7 @@ impl From<CouponStockFragment> for CCouponStockFragmentOwned {
             market: v.market.into(),
             markets: v.markets.into(),
             underlying_type: v.underlying_type,
+            underlying_type_raw: v.underlying_type_raw,
             // `BTreeMap` iterates in key order, so the array is key-sorted.
             amounts: v.amounts.into_iter().collect::<Vec<_>>().into(),
         }
@@ -2003,6 +2199,11 @@ impl ToFFI for CCouponStockFragmentOwned {
             markets: self.markets.to_ffi_type(),
             num_markets: self.markets.len(),
             underlying_type: self.underlying_type.into(),
+            underlying_type_raw: self
+                .underlying_type_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             amounts: self.amounts.to_ffi_type(),
             num_amounts: self.amounts.len(),
         }
@@ -2027,6 +2228,10 @@ pub struct CCoupon {
     pub detail: *const c_char,
     /// Status
     pub card_status: CCouponStatus,
+    /// The server's numeric code of `card_status`, also when it is a code
+    /// this SDK does not know (`card_status` is then `Unknown`); null when the
+    /// server sent none
+    pub card_status_raw: *const i32,
     /// Start of validity as a unix timestamp (null when not set)
     pub start_time: *const i64,
     /// End of validity (none when not set or when the coupon never expires;
@@ -2091,6 +2296,7 @@ pub(crate) struct CCouponOwned {
     description: CString,
     detail: CString,
     card_status: CouponStatus,
+    card_status_raw: Option<i32>,
     start_time: Option<i64>,
     end_time: Option<i64>,
     no_expiry: bool,
@@ -2127,6 +2333,7 @@ impl From<Coupon> for CCouponOwned {
             description: v.description.into(),
             detail: v.detail.into(),
             card_status: v.card_status,
+            card_status_raw: v.card_status_raw,
             start_time: v.start_time.map(OffsetDateTime::unix_timestamp),
             end_time: v.end_time.map(OffsetDateTime::unix_timestamp),
             no_expiry: v.no_expiry,
@@ -2167,6 +2374,11 @@ impl ToFFI for CCouponOwned {
             description: self.description.to_ffi_type(),
             detail: self.detail.to_ffi_type(),
             card_status: self.card_status.into(),
+            card_status_raw: self
+                .card_status_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             start_time: self
                 .start_time
                 .as_ref()
@@ -2390,6 +2602,10 @@ pub struct CDeposit {
     pub state: *const c_char,
     /// State code
     pub state_code: CDepositState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); null when the
+    /// server sent none
+    pub state_code_raw: *const i32,
     /// Sub-state code, as returned by the server
     pub sub_state_code: i32,
     /// Deposit method ID
@@ -2416,6 +2632,7 @@ pub(crate) struct CDepositOwned {
     receivable_amount: Option<CDecimal>,
     state: CString,
     state_code: DepositState,
+    state_code_raw: Option<i32>,
     sub_state_code: i32,
     bank_operation_type_id: CString,
     bank_operation_type_name: CString,
@@ -2436,6 +2653,7 @@ impl From<Deposit> for CDepositOwned {
             receivable_amount: v.receivable_amount.map(Into::into),
             state: v.state.into(),
             state_code: v.state_code,
+            state_code_raw: v.state_code_raw,
             sub_state_code: v.sub_state_code,
             bank_operation_type_id: v.bank_operation_type_id.into(),
             bank_operation_type_name: v.bank_operation_type_name.into(),
@@ -2476,6 +2694,11 @@ impl ToFFI for CDepositOwned {
                 .unwrap_or(std::ptr::null()),
             state: self.state.to_ffi_type(),
             state_code: self.state_code.into(),
+            state_code_raw: self
+                .state_code_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             sub_state_code: self.sub_state_code,
             bank_operation_type_id: self.bank_operation_type_id.to_ffi_type(),
             bank_operation_type_name: self.bank_operation_type_name.to_ffi_type(),
@@ -2506,6 +2729,10 @@ pub struct CWithdrawal {
     pub settlement_amount: *const CDecimal,
     /// State code
     pub state_code: CWithdrawalState,
+    /// The server's numeric code of `state_code`, also when it is a code
+    /// this SDK does not know (`state_code` is then `Unknown`); null when the
+    /// server sent none
+    pub state_code_raw: *const i32,
     /// Raw state, as returned by the server
     pub raw_state: *const c_char,
     /// State display text, as returned by the server
@@ -2530,6 +2757,7 @@ pub(crate) struct CWithdrawalOwned {
     fee: Option<CDecimal>,
     settlement_amount: Option<CDecimal>,
     state_code: WithdrawalState,
+    state_code_raw: Option<i32>,
     raw_state: CString,
     state_description: CString,
     bank_account: CString,
@@ -2549,6 +2777,7 @@ impl From<Withdrawal> for CWithdrawalOwned {
             fee: v.fee.map(Into::into),
             settlement_amount: v.settlement_amount.map(Into::into),
             state_code: v.state_code,
+            state_code_raw: v.state_code_raw,
             raw_state: v.raw_state.into(),
             state_description: v.state_description.into(),
             bank_account: v.bank_account.into(),
@@ -2588,6 +2817,11 @@ impl ToFFI for CWithdrawalOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             state_code: self.state_code.into(),
+            state_code_raw: self
+                .state_code_raw
+                .as_ref()
+                .map(|v| v as *const i32)
+                .unwrap_or(std::ptr::null()),
             raw_state: self.raw_state.to_ffi_type(),
             state_description: self.state_description.to_ffi_type(),
             bank_account: self.bank_account.to_ffi_type(),

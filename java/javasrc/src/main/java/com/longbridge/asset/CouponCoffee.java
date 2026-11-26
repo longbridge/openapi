@@ -36,9 +36,9 @@ public class CouponCoffee {
     }
 
     /**
-     * Returns the coupon number, as returned by the server.
+     * Returns the voucher template code, e.g. {@code coffee-50} (not a personal redemption code).
      *
-     * @return the coupon number, as returned by the server
+     * @return the voucher template code, e.g. {@code coffee-50} (not a personal redemption code)
      */
     public String getCouponNo() {
         return couponNo;

@@ -12,9 +12,9 @@ public class CouponAiBenefit {
     private String benefitTag;
 
     /**
-     * Returns the benefit days, as returned by the server.
+     * Returns the length of the benefit in days.
      *
-     * @return the benefit days, as returned by the server
+     * @return the length of the benefit in days
      */
     public int getBenefitDays() {
         return benefitDays;

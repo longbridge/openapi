@@ -13163,7 +13163,7 @@ class IpoCouponTargetType:
 
 class CommissionUnlimitedType:
     """
-    The server's `unlimited` code of a commission coupon
+    Kind of commission coupon (the server's `unlimited` code). The meanings are the ones the Longbridge app gives the codes; the proto names are given in brackets.
 
     The enum's own integer value is not the server code: use ``code`` to
     get the code the server uses.
@@ -13178,35 +13178,35 @@ class CommissionUnlimitedType:
 
     class Proportionate(CommissionUnlimitedType):
         """
-        `Proportionate` (server code 0)
+        Time-limited free commission (`Proportionate`, server code 0)
         """
 
         ...
 
     class Full(CommissionUnlimitedType):
         """
-        `Full` (server code 1)
+        Commission rebate (`Full`, server code 1)
         """
 
         ...
 
     class Lifetime(CommissionUnlimitedType):
         """
-        `Lifetime` (server code 2)
+        Commission deduction (`Lifetime`, server code 2)
         """
 
         ...
 
     class ByAmountPer(CommissionUnlimitedType):
         """
-        `ByAmountPer` (server code 6)
+        Per-use card with a fixed amount per use: `amount / usage_count` (`ByAmountPer`, server code 6)
         """
 
         ...
 
     class ByRatePer(CommissionUnlimitedType):
         """
-        `ByRatePer` (server code 7)
+        Per-use discount card, capped at `amount_limit` per use (`ByRatePer`, server code 7)
         """
 
         ...
@@ -13560,6 +13560,13 @@ class BankCardAuthorization:
     Authorization status
     """
 
+    status_raw: Optional[int]
+    """
+    The server's numeric code of `status`, also when it is a code
+    this SDK does not know (`status` is then `Unknown`); none when the
+    server sent none
+    """
+
     message: str
     """
     Failure reason (empty unless the authorization failed)
@@ -13682,9 +13689,23 @@ class BankCard:
     Verification status
     """
 
+    status_raw: Optional[int]
+    """
+    The server's numeric code of `status`, also when it is a code
+    this SDK does not know (`status` is then `Unknown`); none when the
+    server sent none
+    """
+
     witness_state: Type[BankCardWitnessState]
     """
     Witness state
+    """
+
+    witness_state_raw: Optional[int]
+    """
+    The server's numeric code of `witness_state`, also when it is a code
+    this SDK does not know (`witness_state` is then `Unknown`); none when the
+    server sent none
     """
 
     support_witness: bool
@@ -13695,6 +13716,13 @@ class BankCard:
     bind_state: Type[BankCardBindState]
     """
     Binding state
+    """
+
+    bind_state_raw: Optional[int]
+    """
+    The server's numeric code of `bind_state`, also when it is a code
+    this SDK does not know (`bind_state` is then `Unknown`); none when the
+    server sent none
     """
 
     bind_tip: str
@@ -13745,6 +13773,13 @@ class EddaApplication:
     status: Type[AuthorizationStatus]
     """
     Application status
+    """
+
+    status_raw: Optional[int]
+    """
+    The server's numeric code of `status`, also when it is a code
+    this SDK does not know (`status` is then `Unknown`); none when the
+    server sent none
     """
 
     message: str
@@ -13812,6 +13847,13 @@ class TransferStock:
     State code of this stock in the transfer
     """
 
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    server sent none
+    """
+
     position_side: str
     """
     Position side
@@ -13870,6 +13912,13 @@ class StockTransferIn:
     state_code: Type[StockTransferInState]
     """
     State code
+    """
+
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    server sent none
     """
 
     app_state: str
@@ -13989,6 +14038,13 @@ class StockTransferOut:
     State code. Only `Submitted` applications can be cancelled
     """
 
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    server sent none
+    """
+
     app_state: str
     """
     App-side state: ``noticed`` means the user tapped "I have notified the
@@ -14048,12 +14104,19 @@ class StockTransferOut:
 
 class RewardRecord:
     """
-    A reward record from the reward center
+    A reward record from the reward center (prize redemption secrets `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are not modelled)
     """
 
     reward_type: Type[RewardType]
     """
-    Reward type
+    Reward type: named after the first detail object the server sent (`cash`, `card`, `prize`, in that order), else the server's `reward_type` code
+    """
+
+    reward_type_raw: Optional[int]
+    """
+    The server's numeric code of `reward_type`, also when it is a code
+    this SDK does not know (`reward_type` is then `Unknown`); none when the
+    server sent none
     """
 
     record_id: str
@@ -14086,6 +14149,13 @@ class RewardRecord:
     Coupon status (coupon rewards; ``CouponStatus.Unknown`` otherwise)
     """
 
+    card_status_raw: Optional[int]
+    """
+    The server's numeric code of `card_status`, also when it is a code
+    this SDK does not know (`card_status` is then `Unknown`); none when the
+    server sent none
+    """
+
     prize_type: Optional[int]
     """
     Prize type code (gift rewards; `0` = physical goods), none when not set
@@ -14106,9 +14176,23 @@ class RewardRecord:
     Reward status
     """
 
+    status_raw: Optional[int]
+    """
+    The server's numeric code of `status`, also when it is a code
+    this SDK does not know (`status` is then `Unknown`); none when the
+    server sent none
+    """
+
     deliver_status: Type[RewardDeliverStatus]
     """
     Delivery status (issued gift rewards only)
+    """
+
+    deliver_status_raw: Optional[int]
+    """
+    The server's numeric code of `deliver_status` (e.g. 11 where `deliver_status` reads `AddressFilled`), also when it is a code
+    this SDK does not know (`deliver_status` is then `Unknown`); none when the
+    server sent none
     """
 
     exit_status: int
@@ -14176,6 +14260,12 @@ class CouponCommission:
     Instrument types the coupon applies to
     """
 
+    bz_types_raw: List[int]
+    """
+    The server's numeric codes of `bz_types`, in order, including codes this
+    SDK does not know (which are `Unknown` in `bz_types`)
+    """
+
     commission_balance: Optional[Decimal]
     """
     Remaining commission balance
@@ -14183,12 +14273,19 @@ class CouponCommission:
 
     commission_duration: int
     """
-    Commission duration, as returned by the server
+    Commission duration in seconds (the app reads 200 years or more as lifetime free commission)
     """
 
     unlimited: Type[CommissionUnlimitedType]
     """
-    The server's `unlimited` code
+    Kind of commission coupon (the server's `unlimited` code)
+    """
+
+    unlimited_raw: Optional[int]
+    """
+    The server's numeric code of `unlimited`, also when it is a code
+    this SDK does not know (`unlimited` is then `Unknown`); none when the
+    server sent none
     """
 
     commission_expired_time: Optional[datetime]
@@ -14213,7 +14310,7 @@ class CouponCommission:
 
     amount_limit: int
     """
-    Amount limit, as returned by the server
+    Amount cap per use of a per-use discount card (`ByRatePer`), as returned by the server
     """
 
     superposition: bool
@@ -14228,7 +14325,7 @@ class CouponAiBenefit:
 
     benefit_days: int
     """
-    Benefit days, as returned by the server
+    Length of the benefit in days
     """
 
     benefit_start: Optional[datetime]
@@ -14253,7 +14350,7 @@ class CouponCash:
 
     receive_duration: int
     """
-    Receive duration, as returned by the server
+    Receive duration, as returned by the server (its unit and meaning are not confirmed)
     """
 
 class CouponCoffeeStore:
@@ -14288,7 +14385,7 @@ class CouponCoffee:
 
     coupon_no: str
     """
-    Coupon number, as returned by the server
+    Voucher template code, e.g. `coffee-50` (not a personal redemption code)
     """
 
     is_available_all_store: bool
@@ -14368,7 +14465,7 @@ class CouponCrypto:
 
 class CouponFinanceInterest:
     """
-    Terms of a finance interest coupon (`finance_interest`)
+    Terms of a finance interest coupon (`finance_interest`). The meaning of these fields is not confirmed; they are returned as the server sends them.
     """
 
     discount_mode: int
@@ -14442,6 +14539,13 @@ class CouponQuote:
     Investor type the coupon applies to
     """
 
+    investor_type_raw: Optional[int]
+    """
+    The server's numeric code of `investor_type`, also when it is a code
+    this SDK does not know (`investor_type` is then `Unknown`); none when the
+    server sent none
+    """
+
     manual_activate: bool
     """
     Whether the coupon is activated manually
@@ -14464,7 +14568,7 @@ class CouponQuote:
 
     quote_duration: int
     """
-    Quote duration, as returned by the server
+    Quote duration in seconds (the app reads 200 years or more as lifetime)
     """
 
     quote_market: str
@@ -14502,6 +14606,12 @@ class CouponIpoCommission:
     IPO subscription types the coupon applies to
     """
 
+    bz_types_raw: List[int]
+    """
+    The server's numeric codes of `bz_types`, in order, including codes this
+    SDK does not know (which are `Unknown` in `bz_types`)
+    """
+
     counter_id: str
     """
     Counter ID
@@ -14524,7 +14634,7 @@ class CouponIpoInterest:
 
     discount_rate: str
     """
-    Discount rate, as returned by the server
+    Annual interest discount rate, as returned by the server (the app computes the daily discount as rate × financed amount / 365)
     """
 
 class CouponPlatformFeeDeduct:
@@ -14535,6 +14645,12 @@ class CouponPlatformFeeDeduct:
     bz_types: List[Type[CouponTargetType]]
     """
     Instrument types the coupon applies to
+    """
+
+    bz_types_raw: List[int]
+    """
+    The server's numeric codes of `bz_types`, in order, including codes this
+    SDK does not know (which are `Unknown` in `bz_types`)
     """
 
     counter_id: str
@@ -14679,6 +14795,13 @@ class CouponStockFragment:
     Instrument type the coupon applies to
     """
 
+    underlying_type_raw: Optional[int]
+    """
+    The server's numeric code of `underlying_type`, also when it is a code
+    this SDK does not know (`underlying_type` is then `Unknown`); none when the
+    server sent none
+    """
+
     amounts: dict[str, str]
     """
     Amounts, as returned by the server (a `dict` of strings)
@@ -14723,6 +14846,13 @@ class Coupon:
     card_status: Type[CouponStatus]
     """
     Status
+    """
+
+    card_status_raw: Optional[int]
+    """
+    The server's numeric code of `card_status`, also when it is a code
+    this SDK does not know (`card_status` is then `Unknown`); none when the
+    server sent none
     """
 
     start_time: Optional[datetime]
@@ -14972,6 +15102,13 @@ class Deposit:
     State code
     """
 
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    server sent none
+    """
+
     sub_state_code: int
     """
     Sub-state code, as returned by the server
@@ -15050,6 +15187,13 @@ class Withdrawal:
     state_code: Type[WithdrawalState]
     """
     State code
+    """
+
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    server sent none
     """
 
     raw_state: str

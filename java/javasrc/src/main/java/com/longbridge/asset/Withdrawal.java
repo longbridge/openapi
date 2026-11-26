@@ -15,6 +15,7 @@ public class Withdrawal {
     private BigDecimal fee;
     private BigDecimal settlementAmount;
     private WithdrawalState stateCode;
+    private Integer stateCodeRaw;
     private String rawState;
     private String stateDescription;
     private String bankAccount;
@@ -95,6 +96,17 @@ public class Withdrawal {
     }
 
     /**
+     * The server's numeric code of state_code, also when it is a code
+     * this SDK does not know (state_code is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getStateCodeRaw() {
+        return stateCodeRaw;
+    }
+
+    /**
      * Returns the raw state, as returned by the server.
      *
      * @return the raw state, as returned by the server
@@ -150,6 +162,6 @@ public class Withdrawal {
 
     @Override
     public String toString() {
-        return "Withdrawal [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "createdAt=" + createdAt + ", " + "currency=" + currency + ", " + "amount=" + amount + ", " + "fee=" + fee + ", " + "settlementAmount=" + settlementAmount + ", " + "stateCode=" + stateCode + ", " + "rawState=" + rawState + ", " + "stateDescription=" + stateDescription + ", " + "bankAccount=" + bankAccount + ", " + "displayBankAccount=" + displayBankAccount + ", " + "userBankSwiftCode=" + userBankSwiftCode + ", " + "accountChannel=" + accountChannel + "]";
+        return "Withdrawal [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "createdAt=" + createdAt + ", " + "currency=" + currency + ", " + "amount=" + amount + ", " + "fee=" + fee + ", " + "settlementAmount=" + settlementAmount + ", " + "stateCode=" + stateCode + ", " + "stateCodeRaw=" + stateCodeRaw + ", " + "rawState=" + rawState + ", " + "stateDescription=" + stateDescription + ", " + "bankAccount=" + bankAccount + ", " + "displayBankAccount=" + displayBankAccount + ", " + "userBankSwiftCode=" + userBankSwiftCode + ", " + "accountChannel=" + accountChannel + "]";
     }
 }

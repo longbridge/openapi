@@ -15,6 +15,7 @@ public class Coupon {
     private String description;
     private String detail;
     private CouponStatus cardStatus;
+    private Integer cardStatusRaw;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
     private boolean noExpiry;
@@ -101,6 +102,17 @@ public class Coupon {
      */
     public CouponStatus getCardStatus() {
         return cardStatus;
+    }
+
+    /**
+     * The server's numeric code of card_status, also when it is a code
+     * this SDK does not know (card_status is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getCardStatusRaw() {
+        return cardStatusRaw;
     }
 
     /**
@@ -321,6 +333,6 @@ public class Coupon {
 
     @Override
     public String toString() {
-        return "Coupon [" + "cardId=" + cardId + ", " + "cardType=" + cardType + ", " + "title=" + title + ", " + "titleSec=" + titleSec + ", " + "description=" + description + ", " + "detail=" + detail + ", " + "cardStatus=" + cardStatus + ", " + "startTime=" + startTime + ", " + "endTime=" + endTime + ", " + "noExpiry=" + noExpiry + ", " + "activateTime=" + activateTime + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "availableTradeSession=" + availableTradeSession + ", " + "tradeSessions=" + Arrays.toString(tradeSessions) + ", " + "subscriptionId=" + subscriptionId + ", " + "aiBenefit=" + aiBenefit + ", " + "cash=" + cash + ", " + "coffeeCoupon=" + coffeeCoupon + ", " + "commission=" + commission + ", " + "crypto=" + crypto + ", " + "financeInterest=" + financeInterest + ", " + "fundDeduct=" + fundDeduct + ", " + "fundamental=" + fundamental + ", " + "ipo=" + ipo + ", " + "ipoCommission=" + ipoCommission + ", " + "ipoInterest=" + ipoInterest + ", " + "platformFeeDeduct=" + platformFeeDeduct + ", " + "quote=" + quote + ", " + "stock=" + stock + ", " + "stockFragment=" + stockFragment + "]";
+        return "Coupon [" + "cardId=" + cardId + ", " + "cardType=" + cardType + ", " + "title=" + title + ", " + "titleSec=" + titleSec + ", " + "description=" + description + ", " + "detail=" + detail + ", " + "cardStatus=" + cardStatus + ", " + "cardStatusRaw=" + cardStatusRaw + ", " + "startTime=" + startTime + ", " + "endTime=" + endTime + ", " + "noExpiry=" + noExpiry + ", " + "activateTime=" + activateTime + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "availableTradeSession=" + availableTradeSession + ", " + "tradeSessions=" + Arrays.toString(tradeSessions) + ", " + "subscriptionId=" + subscriptionId + ", " + "aiBenefit=" + aiBenefit + ", " + "cash=" + cash + ", " + "coffeeCoupon=" + coffeeCoupon + ", " + "commission=" + commission + ", " + "crypto=" + crypto + ", " + "financeInterest=" + financeInterest + ", " + "fundDeduct=" + fundDeduct + ", " + "fundamental=" + fundamental + ", " + "ipo=" + ipo + ", " + "ipoCommission=" + ipoCommission + ", " + "ipoInterest=" + ipoInterest + ", " + "platformFeeDeduct=" + platformFeeDeduct + ", " + "quote=" + quote + ", " + "stock=" + stock + ", " + "stockFragment=" + stockFragment + "]";
     }
 }

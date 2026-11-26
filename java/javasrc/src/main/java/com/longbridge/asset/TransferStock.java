@@ -15,6 +15,7 @@ public class TransferStock {
     private String currency;
     private BigDecimal cost;
     private TransferStockState stateCode;
+    private Integer stateCodeRaw;
     private String positionSide;
 
     /**
@@ -99,6 +100,17 @@ public class TransferStock {
     }
 
     /**
+     * The server's numeric code of state_code, also when it is a code
+     * this SDK does not know (state_code is then Unknown); null when the
+     * server sent none
+     *
+     * @return the raw code
+     */
+    public Integer getStateCodeRaw() {
+        return stateCodeRaw;
+    }
+
+    /**
      * Returns the position side.
      *
      * @return the position side
@@ -109,6 +121,6 @@ public class TransferStock {
 
     @Override
     public String toString() {
-        return "TransferStock [" + "code=" + code + ", " + "name=" + name + ", " + "nameEn=" + nameEn + ", " + "market=" + market + ", " + "counterId=" + counterId + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "cost=" + cost + ", " + "stateCode=" + stateCode + ", " + "positionSide=" + positionSide + "]";
+        return "TransferStock [" + "code=" + code + ", " + "name=" + name + ", " + "nameEn=" + nameEn + ", " + "market=" + market + ", " + "counterId=" + counterId + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "cost=" + cost + ", " + "stateCode=" + stateCode + ", " + "stateCodeRaw=" + stateCodeRaw + ", " + "positionSide=" + positionSide + "]";
     }
 }
