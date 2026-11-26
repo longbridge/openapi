@@ -181,6 +181,174 @@ export declare class AssetContext {
   statements(req?: GetStatementListRequest | undefined | null): Promise<GetStatementListResponse>
   /** Get statement data download URL */
   statementDownloadUrl(req: GetStatementDownloadUrlRequest): Promise<GetStatementDownloadUrlResponse>
+  /**
+   * Get the linked bank cards, with their verification, binding and
+   * authorization (eDDA, bank securities account, FPS) status
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.bankCards();
+   * console.log(resp);
+   * ```
+   */
+  bankCards(): Promise<Array<BankCard>>
+  /**
+   * Get the eDDA authorization applications of a bank card in one
+   * currency
+   *
+   * `cardId` is `BankCard.id`; `currency` is e.g. `HKD` or `USD`.
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.eddaApplications('12345', 'HKD');
+   * console.log(resp);
+   * ```
+   */
+  eddaApplications(cardId: string, currency: string): Promise<Array<EddaApplication>>
+  /**
+   * Get stock transfer-in applications (another broker to this account)
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.stockTransfersIn({ market: 'HK' });
+   * console.log(resp);
+   * ```
+   */
+  stockTransfersIn(opts?: GetStockTransfersOptions | undefined | null): Promise<StockTransferInResponse>
+  /**
+   * Get stock transfer-out applications (this account to another broker)
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.stockTransfersOut();
+   * console.log(resp);
+   * ```
+   */
+  stockTransfersOut(opts?: GetStockTransfersOptions | undefined | null): Promise<Array<StockTransferOut>>
+  /**
+   * Get reward records from the reward center (cash, gifts, coupons, task
+   * rewards)
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.rewardRecords({ pageSize: 20 });
+   * console.log(resp);
+   * ```
+   */
+  rewardRecords(opts?: GetRewardRecordsOptions | undefined | null): Promise<RewardRecordsResponse>
+  /**
+   * Get coupons (reward cards)
+   *
+   * By default lists the coupons that have not expired (set `expired`).
+   * The pinned `topList` / `bottomList` are repeated on every page.
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.coupons({ expired: false });
+   * console.log(resp);
+   * ```
+   */
+  coupons(opts?: GetCouponsOptions | undefined | null): Promise<CouponsResponse>
+  /**
+   * Get the orders a coupon was applied to
+   *
+   * `cardId` is `Coupon.cardId` (32 hex characters, not a bank card ID).
+   * The gateway rate-limits this route tightly per member, so avoid
+   * calling it concurrently.
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.couponOrders(couponId, CouponOrderType.Settled);
+   * console.log(resp);
+   * ```
+   */
+  couponOrders(cardId: string, orderType: CouponOrderType): Promise<Array<CouponOrder>>
+  /**
+   * Get deposit records
+   *
+   * The server's total follows the page size rather than the record
+   * count, so it is not returned; a full page means there may be more.
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.deposits({ size: 20 });
+   * console.log(resp);
+   * ```
+   */
+  deposits(opts?: GetDepositsOptions | undefined | null): Promise<Array<Deposit>>
+  /**
+   * Get withdrawal records
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.withdrawals({ size: 20 });
+   * console.log(resp);
+   * ```
+   */
+  withdrawals(opts?: GetWithdrawalsOptions | undefined | null): Promise<WithdrawalsResponse>
 }
 
 /** Attached order detail */
@@ -231,6 +399,89 @@ export declare class AttachedOrderDetail {
   get submitPrice(): Decimal | null
   /** Bid/ask depth level of the limit order submitted price */
   get limitDepthLevel(): number | null
+}
+
+/** A linked bank card */
+export declare class BankCard {
+  toString(): string
+  toJSON(): any
+  /** Bank card ID (pass to edda_applications) */
+  get id(): string
+  /** Bank ID */
+  get bankId(): string
+  /** Bank name */
+  get bank(): string
+  /** Bank name in English */
+  get bankEn(): string
+  /** Bank code */
+  get bankCode(): string
+  /** Bank account number, as returned by the server (not masked) */
+  get account(): string
+  /** Account type */
+  get accountType(): string
+  /** Country or region of the bank (e.g. `Hong Kong`; not a currency) */
+  get country(): string
+  /** Region code */
+  get region(): string
+  /** Region name */
+  get regionName(): string
+  /** SWIFT code */
+  get swiftCode(): string
+  /** Remark */
+  get remark(): string
+  /** Verification status */
+  get status(): BankCardStatus
+  /** Witness state */
+  get witnessState(): BankCardWitnessState
+  /** Whether the card supports witnessing */
+  get supportWitness(): boolean
+  /** Binding state */
+  get bindState(): BankCardBindState
+  /** Binding hint text */
+  get bindTip(): string
+  /** Withdrawal fee text, as returned by the server */
+  get withdrawFee(): string
+  /** Time the card was added */
+  get createdAt(): Date | null
+  /** Authorizations attached to the card */
+  get authList(): Array<BankCardAuthorization>
+}
+
+/** An authorization attached to a bank card (eDDA, bank securities account, FPS, ...) */
+export declare class BankCardAuthorization {
+  toString(): string
+  toJSON(): any
+  /** Authorization flow: `hk_edda` / `hk_sdda` (eDDA), `hk_bank_sec`, `hk_fps`, ... */
+  get flowId(): string
+  /** Display name of the authorization */
+  get name(): string
+  /** Authorized currency */
+  get currency(): string
+  /** Authorization status */
+  get status(): AuthorizationStatus
+  /** Failure reason (empty unless the authorization failed) */
+  get message(): string
+  /** Whether this authorization is supported for the card */
+  get isSupport(): boolean
+  /** Maximum amount per debit (none when not set) */
+  get maxAmount(): Decimal | null
+  /** Whether the per-debit amount is unlimited */
+  get maxAmountUnlimited(): boolean
+  /** Maximum number of debits per day (none when not set) */
+  get dailyMaxCount(): number | null
+  /** Whether the daily debit count is unlimited */
+  get dailyMaxCountUnlimited(): boolean
+  /**
+   * Expiry date of the authorization (none when not set). A long-term authorization carries the
+   * server's 9999-12-31 sentinel here.
+   */
+  get expiryDate(): Date | null
+  /** Whether the authorization never expires */
+  get longTermValid(): boolean
+  /** Whether submitted documents are under review */
+  get docReviewing(): boolean
+  /** Whether the "no prior deposit" check is under review */
+  get noPriorDepositReviewing(): boolean
 }
 
 /** Brokers */
@@ -474,6 +725,109 @@ export declare class ContentContext {
   news(symbol: string): Promise<Array<NewsItem>>
 }
 
+/** A coupon (reward card) */
+export declare class Coupon {
+  toString(): string
+  toJSON(): any
+  /** Coupon ID (32 hex characters; pass to coupon_orders) */
+  get cardId(): string
+  /** Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`, `cash` */
+  get cardType(): string
+  /** Title */
+  get title(): string
+  /** Secondary title */
+  get titleSec(): string
+  /** Description */
+  get description(): string
+  /** Terms and details */
+  get detail(): string
+  /** Status */
+  get cardStatus(): CouponStatus
+  /** Start of validity */
+  get startTime(): Date | null
+  /** End of validity (none when not set). A date after 2100 means the coupon never expires. */
+  get endTime(): Date | null
+  /** Activation time (none when not activated) */
+  get activateTime(): Date | null
+  /** Amount */
+  get amount(): Decimal | null
+  /** Currency */
+  get currency(): string
+  /** Trading sessions the coupon applies to, as display text */
+  get availableTradeSession(): string
+  /** Commission terms (commission coupons only; empty otherwise) */
+  get commission(): CouponCommission
+}
+
+/** Commission terms of a commission coupon */
+export declare class CouponCommission {
+  toString(): string
+  toJSON(): any
+  /** Markets the coupon applies to */
+  get markets(): Array<string>
+  /** Rebate rate, as returned by the server */
+  get rebateRate(): string
+  /**
+   * Instrument types the coupon applies to: `0` stocks, `1` options, `2` warrants, `3` ETF, `4`
+   * LOF
+   */
+  get bzTypes(): Array<number>
+  /** Remaining commission balance */
+  get commissionBalance(): Decimal | null
+  /** Commission duration, as returned by the server */
+  get commissionDuration(): string
+  /** Whether the coupon is unlimited */
+  get unlimited(): boolean
+  /** Commission expiry time (none when not set) */
+  get commissionExpiredTime(): Date | null
+  /** Number of times used */
+  get usageCount(): number
+  /** Number of uses left */
+  get laveUsageCount(): number
+  /** Settlement model, as returned by the server */
+  get settlementModel(): string
+}
+
+/** An order a coupon was applied to */
+export declare class CouponOrder {
+  toString(): string
+  toJSON(): any
+  /** Order ID */
+  get orderId(): string
+  /** State text, as returned by the server */
+  get state(): string
+  /** State value, as returned by the server (e.g. `FilledStatus`) */
+  get stateVal(): string
+  /** Executed price */
+  get executedPrice(): Decimal | null
+  /** Executed quantity */
+  get executedQuantity(): Decimal | null
+  /** Currency */
+  get currency(): string
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Rebate amount */
+  get rebate(): Decimal | null
+  /** Rebate date, as returned by the server */
+  get rebateDt(): string
+}
+
+/** Response for the coupon list */
+export declare class CouponsResponse {
+  toString(): string
+  toJSON(): any
+  /** Pinned coupons shown above the list (repeated on every page) */
+  get topList(): Array<Coupon>
+  /** Coupons on this page */
+  get list(): Array<Coupon>
+  /** Pinned coupons shown below the list (repeated on every page) */
+  get bottomList(): Array<Coupon>
+  /** Total number of coupons */
+  get total(): number
+  /** Number of expired coupons */
+  get expiredCount(): number
+}
+
 /** Dollar-cost averaging (DCA) plan management context. */
 export declare class DcaContext {
   /** Create a new DCAContext. */
@@ -676,6 +1030,40 @@ export declare class Decimal {
   toJSON(): any
 }
 
+/** A deposit record */
+export declare class Deposit {
+  toString(): string
+  toJSON(): any
+  /** Record ID */
+  get id(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Updated time */
+  get updatedAt(): Date | null
+  /** Currency */
+  get currency(): string
+  /** Notified (applied) amount */
+  get amount(): Decimal | null
+  /** Received amount (`0` = not received yet) */
+  get receivableAmount(): Decimal | null
+  /** State text, as returned by the server */
+  get state(): string
+  /** State code */
+  get stateCode(): DepositState
+  /** Sub-state code, as returned by the server */
+  get subStateCode(): number
+  /** Deposit method ID */
+  get bankOperationTypeId(): string
+  /** Deposit method name */
+  get bankOperationTypeName(): string
+  /** Reference number */
+  get referenceNo(): string
+  /** Whether the deposit can still be cancelled */
+  get canCancel(): boolean
+  /** SWIFT code of the paying bank */
+  get userBankSwiftCode(): string
+}
+
 /** Depth */
 export declare class Depth {
   toString(): string
@@ -688,6 +1076,18 @@ export declare class Depth {
   get volume(): number
   /** Number of orders */
   get orderNum(): number
+}
+
+/** An eDDA authorization application of a bank card */
+export declare class EddaApplication {
+  toString(): string
+  toJSON(): any
+  /** Application ID */
+  get id(): string
+  /** Application status */
+  get status(): AuthorizationStatus
+  /** Failure reason (empty unless the application failed) */
+  get message(): string
 }
 
 /** Response for estimate maximum purchase quantity */
@@ -3894,6 +4294,58 @@ export declare class RealtimeQuote {
   get tradeStatus(): TradeStatus
 }
 
+/** A reward record from the reward center */
+export declare class RewardRecord {
+  toString(): string
+  toJSON(): any
+  /** Reward type */
+  get rewardType(): RewardType
+  /** Record ID */
+  get recordId(): string
+  /** Title of the activity that granted the reward */
+  get activityTitle(): string
+  /** Reward title */
+  get title(): string
+  /** Reward description */
+  get description(): string
+  /** Coupon type (coupon rewards), e.g. `commission` */
+  get cardType(): string
+  /** Coupon status code (coupon rewards), as returned by the server */
+  get cardStatus(): number
+  /** Prize type code (gift rewards; `0` = physical goods), none when not set */
+  get prizeType(): number | null
+  /** Amount */
+  get amount(): Decimal | null
+  /** Currency */
+  get currency(): string
+  /** Reward status */
+  get status(): RewardStatus
+  /** Delivery status (issued gift rewards only) */
+  get deliverStatus(): RewardDeliverStatus
+  /** Exit status code, as returned by the server */
+  get exitStatus(): number
+  /** Time the reward was sent */
+  get sendTime(): Date | null
+  /** Start time */
+  get startTime(): Date | null
+  /** End time */
+  get endTime(): Date | null
+  /** Effective time */
+  get effectiveTime(): Date | null
+  /** Deadline to claim the reward */
+  get receiveDeadline(): Date | null
+}
+
+/** Response for the reward record list */
+export declare class RewardRecordsResponse {
+  toString(): string
+  toJSON(): any
+  /** Reward records */
+  get list(): Array<RewardRecord>
+  /** Total number of records */
+  get total(): number
+}
+
 /** Screener context */
 export declare class ScreenerContext {
   /** Create a new `ScreenerContext` */
@@ -4199,6 +4651,105 @@ export declare class StockPositionsResponse {
   toJSON(): any
   /** Channels */
   get channels(): Array<StockPositionChannel>
+}
+
+/** A stock transfer-in application (another broker to this account) */
+export declare class StockTransferIn {
+  toString(): string
+  toJSON(): any
+  /** Record ID */
+  get id(): string
+  /** Order ID */
+  get orderId(): string
+  /** Market */
+  get market(): string
+  /** Name of the other broker */
+  get broker(): string
+  /** English name of the other broker */
+  get brokerEn(): string
+  /** Broker code of the other broker */
+  get brokerCode(): string
+  /** Account number at the other broker, as returned by the server (not masked) */
+  get account(): string
+  /** State text, as returned by the server */
+  get state(): string
+  /** State code */
+  get stateCode(): StockTransferInState
+  /**
+   * App-side state: `noticed` means the user tapped "I have notified the broker" in the app (the
+   * user's own confirmation, not a Longbridge action); `default` otherwise
+   */
+  get appState(): string
+  /** Whether the application can still be cancelled or changed */
+  get canModify(): boolean
+  /** Created time */
+  get createdAt(): Date | null
+  /** Updated time */
+  get updatedAt(): Date | null
+  /** Processing start time (none when not set) */
+  get processAt(): Date | null
+  /** Execution time (none when not executed) */
+  get execAt(): Date | null
+  /** Remark */
+  get remark(): string
+  /** Reason (e.g. for a failure) */
+  get reason(): string
+  /** Stocks in the application */
+  get stocks(): Array<TransferStock>
+}
+
+/** Response for the stock transfer-in list */
+export declare class StockTransferInResponse {
+  toString(): string
+  toJSON(): any
+  /** Records */
+  get records(): Array<StockTransferIn>
+  /** Total number of records */
+  get total(): number
+}
+
+/** A stock transfer-out application (this account to another broker) */
+export declare class StockTransferOut {
+  toString(): string
+  toJSON(): any
+  /** Record ID */
+  get id(): string
+  /** Order ID */
+  get orderId(): string
+  /** Market */
+  get market(): string
+  /** Name of the other broker */
+  get broker(): string
+  /** English name of the other broker */
+  get brokerEn(): string
+  /** Broker code of the other broker */
+  get brokerCode(): string
+  /** Account number at the other broker, as returned by the server (not masked) */
+  get account(): string
+  /** State text, as returned by the server */
+  get state(): string
+  /** State code. Only `Submitted` applications can be cancelled */
+  get stateCode(): StockTransferOutState
+  /** Created time */
+  get createdAt(): Date | null
+  /** Updated time */
+  get updatedAt(): Date | null
+  /** Processing start time (none when not set) */
+  get processAt(): Date | null
+  /** Execution time (none when not executed) */
+  get execAt(): Date | null
+  /** Time the other broker agreed (none when not set) */
+  get agreeAt(): Date | null
+  /** Time the application was refused (none when not set) */
+  get refuseAt(): Date | null
+  /** Time the application was cancelled (none when not set) */
+  get cancelAt(): Date | null
+  /** Remark */
+  get remark(): string
+  /** Reason (e.g. for a rejection) */
+  get reason(): string
+  /** Stocks in the application */
+  get stocks(): Array<TransferStock>
 }
 
 /** Response for submit grid trading order request */
@@ -4746,6 +5297,32 @@ export declare class TradingSessionInfo {
   get tradeSession(): TradeSession
 }
 
+/** One stock in a stock transfer application */
+export declare class TransferStock {
+  toString(): string
+  toJSON(): any
+  /** Stock code */
+  get code(): string
+  /** Stock name */
+  get name(): string
+  /** Stock name in English */
+  get nameEn(): string
+  /** Market */
+  get market(): string
+  /** Counter ID */
+  get counterId(): string
+  /** Quantity */
+  get amount(): Decimal | null
+  /** Currency */
+  get currency(): string
+  /** Cost price */
+  get cost(): Decimal | null
+  /** State of this stock in the transfer */
+  get state(): TransferStockState
+  /** Position side */
+  get positionSide(): string
+}
+
 /** A grid trigger-history entry (one triggered order). */
 export declare class TriggerOrder {
   toString(): string
@@ -4926,6 +5503,50 @@ export declare class WatchlistSecurity {
   get watchedAt(): Date
   /** Whether the security is pinned to the top of the group */
   get isPinned(): boolean
+}
+
+/** A withdrawal record */
+export declare class Withdrawal {
+  toString(): string
+  toJSON(): any
+  /** Record ID */
+  get id(): string
+  /** Order ID */
+  get orderId(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Currency */
+  get currency(): string
+  /** Applied amount */
+  get amount(): Decimal | null
+  /** Fee */
+  get fee(): Decimal | null
+  /** Amount paid out */
+  get settlementAmount(): Decimal | null
+  /** State */
+  get state(): WithdrawalState
+  /** Raw state, as returned by the server */
+  get rawState(): string
+  /** State description, as returned by the server */
+  get stateDescription(): string
+  /** Receiving bank account number, as returned by the server (not masked) */
+  get bankAccount(): string
+  /** Receiving bank account, as displayed in the app */
+  get displayBankAccount(): string
+  /** SWIFT code of the receiving bank */
+  get userBankSwiftCode(): string
+  /** Account channel */
+  get accountChannel(): string
+}
+
+/** Response for the withdrawal list */
+export declare class WithdrawalsResponse {
+  toString(): string
+  toJSON(): any
+  /** Withdrawal records */
+  get list(): Array<Withdrawal>
+  /** Total number of records */
+  get total(): number
 }
 
 /** Candlestick adjustment type */
@@ -5268,6 +5889,23 @@ export declare const enum AttachedOrderType {
   Bracket = 3
 }
 
+/**
+ * Status of a bank-card authorization (eDDA, bank securities account, FPS) or of an eDDA
+ * application
+ */
+export declare const enum AuthorizationStatus {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Not authorized */
+  Unauthorized = 1,
+  /** Authorized */
+  Authorized = 2,
+  /** Authorization in progress */
+  Authorizing = 3,
+  /** Authorization failed (see the message field for the reason) */
+  Failed = 4
+}
+
 export declare const enum BalanceType {
   /** Unknown */
   Unknown = 0,
@@ -5277,6 +5915,42 @@ export declare const enum BalanceType {
   Stock = 2,
   /** Fund */
   Fund = 3
+}
+
+/** Binding state of a bank card */
+export declare const enum BankCardBindState {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Binding in progress */
+  Binding = 1,
+  /** Bound */
+  Bound = 2,
+  /** Binding failed */
+  Failed = 3
+}
+
+/** Verification status of a bank card */
+export declare const enum BankCardStatus {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Not verified */
+  Unverified = 1,
+  /** Under review */
+  UnderReview = 2,
+  /** Verified */
+  Verified = 3
+}
+
+/** Witness (in-person / video verification) state of a bank card */
+export declare const enum BankCardWitnessState {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Witnessing not required */
+  NotRequired = 1,
+  /** Witnessing pending */
+  Pending = 2,
+  /** Witnessed */
+  Witnessed = 3
 }
 
 /** Changes in broker holding over 1 / 5 / 20 / 60 day periods */
@@ -6018,6 +6692,32 @@ export interface CorpActions {
   items: Array<CorpActionItem>
 }
 
+/** Which orders of a coupon to list */
+export declare const enum CouponOrderType {
+  /** Orders the coupon is locked to (in progress) */
+  Locked = 0,
+  /** Orders whose rebate has been settled */
+  Settled = 1
+}
+
+/** Status of a coupon */
+export declare const enum CouponStatus {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Unused */
+  Unused = 1,
+  /** Used */
+  Used = 2,
+  /** Expired */
+  Expired = 3,
+  /** Being redeemed */
+  Redeeming = 4,
+  /** In use */
+  InUse = 5,
+  /** Processing */
+  Processing = 6
+}
+
 /** Options for creating a topic */
 export interface CreateTopicRequest {
   /** Topic title (required) */
@@ -6212,6 +6912,24 @@ export interface DeleteWatchlistGroup {
   id: number
   /** Move securities in this group to the default group */
   purge: boolean
+}
+
+/** State of a deposit record */
+export declare const enum DepositState {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Processing */
+  Processing = 1,
+  /** Credited to the account */
+  Credited = 2,
+  /** Failed */
+  Failed = 3,
+  /** Cancelled */
+  Cancelled = 4,
+  /** Invalidated */
+  Invalidated = 5,
+  /** Rejected */
+  Rejected = 6
 }
 
 /** Derivative type */
@@ -6569,6 +7287,40 @@ export interface GetCashFlowOptions {
   size?: number
 }
 
+/** Options for the coupon list */
+export interface GetCouponsOptions {
+  /** Page number (default 1) */
+  page?: number
+  /** Page size (max 50) */
+  pageSize?: number
+  /**
+   * List expired coupons instead of the ones that have not expired
+   * (default false)
+   */
+  expired?: boolean
+  /**
+   * Filter by coupon type (e.g. `commission`, `platform_fee_deduct`,
+   * `stock`, `quote`, `cash`; default: all types)
+   */
+  cardType?: string
+}
+
+/** Options for the deposit list */
+export interface GetDepositsOptions {
+  /** Page number (default 1) */
+  page?: number
+  /** Page size */
+  size?: number
+  /** Filter by states (`Unknown` is ignored) */
+  states?: Array<DepositState>
+  /** Filter by currencies (e.g. `HKD`, `USD`) */
+  currencies?: Array<string>
+  /** Only deposits applied at or after this time */
+  start?: Date
+  /** Only deposits applied at or before this time */
+  end?: Date
+}
+
 /** Options for the fund analysis / trend / comparison endpoints. */
 export interface GetFundAnalysisOptions {
   /** Analysis period */
@@ -6761,6 +7513,16 @@ export interface GetHistoryOrdersOptions {
   endAt?: Date
 }
 
+/** Options for the reward record list */
+export interface GetRewardRecordsOptions {
+  /** Page number (default 1) */
+  page?: number
+  /** Page size (max 50) */
+  pageSize?: number
+  /** Filter by reward type (default: all types) */
+  rewardType?: RewardType
+}
+
 /** Options for getting a statement download URL */
 export interface GetStatementDownloadUrlRequest {
   /** File key obtained from the list statements endpoint */
@@ -6787,6 +7549,26 @@ export interface GetStatementListRequest {
 export interface GetStatementListResponse {
   /** List of statement items */
   list: Array<StatementItem>
+}
+
+/** Options for the stock transfer-in and transfer-out lists */
+export interface GetStockTransfersOptions {
+  /** Filter by market (`HK`, `US`, `CN`, `SG`) */
+  market?: string
+  /**
+   * Filter by state code: a `StockTransferInState` code for the
+   * transfer-in list, a `StockTransferOutState` code for the transfer-out
+   * list (see the Rust SDK for the numeric codes)
+   */
+  state?: number
+  /** Only applications created at or after this time */
+  start?: Date
+  /** Only applications created at or before this time */
+  end?: Date
+  /** Page number (default 1) */
+  page?: number
+  /** Page size (default 20, max 50) */
+  size?: number
 }
 
 /** Options for get today executions request */
@@ -6837,6 +7619,18 @@ export interface GetUSTransactionHistoryOptions {
   types?: Array<string>
   /** Currency filter, e.g. `USD`; empty means all */
   currency?: string
+}
+
+/** Options for the withdrawal list */
+export interface GetWithdrawalsOptions {
+  /** Page number (default 1) */
+  page?: number
+  /** Page size */
+  size?: number
+  /** Only withdrawals applied at or after this time */
+  start?: Date
+  /** Only withdrawals applied at or before this time */
+  end?: Date
 }
 
 /** Data granularity */
@@ -8310,6 +9104,70 @@ export interface ReplaceOrderOptions {
   clearDelayedUntil?: boolean
 }
 
+/** Delivery status of an issued prize (only meaningful for issued gift rewards) */
+export declare const enum RewardDeliverStatus {
+  /** Unknown (an undocumented code, or no delivery status) */
+  Unknown = 0,
+  /** Not activated */
+  NotActivated = 1,
+  /** Activated, or shipping */
+  ActivatedOrShipping = 2,
+  /** Consumed */
+  Consumed = 3,
+  /** E-voucher activating */
+  EVoucherActivating = 4,
+  /** E-voucher expired before activation */
+  EVoucherExpired = 5,
+  /** E-voucher invalid */
+  EVoucherInvalid = 6,
+  /** Shipping address missing */
+  AddressMissing = 7,
+  /** Shipping address filled */
+  AddressFilled = 8,
+  /** Shipping */
+  Shipping = 9
+}
+
+/** Status of a reward record */
+export declare const enum RewardStatus {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Upcoming */
+  Upcoming = 1,
+  /** Cancelled */
+  Cancelled = 2,
+  /** The user exited the activity */
+  ExitedActivity = 3,
+  /** Not claimed yet */
+  Unclaimed = 4,
+  /** Being issued */
+  Issuing = 5,
+  /** Issued */
+  Issued = 6,
+  /** Issuing failed */
+  Failed = 7,
+  /** Exchanged */
+  Exchanged = 8,
+  /** Expired */
+  Expired = 9,
+  /** Refunded */
+  Refunded = 10
+}
+
+/** Type of a reward record */
+export declare const enum RewardType {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Cash reward */
+  Cash = 1,
+  /** Gift (prize) */
+  Gift = 2,
+  /** Coupon */
+  Coupon = 3,
+  /** Task reward */
+  Task = 4
+}
+
 /** Risk assessment (suitability questionnaire) result of the current member */
 export interface RiskAssessment {
   /**
@@ -8706,6 +9564,46 @@ export interface StockRatings {
   industryRank?: number
   /** Full ratings array as a JSON string */
   ratingsJson: string
+}
+
+/** State of a stock transfer-in application (another broker to this account) */
+export declare const enum StockTransferInState {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Submitted */
+  Submitted = 1,
+  /** Cancelled */
+  Cancelled = 2,
+  /** Completed */
+  Completed = 3,
+  /** Processing */
+  Processing = 4,
+  /** Partially completed */
+  PartiallyCompleted = 5,
+  /** Failed */
+  Failed = 6
+}
+
+/** State of a stock transfer-out application (this account to another broker) */
+export declare const enum StockTransferOutState {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Submitted (the only state in which the application can still be cancelled) */
+  Submitted = 1,
+  /** Processing */
+  Processing = 2,
+  /** Executing */
+  Executing = 3,
+  /** Completed */
+  Completed = 4,
+  /** Cancelled */
+  Cancelled = 5,
+  /** Partially completed */
+  PartiallyCompleted = 6,
+  /** Failed */
+  Failed = 7,
+  /** Rejected */
+  Rejected = 8
 }
 
 /** Payload of a `subagent_finished` stream event */
@@ -9139,6 +10037,18 @@ export declare const enum TradeStatus {
   WarrantPrepareList = 9,
   /** Warrant To BeListed */
   Suspend = 10
+}
+
+/** State of one stock inside a stock transfer application */
+export declare const enum TransferStockState {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Processing */
+  Processing = 1,
+  /** Succeeded */
+  Succeeded = 2,
+  /** Failed */
+  Failed = 3
 }
 
 /**
@@ -9929,9 +10839,15 @@ export interface ValuationHistoryResponse {
 export interface ValuationMetricData {
   /** Description */
   desc: string
-  /** Upper bound of the fair-value band (not the period maximum; the series can rise above it) */
+  /**
+   * Upper bound of the fair-value band (not the period maximum; the series
+   * can rise above it)
+   */
   high?: string
-  /** Lower bound of the fair-value band (not the period minimum; the series can fall below it) */
+  /**
+   * Lower bound of the fair-value band (not the period minimum; the series
+   * can fall below it)
+   */
   low?: string
   /** Historical median */
   median?: string
@@ -10033,6 +10949,40 @@ export declare const enum WarrantType {
   Bear = 4,
   /** Inline */
   Inline = 5
+}
+
+/** State of a withdrawal record */
+export declare const enum WithdrawalState {
+  /** Unknown (an undocumented code) */
+  Unknown = 0,
+  /** Submitted */
+  Submitted = 1,
+  /** Processing */
+  Processing = 2,
+  /** Rejected */
+  Rejected = 3,
+  /** Cancelled */
+  Cancelled = 4,
+  /** Remitted */
+  Remitted = 5,
+  /** Failed */
+  Failed = 6,
+  /** Refunded */
+  Refunded = 7,
+  /** Approved, awaiting payout */
+  ApprovedAwaitingPayout = 8,
+  /** Large-amount review */
+  LargeAmountReview = 9,
+  /** Change pending approval */
+  ChangePendingApproval = 10,
+  /** Deletion pending approval */
+  DeletionPendingApproval = 11,
+  /** Deleted */
+  Deleted = 12,
+  /** Rejection pending approval */
+  RejectionPendingApproval = 13,
+  /** Awaiting confirmation */
+  AwaitingConfirmation = 14
 }
 
 /** `inputs` of a `workflow_started` stream event */

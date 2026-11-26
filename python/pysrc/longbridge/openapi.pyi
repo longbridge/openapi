@@ -12463,6 +12463,1691 @@ class GetStatementResponse:
     Presigned download URL
     """
 
+class BankCardStatus:
+    """
+    Verification status of a bank card
+    """
+
+    class Unknown(BankCardStatus):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Unverified(BankCardStatus):
+        """
+        Not verified
+        """
+
+        ...
+
+    class UnderReview(BankCardStatus):
+        """
+        Under review
+        """
+
+        ...
+
+    class Verified(BankCardStatus):
+        """
+        Verified
+        """
+
+        ...
+
+class BankCardWitnessState:
+    """
+    Witness (in-person / video verification) state of a bank card
+    """
+
+    class Unknown(BankCardWitnessState):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class NotRequired(BankCardWitnessState):
+        """
+        Witnessing not required
+        """
+
+        ...
+
+    class Pending(BankCardWitnessState):
+        """
+        Witnessing pending
+        """
+
+        ...
+
+    class Witnessed(BankCardWitnessState):
+        """
+        Witnessed
+        """
+
+        ...
+
+class BankCardBindState:
+    """
+    Binding state of a bank card
+    """
+
+    class Unknown(BankCardBindState):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Binding(BankCardBindState):
+        """
+        Binding in progress
+        """
+
+        ...
+
+    class Bound(BankCardBindState):
+        """
+        Bound
+        """
+
+        ...
+
+    class Failed(BankCardBindState):
+        """
+        Binding failed
+        """
+
+        ...
+
+class AuthorizationStatus:
+    """
+    Status of a bank-card authorization (eDDA, bank securities account, FPS) or of
+    an eDDA application
+    """
+
+    class Unknown(AuthorizationStatus):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Unauthorized(AuthorizationStatus):
+        """
+        Not authorized
+        """
+
+        ...
+
+    class Authorized(AuthorizationStatus):
+        """
+        Authorized
+        """
+
+        ...
+
+    class Authorizing(AuthorizationStatus):
+        """
+        Authorization in progress
+        """
+
+        ...
+
+    class Failed(AuthorizationStatus):
+        """
+        Authorization failed (see the message field for the reason)
+        """
+
+        ...
+
+class StockTransferInState:
+    """
+    State of a stock transfer-in application (another broker to this account)
+    """
+
+    class Unknown(StockTransferInState):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Submitted(StockTransferInState):
+        """
+        Submitted
+        """
+
+        ...
+
+    class Cancelled(StockTransferInState):
+        """
+        Cancelled
+        """
+
+        ...
+
+    class Completed(StockTransferInState):
+        """
+        Completed
+        """
+
+        ...
+
+    class Processing(StockTransferInState):
+        """
+        Processing
+        """
+
+        ...
+
+    class PartiallyCompleted(StockTransferInState):
+        """
+        Partially completed
+        """
+
+        ...
+
+    class Failed(StockTransferInState):
+        """
+        Failed
+        """
+
+        ...
+
+class StockTransferOutState:
+    """
+    State of a stock transfer-out application (this account to another broker)
+    """
+
+    class Unknown(StockTransferOutState):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Submitted(StockTransferOutState):
+        """
+        Submitted (the only state in which the application can still be cancelled)
+        """
+
+        ...
+
+    class Processing(StockTransferOutState):
+        """
+        Processing
+        """
+
+        ...
+
+    class Executing(StockTransferOutState):
+        """
+        Executing
+        """
+
+        ...
+
+    class Completed(StockTransferOutState):
+        """
+        Completed
+        """
+
+        ...
+
+    class Cancelled(StockTransferOutState):
+        """
+        Cancelled
+        """
+
+        ...
+
+    class PartiallyCompleted(StockTransferOutState):
+        """
+        Partially completed
+        """
+
+        ...
+
+    class Failed(StockTransferOutState):
+        """
+        Failed
+        """
+
+        ...
+
+    class Rejected(StockTransferOutState):
+        """
+        Rejected
+        """
+
+        ...
+
+class TransferStockState:
+    """
+    State of one stock inside a stock transfer application
+    """
+
+    class Unknown(TransferStockState):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Processing(TransferStockState):
+        """
+        Processing
+        """
+
+        ...
+
+    class Succeeded(TransferStockState):
+        """
+        Succeeded
+        """
+
+        ...
+
+    class Failed(TransferStockState):
+        """
+        Failed
+        """
+
+        ...
+
+class RewardType:
+    """
+    Type of a reward record
+    """
+
+    class Unknown(RewardType):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Cash(RewardType):
+        """
+        Cash reward
+        """
+
+        ...
+
+    class Gift(RewardType):
+        """
+        Gift (prize)
+        """
+
+        ...
+
+    class Coupon(RewardType):
+        """
+        Coupon
+        """
+
+        ...
+
+    class Task(RewardType):
+        """
+        Task reward
+        """
+
+        ...
+
+class RewardStatus:
+    """
+    Status of a reward record
+    """
+
+    class Unknown(RewardStatus):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Upcoming(RewardStatus):
+        """
+        Upcoming
+        """
+
+        ...
+
+    class Cancelled(RewardStatus):
+        """
+        Cancelled
+        """
+
+        ...
+
+    class ExitedActivity(RewardStatus):
+        """
+        The user exited the activity
+        """
+
+        ...
+
+    class Unclaimed(RewardStatus):
+        """
+        Not claimed yet
+        """
+
+        ...
+
+    class Issuing(RewardStatus):
+        """
+        Being issued
+        """
+
+        ...
+
+    class Issued(RewardStatus):
+        """
+        Issued
+        """
+
+        ...
+
+    class Failed(RewardStatus):
+        """
+        Issuing failed
+        """
+
+        ...
+
+    class Exchanged(RewardStatus):
+        """
+        Exchanged
+        """
+
+        ...
+
+    class Expired(RewardStatus):
+        """
+        Expired
+        """
+
+        ...
+
+    class Refunded(RewardStatus):
+        """
+        Refunded
+        """
+
+        ...
+
+class RewardDeliverStatus:
+    """
+    Delivery status of an issued prize (only meaningful for issued gift rewards)
+    """
+
+    class Unknown(RewardDeliverStatus):
+        """
+        Unknown (an undocumented code, or no delivery status)
+        """
+
+        ...
+
+    class NotActivated(RewardDeliverStatus):
+        """
+        Not activated
+        """
+
+        ...
+
+    class ActivatedOrShipping(RewardDeliverStatus):
+        """
+        Activated, or shipping
+        """
+
+        ...
+
+    class Consumed(RewardDeliverStatus):
+        """
+        Consumed
+        """
+
+        ...
+
+    class EVoucherActivating(RewardDeliverStatus):
+        """
+        E-voucher activating
+        """
+
+        ...
+
+    class EVoucherExpired(RewardDeliverStatus):
+        """
+        E-voucher expired before activation
+        """
+
+        ...
+
+    class EVoucherInvalid(RewardDeliverStatus):
+        """
+        E-voucher invalid
+        """
+
+        ...
+
+    class AddressMissing(RewardDeliverStatus):
+        """
+        Shipping address missing
+        """
+
+        ...
+
+    class AddressFilled(RewardDeliverStatus):
+        """
+        Shipping address filled
+        """
+
+        ...
+
+    class Shipping(RewardDeliverStatus):
+        """
+        Shipping
+        """
+
+        ...
+
+class CouponStatus:
+    """
+    Status of a coupon
+    """
+
+    class Unknown(CouponStatus):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Unused(CouponStatus):
+        """
+        Unused
+        """
+
+        ...
+
+    class Used(CouponStatus):
+        """
+        Used
+        """
+
+        ...
+
+    class Expired(CouponStatus):
+        """
+        Expired
+        """
+
+        ...
+
+    class Redeeming(CouponStatus):
+        """
+        Being redeemed
+        """
+
+        ...
+
+    class InUse(CouponStatus):
+        """
+        In use
+        """
+
+        ...
+
+    class Processing(CouponStatus):
+        """
+        Processing
+        """
+
+        ...
+
+class DepositState:
+    """
+    State of a deposit record
+    """
+
+    class Unknown(DepositState):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Processing(DepositState):
+        """
+        Processing
+        """
+
+        ...
+
+    class Credited(DepositState):
+        """
+        Credited to the account
+        """
+
+        ...
+
+    class Failed(DepositState):
+        """
+        Failed
+        """
+
+        ...
+
+    class Cancelled(DepositState):
+        """
+        Cancelled
+        """
+
+        ...
+
+    class Invalidated(DepositState):
+        """
+        Invalidated
+        """
+
+        ...
+
+    class Rejected(DepositState):
+        """
+        Rejected
+        """
+
+        ...
+
+class WithdrawalState:
+    """
+    State of a withdrawal record
+    """
+
+    class Unknown(WithdrawalState):
+        """
+        Unknown (an undocumented code)
+        """
+
+        ...
+
+    class Submitted(WithdrawalState):
+        """
+        Submitted
+        """
+
+        ...
+
+    class Processing(WithdrawalState):
+        """
+        Processing
+        """
+
+        ...
+
+    class Rejected(WithdrawalState):
+        """
+        Rejected
+        """
+
+        ...
+
+    class Cancelled(WithdrawalState):
+        """
+        Cancelled
+        """
+
+        ...
+
+    class Remitted(WithdrawalState):
+        """
+        Remitted
+        """
+
+        ...
+
+    class Failed(WithdrawalState):
+        """
+        Failed
+        """
+
+        ...
+
+    class Refunded(WithdrawalState):
+        """
+        Refunded
+        """
+
+        ...
+
+    class ApprovedAwaitingPayout(WithdrawalState):
+        """
+        Approved, awaiting payout
+        """
+
+        ...
+
+    class LargeAmountReview(WithdrawalState):
+        """
+        Large-amount review
+        """
+
+        ...
+
+    class ChangePendingApproval(WithdrawalState):
+        """
+        Change pending approval
+        """
+
+        ...
+
+    class DeletionPendingApproval(WithdrawalState):
+        """
+        Deletion pending approval
+        """
+
+        ...
+
+    class Deleted(WithdrawalState):
+        """
+        Deleted
+        """
+
+        ...
+
+    class RejectionPendingApproval(WithdrawalState):
+        """
+        Rejection pending approval
+        """
+
+        ...
+
+    class AwaitingConfirmation(WithdrawalState):
+        """
+        Awaiting confirmation
+        """
+
+        ...
+
+class CouponOrderType:
+    """
+    Which orders of a coupon to list
+    """
+
+    class Locked(CouponOrderType):
+        """
+        Orders the coupon is locked to (in progress)
+        """
+
+        ...
+
+    class Settled(CouponOrderType):
+        """
+        Orders whose rebate has been settled
+        """
+
+        ...
+
+class BankCardAuthorization:
+    """
+    An authorization attached to a bank card (eDDA, bank securities account, FPS,
+    ...)
+    """
+
+    flow_id: str
+    """
+    Authorization flow: `hk_edda` / `hk_sdda` (eDDA), `hk_bank_sec`, `hk_fps`, ...
+    """
+
+    name: str
+    """
+    Display name of the authorization
+    """
+
+    currency: str
+    """
+    Authorized currency
+    """
+
+    status: Type[AuthorizationStatus]
+    """
+    Authorization status
+    """
+
+    message: str
+    """
+    Failure reason (empty unless the authorization failed)
+    """
+
+    is_support: bool
+    """
+    Whether this authorization is supported for the card
+    """
+
+    max_amount: Optional[Decimal]
+    """
+    Maximum amount per debit (none when not set)
+    """
+
+    max_amount_unlimited: bool
+    """
+    Whether the per-debit amount is unlimited
+    """
+
+    daily_max_count: Optional[int]
+    """
+    Maximum number of debits per day (none when not set)
+    """
+
+    daily_max_count_unlimited: bool
+    """
+    Whether the daily debit count is unlimited
+    """
+
+    expiry_date: Optional[datetime]
+    """
+    Expiry date of the authorization (none when not set). A long-term authorization
+    carries the server's 9999-12-31 sentinel here.
+    """
+
+    long_term_valid: bool
+    """
+    Whether the authorization never expires
+    """
+
+    doc_reviewing: bool
+    """
+    Whether submitted documents are under review
+    """
+
+    no_prior_deposit_reviewing: bool
+    """
+    Whether the "no prior deposit" check is under review
+    """
+
+class BankCard:
+    """
+    A linked bank card
+    """
+
+    id: str
+    """
+    Bank card ID (pass to edda_applications)
+    """
+
+    bank_id: str
+    """
+    Bank ID
+    """
+
+    bank: str
+    """
+    Bank name
+    """
+
+    bank_en: str
+    """
+    Bank name in English
+    """
+
+    bank_code: str
+    """
+    Bank code
+    """
+
+    account: str
+    """
+    Bank account number, as returned by the server (not masked)
+    """
+
+    account_type: str
+    """
+    Account type
+    """
+
+    country: str
+    """
+    Country or region of the bank (e.g. `Hong Kong`; not a currency)
+    """
+
+    region: str
+    """
+    Region code
+    """
+
+    region_name: str
+    """
+    Region name
+    """
+
+    swift_code: str
+    """
+    SWIFT code
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+    status: Type[BankCardStatus]
+    """
+    Verification status
+    """
+
+    witness_state: Type[BankCardWitnessState]
+    """
+    Witness state
+    """
+
+    support_witness: bool
+    """
+    Whether the card supports witnessing
+    """
+
+    bind_state: Type[BankCardBindState]
+    """
+    Binding state
+    """
+
+    bind_tip: str
+    """
+    Binding hint text
+    """
+
+    withdraw_fee: str
+    """
+    Withdrawal fee text, as returned by the server
+    """
+
+    created_at: Optional[datetime]
+    """
+    Time the card was added
+    """
+
+    auth_list: List[BankCardAuthorization]
+    """
+    Authorizations attached to the card
+    """
+
+class EddaApplication:
+    """
+    An eDDA authorization application of a bank card
+    """
+
+    id: str
+    """
+    Application ID
+    """
+
+    status: Type[AuthorizationStatus]
+    """
+    Application status
+    """
+
+    message: str
+    """
+    Failure reason (empty unless the application failed)
+    """
+
+class TransferStock:
+    """
+    One stock in a stock transfer application
+    """
+
+    code: str
+    """
+    Stock code
+    """
+
+    name: str
+    """
+    Stock name
+    """
+
+    name_en: str
+    """
+    Stock name in English
+    """
+
+    market: str
+    """
+    Market
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    amount: Optional[Decimal]
+    """
+    Quantity
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    cost: Optional[Decimal]
+    """
+    Cost price
+    """
+
+    state: Type[TransferStockState]
+    """
+    State of this stock in the transfer
+    """
+
+    position_side: str
+    """
+    Position side
+    """
+
+class StockTransferIn:
+    """
+    A stock transfer-in application (another broker to this account)
+    """
+
+    id: str
+    """
+    Record ID
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    market: str
+    """
+    Market
+    """
+
+    broker: str
+    """
+    Name of the other broker
+    """
+
+    broker_en: str
+    """
+    English name of the other broker
+    """
+
+    broker_code: str
+    """
+    Broker code of the other broker
+    """
+
+    account: str
+    """
+    Account number at the other broker, as returned by the server (not masked)
+    """
+
+    state: str
+    """
+    State text, as returned by the server
+    """
+
+    state_code: Type[StockTransferInState]
+    """
+    State code
+    """
+
+    app_state: str
+    """
+    App-side state: `noticed` means the user tapped "I have notified the broker" in
+    the app (the user's own confirmation, not a Longbridge action); `default`
+    otherwise
+    """
+
+    can_modify: bool
+    """
+    Whether the application can still be cancelled or changed
+    """
+
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Updated time
+    """
+
+    process_at: Optional[datetime]
+    """
+    Processing start time (none when not set)
+    """
+
+    exec_at: Optional[datetime]
+    """
+    Execution time (none when not executed)
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+    reason: str
+    """
+    Reason (e.g. for a failure)
+    """
+
+    stocks: List[TransferStock]
+    """
+    Stocks in the application
+    """
+
+class StockTransferInResponse:
+    """
+    Response for the stock transfer-in list
+    """
+
+    records: List[StockTransferIn]
+    """
+    Records
+    """
+
+    total: int
+    """
+    Total number of records
+    """
+
+class StockTransferOut:
+    """
+    A stock transfer-out application (this account to another broker)
+    """
+
+    id: str
+    """
+    Record ID
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    market: str
+    """
+    Market
+    """
+
+    broker: str
+    """
+    Name of the other broker
+    """
+
+    broker_en: str
+    """
+    English name of the other broker
+    """
+
+    broker_code: str
+    """
+    Broker code of the other broker
+    """
+
+    account: str
+    """
+    Account number at the other broker, as returned by the server (not masked)
+    """
+
+    state: str
+    """
+    State text, as returned by the server
+    """
+
+    state_code: Type[StockTransferOutState]
+    """
+    State code. Only `Submitted` applications can be cancelled
+    """
+
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Updated time
+    """
+
+    process_at: Optional[datetime]
+    """
+    Processing start time (none when not set)
+    """
+
+    exec_at: Optional[datetime]
+    """
+    Execution time (none when not executed)
+    """
+
+    agree_at: Optional[datetime]
+    """
+    Time the other broker agreed (none when not set)
+    """
+
+    refuse_at: Optional[datetime]
+    """
+    Time the application was refused (none when not set)
+    """
+
+    cancel_at: Optional[datetime]
+    """
+    Time the application was cancelled (none when not set)
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+    reason: str
+    """
+    Reason (e.g. for a rejection)
+    """
+
+    stocks: List[TransferStock]
+    """
+    Stocks in the application
+    """
+
+class RewardRecord:
+    """
+    A reward record from the reward center
+    """
+
+    reward_type: Type[RewardType]
+    """
+    Reward type
+    """
+
+    record_id: str
+    """
+    Record ID
+    """
+
+    activity_title: str
+    """
+    Title of the activity that granted the reward
+    """
+
+    title: str
+    """
+    Reward title
+    """
+
+    description: str
+    """
+    Reward description
+    """
+
+    card_type: str
+    """
+    Coupon type (coupon rewards), e.g. `commission`
+    """
+
+    card_status: int
+    """
+    Coupon status code (coupon rewards), as returned by the server
+    """
+
+    prize_type: Optional[int]
+    """
+    Prize type code (gift rewards; `0` = physical goods), none when not set
+    """
+
+    amount: Optional[Decimal]
+    """
+    Amount
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    status: Type[RewardStatus]
+    """
+    Reward status
+    """
+
+    deliver_status: Type[RewardDeliverStatus]
+    """
+    Delivery status (issued gift rewards only)
+    """
+
+    exit_status: int
+    """
+    Exit status code, as returned by the server
+    """
+
+    send_time: Optional[datetime]
+    """
+    Time the reward was sent
+    """
+
+    start_time: Optional[datetime]
+    """
+    Start time
+    """
+
+    end_time: Optional[datetime]
+    """
+    End time
+    """
+
+    effective_time: Optional[datetime]
+    """
+    Effective time
+    """
+
+    receive_deadline: Optional[datetime]
+    """
+    Deadline to claim the reward
+    """
+
+class RewardRecordsResponse:
+    """
+    Response for the reward record list
+    """
+
+    list: List[RewardRecord]
+    """
+    Reward records
+    """
+
+    total: int
+    """
+    Total number of records
+    """
+
+class CouponCommission:
+    """
+    Commission terms of a commission coupon
+    """
+
+    markets: List[str]
+    """
+    Markets the coupon applies to
+    """
+
+    rebate_rate: str
+    """
+    Rebate rate, as returned by the server
+    """
+
+    bz_types: List[int]
+    """
+    Instrument types the coupon applies to: `0` stocks, `1` options, `2` warrants,
+    `3` ETF, `4` LOF
+    """
+
+    commission_balance: Optional[Decimal]
+    """
+    Remaining commission balance
+    """
+
+    commission_duration: str
+    """
+    Commission duration, as returned by the server
+    """
+
+    unlimited: bool
+    """
+    Whether the coupon is unlimited
+    """
+
+    commission_expired_time: Optional[datetime]
+    """
+    Commission expiry time (none when not set)
+    """
+
+    usage_count: int
+    """
+    Number of times used
+    """
+
+    lave_usage_count: int
+    """
+    Number of uses left
+    """
+
+    settlement_model: str
+    """
+    Settlement model, as returned by the server
+    """
+
+class Coupon:
+    """
+    A coupon (reward card)
+    """
+
+    card_id: str
+    """
+    Coupon ID (32 hex characters; pass to coupon_orders)
+    """
+
+    card_type: str
+    """
+    Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`, `cash`
+    """
+
+    title: str
+    """
+    Title
+    """
+
+    title_sec: str
+    """
+    Secondary title
+    """
+
+    description: str
+    """
+    Description
+    """
+
+    detail: str
+    """
+    Terms and details
+    """
+
+    card_status: Type[CouponStatus]
+    """
+    Status
+    """
+
+    start_time: Optional[datetime]
+    """
+    Start of validity
+    """
+
+    end_time: Optional[datetime]
+    """
+    End of validity (none when not set). A date after 2100 means the coupon never
+    expires.
+    """
+
+    activate_time: Optional[datetime]
+    """
+    Activation time (none when not activated)
+    """
+
+    amount: Optional[Decimal]
+    """
+    Amount
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    available_trade_session: str
+    """
+    Trading sessions the coupon applies to, as display text
+    """
+
+    commission: CouponCommission
+    """
+    Commission terms (commission coupons only; empty otherwise)
+    """
+
+class CouponsResponse:
+    """
+    Response for the coupon list
+    """
+
+    top_list: List[Coupon]
+    """
+    Pinned coupons shown above the list (repeated on every page)
+    """
+
+    list: List[Coupon]
+    """
+    Coupons on this page
+    """
+
+    bottom_list: List[Coupon]
+    """
+    Pinned coupons shown below the list (repeated on every page)
+    """
+
+    total: int
+    """
+    Total number of coupons
+    """
+
+    expired_count: int
+    """
+    Number of expired coupons
+    """
+
+class CouponOrder:
+    """
+    An order a coupon was applied to
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    state: str
+    """
+    State text, as returned by the server
+    """
+
+    state_val: str
+    """
+    State value, as returned by the server (e.g. `FilledStatus`)
+    """
+
+    executed_price: Optional[Decimal]
+    """
+    Executed price
+    """
+
+    executed_quantity: Optional[Decimal]
+    """
+    Executed quantity
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    settlement_currency: str
+    """
+    Settlement currency
+    """
+
+    rebate: Optional[Decimal]
+    """
+    Rebate amount
+    """
+
+    rebate_dt: str
+    """
+    Rebate date, as returned by the server
+    """
+
+class Deposit:
+    """
+    A deposit record
+    """
+
+    id: str
+    """
+    Record ID
+    """
+
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Updated time
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    amount: Optional[Decimal]
+    """
+    Notified (applied) amount
+    """
+
+    receivable_amount: Optional[Decimal]
+    """
+    Received amount (`0` = not received yet)
+    """
+
+    state: str
+    """
+    State text, as returned by the server
+    """
+
+    state_code: Type[DepositState]
+    """
+    State code
+    """
+
+    sub_state_code: int
+    """
+    Sub-state code, as returned by the server
+    """
+
+    bank_operation_type_id: str
+    """
+    Deposit method ID
+    """
+
+    bank_operation_type_name: str
+    """
+    Deposit method name
+    """
+
+    reference_no: str
+    """
+    Reference number
+    """
+
+    can_cancel: bool
+    """
+    Whether the deposit can still be cancelled
+    """
+
+    user_bank_swift_code: str
+    """
+    SWIFT code of the paying bank
+    """
+
+class Withdrawal:
+    """
+    A withdrawal record
+    """
+
+    id: str
+    """
+    Record ID
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    amount: Optional[Decimal]
+    """
+    Applied amount
+    """
+
+    fee: Optional[Decimal]
+    """
+    Fee
+    """
+
+    settlement_amount: Optional[Decimal]
+    """
+    Amount paid out
+    """
+
+    state: Type[WithdrawalState]
+    """
+    State
+    """
+
+    raw_state: str
+    """
+    Raw state, as returned by the server
+    """
+
+    state_description: str
+    """
+    State description, as returned by the server
+    """
+
+    bank_account: str
+    """
+    Receiving bank account number, as returned by the server (not masked)
+    """
+
+    display_bank_account: str
+    """
+    Receiving bank account, as displayed in the app
+    """
+
+    user_bank_swift_code: str
+    """
+    SWIFT code of the receiving bank
+    """
+
+    account_channel: str
+    """
+    Account channel
+    """
+
+class WithdrawalsResponse:
+    """
+    Response for the withdrawal list
+    """
+
+    list: List[Withdrawal]
+    """
+    Withdrawal records
+    """
+
+    total: int
+    """
+    Total number of records
+    """
+
 class AssetContext:
     """
     Asset context
@@ -12528,6 +14213,328 @@ class AssetContext:
                 if resp.list:
                     url_resp = ctx.statement_download_url(resp.list[0].file_key)
                     print(url_resp.url)
+        """
+        ...
+
+    def bank_cards(self) -> List[BankCard]:
+        """
+        Get the linked bank cards, with their verification, binding and authorization (eDDA, bank securities account, FPS) status.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Returns:
+            List[BankCard]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.bank_cards()
+                for card in resp:
+                    print(card.bank, card.status)
+        """
+        ...
+
+    def edda_applications(self, card_id: str, currency: str) -> List[EddaApplication]:
+        """
+        Get the eDDA authorization applications of a bank card in one currency.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            card_id: Bank card ID (``BankCard.id``)
+            currency: Authorized currency, e.g. ``HKD`` or ``USD``
+
+        Returns:
+            List[EddaApplication]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.edda_applications("12345", "HKD")
+                print(resp)
+        """
+        ...
+
+    def stock_transfers_in(
+        self,
+        market: Optional[str] = None,
+        state: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> StockTransferInResponse:
+        """
+        Get stock transfer-in applications (another broker to this account).
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
+            state: Filter by state code: 0 submitted, 1 cancelled, 3 completed, 5 processing, 7 partially completed, 8 failed
+            start: Only applications created at or after this time
+            end: Only applications created at or before this time
+            page: Page number (default 1)
+            size: Page size (default 20, max 50)
+
+        Returns:
+            StockTransferInResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.stock_transfers_in(market="HK")
+                for record in resp.records:
+                    print(record.broker, record.state_code)
+        """
+        ...
+
+    def stock_transfers_out(
+        self,
+        market: Optional[str] = None,
+        state: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[StockTransferOut]:
+        """
+        Get stock transfer-out applications (this account to another broker).
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
+            state: Filter by state code: 0 submitted, 1 processing, 2 executing, 3 completed, 4 cancelled, 5 partially completed, 6 failed, 7 rejected
+            start: Only applications created at or after this time
+            end: Only applications created at or before this time
+            page: Page number (default 1)
+            size: Page size (default 20, max 50)
+
+        Returns:
+            List[StockTransferOut]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.stock_transfers_out()
+                for record in resp:
+                    print(record.broker, record.state_code)
+        """
+        ...
+
+    def reward_records(
+        self,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        reward_type: Optional[Type[RewardType]] = None,
+    ) -> RewardRecordsResponse:
+        """
+        Get reward records from the reward center (cash, gifts, coupons, task rewards).
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            page: Page number (default 1)
+            page_size: Page size (max 50)
+            reward_type: Filter by reward type (default: all types)
+
+        Returns:
+            RewardRecordsResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.reward_records(reward_type=RewardType.Cash)
+                for record in resp.list:
+                    print(record.title, record.status)
+        """
+        ...
+
+    def coupons(
+        self,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        expired: bool = False,
+        card_type: Optional[str] = None,
+    ) -> CouponsResponse:
+        """
+        Get coupons (reward cards). The pinned ``top_list`` / ``bottom_list`` are repeated on every page.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            page: Page number (default 1)
+            page_size: Page size (max 50)
+            expired: List expired coupons instead of the ones that have not expired
+            card_type: Filter by coupon type (e.g. ``commission``, ``platform_fee_deduct``, ``stock``, ``quote``, ``cash``)
+
+        Returns:
+            CouponsResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.coupons()
+                for coupon in resp.list:
+                    print(coupon.card_id, coupon.title, coupon.card_status)
+        """
+        ...
+
+    def coupon_orders(self, card_id: str, order_type: Type[CouponOrderType]) -> List[CouponOrder]:
+        """
+        Get the orders a coupon was applied to. The gateway rate-limits this route tightly per member, so avoid calling it concurrently.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            card_id: Coupon ID (``Coupon.card_id``, 32 hex characters; not a bank card ID)
+            order_type: ``CouponOrderType.Locked`` (in progress) or ``CouponOrderType.Settled`` (rebate settled)
+
+        Returns:
+            List[CouponOrder]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.coupon_orders("bd6b0000000000000000000000000000", CouponOrderType.Settled)
+                print(resp)
+        """
+        ...
+
+    def deposits(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        states: Optional[List[Type[DepositState]]] = None,
+        currencies: Optional[List[str]] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> List[Deposit]:
+        """
+        Get deposit records. The server's total follows the page size rather than the record count, so it is not returned; a full page means there may be more.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            page: Page number (default 1)
+            size: Page size
+            states: Filter by states (``DepositState.Unknown`` is ignored)
+            currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
+            start: Only deposits applied at or after this time
+            end: Only deposits applied at or before this time
+
+        Returns:
+            List[Deposit]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.deposits(currencies=["HKD"])
+                for deposit in resp:
+                    print(deposit.amount, deposit.state_code)
+        """
+        ...
+
+    def withdrawals(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> WithdrawalsResponse:
+        """
+        Get withdrawal records.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            page: Page number (default 1)
+            size: Page size
+            start: Only withdrawals applied at or after this time
+            end: Only withdrawals applied at or before this time
+
+        Returns:
+            WithdrawalsResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.withdrawals()
+                for withdrawal in resp.list:
+                    print(withdrawal.amount, withdrawal.state)
         """
         ...
 
@@ -12628,6 +14635,355 @@ class AsyncAssetContext:
                     if resp.list:
                         url_resp = await ctx.statement_download_url(resp.list[0].file_key)
                         print(url_resp.url)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def bank_cards(self) -> Awaitable[List[BankCard]]:
+        """
+        Get the linked bank cards, with their verification, binding and authorization (eDDA, bank securities account, FPS) status.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Returns:
+            List[BankCard]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.bank_cards()
+                    for card in resp:
+                        print(card.bank, card.status)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def edda_applications(self, card_id: str, currency: str) -> Awaitable[List[EddaApplication]]:
+        """
+        Get the eDDA authorization applications of a bank card in one currency.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            card_id: Bank card ID (``BankCard.id``)
+            currency: Authorized currency, e.g. ``HKD`` or ``USD``
+
+        Returns:
+            List[EddaApplication]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.edda_applications("12345", "HKD")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def stock_transfers_in(
+        self,
+        market: Optional[str] = None,
+        state: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> Awaitable[StockTransferInResponse]:
+        """
+        Get stock transfer-in applications (another broker to this account).
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
+            state: Filter by state code: 0 submitted, 1 cancelled, 3 completed, 5 processing, 7 partially completed, 8 failed
+            start: Only applications created at or after this time
+            end: Only applications created at or before this time
+            page: Page number (default 1)
+            size: Page size (default 20, max 50)
+
+        Returns:
+            StockTransferInResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.stock_transfers_in(market="HK")
+                    for record in resp.records:
+                        print(record.broker, record.state_code)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def stock_transfers_out(
+        self,
+        market: Optional[str] = None,
+        state: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> Awaitable[List[StockTransferOut]]:
+        """
+        Get stock transfer-out applications (this account to another broker).
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
+            state: Filter by state code: 0 submitted, 1 processing, 2 executing, 3 completed, 4 cancelled, 5 partially completed, 6 failed, 7 rejected
+            start: Only applications created at or after this time
+            end: Only applications created at or before this time
+            page: Page number (default 1)
+            size: Page size (default 20, max 50)
+
+        Returns:
+            List[StockTransferOut]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.stock_transfers_out()
+                    for record in resp:
+                        print(record.broker, record.state_code)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def reward_records(
+        self,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        reward_type: Optional[Type[RewardType]] = None,
+    ) -> Awaitable[RewardRecordsResponse]:
+        """
+        Get reward records from the reward center (cash, gifts, coupons, task rewards).
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            page: Page number (default 1)
+            page_size: Page size (max 50)
+            reward_type: Filter by reward type (default: all types)
+
+        Returns:
+            RewardRecordsResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.reward_records(reward_type=RewardType.Cash)
+                    for record in resp.list:
+                        print(record.title, record.status)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def coupons(
+        self,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        expired: bool = False,
+        card_type: Optional[str] = None,
+    ) -> Awaitable[CouponsResponse]:
+        """
+        Get coupons (reward cards). The pinned ``top_list`` / ``bottom_list`` are repeated on every page.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            page: Page number (default 1)
+            page_size: Page size (max 50)
+            expired: List expired coupons instead of the ones that have not expired
+            card_type: Filter by coupon type (e.g. ``commission``, ``platform_fee_deduct``, ``stock``, ``quote``, ``cash``)
+
+        Returns:
+            CouponsResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.coupons()
+                    for coupon in resp.list:
+                        print(coupon.card_id, coupon.title, coupon.card_status)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def coupon_orders(self, card_id: str, order_type: Type[CouponOrderType]) -> Awaitable[List[CouponOrder]]:
+        """
+        Get the orders a coupon was applied to. The gateway rate-limits this route tightly per member, so avoid calling it concurrently.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            card_id: Coupon ID (``Coupon.card_id``, 32 hex characters; not a bank card ID)
+            order_type: ``CouponOrderType.Locked`` (in progress) or ``CouponOrderType.Settled`` (rebate settled)
+
+        Returns:
+            List[CouponOrder]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.coupon_orders("bd6b0000000000000000000000000000", CouponOrderType.Settled)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def deposits(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        states: Optional[List[Type[DepositState]]] = None,
+        currencies: Optional[List[str]] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> Awaitable[List[Deposit]]:
+        """
+        Get deposit records. The server's total follows the page size rather than the record count, so it is not returned; a full page means there may be more.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            page: Page number (default 1)
+            size: Page size
+            states: Filter by states (``DepositState.Unknown`` is ignored)
+            currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
+            start: Only deposits applied at or after this time
+            end: Only deposits applied at or before this time
+
+        Returns:
+            List[Deposit]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.deposits(currencies=["HKD"])
+                    for deposit in resp:
+                        print(deposit.amount, deposit.state_code)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def withdrawals(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> Awaitable[WithdrawalsResponse]:
+        """
+        Get withdrawal records.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            page: Page number (default 1)
+            size: Page size
+            start: Only withdrawals applied at or after this time
+            end: Only withdrawals applied at or before this time
+
+        Returns:
+            WithdrawalsResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.withdrawals()
+                    for withdrawal in resp.list:
+                        print(withdrawal.amount, withdrawal.state)
 
                 asyncio.run(main())
         """
