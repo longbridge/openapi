@@ -58,15 +58,17 @@ on_value_result(const lb_async_result_t* res)
   }
 }
 
-/// Owns the C view of `GetStockTransfersOptions` for the duration of a call
+/// Owns the C view of `GetStockTransfersInOptions` /
+/// `GetStockTransfersOutOptions` for the duration of a call
+template<typename Options, typename COptions, typename CState>
 struct StockTransfersOptionsC
 {
-  lb_get_stock_transfers_options_t opts = {
+  COptions opts = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
   };
+  CState state;
 
-  explicit StockTransfersOptionsC(
-    const std::optional<GetStockTransfersOptions>& value)
+  explicit StockTransfersOptionsC(const std::optional<Options>& value)
   {
     if (!value) {
       return;
@@ -75,7 +77,8 @@ struct StockTransfersOptionsC
       opts.market = value->market->c_str();
     }
     if (value->state) {
-      opts.state = &value->state.value();
+      state = convert(*value->state);
+      opts.state = &state;
     }
     if (value->start) {
       opts.start = &value->start.value();
@@ -253,10 +256,13 @@ AssetContext::edda_applications(
 
 void
 AssetContext::stock_transfers_in(
-  const std::optional<GetStockTransfersOptions>& opts,
+  const std::optional<GetStockTransfersInOptions>& opts,
   AsyncCallback<AssetContext, StockTransferInResponse> callback) const
 {
-  StockTransfersOptionsC opts2(opts);
+  StockTransfersOptionsC<GetStockTransfersInOptions,
+                         lb_get_stock_transfers_in_options_t,
+                         lb_stock_transfer_in_state_t>
+    opts2(opts);
   lb_asset_context_stock_transfers_in(
     ctx_,
     &opts2.opts,
@@ -266,10 +272,13 @@ AssetContext::stock_transfers_in(
 
 void
 AssetContext::stock_transfers_out(
-  const std::optional<GetStockTransfersOptions>& opts,
+  const std::optional<GetStockTransfersOutOptions>& opts,
   AsyncCallback<AssetContext, std::vector<StockTransferOut>> callback) const
 {
-  StockTransfersOptionsC opts2(opts);
+  StockTransfersOptionsC<GetStockTransfersOutOptions,
+                         lb_get_stock_transfers_out_options_t,
+                         lb_stock_transfer_out_state_t>
+    opts2(opts);
   lb_asset_context_stock_transfers_out(
     ctx_,
     &opts2.opts,

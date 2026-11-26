@@ -234,27 +234,112 @@ typedef enum lb_alert_frequency_t {
 } lb_alert_frequency_t;
 
 /**
+ * State of a stock transfer-in application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_stock_transfer_in_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  StockTransferInStateUnknown,
+  /**
+   * Submitted (server code 0)
+   */
+  StockTransferInStateSubmitted,
+  /**
+   * Cancelled (server code 1)
+   */
+  StockTransferInStateCancelled,
+  /**
+   * Completed (server code 3)
+   */
+  StockTransferInStateCompleted,
+  /**
+   * Processing (server code 5)
+   */
+  StockTransferInStateProcessing,
+  /**
+   * Partially completed (server code 7)
+   */
+  StockTransferInStatePartiallyCompleted,
+  /**
+   * Failed (server code 8)
+   */
+  StockTransferInStateFailed,
+} lb_stock_transfer_in_state_t;
+
+/**
+ * State of a stock transfer-out application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_stock_transfer_out_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  StockTransferOutStateUnknown,
+  /**
+   * Submitted (the only state that can still be cancelled) (server code 0)
+   */
+  StockTransferOutStateSubmitted,
+  /**
+   * Processing (server code 1)
+   */
+  StockTransferOutStateProcessing,
+  /**
+   * Executing (server code 2)
+   */
+  StockTransferOutStateExecuting,
+  /**
+   * Completed (server code 3)
+   */
+  StockTransferOutStateCompleted,
+  /**
+   * Cancelled (server code 4)
+   */
+  StockTransferOutStateCancelled,
+  /**
+   * Partially completed (server code 5)
+   */
+  StockTransferOutStatePartiallyCompleted,
+  /**
+   * Failed (server code 6)
+   */
+  StockTransferOutStateFailed,
+  /**
+   * Rejected (server code 7)
+   */
+  StockTransferOutStateRejected,
+} lb_stock_transfer_out_state_t;
+
+/**
  * Type of a reward record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_reward_type_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   RewardTypeUnknown,
   /**
-   * Cash reward
+   * Cash reward (server code 0)
    */
   RewardTypeCash,
   /**
-   * Gift (prize)
+   * Gift (prize) (server code 1)
    */
   RewardTypeGift,
   /**
-   * Coupon
+   * Coupon (server code 2)
    */
   RewardTypeCoupon,
   /**
-   * Task reward
+   * Task reward (server code 3)
    */
   RewardTypeTask,
 } lb_reward_type_t;
@@ -275,34 +360,37 @@ typedef enum lb_coupon_order_type_t {
 
 /**
  * State of a deposit record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_deposit_state_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   DepositStateUnknown,
   /**
-   * Processing
+   * Processing (server code 0)
    */
   DepositStateProcessing,
   /**
-   * Credited to the account
+   * Credited to the account (server code 1)
    */
   DepositStateCredited,
   /**
-   * Failed
+   * Failed (server code 2)
    */
   DepositStateFailed,
   /**
-   * Cancelled
+   * Cancelled (server code 3)
    */
   DepositStateCancelled,
   /**
-   * Invalidated
+   * Invalidated (server code 4)
    */
   DepositStateInvalidated,
   /**
-   * Rejected
+   * Rejected (server code 5)
    */
   DepositStateRejected,
 } lb_deposit_state_t;
@@ -1880,386 +1968,338 @@ typedef enum lb_charge_category_code_t {
 
 /**
  * Status of a bank-card authorization or of an eDDA application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_authorization_status_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   AuthorizationStatusUnknown,
   /**
-   * Not authorized
+   * Not authorized (server code 0)
    */
   AuthorizationStatusUnauthorized,
   /**
-   * Authorized
+   * Authorized (server code 1)
    */
   AuthorizationStatusAuthorized,
   /**
-   * Authorization in progress
+   * Authorization in progress (server code 2)
    */
   AuthorizationStatusAuthorizing,
   /**
-   * Authorization failed
+   * Authorization failed (server code 3)
    */
   AuthorizationStatusFailed,
 } lb_authorization_status_t;
 
 /**
  * Verification status of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_bank_card_status_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   BankCardStatusUnknown,
   /**
-   * Not verified
+   * Not verified (server code 0)
    */
   BankCardStatusUnverified,
   /**
-   * Under review
+   * Under review (server code 1)
    */
   BankCardStatusUnderReview,
   /**
-   * Verified
+   * Verified (server code 2)
    */
   BankCardStatusVerified,
 } lb_bank_card_status_t;
 
 /**
  * Witness (in-person / video verification) state of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_bank_card_witness_state_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   BankCardWitnessStateUnknown,
   /**
-   * Witnessing not required
+   * Witnessing not required (server code 1)
    */
   BankCardWitnessStateNotRequired,
   /**
-   * Witnessing pending
+   * Witnessing pending (server code 2)
    */
   BankCardWitnessStatePending,
   /**
-   * Witnessed
+   * Witnessed (server code 3)
    */
   BankCardWitnessStateWitnessed,
 } lb_bank_card_witness_state_t;
 
 /**
  * Binding state of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_bank_card_bind_state_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   BankCardBindStateUnknown,
   /**
-   * Binding in progress
+   * Binding in progress (server code 0)
    */
   BankCardBindStateBinding,
   /**
-   * Bound
+   * Bound (server code 1)
    */
   BankCardBindStateBound,
   /**
-   * Binding failed
+   * Binding failed (server code 2)
    */
   BankCardBindStateFailed,
 } lb_bank_card_bind_state_t;
 
 /**
  * State of one stock inside a stock transfer application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_transfer_stock_state_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   TransferStockStateUnknown,
   /**
-   * Processing
+   * Processing (server code 0)
    */
   TransferStockStateProcessing,
   /**
-   * Succeeded
+   * Succeeded (server code 1)
    */
   TransferStockStateSucceeded,
   /**
-   * Failed
+   * Failed (server code 2)
    */
   TransferStockStateFailed,
 } lb_transfer_stock_state_t;
 
 /**
- * State of a stock transfer-in application
+ * Status of a coupon
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
-typedef enum lb_stock_transfer_in_state_t {
+typedef enum lb_coupon_status_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
-  StockTransferInStateUnknown,
+  CouponStatusUnknown,
   /**
-   * Submitted
+   * Unused (server code 0)
    */
-  StockTransferInStateSubmitted,
+  CouponStatusUnused,
   /**
-   * Cancelled
+   * Used (server code 1)
    */
-  StockTransferInStateCancelled,
+  CouponStatusUsed,
   /**
-   * Completed
+   * Expired (server code 2)
    */
-  StockTransferInStateCompleted,
+  CouponStatusExpired,
   /**
-   * Processing
+   * Being redeemed (server code 3)
    */
-  StockTransferInStateProcessing,
+  CouponStatusRedeeming,
   /**
-   * Partially completed
+   * In use (server code 4)
    */
-  StockTransferInStatePartiallyCompleted,
+  CouponStatusInUse,
   /**
-   * Failed
+   * Processing (server code 5)
    */
-  StockTransferInStateFailed,
-} lb_stock_transfer_in_state_t;
-
-/**
- * State of a stock transfer-out application
- */
-typedef enum lb_stock_transfer_out_state_t {
-  /**
-   * Unknown (an undocumented code)
-   */
-  StockTransferOutStateUnknown,
-  /**
-   * Submitted (the only state that can still be cancelled)
-   */
-  StockTransferOutStateSubmitted,
-  /**
-   * Processing
-   */
-  StockTransferOutStateProcessing,
-  /**
-   * Executing
-   */
-  StockTransferOutStateExecuting,
-  /**
-   * Completed
-   */
-  StockTransferOutStateCompleted,
-  /**
-   * Cancelled
-   */
-  StockTransferOutStateCancelled,
-  /**
-   * Partially completed
-   */
-  StockTransferOutStatePartiallyCompleted,
-  /**
-   * Failed
-   */
-  StockTransferOutStateFailed,
-  /**
-   * Rejected
-   */
-  StockTransferOutStateRejected,
-} lb_stock_transfer_out_state_t;
+  CouponStatusProcessing,
+} lb_coupon_status_t;
 
 /**
  * Status of a reward record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_reward_status_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   RewardStatusUnknown,
   /**
-   * Upcoming
+   * Upcoming (server code 0)
    */
   RewardStatusUpcoming,
   /**
-   * Cancelled
+   * Cancelled (server code 1)
    */
   RewardStatusCancelled,
   /**
-   * The user exited the activity
+   * The user exited the activity (server code 2)
    */
   RewardStatusExitedActivity,
   /**
-   * Not claimed yet
+   * Not claimed yet (server code 8)
    */
   RewardStatusUnclaimed,
   /**
-   * Being issued
+   * Being issued (server code 10)
    */
   RewardStatusIssuing,
   /**
-   * Issued
+   * Issued (server code 12)
    */
   RewardStatusIssued,
   /**
-   * Issuing failed
+   * Issuing failed (server code 13)
    */
   RewardStatusFailed,
   /**
-   * Exchanged
+   * Exchanged (server code 16)
    */
   RewardStatusExchanged,
   /**
-   * Expired
+   * Expired (server code 17)
    */
   RewardStatusExpired,
   /**
-   * Refunded
+   * Refunded (server code 18)
    */
   RewardStatusRefunded,
 } lb_reward_status_t;
 
 /**
  * Delivery status of an issued prize
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_reward_deliver_status_t {
   /**
-   * Unknown (an undocumented code, or no delivery status)
+   * Unknown: an undocumented code, or no delivery status (never sent to the
+   * server)
    */
   RewardDeliverStatusUnknown,
   /**
-   * Not activated
+   * Not activated (server code 0)
    */
   RewardDeliverStatusNotActivated,
   /**
-   * Activated, or shipping
+   * Activated, or shipping (server code 1)
    */
   RewardDeliverStatusActivatedOrShipping,
   /**
-   * Consumed
+   * Consumed (server code 2)
    */
   RewardDeliverStatusConsumed,
   /**
-   * E-voucher activating
+   * E-voucher activating (server code 5)
    */
   RewardDeliverStatusEVoucherActivating,
   /**
-   * E-voucher expired before activation
+   * E-voucher expired before activation (server code 6)
    */
   RewardDeliverStatusEVoucherExpired,
   /**
-   * E-voucher invalid
+   * E-voucher invalid (server code 7)
    */
   RewardDeliverStatusEVoucherInvalid,
   /**
-   * Shipping address missing
+   * Shipping address missing (server code 8)
    */
   RewardDeliverStatusAddressMissing,
   /**
-   * Shipping address filled
+   * Shipping address filled (server code 9)
    */
   RewardDeliverStatusAddressFilled,
   /**
-   * Shipping
+   * Shipping (server code 10)
    */
   RewardDeliverStatusShipping,
 } lb_reward_deliver_status_t;
 
 /**
- * Status of a coupon
- */
-typedef enum lb_coupon_status_t {
-  /**
-   * Unknown (an undocumented code)
-   */
-  CouponStatusUnknown,
-  /**
-   * Unused
-   */
-  CouponStatusUnused,
-  /**
-   * Used
-   */
-  CouponStatusUsed,
-  /**
-   * Expired
-   */
-  CouponStatusExpired,
-  /**
-   * Being redeemed
-   */
-  CouponStatusRedeeming,
-  /**
-   * In use
-   */
-  CouponStatusInUse,
-  /**
-   * Processing
-   */
-  CouponStatusProcessing,
-} lb_coupon_status_t;
-
-/**
  * State of a withdrawal record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
  */
 typedef enum lb_withdrawal_state_t {
   /**
-   * Unknown (an undocumented code)
+   * Unknown: an undocumented code (never sent to the server)
    */
   WithdrawalStateUnknown,
   /**
-   * Submitted
+   * Submitted (server code 0)
    */
   WithdrawalStateSubmitted,
   /**
-   * Processing
+   * Processing (server code 1)
    */
   WithdrawalStateProcessing,
   /**
-   * Rejected
+   * Rejected (server code 2)
    */
   WithdrawalStateRejected,
   /**
-   * Cancelled
+   * Cancelled (server code 3)
    */
   WithdrawalStateCancelled,
   /**
-   * Remitted
+   * Remitted (server code 4)
    */
   WithdrawalStateRemitted,
   /**
-   * Failed
+   * Failed (server code 5)
    */
   WithdrawalStateFailed,
   /**
-   * Refunded
+   * Refunded (server code 6)
    */
   WithdrawalStateRefunded,
   /**
-   * Approved, awaiting payout
+   * Approved, awaiting payout (server code 7)
    */
   WithdrawalStateApprovedAwaitingPayout,
   /**
-   * Large-amount review
+   * Large-amount review (server code 8)
    */
   WithdrawalStateLargeAmountReview,
   /**
-   * Change pending approval
+   * Change pending approval (server code 9)
    */
   WithdrawalStateChangePendingApproval,
   /**
-   * Deletion pending approval
+   * Deletion pending approval (server code 10)
    */
   WithdrawalStateDeletionPendingApproval,
   /**
-   * Deleted
+   * Deleted (server code 11)
    */
   WithdrawalStateDeleted,
   /**
-   * Rejection pending approval
+   * Rejection pending approval (server code 12)
    */
   WithdrawalStateRejectionPendingApproval,
   /**
-   * Awaiting confirmation
+   * Awaiting confirmation (server code 15)
    */
   WithdrawalStateAwaitingConfirmation,
 } lb_withdrawal_state_t;
@@ -3720,19 +3760,19 @@ typedef struct lb_alert_item_t {
 } lb_alert_item_t;
 
 /**
- * Options for the stock transfer-in and transfer-out lists
+ * Options for the stock transfer-in list
  */
-typedef struct lb_get_stock_transfers_options_t {
+typedef struct lb_get_stock_transfers_in_options_t {
   /**
    * Market filter: `HK`, `US`, `CN` or `SG` (can be null)
    */
   const char *market;
   /**
-   * State code filter: a `lb_stock_transfer_in_state_t` code for the
-   * transfer-in list, a `lb_stock_transfer_out_state_t` code for the
-   * transfer-out list, as the server's integer value (can be null)
+   * State filter (can be null for all states; `StockTransferInStateUnknown`
+   * is ignored). Sent to the server as the state's server code, not as the C
+   * enum value.
    */
-  const int32_t *state;
+  const enum lb_stock_transfer_in_state_t *state;
   /**
    * Only applications created at or after this unix timestamp (can be
    * null)
@@ -3751,7 +3791,41 @@ typedef struct lb_get_stock_transfers_options_t {
    * Page size (can be null, default 20, max 50)
    */
   const int32_t *size;
-} lb_get_stock_transfers_options_t;
+} lb_get_stock_transfers_in_options_t;
+
+/**
+ * Options for the stock transfer-out list
+ */
+typedef struct lb_get_stock_transfers_out_options_t {
+  /**
+   * Market filter: `HK`, `US`, `CN` or `SG` (can be null)
+   */
+  const char *market;
+  /**
+   * State filter (can be null for all states; `StockTransferOutStateUnknown`
+   * is ignored). Sent to the server as the state's server code, not as the C
+   * enum value.
+   */
+  const enum lb_stock_transfer_out_state_t *state;
+  /**
+   * Only applications created at or after this unix timestamp (can be
+   * null)
+   */
+  const int64_t *start;
+  /**
+   * Only applications created at or before this unix timestamp (can be
+   * null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null, default 1)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null, default 20, max 50)
+   */
+  const int32_t *size;
+} lb_get_stock_transfers_out_options_t;
 
 /**
  * Options for the reward record list
@@ -3766,7 +3840,8 @@ typedef struct lb_get_reward_records_options_t {
    */
   const int32_t *page_size;
   /**
-   * Reward type filter (can be null for all types)
+   * Reward type filter (can be null for all types; `RewardTypeUnknown` is
+   * ignored)
    */
   const enum lb_reward_type_t *reward_type;
 } lb_get_reward_records_options_t;
@@ -7391,8 +7466,9 @@ typedef struct lb_bank_card_authorization_t {
    */
   bool daily_max_count_unlimited;
   /**
-   * Expiry date of the authorization as a unix timestamp (null when not set;
-   * a long-term authorization carries the 9999-12-31 sentinel)
+   * Expiry date of the authorization as a unix timestamp (null when not set
+   * and for a long-term authorization: the server's 9999-12-31 "never
+   * expires" sentinel is null; see `long_term_valid`)
    */
   const int64_t *expiry_date;
   /**
@@ -7554,9 +7630,9 @@ typedef struct lb_transfer_stock_t {
    */
   const struct lb_decimal_t *cost;
   /**
-   * State of this stock in the transfer
+   * State code of this stock in the transfer
    */
-  enum lb_transfer_stock_state_t state;
+  enum lb_transfer_stock_state_t state_code;
   /**
    * Position side
    */
@@ -7583,6 +7659,10 @@ typedef struct lb_stock_transfer_in_t {
    * Name of the other broker
    */
   const char *broker;
+  /**
+   * ID of the other broker
+   */
+  const char *broker_id;
   /**
    * English name of the other broker
    */
@@ -7686,6 +7766,10 @@ typedef struct lb_stock_transfer_out_t {
    */
   const char *broker;
   /**
+   * ID of the other broker
+   */
+  const char *broker_id;
+  /**
    * English name of the other broker
    */
   const char *broker_en;
@@ -7706,6 +7790,12 @@ typedef struct lb_stock_transfer_out_t {
    * State code (only `Submitted` applications can be cancelled)
    */
   enum lb_stock_transfer_out_state_t state_code;
+  /**
+   * App-side state: `noticed` means the user tapped "I have notified the
+   * broker" in the app (the user's own confirmation, not a Longbridge
+   * action); `default` otherwise
+   */
+  const char *app_state;
   /**
    * Created time as a unix timestamp (null when not set)
    */
@@ -7785,7 +7875,7 @@ typedef struct lb_reward_record_t {
   /**
    * Coupon status code (coupon rewards), as returned by the server
    */
-  int32_t card_status;
+  enum lb_coupon_status_t card_status;
   /**
    * Prize type code (gift rewards; `0` = physical goods), null when not set
    */
@@ -7943,10 +8033,15 @@ typedef struct lb_coupon_t {
    */
   const int64_t *start_time;
   /**
-   * End of validity as a unix timestamp (null when not set; a date after
-   * 2100 means the coupon never expires)
+   * End of validity as a unix timestamp (null when not set or when the
+   * coupon never expires; see `no_expiry`)
    */
   const int64_t *end_time;
+  /**
+   * Whether the coupon never expires (the server's end time is in or after
+   * 2100)
+   */
+  bool no_expiry;
   /**
    * Activation time as a unix timestamp (null when not activated)
    */
@@ -8144,15 +8239,15 @@ typedef struct lb_withdrawal_t {
    */
   const struct lb_decimal_t *settlement_amount;
   /**
-   * State
+   * State code
    */
-  enum lb_withdrawal_state_t state;
+  enum lb_withdrawal_state_t state_code;
   /**
    * Raw state, as returned by the server
    */
   const char *raw_state;
   /**
-   * State description, as returned by the server
+   * State display text, as returned by the server
    */
   const char *state_description;
   /**
@@ -15982,7 +16077,7 @@ void lb_asset_context_edda_applications(const struct lb_asset_context_t *ctx,
  * @param[in] opts Options (can be null)
  */
 void lb_asset_context_stock_transfers_in(const struct lb_asset_context_t *ctx,
-                                         const struct lb_get_stock_transfers_options_t *opts,
+                                         const struct lb_get_stock_transfers_in_options_t *opts,
                                          lb_async_callback_t callback,
                                          void *userdata);
 
@@ -15996,12 +16091,15 @@ void lb_asset_context_stock_transfers_in(const struct lb_asset_context_t *ctx,
  * @param[in] opts Options (can be null)
  */
 void lb_asset_context_stock_transfers_out(const struct lb_asset_context_t *ctx,
-                                          const struct lb_get_stock_transfers_options_t *opts,
+                                          const struct lb_get_stock_transfers_out_options_t *opts,
                                           lb_async_callback_t callback,
                                           void *userdata);
 
 /**
  * Get reward records from the reward center
+ *
+ * The route has no date filter: to find rewards in a time range, page
+ * through the records and filter on their times.
  *
  * AP accounts only: US data-center accounts get a region error.
  *

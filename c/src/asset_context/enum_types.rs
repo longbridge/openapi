@@ -1,381 +1,421 @@
 use longbridge_c_macros::CEnum;
 
 /// Verification status of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::BankCardStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CBankCardStatus {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     BankCardStatusUnknown,
-    /// Not verified
+    /// Not verified (server code 0)
     #[c(remote = "Unverified")]
     BankCardStatusUnverified,
-    /// Under review
+    /// Under review (server code 1)
     #[c(remote = "UnderReview")]
     BankCardStatusUnderReview,
-    /// Verified
+    /// Verified (server code 2)
     #[c(remote = "Verified")]
     BankCardStatusVerified,
 }
 
 /// Witness (in-person / video verification) state of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::BankCardWitnessState")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CBankCardWitnessState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     BankCardWitnessStateUnknown,
-    /// Witnessing not required
+    /// Witnessing not required (server code 1)
     #[c(remote = "NotRequired")]
     BankCardWitnessStateNotRequired,
-    /// Witnessing pending
+    /// Witnessing pending (server code 2)
     #[c(remote = "Pending")]
     BankCardWitnessStatePending,
-    /// Witnessed
+    /// Witnessed (server code 3)
     #[c(remote = "Witnessed")]
     BankCardWitnessStateWitnessed,
 }
 
 /// Binding state of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::BankCardBindState")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CBankCardBindState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     BankCardBindStateUnknown,
-    /// Binding in progress
+    /// Binding in progress (server code 0)
     #[c(remote = "Binding")]
     BankCardBindStateBinding,
-    /// Bound
+    /// Bound (server code 1)
     #[c(remote = "Bound")]
     BankCardBindStateBound,
-    /// Binding failed
+    /// Binding failed (server code 2)
     #[c(remote = "Failed")]
     BankCardBindStateFailed,
 }
 
 /// Status of a bank-card authorization or of an eDDA application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::AuthorizationStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CAuthorizationStatus {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     AuthorizationStatusUnknown,
-    /// Not authorized
+    /// Not authorized (server code 0)
     #[c(remote = "Unauthorized")]
     AuthorizationStatusUnauthorized,
-    /// Authorized
+    /// Authorized (server code 1)
     #[c(remote = "Authorized")]
     AuthorizationStatusAuthorized,
-    /// Authorization in progress
+    /// Authorization in progress (server code 2)
     #[c(remote = "Authorizing")]
     AuthorizationStatusAuthorizing,
-    /// Authorization failed
+    /// Authorization failed (server code 3)
     #[c(remote = "Failed")]
     AuthorizationStatusFailed,
 }
 
 /// State of a stock transfer-in application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::StockTransferInState")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CStockTransferInState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     StockTransferInStateUnknown,
-    /// Submitted
+    /// Submitted (server code 0)
     #[c(remote = "Submitted")]
     StockTransferInStateSubmitted,
-    /// Cancelled
+    /// Cancelled (server code 1)
     #[c(remote = "Cancelled")]
     StockTransferInStateCancelled,
-    /// Completed
+    /// Completed (server code 3)
     #[c(remote = "Completed")]
     StockTransferInStateCompleted,
-    /// Processing
+    /// Processing (server code 5)
     #[c(remote = "Processing")]
     StockTransferInStateProcessing,
-    /// Partially completed
+    /// Partially completed (server code 7)
     #[c(remote = "PartiallyCompleted")]
     StockTransferInStatePartiallyCompleted,
-    /// Failed
+    /// Failed (server code 8)
     #[c(remote = "Failed")]
     StockTransferInStateFailed,
 }
 
 /// State of a stock transfer-out application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::StockTransferOutState")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CStockTransferOutState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     StockTransferOutStateUnknown,
-    /// Submitted (the only state that can still be cancelled)
+    /// Submitted (the only state that can still be cancelled) (server code 0)
     #[c(remote = "Submitted")]
     StockTransferOutStateSubmitted,
-    /// Processing
+    /// Processing (server code 1)
     #[c(remote = "Processing")]
     StockTransferOutStateProcessing,
-    /// Executing
+    /// Executing (server code 2)
     #[c(remote = "Executing")]
     StockTransferOutStateExecuting,
-    /// Completed
+    /// Completed (server code 3)
     #[c(remote = "Completed")]
     StockTransferOutStateCompleted,
-    /// Cancelled
+    /// Cancelled (server code 4)
     #[c(remote = "Cancelled")]
     StockTransferOutStateCancelled,
-    /// Partially completed
+    /// Partially completed (server code 5)
     #[c(remote = "PartiallyCompleted")]
     StockTransferOutStatePartiallyCompleted,
-    /// Failed
+    /// Failed (server code 6)
     #[c(remote = "Failed")]
     StockTransferOutStateFailed,
-    /// Rejected
+    /// Rejected (server code 7)
     #[c(remote = "Rejected")]
     StockTransferOutStateRejected,
 }
 
 /// State of one stock inside a stock transfer application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::TransferStockState")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CTransferStockState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     TransferStockStateUnknown,
-    /// Processing
+    /// Processing (server code 0)
     #[c(remote = "Processing")]
     TransferStockStateProcessing,
-    /// Succeeded
+    /// Succeeded (server code 1)
     #[c(remote = "Succeeded")]
     TransferStockStateSucceeded,
-    /// Failed
+    /// Failed (server code 2)
     #[c(remote = "Failed")]
     TransferStockStateFailed,
 }
 
 /// Type of a reward record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::RewardType")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CRewardType {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     RewardTypeUnknown,
-    /// Cash reward
+    /// Cash reward (server code 0)
     #[c(remote = "Cash")]
     RewardTypeCash,
-    /// Gift (prize)
+    /// Gift (prize) (server code 1)
     #[c(remote = "Gift")]
     RewardTypeGift,
-    /// Coupon
+    /// Coupon (server code 2)
     #[c(remote = "Coupon")]
     RewardTypeCoupon,
-    /// Task reward
+    /// Task reward (server code 3)
     #[c(remote = "Task")]
     RewardTypeTask,
 }
 
 /// Status of a reward record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::RewardStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CRewardStatus {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     RewardStatusUnknown,
-    /// Upcoming
+    /// Upcoming (server code 0)
     #[c(remote = "Upcoming")]
     RewardStatusUpcoming,
-    /// Cancelled
+    /// Cancelled (server code 1)
     #[c(remote = "Cancelled")]
     RewardStatusCancelled,
-    /// The user exited the activity
+    /// The user exited the activity (server code 2)
     #[c(remote = "ExitedActivity")]
     RewardStatusExitedActivity,
-    /// Not claimed yet
+    /// Not claimed yet (server code 8)
     #[c(remote = "Unclaimed")]
     RewardStatusUnclaimed,
-    /// Being issued
+    /// Being issued (server code 10)
     #[c(remote = "Issuing")]
     RewardStatusIssuing,
-    /// Issued
+    /// Issued (server code 12)
     #[c(remote = "Issued")]
     RewardStatusIssued,
-    /// Issuing failed
+    /// Issuing failed (server code 13)
     #[c(remote = "Failed")]
     RewardStatusFailed,
-    /// Exchanged
+    /// Exchanged (server code 16)
     #[c(remote = "Exchanged")]
     RewardStatusExchanged,
-    /// Expired
+    /// Expired (server code 17)
     #[c(remote = "Expired")]
     RewardStatusExpired,
-    /// Refunded
+    /// Refunded (server code 18)
     #[c(remote = "Refunded")]
     RewardStatusRefunded,
 }
 
 /// Delivery status of an issued prize
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::RewardDeliverStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CRewardDeliverStatus {
-    /// Unknown (an undocumented code, or no delivery status)
+    /// Unknown: an undocumented code, or no delivery status (never sent to the
+    /// server)
     #[c(remote = "Unknown")]
     RewardDeliverStatusUnknown,
-    /// Not activated
+    /// Not activated (server code 0)
     #[c(remote = "NotActivated")]
     RewardDeliverStatusNotActivated,
-    /// Activated, or shipping
+    /// Activated, or shipping (server code 1)
     #[c(remote = "ActivatedOrShipping")]
     RewardDeliverStatusActivatedOrShipping,
-    /// Consumed
+    /// Consumed (server code 2)
     #[c(remote = "Consumed")]
     RewardDeliverStatusConsumed,
-    /// E-voucher activating
+    /// E-voucher activating (server code 5)
     #[c(remote = "EVoucherActivating")]
     RewardDeliverStatusEVoucherActivating,
-    /// E-voucher expired before activation
+    /// E-voucher expired before activation (server code 6)
     #[c(remote = "EVoucherExpired")]
     RewardDeliverStatusEVoucherExpired,
-    /// E-voucher invalid
+    /// E-voucher invalid (server code 7)
     #[c(remote = "EVoucherInvalid")]
     RewardDeliverStatusEVoucherInvalid,
-    /// Shipping address missing
+    /// Shipping address missing (server code 8)
     #[c(remote = "AddressMissing")]
     RewardDeliverStatusAddressMissing,
-    /// Shipping address filled
+    /// Shipping address filled (server code 9)
     #[c(remote = "AddressFilled")]
     RewardDeliverStatusAddressFilled,
-    /// Shipping
+    /// Shipping (server code 10)
     #[c(remote = "Shipping")]
     RewardDeliverStatusShipping,
 }
 
 /// Status of a coupon
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::CouponStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CCouponStatus {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     CouponStatusUnknown,
-    /// Unused
+    /// Unused (server code 0)
     #[c(remote = "Unused")]
     CouponStatusUnused,
-    /// Used
+    /// Used (server code 1)
     #[c(remote = "Used")]
     CouponStatusUsed,
-    /// Expired
+    /// Expired (server code 2)
     #[c(remote = "Expired")]
     CouponStatusExpired,
-    /// Being redeemed
+    /// Being redeemed (server code 3)
     #[c(remote = "Redeeming")]
     CouponStatusRedeeming,
-    /// In use
+    /// In use (server code 4)
     #[c(remote = "InUse")]
     CouponStatusInUse,
-    /// Processing
+    /// Processing (server code 5)
     #[c(remote = "Processing")]
     CouponStatusProcessing,
 }
 
 /// State of a deposit record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::DepositState")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CDepositState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     DepositStateUnknown,
-    /// Processing
+    /// Processing (server code 0)
     #[c(remote = "Processing")]
     DepositStateProcessing,
-    /// Credited to the account
+    /// Credited to the account (server code 1)
     #[c(remote = "Credited")]
     DepositStateCredited,
-    /// Failed
+    /// Failed (server code 2)
     #[c(remote = "Failed")]
     DepositStateFailed,
-    /// Cancelled
+    /// Cancelled (server code 3)
     #[c(remote = "Cancelled")]
     DepositStateCancelled,
-    /// Invalidated
+    /// Invalidated (server code 4)
     #[c(remote = "Invalidated")]
     DepositStateInvalidated,
-    /// Rejected
+    /// Rejected (server code 5)
     #[c(remote = "Rejected")]
     DepositStateRejected,
 }
 
 /// State of a withdrawal record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::asset::WithdrawalState")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CWithdrawalState {
-    /// Unknown (an undocumented code)
+    /// Unknown: an undocumented code (never sent to the server)
     #[c(remote = "Unknown")]
     WithdrawalStateUnknown,
-    /// Submitted
+    /// Submitted (server code 0)
     #[c(remote = "Submitted")]
     WithdrawalStateSubmitted,
-    /// Processing
+    /// Processing (server code 1)
     #[c(remote = "Processing")]
     WithdrawalStateProcessing,
-    /// Rejected
+    /// Rejected (server code 2)
     #[c(remote = "Rejected")]
     WithdrawalStateRejected,
-    /// Cancelled
+    /// Cancelled (server code 3)
     #[c(remote = "Cancelled")]
     WithdrawalStateCancelled,
-    /// Remitted
+    /// Remitted (server code 4)
     #[c(remote = "Remitted")]
     WithdrawalStateRemitted,
-    /// Failed
+    /// Failed (server code 5)
     #[c(remote = "Failed")]
     WithdrawalStateFailed,
-    /// Refunded
+    /// Refunded (server code 6)
     #[c(remote = "Refunded")]
     WithdrawalStateRefunded,
-    /// Approved, awaiting payout
+    /// Approved, awaiting payout (server code 7)
     #[c(remote = "ApprovedAwaitingPayout")]
     WithdrawalStateApprovedAwaitingPayout,
-    /// Large-amount review
+    /// Large-amount review (server code 8)
     #[c(remote = "LargeAmountReview")]
     WithdrawalStateLargeAmountReview,
-    /// Change pending approval
+    /// Change pending approval (server code 9)
     #[c(remote = "ChangePendingApproval")]
     WithdrawalStateChangePendingApproval,
-    /// Deletion pending approval
+    /// Deletion pending approval (server code 10)
     #[c(remote = "DeletionPendingApproval")]
     WithdrawalStateDeletionPendingApproval,
-    /// Deleted
+    /// Deleted (server code 11)
     #[c(remote = "Deleted")]
     WithdrawalStateDeleted,
-    /// Rejection pending approval
+    /// Rejection pending approval (server code 12)
     #[c(remote = "RejectionPendingApproval")]
     WithdrawalStateRejectionPendingApproval,
-    /// Awaiting confirmation
+    /// Awaiting confirmation (server code 15)
     #[c(remote = "AwaitingConfirmation")]
     WithdrawalStateAwaitingConfirmation,
 }

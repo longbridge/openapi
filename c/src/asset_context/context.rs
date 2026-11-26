@@ -13,9 +13,9 @@ use crate::{
         types::{
             CBankCardOwned, CCouponOrderOwned, CCouponsResponseOwned, CDepositOwned,
             CEddaApplicationOwned, CGetCouponsOptions, CGetDepositsOptions,
-            CGetRewardRecordsOptions, CGetStockTransfersOptions, CGetWithdrawalsOptions,
-            CRewardRecordsResponseOwned, CStatementItemOwned, CStockTransferInResponseOwned,
-            CStockTransferOutOwned, CWithdrawalsResponseOwned,
+            CGetRewardRecordsOptions, CGetStockTransfersInOptions, CGetStockTransfersOutOptions,
+            CGetWithdrawalsOptions, CRewardRecordsResponseOwned, CStatementItemOwned,
+            CStockTransferInResponseOwned, CStockTransferOutOwned, CWithdrawalsResponseOwned,
         },
     },
     async_call::{CAsyncCallback, execute_async},
@@ -33,33 +33,33 @@ unsafe fn opt_time(value: *const i64) -> Option<OffsetDateTime> {
     }
 }
 
-unsafe fn stock_transfers_options(
-    opts: *const CGetStockTransfersOptions,
-) -> GetStockTransfersOptions {
-    let mut opts2 = GetStockTransfersOptions::new();
-    if opts.is_null() {
-        return opts2;
-    }
-    let opts = &*opts;
-    if !opts.market.is_null() {
-        opts2 = opts2.market(cstr_to_rust(opts.market));
-    }
-    if !opts.state.is_null() {
-        opts2 = opts2.state(*opts.state);
-    }
-    if let Some(start) = opt_time(opts.start) {
-        opts2 = opts2.start(start);
-    }
-    if let Some(end) = opt_time(opts.end) {
-        opts2 = opts2.end(end);
-    }
-    if !opts.page.is_null() {
-        opts2 = opts2.page(*opts.page);
-    }
-    if !opts.size.is_null() {
-        opts2 = opts2.size(*opts.size);
-    }
-    opts2
+macro_rules! stock_transfers_options {
+    ($opts:expr) => {{
+        let opts = $opts;
+        let mut opts2 = GetStockTransfersOptions::new();
+        if !opts.is_null() {
+            let opts = &*opts;
+            if !opts.market.is_null() {
+                opts2 = opts2.market(cstr_to_rust(opts.market));
+            }
+            if !opts.state.is_null() {
+                opts2 = opts2.state((*opts.state).into());
+            }
+            if let Some(start) = opt_time(opts.start) {
+                opts2 = opts2.start(start);
+            }
+            if let Some(end) = opt_time(opts.end) {
+                opts2 = opts2.end(end);
+            }
+            if !opts.page.is_null() {
+                opts2 = opts2.page(*opts.page);
+            }
+            if !opts.size.is_null() {
+                opts2 = opts2.size(*opts.size);
+            }
+        }
+        opts2
+    }};
 }
 
 /// Asset context
@@ -203,12 +203,12 @@ pub unsafe extern "C" fn lb_asset_context_edda_applications(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_asset_context_stock_transfers_in(
     ctx: *const CAssetContext,
-    opts: *const CGetStockTransfersOptions,
+    opts: *const CGetStockTransfersInOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let opts2 = stock_transfers_options(opts);
+    let opts2 = stock_transfers_options!(opts);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CStockTransferInResponseOwned> =
             CCow::new(ctx_inner.stock_transfers_in(opts2).await?);
@@ -226,12 +226,12 @@ pub unsafe extern "C" fn lb_asset_context_stock_transfers_in(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_asset_context_stock_transfers_out(
     ctx: *const CAssetContext,
-    opts: *const CGetStockTransfersOptions,
+    opts: *const CGetStockTransfersOutOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let opts2 = stock_transfers_options(opts);
+    let opts2 = stock_transfers_options!(opts);
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CStockTransferOutOwned> = ctx_inner.stock_transfers_out(opts2).await?.into();
         Ok(rows)
@@ -239,6 +239,9 @@ pub unsafe extern "C" fn lb_asset_context_stock_transfers_out(
 }
 
 /// Get reward records from the reward center
+///
+/// The route has no date filter: to find rewards in a time range, page
+/// through the records and filter on their times.
 ///
 /// AP accounts only: US data-center accounts get a region error.
 ///

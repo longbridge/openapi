@@ -30,251 +30,290 @@ struct StatementDownloadUrlResponse
 };
 
 /// Verification status of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class BankCardStatus
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Not verified
+  /// Not verified (server code 0)
   Unverified,
-  /// Under review
+  /// Under review (server code 1)
   UnderReview,
-  /// Verified
+  /// Verified (server code 2)
   Verified,
 };
 
 /// Witness (in-person / video verification) state of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class BankCardWitnessState
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Witnessing not required
+  /// Witnessing not required (server code 1)
   NotRequired,
-  /// Witnessing pending
+  /// Witnessing pending (server code 2)
   Pending,
-  /// Witnessed
+  /// Witnessed (server code 3)
   Witnessed,
 };
 
 /// Binding state of a bank card
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class BankCardBindState
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Binding in progress
+  /// Binding in progress (server code 0)
   Binding,
-  /// Bound
+  /// Bound (server code 1)
   Bound,
-  /// Binding failed
+  /// Binding failed (server code 2)
   Failed,
 };
 
 /// Status of a bank-card authorization or of an eDDA application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class AuthorizationStatus
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Not authorized
+  /// Not authorized (server code 0)
   Unauthorized,
-  /// Authorized
+  /// Authorized (server code 1)
   Authorized,
-  /// Authorization in progress
+  /// Authorization in progress (server code 2)
   Authorizing,
-  /// Authorization failed
+  /// Authorization failed (server code 3)
   Failed,
 };
 
 /// State of a stock transfer-in application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class StockTransferInState
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Submitted
+  /// Submitted (server code 0)
   Submitted,
-  /// Cancelled
+  /// Cancelled (server code 1)
   Cancelled,
-  /// Completed
+  /// Completed (server code 3)
   Completed,
-  /// Processing
+  /// Processing (server code 5)
   Processing,
-  /// Partially completed
+  /// Partially completed (server code 7)
   PartiallyCompleted,
-  /// Failed
+  /// Failed (server code 8)
   Failed,
 };
 
 /// State of a stock transfer-out application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class StockTransferOutState
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Submitted (the only state that can still be cancelled)
+  /// Submitted (the only state that can still be cancelled) (server code 0)
   Submitted,
-  /// Processing
+  /// Processing (server code 1)
   Processing,
-  /// Executing
+  /// Executing (server code 2)
   Executing,
-  /// Completed
+  /// Completed (server code 3)
   Completed,
-  /// Cancelled
+  /// Cancelled (server code 4)
   Cancelled,
-  /// Partially completed
+  /// Partially completed (server code 5)
   PartiallyCompleted,
-  /// Failed
+  /// Failed (server code 6)
   Failed,
-  /// Rejected
+  /// Rejected (server code 7)
   Rejected,
 };
 
 /// State of one stock inside a stock transfer application
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class TransferStockState
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Processing
+  /// Processing (server code 0)
   Processing,
-  /// Succeeded
+  /// Succeeded (server code 1)
   Succeeded,
-  /// Failed
+  /// Failed (server code 2)
   Failed,
 };
 
 /// Type of a reward record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class RewardType
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Cash reward
+  /// Cash reward (server code 0)
   Cash,
-  /// Gift (prize)
+  /// Gift (prize) (server code 1)
   Gift,
-  /// Coupon
+  /// Coupon (server code 2)
   Coupon,
-  /// Task reward
+  /// Task reward (server code 3)
   Task,
 };
 
 /// Status of a reward record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class RewardStatus
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Upcoming
+  /// Upcoming (server code 0)
   Upcoming,
-  /// Cancelled
+  /// Cancelled (server code 1)
   Cancelled,
-  /// The user exited the activity
+  /// The user exited the activity (server code 2)
   ExitedActivity,
-  /// Not claimed yet
+  /// Not claimed yet (server code 8)
   Unclaimed,
-  /// Being issued
+  /// Being issued (server code 10)
   Issuing,
-  /// Issued
+  /// Issued (server code 12)
   Issued,
-  /// Issuing failed
+  /// Issuing failed (server code 13)
   Failed,
-  /// Exchanged
+  /// Exchanged (server code 16)
   Exchanged,
-  /// Expired
+  /// Expired (server code 17)
   Expired,
-  /// Refunded
+  /// Refunded (server code 18)
   Refunded,
 };
 
 /// Delivery status of an issued prize
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class RewardDeliverStatus
 {
-  /// Unknown (an undocumented code, or no delivery status)
+  /// Unknown: an undocumented code, or no delivery status (never sent to the server)
   Unknown,
-  /// Not activated
+  /// Not activated (server code 0)
   NotActivated,
-  /// Activated, or shipping
+  /// Activated, or shipping (server code 1)
   ActivatedOrShipping,
-  /// Consumed
+  /// Consumed (server code 2)
   Consumed,
-  /// E-voucher activating
+  /// E-voucher activating (server code 5)
   EVoucherActivating,
-  /// E-voucher expired before activation
+  /// E-voucher expired before activation (server code 6)
   EVoucherExpired,
-  /// E-voucher invalid
+  /// E-voucher invalid (server code 7)
   EVoucherInvalid,
-  /// Shipping address missing
+  /// Shipping address missing (server code 8)
   AddressMissing,
-  /// Shipping address filled
+  /// Shipping address filled (server code 9)
   AddressFilled,
-  /// Shipping
+  /// Shipping (server code 10)
   Shipping,
 };
 
 /// Status of a coupon
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class CouponStatus
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Unused
+  /// Unused (server code 0)
   Unused,
-  /// Used
+  /// Used (server code 1)
   Used,
-  /// Expired
+  /// Expired (server code 2)
   Expired,
-  /// Being redeemed
+  /// Being redeemed (server code 3)
   Redeeming,
-  /// In use
+  /// In use (server code 4)
   InUse,
-  /// Processing
+  /// Processing (server code 5)
   Processing,
 };
 
 /// State of a deposit record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class DepositState
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Processing
+  /// Processing (server code 0)
   Processing,
-  /// Credited to the account
+  /// Credited to the account (server code 1)
   Credited,
-  /// Failed
+  /// Failed (server code 2)
   Failed,
-  /// Cancelled
+  /// Cancelled (server code 3)
   Cancelled,
-  /// Invalidated
+  /// Invalidated (server code 4)
   Invalidated,
-  /// Rejected
+  /// Rejected (server code 5)
   Rejected,
 };
 
 /// State of a withdrawal record
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
 enum class WithdrawalState
 {
-  /// Unknown (an undocumented code)
+  /// Unknown: an undocumented code (never sent to the server)
   Unknown,
-  /// Submitted
+  /// Submitted (server code 0)
   Submitted,
-  /// Processing
+  /// Processing (server code 1)
   Processing,
-  /// Rejected
+  /// Rejected (server code 2)
   Rejected,
-  /// Cancelled
+  /// Cancelled (server code 3)
   Cancelled,
-  /// Remitted
+  /// Remitted (server code 4)
   Remitted,
-  /// Failed
+  /// Failed (server code 5)
   Failed,
-  /// Refunded
+  /// Refunded (server code 6)
   Refunded,
-  /// Approved, awaiting payout
+  /// Approved, awaiting payout (server code 7)
   ApprovedAwaitingPayout,
-  /// Large-amount review
+  /// Large-amount review (server code 8)
   LargeAmountReview,
-  /// Change pending approval
+  /// Change pending approval (server code 9)
   ChangePendingApproval,
-  /// Deletion pending approval
+  /// Deletion pending approval (server code 10)
   DeletionPendingApproval,
-  /// Deleted
+  /// Deleted (server code 11)
   Deleted,
-  /// Rejection pending approval
+  /// Rejection pending approval (server code 12)
   RejectionPendingApproval,
-  /// Awaiting confirmation
+  /// Awaiting confirmation (server code 15)
   AwaitingConfirmation,
 };
 
@@ -310,7 +349,9 @@ struct BankCardAuthorization
   std::optional<int64_t> daily_max_count;
   /// Whether the daily debit count is unlimited
   bool daily_max_count_unlimited;
-  /// Expiry date of the authorization as a unix timestamp (null when not set; a long-term authorization carries the 9999-12-31 sentinel)
+  /// Expiry date of the authorization as a unix timestamp (null when not set
+  /// and for a long-term authorization: the server's 9999-12-31 "never
+  /// expires" sentinel is null; see `long_term_valid`)
   std::optional<int64_t> expiry_date;
   /// Whether the authorization never expires
   bool long_term_valid;
@@ -395,8 +436,8 @@ struct TransferStock
   std::string currency;
   /// Cost price (null when not set)
   std::optional<Decimal> cost;
-  /// State of this stock in the transfer
-  TransferStockState state;
+  /// State code of this stock in the transfer
+  TransferStockState state_code;
   /// Position side
   std::string position_side;
 };
@@ -412,6 +453,8 @@ struct StockTransferIn
   std::string market;
   /// Name of the other broker
   std::string broker;
+  /// ID of the other broker
+  std::string broker_id;
   /// English name of the other broker
   std::string broker_en;
   /// Broker code of the other broker
@@ -422,7 +465,9 @@ struct StockTransferIn
   std::string state;
   /// State code
   StockTransferInState state_code;
-  /// App-side state: `noticed` means the user tapped "I have notified the broker" in the app; `default` otherwise
+  /// App-side state: `noticed` means the user tapped "I have notified the
+  /// broker" in the app (the user's own confirmation, not a Longbridge
+  /// action); `default` otherwise
   std::string app_state;
   /// Whether the application can still be cancelled or changed
   bool can_modify;
@@ -462,6 +507,8 @@ struct StockTransferOut
   std::string market;
   /// Name of the other broker
   std::string broker;
+  /// ID of the other broker
+  std::string broker_id;
   /// English name of the other broker
   std::string broker_en;
   /// Broker code of the other broker
@@ -472,6 +519,10 @@ struct StockTransferOut
   std::string state;
   /// State code (only `Submitted` applications can be cancelled)
   StockTransferOutState state_code;
+  /// App-side state: `noticed` means the user tapped "I have notified the
+  /// broker" in the app (the user's own confirmation, not a Longbridge
+  /// action); `default` otherwise
+  std::string app_state;
   /// Created time as a unix timestamp (null when not set)
   std::optional<int64_t> created_at;
   /// Updated time as a unix timestamp (null when not set)
@@ -509,8 +560,8 @@ struct RewardRecord
   std::string description;
   /// Coupon type (coupon rewards), e.g. `commission`
   std::string card_type;
-  /// Coupon status code (coupon rewards), as returned by the server
-  int32_t card_status;
+  /// Coupon status (coupon rewards; `CouponStatus::Unknown` otherwise)
+  CouponStatus card_status;
   /// Prize type code (gift rewards; `0` = physical goods), null when not set
   std::optional<int32_t> prize_type;
   /// Amount (null when not set)
@@ -588,8 +639,12 @@ struct Coupon
   CouponStatus card_status;
   /// Start of validity as a unix timestamp (null when not set)
   std::optional<int64_t> start_time;
-  /// End of validity as a unix timestamp (null when not set; a date after 2100 means the coupon never expires)
+  /// End of validity as a unix timestamp (null when not set or when the
+  /// coupon never expires; see `no_expiry`)
   std::optional<int64_t> end_time;
+  /// Whether the coupon never expires (the server's end time is in or after
+  /// 2100)
+  bool no_expiry;
   /// Activation time as a unix timestamp (null when not activated)
   std::optional<int64_t> activate_time;
   /// Amount (null when not set)
@@ -690,11 +745,11 @@ struct Withdrawal
   std::optional<Decimal> fee;
   /// Amount paid out (null when not set)
   std::optional<Decimal> settlement_amount;
-  /// State
-  WithdrawalState state;
+  /// State code
+  WithdrawalState state_code;
   /// Raw state, as returned by the server
   std::string raw_state;
-  /// State description, as returned by the server
+  /// State display text, as returned by the server
   std::string state_description;
   /// Receiving bank account number, as returned by the server (not masked)
   std::string bank_account;
@@ -716,15 +771,32 @@ struct WithdrawalsResponse
 };
 
 
-/// Options for the stock transfer-in and transfer-out lists
-struct GetStockTransfersOptions
+/// Options for the stock transfer-in list
+struct GetStockTransfersInOptions
 {
   /// Market filter: `HK`, `US`, `CN` or `SG`
   std::optional<std::string> market;
-  /// State code filter: a `StockTransferInState` server code for the
-  /// transfer-in list, a `StockTransferOutState` server code for the
-  /// transfer-out list
-  std::optional<int32_t> state;
+  /// State filter (`StockTransferInState::Unknown` is ignored); sent to the server as the
+  /// state's server code
+  std::optional<StockTransferInState> state;
+  /// Only applications created at or after this unix timestamp
+  std::optional<int64_t> start;
+  /// Only applications created at or before this unix timestamp
+  std::optional<int64_t> end;
+  /// Page number (default 1)
+  std::optional<int32_t> page;
+  /// Page size (default 20, max 50)
+  std::optional<int32_t> size;
+};
+
+/// Options for the stock transfer-out list
+struct GetStockTransfersOutOptions
+{
+  /// Market filter: `HK`, `US`, `CN` or `SG`
+  std::optional<std::string> market;
+  /// State filter (`StockTransferOutState::Unknown` is ignored); sent to the server as the
+  /// state's server code
+  std::optional<StockTransferOutState> state;
   /// Only applications created at or after this unix timestamp
   std::optional<int64_t> start;
   /// Only applications created at or before this unix timestamp
@@ -742,7 +814,8 @@ struct GetRewardRecordsOptions
   std::optional<int32_t> page;
   /// Page size (max 50)
   std::optional<int32_t> page_size;
-  /// Reward type filter (default: all types)
+  /// Reward type filter (default: all types; `RewardType::Unknown` is
+  /// ignored)
   std::optional<RewardType> reward_type;
 };
 
@@ -833,15 +906,16 @@ public:
 
   /// Get stock transfer-in applications (AP accounts only)
   void stock_transfers_in(
-    const std::optional<GetStockTransfersOptions>& opts,
+    const std::optional<GetStockTransfersInOptions>& opts,
     AsyncCallback<AssetContext, StockTransferInResponse> callback) const;
 
   /// Get stock transfer-out applications (AP accounts only)
   void stock_transfers_out(
-    const std::optional<GetStockTransfersOptions>& opts,
+    const std::optional<GetStockTransfersOutOptions>& opts,
     AsyncCallback<AssetContext, std::vector<StockTransferOut>> callback) const;
 
-  /// Get reward records from the reward center (AP accounts only)
+  /// Get reward records from the reward center (AP accounts only). The route
+  /// has no date filter: page through the records and filter on their times.
   void reward_records(
     const std::optional<GetRewardRecordsOptions>& opts,
     AsyncCallback<AssetContext, RewardRecordsResponse> callback) const;

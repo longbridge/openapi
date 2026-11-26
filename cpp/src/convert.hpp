@@ -5597,7 +5597,7 @@ convert(const lb_transfer_stock_t* info)
   out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
   out.currency = std::string(info->currency ? info->currency : "");
   out.cost = info->cost ? std::optional<Decimal>(Decimal(info->cost)) : std::nullopt;
-  out.state = convert(info->state);
+  out.state_code = convert(info->state_code);
   out.position_side = std::string(info->position_side ? info->position_side : "");
   return out;
 }
@@ -5610,6 +5610,7 @@ convert(const lb_stock_transfer_in_t* info)
   out.order_id = std::string(info->order_id ? info->order_id : "");
   out.market = std::string(info->market ? info->market : "");
   out.broker = std::string(info->broker ? info->broker : "");
+  out.broker_id = std::string(info->broker_id ? info->broker_id : "");
   out.broker_en = std::string(info->broker_en ? info->broker_en : "");
   out.broker_code = std::string(info->broker_code ? info->broker_code : "");
   out.account = std::string(info->account ? info->account : "");
@@ -5644,11 +5645,13 @@ convert(const lb_stock_transfer_out_t* info)
   out.order_id = std::string(info->order_id ? info->order_id : "");
   out.market = std::string(info->market ? info->market : "");
   out.broker = std::string(info->broker ? info->broker : "");
+  out.broker_id = std::string(info->broker_id ? info->broker_id : "");
   out.broker_en = std::string(info->broker_en ? info->broker_en : "");
   out.broker_code = std::string(info->broker_code ? info->broker_code : "");
   out.account = std::string(info->account ? info->account : "");
   out.state = std::string(info->state ? info->state : "");
   out.state_code = convert(info->state_code);
+  out.app_state = std::string(info->app_state ? info->app_state : "");
   out.created_at = info->created_at ? std::optional<int64_t>(*info->created_at) : std::nullopt;
   out.updated_at = info->updated_at ? std::optional<int64_t>(*info->updated_at) : std::nullopt;
   out.process_at = info->process_at ? std::optional<int64_t>(*info->process_at) : std::nullopt;
@@ -5672,7 +5675,7 @@ convert(const lb_reward_record_t* info)
   out.title = std::string(info->title ? info->title : "");
   out.description = std::string(info->description ? info->description : "");
   out.card_type = std::string(info->card_type ? info->card_type : "");
-  out.card_status = info->card_status;
+  out.card_status = convert(info->card_status);
   out.prize_type = info->prize_type ? std::optional<int32_t>(*info->prize_type) : std::nullopt;
   out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
   out.currency = std::string(info->currency ? info->currency : "");
@@ -5726,6 +5729,7 @@ convert(const lb_coupon_t* info)
   out.card_status = convert(info->card_status);
   out.start_time = info->start_time ? std::optional<int64_t>(*info->start_time) : std::nullopt;
   out.end_time = info->end_time ? std::optional<int64_t>(*info->end_time) : std::nullopt;
+  out.no_expiry = info->no_expiry;
   out.activate_time = info->activate_time ? std::optional<int64_t>(*info->activate_time) : std::nullopt;
   out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
   out.currency = std::string(info->currency ? info->currency : "");
@@ -5794,7 +5798,7 @@ convert(const lb_withdrawal_t* info)
   out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
   out.fee = info->fee ? std::optional<Decimal>(Decimal(info->fee)) : std::nullopt;
   out.settlement_amount = info->settlement_amount ? std::optional<Decimal>(Decimal(info->settlement_amount)) : std::nullopt;
-  out.state = convert(info->state);
+  out.state_code = convert(info->state_code);
   out.raw_state = std::string(info->raw_state ? info->raw_state : "");
   out.state_description = std::string(info->state_description ? info->state_description : "");
   out.bank_account = std::string(info->bank_account ? info->bank_account : "");

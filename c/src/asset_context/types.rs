@@ -78,8 +78,9 @@ pub struct CBankCardAuthorization {
     pub daily_max_count: *const i64,
     /// Whether the daily debit count is unlimited
     pub daily_max_count_unlimited: bool,
-    /// Expiry date of the authorization as a unix timestamp (null when not set;
-    /// a long-term authorization carries the 9999-12-31 sentinel)
+    /// Expiry date of the authorization as a unix timestamp (null when not set
+    /// and for a long-term authorization: the server's 9999-12-31 "never
+    /// expires" sentinel is null; see `long_term_valid`)
     pub expiry_date: *const i64,
     /// Whether the authorization never expires
     pub long_term_valid: bool,
@@ -354,8 +355,8 @@ pub struct CTransferStock {
     pub currency: *const c_char,
     /// Cost price (null when not set)
     pub cost: *const CDecimal,
-    /// State of this stock in the transfer
-    pub state: CTransferStockState,
+    /// State code of this stock in the transfer
+    pub state_code: CTransferStockState,
     /// Position side
     pub position_side: *const c_char,
 }
@@ -370,7 +371,7 @@ pub(crate) struct CTransferStockOwned {
     amount: Option<CDecimal>,
     currency: CString,
     cost: Option<CDecimal>,
-    state: TransferStockState,
+    state_code: TransferStockState,
     position_side: CString,
 }
 
@@ -385,7 +386,7 @@ impl From<TransferStock> for CTransferStockOwned {
             amount: v.amount.map(Into::into),
             currency: v.currency.into(),
             cost: v.cost.map(Into::into),
-            state: v.state,
+            state_code: v.state_code,
             position_side: v.position_side.into(),
         }
     }
@@ -412,7 +413,7 @@ impl ToFFI for CTransferStockOwned {
                 .as_ref()
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
-            state: self.state.into(),
+            state_code: self.state_code.into(),
             position_side: self.position_side.to_ffi_type(),
         }
     }
@@ -429,6 +430,8 @@ pub struct CStockTransferIn {
     pub market: *const c_char,
     /// Name of the other broker
     pub broker: *const c_char,
+    /// ID of the other broker
+    pub broker_id: *const c_char,
     /// English name of the other broker
     pub broker_en: *const c_char,
     /// Broker code of the other broker
@@ -469,6 +472,7 @@ pub(crate) struct CStockTransferInOwned {
     order_id: CString,
     market: CString,
     broker: CString,
+    broker_id: CString,
     broker_en: CString,
     broker_code: CString,
     account: CString,
@@ -492,6 +496,7 @@ impl From<StockTransferIn> for CStockTransferInOwned {
             order_id: v.order_id.into(),
             market: v.market.into(),
             broker: v.broker.into(),
+            broker_id: v.broker_id.into(),
             broker_en: v.broker_en.into(),
             broker_code: v.broker_code.into(),
             account: v.account.into(),
@@ -519,6 +524,7 @@ impl ToFFI for CStockTransferInOwned {
             order_id: self.order_id.to_ffi_type(),
             market: self.market.to_ffi_type(),
             broker: self.broker.to_ffi_type(),
+            broker_id: self.broker_id.to_ffi_type(),
             broker_en: self.broker_en.to_ffi_type(),
             broker_code: self.broker_code.to_ffi_type(),
             account: self.account.to_ffi_type(),
@@ -603,6 +609,8 @@ pub struct CStockTransferOut {
     pub market: *const c_char,
     /// Name of the other broker
     pub broker: *const c_char,
+    /// ID of the other broker
+    pub broker_id: *const c_char,
     /// English name of the other broker
     pub broker_en: *const c_char,
     /// Broker code of the other broker
@@ -614,6 +622,10 @@ pub struct CStockTransferOut {
     pub state: *const c_char,
     /// State code (only `Submitted` applications can be cancelled)
     pub state_code: CStockTransferOutState,
+    /// App-side state: `noticed` means the user tapped "I have notified the
+    /// broker" in the app (the user's own confirmation, not a Longbridge
+    /// action); `default` otherwise
+    pub app_state: *const c_char,
     /// Created time as a unix timestamp (null when not set)
     pub created_at: *const i64,
     /// Updated time as a unix timestamp (null when not set)
@@ -645,11 +657,13 @@ pub(crate) struct CStockTransferOutOwned {
     order_id: CString,
     market: CString,
     broker: CString,
+    broker_id: CString,
     broker_en: CString,
     broker_code: CString,
     account: CString,
     state: CString,
     state_code: StockTransferOutState,
+    app_state: CString,
     created_at: Option<i64>,
     updated_at: Option<i64>,
     process_at: Option<i64>,
@@ -669,11 +683,13 @@ impl From<StockTransferOut> for CStockTransferOutOwned {
             order_id: v.order_id.into(),
             market: v.market.into(),
             broker: v.broker.into(),
+            broker_id: v.broker_id.into(),
             broker_en: v.broker_en.into(),
             broker_code: v.broker_code.into(),
             account: v.account.into(),
             state: v.state.into(),
             state_code: v.state_code,
+            app_state: v.app_state.into(),
             created_at: v.created_at.map(OffsetDateTime::unix_timestamp),
             updated_at: v.updated_at.map(OffsetDateTime::unix_timestamp),
             process_at: v.process_at.map(OffsetDateTime::unix_timestamp),
@@ -697,11 +713,13 @@ impl ToFFI for CStockTransferOutOwned {
             order_id: self.order_id.to_ffi_type(),
             market: self.market.to_ffi_type(),
             broker: self.broker.to_ffi_type(),
+            broker_id: self.broker_id.to_ffi_type(),
             broker_en: self.broker_en.to_ffi_type(),
             broker_code: self.broker_code.to_ffi_type(),
             account: self.account.to_ffi_type(),
             state: self.state.to_ffi_type(),
             state_code: self.state_code.into(),
+            app_state: self.app_state.to_ffi_type(),
             created_at: self
                 .created_at
                 .as_ref()
@@ -762,7 +780,7 @@ pub struct CRewardRecord {
     /// Coupon type (coupon rewards), e.g. `commission`
     pub card_type: *const c_char,
     /// Coupon status code (coupon rewards), as returned by the server
-    pub card_status: i32,
+    pub card_status: CCouponStatus,
     /// Prize type code (gift rewards; `0` = physical goods), null when not set
     pub prize_type: *const i32,
     /// Amount (null when not set)
@@ -795,7 +813,7 @@ pub(crate) struct CRewardRecordOwned {
     title: CString,
     description: CString,
     card_type: CString,
-    card_status: i32,
+    card_status: CouponStatus,
     prize_type: Option<i32>,
     amount: Option<CDecimal>,
     currency: CString,
@@ -845,7 +863,7 @@ impl ToFFI for CRewardRecordOwned {
             title: self.title.to_ffi_type(),
             description: self.description.to_ffi_type(),
             card_type: self.card_type.to_ffi_type(),
-            card_status: self.card_status,
+            card_status: self.card_status.into(),
             prize_type: self
                 .prize_type
                 .as_ref()
@@ -1039,9 +1057,12 @@ pub struct CCoupon {
     pub card_status: CCouponStatus,
     /// Start of validity as a unix timestamp (null when not set)
     pub start_time: *const i64,
-    /// End of validity as a unix timestamp (null when not set; a date after
-    /// 2100 means the coupon never expires)
+    /// End of validity as a unix timestamp (null when not set or when the
+    /// coupon never expires; see `no_expiry`)
     pub end_time: *const i64,
+    /// Whether the coupon never expires (the server's end time is in or after
+    /// 2100)
+    pub no_expiry: bool,
     /// Activation time as a unix timestamp (null when not activated)
     pub activate_time: *const i64,
     /// Amount (null when not set)
@@ -1065,6 +1086,7 @@ pub(crate) struct CCouponOwned {
     card_status: CouponStatus,
     start_time: Option<i64>,
     end_time: Option<i64>,
+    no_expiry: bool,
     activate_time: Option<i64>,
     amount: Option<CDecimal>,
     currency: CString,
@@ -1084,6 +1106,7 @@ impl From<Coupon> for CCouponOwned {
             card_status: v.card_status,
             start_time: v.start_time.map(OffsetDateTime::unix_timestamp),
             end_time: v.end_time.map(OffsetDateTime::unix_timestamp),
+            no_expiry: v.no_expiry,
             activate_time: v.activate_time.map(OffsetDateTime::unix_timestamp),
             amount: v.amount.map(Into::into),
             currency: v.currency.into(),
@@ -1115,6 +1138,7 @@ impl ToFFI for CCouponOwned {
                 .as_ref()
                 .map(|v| v as *const i64)
                 .unwrap_or(std::ptr::null()),
+            no_expiry: self.no_expiry,
             activate_time: self
                 .activate_time
                 .as_ref()
@@ -1401,11 +1425,11 @@ pub struct CWithdrawal {
     pub fee: *const CDecimal,
     /// Amount paid out (null when not set)
     pub settlement_amount: *const CDecimal,
-    /// State
-    pub state: CWithdrawalState,
+    /// State code
+    pub state_code: CWithdrawalState,
     /// Raw state, as returned by the server
     pub raw_state: *const c_char,
-    /// State description, as returned by the server
+    /// State display text, as returned by the server
     pub state_description: *const c_char,
     /// Receiving bank account number, as returned by the server (not masked)
     pub bank_account: *const c_char,
@@ -1426,7 +1450,7 @@ pub(crate) struct CWithdrawalOwned {
     amount: Option<CDecimal>,
     fee: Option<CDecimal>,
     settlement_amount: Option<CDecimal>,
-    state: WithdrawalState,
+    state_code: WithdrawalState,
     raw_state: CString,
     state_description: CString,
     bank_account: CString,
@@ -1445,7 +1469,7 @@ impl From<Withdrawal> for CWithdrawalOwned {
             amount: v.amount.map(Into::into),
             fee: v.fee.map(Into::into),
             settlement_amount: v.settlement_amount.map(Into::into),
-            state: v.state,
+            state_code: v.state_code,
             raw_state: v.raw_state.into(),
             state_description: v.state_description.into(),
             bank_account: v.bank_account.into(),
@@ -1484,7 +1508,7 @@ impl ToFFI for CWithdrawalOwned {
                 .as_ref()
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
-            state: self.state.into(),
+            state_code: self.state_code.into(),
             raw_state: self.raw_state.to_ffi_type(),
             state_description: self.state_description.to_ffi_type(),
             bank_account: self.bank_account.to_ffi_type(),
@@ -1533,15 +1557,36 @@ impl ToFFI for CWithdrawalsResponseOwned {
     }
 }
 
-/// Options for the stock transfer-in and transfer-out lists
+/// Options for the stock transfer-in list
 #[repr(C)]
-pub struct CGetStockTransfersOptions {
+pub struct CGetStockTransfersInOptions {
     /// Market filter: `HK`, `US`, `CN` or `SG` (can be null)
     pub market: *const c_char,
-    /// State code filter: a `lb_stock_transfer_in_state_t` code for the
-    /// transfer-in list, a `lb_stock_transfer_out_state_t` code for the
-    /// transfer-out list, as the server's integer value (can be null)
-    pub state: *const i32,
+    /// State filter (can be null for all states; `StockTransferInStateUnknown`
+    /// is ignored). Sent to the server as the state's server code, not as the C
+    /// enum value.
+    pub state: *const CStockTransferInState,
+    /// Only applications created at or after this unix timestamp (can be
+    /// null)
+    pub start: *const i64,
+    /// Only applications created at or before this unix timestamp (can be
+    /// null)
+    pub end: *const i64,
+    /// Page number (can be null, default 1)
+    pub page: *const i32,
+    /// Page size (can be null, default 20, max 50)
+    pub size: *const i32,
+}
+
+/// Options for the stock transfer-out list
+#[repr(C)]
+pub struct CGetStockTransfersOutOptions {
+    /// Market filter: `HK`, `US`, `CN` or `SG` (can be null)
+    pub market: *const c_char,
+    /// State filter (can be null for all states; `StockTransferOutStateUnknown`
+    /// is ignored). Sent to the server as the state's server code, not as the C
+    /// enum value.
+    pub state: *const CStockTransferOutState,
     /// Only applications created at or after this unix timestamp (can be
     /// null)
     pub start: *const i64,
@@ -1561,7 +1606,8 @@ pub struct CGetRewardRecordsOptions {
     pub page: *const i32,
     /// Page size (can be null, max 50)
     pub page_size: *const i32,
-    /// Reward type filter (can be null for all types)
+    /// Reward type filter (can be null for all types; `RewardTypeUnknown` is
+    /// ignored)
     pub reward_type: *const CRewardType,
 }
 
