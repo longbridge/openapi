@@ -16,10 +16,10 @@ const DEFAULT_ACCOUNT_CHANNEL: &str = "lb";
 /// The account channel of an access token, or `None` when the token is not a
 /// decodable JWT (the parameter is then not sent).
 ///
-/// Read from the top-level `ac` claim, else a top-level `account_channel`
-/// claim, else `account_channel` inside the `sub` claim (a JSON string), with
-/// surrounding whitespace trimmed; a decodable token naming none yields
-/// [`DEFAULT_ACCOUNT_CHANNEL`].
+/// Read from the top-level `ac` claim, else `account_channel` inside the
+/// `sub` claim (a JSON string), else a top-level `account_channel` claim,
+/// with surrounding whitespace trimmed and empty values skipped; a decodable
+/// token naming none yields [`DEFAULT_ACCOUNT_CHANNEL`].
 pub(crate) fn account_channel(token: &str) -> Option<String> {
     let token = token.strip_prefix("Bearer ").unwrap_or(token);
     let payload = token.split('.').nth(1)?;
@@ -41,8 +41,8 @@ pub(crate) fn account_channel(token: &str) -> Option<String> {
         claims
             .get("ac")
             .and_then(non_empty)
-            .or_else(|| claims.get("account_channel").and_then(non_empty))
             .or_else(from_sub)
+            .or_else(|| claims.get("account_channel").and_then(non_empty))
             .unwrap_or_else(|| DEFAULT_ACCOUNT_CHANNEL.to_string()),
     )
 }
@@ -129,6 +129,30 @@ mod tests {
             account_channel(&token(r#"{"account_channel":" lb_paper "}"#)).as_deref(),
             Some("lb_paper"),
             "top-level account_channel claim, trimmed"
+        );
+        assert_eq!(
+            account_channel(&token(
+                r#"{"account_channel":"top","sub":"{\"account_channel\":\"sub\"}"}"#
+            ))
+            .as_deref(),
+            Some("sub"),
+            "sub wins over a top-level account_channel"
+        );
+        assert_eq!(
+            account_channel(&token(
+                r#"{"ac":" ac ","account_channel":"top","sub":"{\"account_channel\":\"sub\"}"}"#
+            ))
+            .as_deref(),
+            Some("ac"),
+            "ac wins over both"
+        );
+        assert_eq!(
+            account_channel(&token(
+                r#"{"ac":" ","account_channel":"top","sub":"{\"account_channel\":\"\"}"}"#
+            ))
+            .as_deref(),
+            Some("top"),
+            "empty values are skipped"
         );
         assert_eq!(account_channel("opaque-token"), None, "not a JWT");
         assert_eq!(account_channel("a.!!!.c"), None, "invalid base64");
