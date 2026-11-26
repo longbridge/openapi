@@ -483,11 +483,27 @@ pub struct EddaApplication {
     /// Application ID
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub id: String,
+    /// Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda`
+    /// (authorized in the app)
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub flow_id: String,
+    /// Display name of the authorization
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub name: String,
+    /// Authorized currency
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub currency: String,
     /// Application status
     pub status: AuthorizationStatus,
     /// Failure reason (empty unless the application failed)
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub message: String,
+    /// Time the application was filed (`None` when not set)
+    #[serde(with = "serde_utils::account_time_opt")]
+    pub created_at: Option<OffsetDateTime>,
+    /// Time the application was last updated (`None` when not set)
+    #[serde(with = "serde_utils::account_time_opt")]
+    pub updated_at: Option<OffsetDateTime>,
 }
 
 /// The eDDA status reply: `{list: [...]}`, or a single `{id, status,
@@ -983,6 +999,9 @@ pub struct Coupon {
     /// Trading sessions the coupon applies to, as display text
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub available_trade_session: String,
+    /// Trading sessions the coupon applies to, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
+    pub trade_sessions: Vec<String>,
     /// Commission terms (commission coupons only; empty otherwise)
     #[serde(deserialize_with = "serde_utils::null_as_default")]
     pub commission: CouponCommission,
@@ -1073,7 +1092,8 @@ pub(crate) struct CouponOrdersResponse {
 
 /// A deposit record
 ///
-/// Receipt images uploaded with the deposit are intentionally not modelled.
+/// Receipt images uploaded with the deposit are intentionally not modelled;
+/// only their number is ([`Self::voucher_count`]).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Deposit {
@@ -1118,6 +1138,27 @@ pub struct Deposit {
     /// SWIFT code of the paying bank
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub user_bank_swift_code: String,
+    /// Number of receipts uploaded with the deposit (the length of the
+    /// server's `vouchers`)
+    #[serde(
+        rename(deserialize = "vouchers"),
+        alias = "voucher_count",
+        deserialize_with = "item_count"
+    )]
+    pub voucher_count: i64,
+}
+
+/// Decodes the number of items of a JSON array (the server's `vouchers`,
+/// whose items are not modelled); a number (`voucher_count`, on a round trip)
+/// is read as the count itself.
+fn item_count<'de, D>(deserializer: D) -> Result<i64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(match serde_json::Value::deserialize(deserializer)? {
+        serde_json::Value::Array(items) => i64::try_from(items.len()).unwrap_or(i64::MAX),
+        other => serde_utils::lenient_int_opt(&other).unwrap_or_default(),
+    })
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -1254,11 +1295,17 @@ mod tests {
     #[test]
     fn edda_applications_accept_list_and_single_object() {
         let list: EddaApplicationsResponse = serde_json::from_str(
-            r#"{"list":[{"id":"9","status":2,"message":""},{"id":10,"status":42}]}"#,
+            r#"{"list":[{"id":"9","flow_id":"hk_sdda","name":"eDDA","currency":"HKD",
+                "status":2,"message":"","created_at":1764064746,"updated_at":"0"},
+                {"id":10,"status":42}]}"#,
         )
         .expect("list decodes");
         assert_eq!(list.0.len(), 2, "two applications");
         assert_eq!(list.0[0].status, AuthorizationStatus::Authorizing, "known");
+        assert_eq!(list.0[0].flow_id, "hk_sdda", "flow");
+        assert_eq!(list.0[0].currency, "HKD", "currency");
+        assert!(list.0[0].created_at.is_some(), "filed time");
+        assert!(list.0[0].updated_at.is_none(), "\"0\" placeholder");
         assert_eq!(
             list.0[1].status,
             AuthorizationStatus::Unknown,
@@ -1398,7 +1445,7 @@ mod tests {
         let resp: CouponsResponse = serde_json::from_str(
             r#"{"top_list":null,"list":[{"card_id":"bd6b0000000000000000000000000000",
                 "card_type":"commission","start_time":1750313704,"end_time":"8061747303",
-                "card_status":4,"activate_time":"0","cover":"x",
+                "card_status":4,"activate_time":"0","cover":"x","trade_sessions":["intraday","overnight"],
                 "commission":{"markets":["US"],"bz_types":[0,"2",3],"rebate_rate":"1",
                     "commission_expired_time":"0","unlimited":true,"usage_count":"2"}},
                 {"card_id":"c2","card_status":2,"end_time":1798732800000}],
@@ -1414,6 +1461,11 @@ mod tests {
         assert!(lifetime.no_expiry, "far future means never expires");
         assert!(lifetime.activate_time.is_none(), "\"0\" placeholder");
         assert_eq!(lifetime.commission.bz_types, vec![0, 2, 3], "targets");
+        assert_eq!(
+            lifetime.trade_sessions,
+            vec!["intraday", "overnight"],
+            "trade sessions"
+        );
         assert!(lifetime.commission.unlimited, "unlimited");
         assert_eq!(lifetime.commission.usage_count, 2, "usage count");
         assert!(
@@ -1455,6 +1507,9 @@ mod tests {
             !json.contains("receipt.png"),
             "vouchers must not be modelled"
         );
+        assert_eq!(deposit.voucher_count, 1, "receipts counted");
+        let back: Deposit = serde_json::from_str(&json).expect("round trip");
+        assert_eq!(back.voucher_count, 1, "voucher_count survives a round trip");
 
         let withdrawals: WithdrawalsResponse = serde_json::from_str(
             r#"{"list":[{"id":"w1","state":15,"state_description":"待确认","amount":"100","fee":"0",

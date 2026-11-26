@@ -7584,6 +7584,19 @@ typedef struct lb_edda_application_t {
    */
   const char *id;
   /**
+   * Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda`
+   * (authorized in the app)
+   */
+  const char *flow_id;
+  /**
+   * Display name of the authorization
+   */
+  const char *name;
+  /**
+   * Authorized currency
+   */
+  const char *currency;
+  /**
    * Application status
    */
   enum lb_authorization_status_t status;
@@ -7591,6 +7604,16 @@ typedef struct lb_edda_application_t {
    * Failure reason (empty unless the application failed)
    */
   const char *message;
+  /**
+   * Time the application was filed as a unix timestamp (null when not
+   * set)
+   */
+  const int64_t *created_at;
+  /**
+   * Time the application was last updated as a unix timestamp (null when
+   * not set)
+   */
+  const int64_t *updated_at;
 } lb_edda_application_t;
 
 /**
@@ -8059,6 +8082,14 @@ typedef struct lb_coupon_t {
    */
   const char *available_trade_session;
   /**
+   * Trading sessions the coupon applies to, as returned by the server
+   */
+  const char *const *trade_sessions;
+  /**
+   * Number of `trade_sessions`
+   */
+  uintptr_t num_trade_sessions;
+  /**
    * Commission terms (commission coupons only; empty otherwise)
    */
   struct lb_coupon_commission_t commission;
@@ -8204,6 +8235,10 @@ typedef struct lb_deposit_t {
    * SWIFT code of the paying bank
    */
   const char *user_bank_swift_code;
+  /**
+   * Number of receipts uploaded with the deposit
+   */
+  int64_t voucher_count;
 } lb_deposit_t;
 
 /**

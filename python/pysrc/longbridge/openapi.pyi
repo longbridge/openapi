@@ -13529,6 +13529,21 @@ class EddaApplication:
     Application ID
     """
 
+    flow_id: str
+    """
+    Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda` (authorized in the app)
+    """
+
+    name: str
+    """
+    Display name of the authorization
+    """
+
+    currency: str
+    """
+    Authorized currency
+    """
+
     status: Type[AuthorizationStatus]
     """
     Application status
@@ -13537,6 +13552,16 @@ class EddaApplication:
     message: str
     """
     Failure reason (empty unless the application failed)
+    """
+
+    created_at: Optional[datetime]
+    """
+    Time the application was filed
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Time the application was last updated
     """
 
 class TransferStock:
@@ -14065,6 +14090,11 @@ class Coupon:
     Trading sessions the coupon applies to, as display text
     """
 
+    trade_sessions: List[str]
+    """
+    Trading sessions the coupon applies to, as returned by the server
+    """
+
     commission: CouponCommission
     """
     Commission terms (commission coupons only; empty otherwise)
@@ -14223,6 +14253,11 @@ class Deposit:
     user_bank_swift_code: str
     """
     SWIFT code of the paying bank
+    """
+
+    voucher_count: int
+    """
+    Number of receipts uploaded with the deposit
     """
 
 class Withdrawal:

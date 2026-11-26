@@ -301,25 +301,48 @@ impl ToFFI for CBankCardOwned {
 pub struct CEddaApplication {
     /// Application ID
     pub id: *const c_char,
+    /// Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda`
+    /// (authorized in the app)
+    pub flow_id: *const c_char,
+    /// Display name of the authorization
+    pub name: *const c_char,
+    /// Authorized currency
+    pub currency: *const c_char,
     /// Application status
     pub status: CAuthorizationStatus,
     /// Failure reason (empty unless the application failed)
     pub message: *const c_char,
+    /// Time the application was filed as a unix timestamp (null when not
+    /// set)
+    pub created_at: *const i64,
+    /// Time the application was last updated as a unix timestamp (null when
+    /// not set)
+    pub updated_at: *const i64,
 }
 
 #[derive(Debug)]
 pub(crate) struct CEddaApplicationOwned {
     id: CString,
+    flow_id: CString,
+    name: CString,
+    currency: CString,
     status: AuthorizationStatus,
     message: CString,
+    created_at: Option<i64>,
+    updated_at: Option<i64>,
 }
 
 impl From<EddaApplication> for CEddaApplicationOwned {
     fn from(v: EddaApplication) -> Self {
         Self {
             id: v.id.into(),
+            flow_id: v.flow_id.into(),
+            name: v.name.into(),
+            currency: v.currency.into(),
             status: v.status,
             message: v.message.into(),
+            created_at: v.created_at.map(OffsetDateTime::unix_timestamp),
+            updated_at: v.updated_at.map(OffsetDateTime::unix_timestamp),
         }
     }
 }
@@ -330,8 +353,21 @@ impl ToFFI for CEddaApplicationOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CEddaApplication {
             id: self.id.to_ffi_type(),
+            flow_id: self.flow_id.to_ffi_type(),
+            name: self.name.to_ffi_type(),
+            currency: self.currency.to_ffi_type(),
             status: self.status.into(),
             message: self.message.to_ffi_type(),
+            created_at: self
+                .created_at
+                .as_ref()
+                .map(|v| v as *const i64)
+                .unwrap_or(std::ptr::null()),
+            updated_at: self
+                .updated_at
+                .as_ref()
+                .map(|v| v as *const i64)
+                .unwrap_or(std::ptr::null()),
         }
     }
 }
@@ -1071,6 +1107,10 @@ pub struct CCoupon {
     pub currency: *const c_char,
     /// Trading sessions the coupon applies to, as display text
     pub available_trade_session: *const c_char,
+    /// Trading sessions the coupon applies to, as returned by the server
+    pub trade_sessions: *const *const c_char,
+    /// Number of `trade_sessions`
+    pub num_trade_sessions: usize,
     /// Commission terms (commission coupons only; empty otherwise)
     pub commission: CCouponCommission,
 }
@@ -1091,6 +1131,7 @@ pub(crate) struct CCouponOwned {
     amount: Option<CDecimal>,
     currency: CString,
     available_trade_session: CString,
+    trade_sessions: CVec<CString>,
     commission: CCouponCommissionOwned,
 }
 
@@ -1111,6 +1152,7 @@ impl From<Coupon> for CCouponOwned {
             amount: v.amount.map(Into::into),
             currency: v.currency.into(),
             available_trade_session: v.available_trade_session.into(),
+            trade_sessions: v.trade_sessions.into(),
             commission: v.commission.into(),
         }
     }
@@ -1151,6 +1193,8 @@ impl ToFFI for CCouponOwned {
                 .unwrap_or(std::ptr::null()),
             currency: self.currency.to_ffi_type(),
             available_trade_session: self.available_trade_session.to_ffi_type(),
+            trade_sessions: self.trade_sessions.to_ffi_type(),
+            num_trade_sessions: self.trade_sessions.len(),
             commission: self.commission.to_ffi_type(),
         }
     }
@@ -1328,6 +1372,8 @@ pub struct CDeposit {
     pub can_cancel: bool,
     /// SWIFT code of the paying bank
     pub user_bank_swift_code: *const c_char,
+    /// Number of receipts uploaded with the deposit
+    pub voucher_count: i64,
 }
 
 #[derive(Debug)]
@@ -1346,6 +1392,7 @@ pub(crate) struct CDepositOwned {
     reference_no: CString,
     can_cancel: bool,
     user_bank_swift_code: CString,
+    voucher_count: i64,
 }
 
 impl From<Deposit> for CDepositOwned {
@@ -1365,6 +1412,7 @@ impl From<Deposit> for CDepositOwned {
             reference_no: v.reference_no.into(),
             can_cancel: v.can_cancel,
             user_bank_swift_code: v.user_bank_swift_code.into(),
+            voucher_count: v.voucher_count,
         }
     }
 }
@@ -1404,6 +1452,7 @@ impl ToFFI for CDepositOwned {
             reference_no: self.reference_no.to_ffi_type(),
             can_cancel: self.can_cancel,
             user_bank_swift_code: self.user_bank_swift_code.to_ffi_type(),
+            voucher_count: self.voucher_count,
         }
     }
 }

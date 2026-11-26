@@ -411,10 +411,22 @@ struct EddaApplication
 {
   /// Application ID
   std::string id;
+  /// Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda`
+  /// (authorized in the app)
+  std::string flow_id;
+  /// Display name of the authorization
+  std::string name;
+  /// Authorized currency
+  std::string currency;
   /// Application status
   AuthorizationStatus status;
   /// Failure reason (empty unless the application failed)
   std::string message;
+  /// Time the application was filed as a unix timestamp (null when not set)
+  std::optional<int64_t> created_at;
+  /// Time the application was last updated as a unix timestamp (null when
+  /// not set)
+  std::optional<int64_t> updated_at;
 };
 
 /// One stock in a stock transfer application
@@ -653,6 +665,8 @@ struct Coupon
   std::string currency;
   /// Trading sessions the coupon applies to, as display text
   std::string available_trade_session;
+  /// Trading sessions the coupon applies to, as returned by the server
+  std::vector<std::string> trade_sessions;
   /// Commission terms (commission coupons only; empty otherwise)
   CouponCommission commission;
 };
@@ -726,6 +740,8 @@ struct Deposit
   bool can_cancel;
   /// SWIFT code of the paying bank
   std::string user_bank_swift_code;
+  /// Number of receipts uploaded with the deposit
+  int64_t voucher_count;
 };
 
 /// A withdrawal record

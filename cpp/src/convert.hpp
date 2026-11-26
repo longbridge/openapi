@@ -5580,8 +5580,13 @@ convert(const lb_edda_application_t* info)
 {
   asset::EddaApplication out;
   out.id = std::string(info->id ? info->id : "");
+  out.flow_id = std::string(info->flow_id ? info->flow_id : "");
+  out.name = std::string(info->name ? info->name : "");
+  out.currency = std::string(info->currency ? info->currency : "");
   out.status = convert(info->status);
   out.message = std::string(info->message ? info->message : "");
+  out.created_at = info->created_at ? std::optional<int64_t>(*info->created_at) : std::nullopt;
+  out.updated_at = info->updated_at ? std::optional<int64_t>(*info->updated_at) : std::nullopt;
   return out;
 }
 
@@ -5734,6 +5739,7 @@ convert(const lb_coupon_t* info)
   out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
   out.currency = std::string(info->currency ? info->currency : "");
   out.available_trade_session = std::string(info->available_trade_session ? info->available_trade_session : "");
+  out.trade_sessions = std::vector<std::string>(info->trade_sessions, info->trade_sessions + info->num_trade_sessions);
   out.commission = convert(&info->commission);
   return out;
 }
@@ -5784,6 +5790,7 @@ convert(const lb_deposit_t* info)
   out.reference_no = std::string(info->reference_no ? info->reference_no : "");
   out.can_cancel = info->can_cancel;
   out.user_bank_swift_code = std::string(info->user_bank_swift_code ? info->user_bank_swift_code : "");
+  out.voucher_count = info->voucher_count;
   return out;
 }
 

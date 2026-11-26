@@ -1,12 +1,19 @@
 package com.longbridge.asset;
 
+import java.time.OffsetDateTime;
+
 /**
  * An eDDA authorization application of a bank card
  */
 public class EddaApplication {
     private String id;
+    private String flowId;
+    private String name;
+    private String currency;
     private AuthorizationStatus status;
     private String message;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 
     /**
      * Returns the application ID.
@@ -15,6 +22,34 @@ public class EddaApplication {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Returns the authorization flow: {@code hk_edda} (authorized at the bank)
+     * or {@code hk_sdda} (authorized in the app).
+     *
+     * @return the authorization flow
+     */
+    public String getFlowId() {
+        return flowId;
+    }
+
+    /**
+     * Returns the display name of the authorization.
+     *
+     * @return the display name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the authorized currency.
+     *
+     * @return the currency
+     */
+    public String getCurrency() {
+        return currency;
     }
 
     /**
@@ -35,8 +70,26 @@ public class EddaApplication {
         return message;
     }
 
+    /**
+     * Returns the time the application was filed (null when not set).
+     *
+     * @return the filed time
+     */
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * Returns the time the application was last updated (null when not set).
+     *
+     * @return the updated time
+     */
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
     @Override
     public String toString() {
-        return "EddaApplication [" + "id=" + id + ", " + "status=" + status + ", " + "message=" + message + "]";
+        return "EddaApplication [" + "id=" + id + ", " + "flowId=" + flowId + ", " + "name=" + name + ", " + "currency=" + currency + ", " + "status=" + status + ", " + "message=" + message + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + "]";
     }
 }

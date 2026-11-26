@@ -479,10 +479,23 @@ pub struct BankCard {
 pub struct EddaApplication {
     /// Application ID
     id: String,
+    /// Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda`
+    /// (authorized in the app)
+    flow_id: String,
+    /// Display name of the authorization
+    name: String,
+    /// Authorized currency
+    currency: String,
     /// Application status
     status: AuthorizationStatus,
     /// Failure reason (empty unless the application failed)
     message: String,
+    /// Time the application was filed
+    #[js(opt, datetime)]
+    created_at: Option<DateTime<Utc>>,
+    /// Time the application was last updated
+    #[js(opt, datetime)]
+    updated_at: Option<DateTime<Utc>>,
 }
 
 /// One stock in a stock transfer application
@@ -773,6 +786,9 @@ pub struct Coupon {
     currency: String,
     /// Trading sessions the coupon applies to, as display text
     available_trade_session: String,
+    /// Trading sessions the coupon applies to, as returned by the server
+    #[js(array)]
+    trade_sessions: Vec<String>,
     /// Commission terms (commission coupons only; empty otherwise)
     commission: CouponCommission,
 }
@@ -862,6 +878,8 @@ pub struct Deposit {
     can_cancel: bool,
     /// SWIFT code of the paying bank
     user_bank_swift_code: String,
+    /// Number of receipts uploaded with the deposit
+    voucher_count: i64,
 }
 
 /// A withdrawal record

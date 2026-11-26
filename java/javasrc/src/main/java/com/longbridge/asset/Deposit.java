@@ -21,6 +21,7 @@ public class Deposit {
     private String referenceNo;
     private boolean canCancel;
     private String userBankSwiftCode;
+    private long voucherCount;
 
     /**
      * Returns the record ID.
@@ -148,8 +149,17 @@ public class Deposit {
         return userBankSwiftCode;
     }
 
+    /**
+     * Returns the number of receipts uploaded with the deposit.
+     *
+     * @return the number of receipts
+     */
+    public long getVoucherCount() {
+        return voucherCount;
+    }
+
     @Override
     public String toString() {
-        return "Deposit [" + "id=" + id + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "currency=" + currency + ", " + "amount=" + amount + ", " + "receivableAmount=" + receivableAmount + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "subStateCode=" + subStateCode + ", " + "bankOperationTypeId=" + bankOperationTypeId + ", " + "bankOperationTypeName=" + bankOperationTypeName + ", " + "referenceNo=" + referenceNo + ", " + "canCancel=" + canCancel + ", " + "userBankSwiftCode=" + userBankSwiftCode + "]";
+        return "Deposit [" + "id=" + id + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "currency=" + currency + ", " + "amount=" + amount + ", " + "receivableAmount=" + receivableAmount + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "subStateCode=" + subStateCode + ", " + "bankOperationTypeId=" + bankOperationTypeId + ", " + "bankOperationTypeName=" + bankOperationTypeName + ", " + "referenceNo=" + referenceNo + ", " + "canCancel=" + canCancel + ", " + "userBankSwiftCode=" + userBankSwiftCode + ", " + "voucherCount=" + voucherCount + "]";
     }
 }

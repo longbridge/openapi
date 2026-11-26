@@ -2,6 +2,7 @@ package com.longbridge.asset;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 
 /**
  * A coupon (reward card)
@@ -21,6 +22,7 @@ public class Coupon {
     private BigDecimal amount;
     private String currency;
     private String availableTradeSession;
+    private String[] tradeSessions;
     private CouponCommission commission;
 
     /**
@@ -152,6 +154,16 @@ public class Coupon {
     }
 
     /**
+     * Returns the trading sessions the coupon applies to, as returned by the
+     * server.
+     *
+     * @return the trading sessions
+     */
+    public String[] getTradeSessions() {
+        return tradeSessions;
+    }
+
+    /**
      * Returns the commission terms (commission coupons only; empty otherwise).
      *
      * @return the commission terms
@@ -162,6 +174,6 @@ public class Coupon {
 
     @Override
     public String toString() {
-        return "Coupon [" + "cardId=" + cardId + ", " + "cardType=" + cardType + ", " + "title=" + title + ", " + "titleSec=" + titleSec + ", " + "description=" + description + ", " + "detail=" + detail + ", " + "cardStatus=" + cardStatus + ", " + "startTime=" + startTime + ", " + "endTime=" + endTime + ", " + "noExpiry=" + noExpiry + ", " + "activateTime=" + activateTime + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "availableTradeSession=" + availableTradeSession + ", " + "commission=" + commission + "]";
+        return "Coupon [" + "cardId=" + cardId + ", " + "cardType=" + cardType + ", " + "title=" + title + ", " + "titleSec=" + titleSec + ", " + "description=" + description + ", " + "detail=" + detail + ", " + "cardStatus=" + cardStatus + ", " + "startTime=" + startTime + ", " + "endTime=" + endTime + ", " + "noExpiry=" + noExpiry + ", " + "activateTime=" + activateTime + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "availableTradeSession=" + availableTradeSession + ", " + "tradeSessions=" + Arrays.toString(tradeSessions) + ", " + "commission=" + commission + "]";
     }
 }

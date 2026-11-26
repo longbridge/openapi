@@ -4561,7 +4561,9 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/asset/EddaApplication",
     longbridge::asset::EddaApplication,
-    [id, status, message]
+    [
+        id, flow_id, name, currency, status, message, created_at, updated_at
+    ]
 );
 
 impl_java_class!(
@@ -4720,6 +4722,8 @@ impl_java_class!(
         amount,
         currency,
         available_trade_session,
+        #[java(objarray)]
+        trade_sessions,
         commission
     ]
 );
@@ -4772,7 +4776,8 @@ impl_java_class!(
         bank_operation_type_name,
         reference_no,
         can_cancel,
-        user_bank_swift_code
+        user_bank_swift_code,
+        voucher_count
     ]
 );
 
