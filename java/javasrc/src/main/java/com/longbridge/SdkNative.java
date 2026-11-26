@@ -85,10 +85,10 @@ public class SdkNative {
         public static native void assetContextEddaApplications(long context, String cardId, String currency,
                         AsyncCallback callback);
 
-        public static native void assetContextStockTransfersIn(long context, GetStockTransfersOptions opts,
+        public static native void assetContextStockTransfersIn(long context, GetStockTransfersInOptions opts,
                         AsyncCallback callback);
 
-        public static native void assetContextStockTransfersOut(long context, GetStockTransfersOptions opts,
+        public static native void assetContextStockTransfersOut(long context, GetStockTransfersOutOptions opts,
                         AsyncCallback callback);
 
         public static native void assetContextRewardRecords(long context, GetRewardRecordsOptions opts,

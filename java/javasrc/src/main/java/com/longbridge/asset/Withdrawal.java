@@ -14,7 +14,7 @@ public class Withdrawal {
     private BigDecimal amount;
     private BigDecimal fee;
     private BigDecimal settlementAmount;
-    private WithdrawalState state;
+    private WithdrawalState stateCode;
     private String rawState;
     private String stateDescription;
     private String bankAccount;
@@ -86,12 +86,12 @@ public class Withdrawal {
     }
 
     /**
-     * Returns the state.
+     * Returns the state code.
      *
-     * @return the state
+     * @return the state code
      */
-    public WithdrawalState getState() {
-        return state;
+    public WithdrawalState getStateCode() {
+        return stateCode;
     }
 
     /**
@@ -104,9 +104,9 @@ public class Withdrawal {
     }
 
     /**
-     * Returns the state description, as returned by the server.
+     * Returns the state display text, as returned by the server.
      *
-     * @return the state description, as returned by the server
+     * @return the state display text, as returned by the server
      */
     public String getStateDescription() {
         return stateDescription;
@@ -150,6 +150,6 @@ public class Withdrawal {
 
     @Override
     public String toString() {
-        return "Withdrawal [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "createdAt=" + createdAt + ", " + "currency=" + currency + ", " + "amount=" + amount + ", " + "fee=" + fee + ", " + "settlementAmount=" + settlementAmount + ", " + "state=" + state + ", " + "rawState=" + rawState + ", " + "stateDescription=" + stateDescription + ", " + "bankAccount=" + bankAccount + ", " + "displayBankAccount=" + displayBankAccount + ", " + "userBankSwiftCode=" + userBankSwiftCode + ", " + "accountChannel=" + accountChannel + "]";
+        return "Withdrawal [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "createdAt=" + createdAt + ", " + "currency=" + currency + ", " + "amount=" + amount + ", " + "fee=" + fee + ", " + "settlementAmount=" + settlementAmount + ", " + "stateCode=" + stateCode + ", " + "rawState=" + rawState + ", " + "stateDescription=" + stateDescription + ", " + "bankAccount=" + bankAccount + ", " + "displayBankAccount=" + displayBankAccount + ", " + "userBankSwiftCode=" + userBankSwiftCode + ", " + "accountChannel=" + accountChannel + "]";
     }
 }

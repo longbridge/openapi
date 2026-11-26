@@ -16,6 +16,7 @@ public class Coupon {
     private CouponStatus cardStatus;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
+    private boolean noExpiry;
     private OffsetDateTime activateTime;
     private BigDecimal amount;
     private String currency;
@@ -95,12 +96,23 @@ public class Coupon {
     }
 
     /**
-     * Returns the end of validity ({@code null} when not set); a date after 2100 means the coupon never expires.
+     * Returns the end of validity ({@code null} when not set or when the
+     * coupon never expires; see {@link #isNoExpiry()}).
      *
      * @return the end of validity
      */
     public OffsetDateTime getEndTime() {
         return endTime;
+    }
+
+    /**
+     * Returns whether the coupon never expires (the server's end time is in
+     * or after 2100).
+     *
+     * @return whether the coupon never expires
+     */
+    public boolean isNoExpiry() {
+        return noExpiry;
     }
 
     /**
@@ -150,6 +162,6 @@ public class Coupon {
 
     @Override
     public String toString() {
-        return "Coupon [" + "cardId=" + cardId + ", " + "cardType=" + cardType + ", " + "title=" + title + ", " + "titleSec=" + titleSec + ", " + "description=" + description + ", " + "detail=" + detail + ", " + "cardStatus=" + cardStatus + ", " + "startTime=" + startTime + ", " + "endTime=" + endTime + ", " + "activateTime=" + activateTime + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "availableTradeSession=" + availableTradeSession + ", " + "commission=" + commission + "]";
+        return "Coupon [" + "cardId=" + cardId + ", " + "cardType=" + cardType + ", " + "title=" + title + ", " + "titleSec=" + titleSec + ", " + "description=" + description + ", " + "detail=" + detail + ", " + "cardStatus=" + cardStatus + ", " + "startTime=" + startTime + ", " + "endTime=" + endTime + ", " + "noExpiry=" + noExpiry + ", " + "activateTime=" + activateTime + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "availableTradeSession=" + availableTradeSession + ", " + "commission=" + commission + "]";
     }
 }

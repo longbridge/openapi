@@ -3,12 +3,12 @@ package com.longbridge.asset;
 import java.time.OffsetDateTime;
 
 /**
- * Options for the stock transfer-in and transfer-out lists
+ * Options for the stock transfer-out list
  */
 @SuppressWarnings("unused")
-public class GetStockTransfersOptions {
+public class GetStockTransfersOutOptions {
     private String market;
-    private Integer state;
+    private StockTransferOutState state;
     private OffsetDateTime start;
     private OffsetDateTime end;
     private Integer page;
@@ -20,22 +20,19 @@ public class GetStockTransfersOptions {
      * @param market market
      * @return this instance for chaining
      */
-    public GetStockTransfersOptions setMarket(String market) {
+    public GetStockTransfersOutOptions setMarket(String market) {
         this.market = market;
         return this;
     }
 
     /**
-     * Filters by state code: a {@link StockTransferInState} code for the
-     * transfer-in list (0 submitted, 1 cancelled, 3 completed, 5 processing, 7
-     * partially completed, 8 failed), a {@link StockTransferOutState} code for
-     * the transfer-out list (0 submitted, 1 processing, 2 executing, 3
-     * completed, 4 cancelled, 5 partially completed, 6 failed, 7 rejected).
+     * Filters by state. The state is sent to the server as its server code
+     * ({@link StockTransferOutState#code()}); {@link StockTransferOutState#Unknown} clears the filter.
      *
-     * @param state state code
+     * @param state state
      * @return this instance for chaining
      */
-    public GetStockTransfersOptions setState(int state) {
+    public GetStockTransfersOutOptions setState(StockTransferOutState state) {
         this.state = state;
         return this;
     }
@@ -46,7 +43,7 @@ public class GetStockTransfersOptions {
      * @param start start time
      * @return this instance for chaining
      */
-    public GetStockTransfersOptions setStart(OffsetDateTime start) {
+    public GetStockTransfersOutOptions setStart(OffsetDateTime start) {
         this.start = start;
         return this;
     }
@@ -57,7 +54,7 @@ public class GetStockTransfersOptions {
      * @param end end time
      * @return this instance for chaining
      */
-    public GetStockTransfersOptions setEnd(OffsetDateTime end) {
+    public GetStockTransfersOutOptions setEnd(OffsetDateTime end) {
         this.end = end;
         return this;
     }
@@ -68,7 +65,7 @@ public class GetStockTransfersOptions {
      * @param page page number
      * @return this instance for chaining
      */
-    public GetStockTransfersOptions setPage(int page) {
+    public GetStockTransfersOutOptions setPage(int page) {
         this.page = page;
         return this;
     }
@@ -79,7 +76,7 @@ public class GetStockTransfersOptions {
      * @param size page size
      * @return this instance for chaining
      */
-    public GetStockTransfersOptions setSize(int size) {
+    public GetStockTransfersOutOptions setSize(int size) {
         this.size = size;
         return this;
     }

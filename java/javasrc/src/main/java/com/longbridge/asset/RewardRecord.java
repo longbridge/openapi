@@ -13,7 +13,7 @@ public class RewardRecord {
     private String title;
     private String description;
     private String cardType;
-    private int cardStatus;
+    private CouponStatus cardStatus;
     private Integer prizeType;
     private BigDecimal amount;
     private String currency;
@@ -81,11 +81,12 @@ public class RewardRecord {
     }
 
     /**
-     * Returns the coupon status code (coupon rewards), as returned by the server.
+     * Returns the coupon status (coupon rewards; {@link CouponStatus#Unknown}
+     * otherwise).
      *
-     * @return the coupon status code
+     * @return the coupon status
      */
-    public int getCardStatus() {
+    public CouponStatus getCardStatus() {
         return cardStatus;
     }
 

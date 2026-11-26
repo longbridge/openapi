@@ -14,7 +14,7 @@ public class TransferStock {
     private BigDecimal amount;
     private String currency;
     private BigDecimal cost;
-    private TransferStockState state;
+    private TransferStockState stateCode;
     private String positionSide;
 
     /**
@@ -90,12 +90,12 @@ public class TransferStock {
     }
 
     /**
-     * Returns the state of this stock in the transfer.
+     * Returns the state code of this stock in the transfer.
      *
-     * @return the state of this stock in the transfer
+     * @return the state code of this stock in the transfer
      */
-    public TransferStockState getState() {
-        return state;
+    public TransferStockState getStateCode() {
+        return stateCode;
     }
 
     /**
@@ -109,6 +109,6 @@ public class TransferStock {
 
     @Override
     public String toString() {
-        return "TransferStock [" + "code=" + code + ", " + "name=" + name + ", " + "nameEn=" + nameEn + ", " + "market=" + market + ", " + "counterId=" + counterId + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "cost=" + cost + ", " + "state=" + state + ", " + "positionSide=" + positionSide + "]";
+        return "TransferStock [" + "code=" + code + ", " + "name=" + name + ", " + "nameEn=" + nameEn + ", " + "market=" + market + ", " + "counterId=" + counterId + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "cost=" + cost + ", " + "stateCode=" + stateCode + ", " + "positionSide=" + positionSide + "]";
     }
 }

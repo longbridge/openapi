@@ -32,7 +32,8 @@ public class GetRewardRecordsOptions {
     }
 
     /**
-     * Filters by reward type (default: all types).
+     * Filters by reward type (default: all types). {@link RewardType#Unknown}
+     * is not a server code, so it clears the filter.
      *
      * @param rewardType reward type
      * @return this instance for chaining

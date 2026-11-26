@@ -11,6 +11,7 @@ public class StockTransferIn {
     private String orderId;
     private String market;
     private String broker;
+    private String brokerId;
     private String brokerEn;
     private String brokerCode;
     private String account;
@@ -63,6 +64,15 @@ public class StockTransferIn {
     }
 
     /**
+     * Returns the ID of the other broker.
+     *
+     * @return the ID of the other broker
+     */
+    public String getBrokerId() {
+        return brokerId;
+    }
+
+    /**
      * Returns the English name of the other broker.
      *
      * @return the English name of the other broker
@@ -108,12 +118,24 @@ public class StockTransferIn {
     }
 
     /**
-     * Returns the app-side state: {@code noticed} means the user tapped "I have notified the broker" in the app; {@code default} otherwise.
+     * Returns the app-side state: {@code noticed} means the user tapped "I
+     * have notified the broker" in the app (the user's own confirmation, not a
+     * Longbridge action); {@code default} otherwise.
      *
-     * @return the app-side state: {@code noticed} means the user tapped "I have notified the broker" in the app
+     * @return the app-side state
      */
     public String getAppState() {
         return appState;
+    }
+
+    /**
+     * Returns whether the user confirmed in the app that the other broker was
+     * notified ({@link #getAppState()} is {@code noticed}).
+     *
+     * @return whether the user notified the other broker
+     */
+    public boolean isUserNotifiedBroker() {
+        return "noticed".equals(appState);
     }
 
     /**
@@ -190,6 +212,6 @@ public class StockTransferIn {
 
     @Override
     public String toString() {
-        return "StockTransferIn [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "market=" + market + ", " + "broker=" + broker + ", " + "brokerEn=" + brokerEn + ", " + "brokerCode=" + brokerCode + ", " + "account=" + account + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "appState=" + appState + ", " + "canModify=" + canModify + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "processAt=" + processAt + ", " + "execAt=" + execAt + ", " + "remark=" + remark + ", " + "reason=" + reason + ", " + "stocks=" + Arrays.toString(stocks) + "]";
+        return "StockTransferIn [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "market=" + market + ", " + "broker=" + broker + ", " + "brokerId=" + brokerId + ", " + "brokerEn=" + brokerEn + ", " + "brokerCode=" + brokerCode + ", " + "account=" + account + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "appState=" + appState + ", " + "canModify=" + canModify + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "processAt=" + processAt + ", " + "execAt=" + execAt + ", " + "remark=" + remark + ", " + "reason=" + reason + ", " + "stocks=" + Arrays.toString(stocks) + "]";
     }
 }

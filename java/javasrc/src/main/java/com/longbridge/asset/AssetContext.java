@@ -109,7 +109,7 @@ public class AssetContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public synchronized CompletableFuture<StockTransferInResponse> getStockTransfersIn(GetStockTransfersOptions opts)
+    public synchronized CompletableFuture<StockTransferInResponse> getStockTransfersIn(GetStockTransfersInOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.assetContextStockTransfersIn(raw(), opts, callback);
@@ -125,7 +125,7 @@ public class AssetContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public synchronized CompletableFuture<StockTransferOut[]> getStockTransfersOut(GetStockTransfersOptions opts)
+    public synchronized CompletableFuture<StockTransferOut[]> getStockTransfersOut(GetStockTransfersOutOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.assetContextStockTransfersOut(raw(), opts, callback);
@@ -135,6 +135,9 @@ public class AssetContext implements AutoCloseable {
     /**
      * Get reward records from the reward center (cash, gifts, coupons, task
      * rewards).
+     * <p>
+     * The route has no date filter: to find rewards in a time range, page
+     * through the records and filter on their times.
      * <p>
      * AP accounts only: US data-center accounts get a region error.
      *

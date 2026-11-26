@@ -11,11 +11,13 @@ public class StockTransferOut {
     private String orderId;
     private String market;
     private String broker;
+    private String brokerId;
     private String brokerEn;
     private String brokerCode;
     private String account;
     private String state;
     private StockTransferOutState stateCode;
+    private String appState;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     private OffsetDateTime processAt;
@@ -64,6 +66,15 @@ public class StockTransferOut {
     }
 
     /**
+     * Returns the ID of the other broker.
+     *
+     * @return the ID of the other broker
+     */
+    public String getBrokerId() {
+        return brokerId;
+    }
+
+    /**
      * Returns the English name of the other broker.
      *
      * @return the English name of the other broker
@@ -106,6 +117,37 @@ public class StockTransferOut {
      */
     public StockTransferOutState getStateCode() {
         return stateCode;
+    }
+
+    /**
+     * Returns the app-side state: {@code noticed} means the user tapped "I
+     * have notified the broker" in the app (the user's own confirmation, not a
+     * Longbridge action); {@code default} otherwise.
+     *
+     * @return the app-side state
+     */
+    public String getAppState() {
+        return appState;
+    }
+
+    /**
+     * Returns whether the user confirmed in the app that the other broker was
+     * notified ({@link #getAppState()} is {@code noticed}).
+     *
+     * @return whether the user notified the other broker
+     */
+    public boolean isUserNotifiedBroker() {
+        return "noticed".equals(appState);
+    }
+
+    /**
+     * Returns whether the application can still be cancelled (only
+     * {@link StockTransferOutState#Submitted} applications can).
+     *
+     * @return whether the application can still be cancelled
+     */
+    public boolean isCancellable() {
+        return stateCode == StockTransferOutState.Submitted;
     }
 
     /**
@@ -200,6 +242,6 @@ public class StockTransferOut {
 
     @Override
     public String toString() {
-        return "StockTransferOut [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "market=" + market + ", " + "broker=" + broker + ", " + "brokerEn=" + brokerEn + ", " + "brokerCode=" + brokerCode + ", " + "account=" + account + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "processAt=" + processAt + ", " + "execAt=" + execAt + ", " + "agreeAt=" + agreeAt + ", " + "refuseAt=" + refuseAt + ", " + "cancelAt=" + cancelAt + ", " + "remark=" + remark + ", " + "reason=" + reason + ", " + "stocks=" + Arrays.toString(stocks) + "]";
+        return "StockTransferOut [" + "id=" + id + ", " + "orderId=" + orderId + ", " + "market=" + market + ", " + "broker=" + broker + ", " + "brokerId=" + brokerId + ", " + "brokerEn=" + brokerEn + ", " + "brokerCode=" + brokerCode + ", " + "account=" + account + ", " + "state=" + state + ", " + "stateCode=" + stateCode + ", " + "appState=" + appState + ", " + "createdAt=" + createdAt + ", " + "updatedAt=" + updatedAt + ", " + "processAt=" + processAt + ", " + "execAt=" + execAt + ", " + "agreeAt=" + agreeAt + ", " + "refuseAt=" + refuseAt + ", " + "cancelAt=" + cancelAt + ", " + "remark=" + remark + ", " + "reason=" + reason + ", " + "stocks=" + Arrays.toString(stocks) + "]";
     }
 }

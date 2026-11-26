@@ -113,7 +113,9 @@ public class BankCardAuthorization {
     }
 
     /**
-     * Returns the expiry date ({@code null} when not set); a long-term authorization carries the server's 9999-12-31 sentinel.
+     * Returns the expiry date ({@code null} when not set and for a long-term
+     * authorization: the server's 9999-12-31 "never expires" sentinel is
+     * {@code null}; see {@link #isLongTermValid()}).
      *
      * @return the expiry date
      */

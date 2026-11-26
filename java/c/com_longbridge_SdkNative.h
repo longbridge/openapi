@@ -642,7 +642,7 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextEddaApplication
 /*
  * Class:     com_longbridge_SdkNative
  * Method:    assetContextStockTransfersIn
- * Signature: (JLcom/longbridge/asset/GetStockTransfersOptions;Lcom/longbridge/AsyncCallback;)V
+ * Signature: (JLcom/longbridge/asset/GetStockTransfersInOptions;Lcom/longbridge/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextStockTransfersIn
   (JNIEnv *, jclass, jlong, jobject, jobject);
@@ -650,7 +650,7 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextStockTransfersI
 /*
  * Class:     com_longbridge_SdkNative
  * Method:    assetContextStockTransfersOut
- * Signature: (JLcom/longbridge/asset/GetStockTransfersOptions;Lcom/longbridge/AsyncCallback;)V
+ * Signature: (JLcom/longbridge/asset/GetStockTransfersOutOptions;Lcom/longbridge/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_assetContextStockTransfersOut
   (JNIEnv *, jclass, jlong, jobject, jobject);

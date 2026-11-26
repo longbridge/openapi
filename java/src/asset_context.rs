@@ -10,6 +10,7 @@ use longbridge::{
         AssetContext, CouponOrderType, DepositState, GetCouponsOptions, GetDepositsOptions,
         GetRewardRecordsOptions, GetStatementListOptions, GetStatementOptions,
         GetStockTransfersOptions, GetWithdrawalsOptions, RewardType, StatementType,
+        StockTransferInState, StockTransferOutState, StockTransferStateFilter,
     },
 };
 use time::OffsetDateTime;
@@ -17,7 +18,7 @@ use time::OffsetDateTime;
 use crate::{
     async_util,
     error::jni_result,
-    types::{FromJValue, JavaInteger, ObjectArray, get_field},
+    types::{FromJValue, JSignature, JavaInteger, ObjectArray, get_field},
 };
 
 struct ContextObj {
@@ -143,16 +144,19 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextEddaAppl
     })
 }
 
-unsafe fn stock_transfers_options(
+unsafe fn stock_transfers_options<S>(
     env: &mut JNIEnv,
     opts: &JObject,
-) -> jni::errors::Result<GetStockTransfersOptions> {
+) -> jni::errors::Result<GetStockTransfersOptions<S>>
+where
+    S: StockTransferStateFilter + FromJValue + JSignature,
+{
     let mut options = GetStockTransfersOptions::new();
     if opts.is_null() {
         return Ok(options);
     }
     let market: Option<String> = get_field(env, opts, "market")?;
-    let state: Option<JavaInteger> = get_field(env, opts, "state")?;
+    let state: Option<S> = get_field(env, opts, "state")?;
     let start: Option<OffsetDateTime> = get_field(env, opts, "start")?;
     let end: Option<OffsetDateTime> = get_field(env, opts, "end")?;
     let page: Option<JavaInteger> = get_field(env, opts, "page")?;
@@ -161,7 +165,7 @@ unsafe fn stock_transfers_options(
         options = options.market(market);
     }
     if let Some(state) = state {
-        options = options.state(state.into());
+        options = options.state(state);
     }
     if let Some(start) = start {
         options = options.start(start);
@@ -189,7 +193,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextStockTra
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let options = stock_transfers_options(env, &opts)?;
+        let options = stock_transfers_options::<StockTransferInState>(env, &opts)?;
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.stock_transfers_in(options).await?)
         })?;
@@ -208,7 +212,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextStockTra
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let options = stock_transfers_options(env, &opts)?;
+        let options = stock_transfers_options::<StockTransferOutState>(env, &opts)?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(__owned_ctx.stock_transfers_out(options).await?))
         })?;
