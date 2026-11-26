@@ -4,6 +4,7 @@
 #include "fund_ffi.hpp"
 #include "types.hpp"
 #include "portfolio_context.hpp"
+#include "asset_context.hpp"
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
@@ -4836,6 +4837,982 @@ convert(const fund::ffi::CFundOrderSubmitResponse* r)
     r->units,
   };
 }
+
+
+inline asset::BankCardStatus
+convert(lb_bank_card_status_t ty)
+{
+  switch (ty) {
+    case BankCardStatusUnknown:
+      return asset::BankCardStatus::Unknown;
+    case BankCardStatusUnverified:
+      return asset::BankCardStatus::Unverified;
+    case BankCardStatusUnderReview:
+      return asset::BankCardStatus::UnderReview;
+    case BankCardStatusVerified:
+      return asset::BankCardStatus::Verified;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_bank_card_status_t
+convert(asset::BankCardStatus ty)
+{
+  switch (ty) {
+    case asset::BankCardStatus::Unknown:
+      return BankCardStatusUnknown;
+    case asset::BankCardStatus::Unverified:
+      return BankCardStatusUnverified;
+    case asset::BankCardStatus::UnderReview:
+      return BankCardStatusUnderReview;
+    case asset::BankCardStatus::Verified:
+      return BankCardStatusVerified;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::BankCardWitnessState
+convert(lb_bank_card_witness_state_t ty)
+{
+  switch (ty) {
+    case BankCardWitnessStateUnknown:
+      return asset::BankCardWitnessState::Unknown;
+    case BankCardWitnessStateNotRequired:
+      return asset::BankCardWitnessState::NotRequired;
+    case BankCardWitnessStatePending:
+      return asset::BankCardWitnessState::Pending;
+    case BankCardWitnessStateWitnessed:
+      return asset::BankCardWitnessState::Witnessed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_bank_card_witness_state_t
+convert(asset::BankCardWitnessState ty)
+{
+  switch (ty) {
+    case asset::BankCardWitnessState::Unknown:
+      return BankCardWitnessStateUnknown;
+    case asset::BankCardWitnessState::NotRequired:
+      return BankCardWitnessStateNotRequired;
+    case asset::BankCardWitnessState::Pending:
+      return BankCardWitnessStatePending;
+    case asset::BankCardWitnessState::Witnessed:
+      return BankCardWitnessStateWitnessed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::BankCardBindState
+convert(lb_bank_card_bind_state_t ty)
+{
+  switch (ty) {
+    case BankCardBindStateUnknown:
+      return asset::BankCardBindState::Unknown;
+    case BankCardBindStateBinding:
+      return asset::BankCardBindState::Binding;
+    case BankCardBindStateBound:
+      return asset::BankCardBindState::Bound;
+    case BankCardBindStateFailed:
+      return asset::BankCardBindState::Failed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_bank_card_bind_state_t
+convert(asset::BankCardBindState ty)
+{
+  switch (ty) {
+    case asset::BankCardBindState::Unknown:
+      return BankCardBindStateUnknown;
+    case asset::BankCardBindState::Binding:
+      return BankCardBindStateBinding;
+    case asset::BankCardBindState::Bound:
+      return BankCardBindStateBound;
+    case asset::BankCardBindState::Failed:
+      return BankCardBindStateFailed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::AuthorizationStatus
+convert(lb_authorization_status_t ty)
+{
+  switch (ty) {
+    case AuthorizationStatusUnknown:
+      return asset::AuthorizationStatus::Unknown;
+    case AuthorizationStatusUnauthorized:
+      return asset::AuthorizationStatus::Unauthorized;
+    case AuthorizationStatusAuthorized:
+      return asset::AuthorizationStatus::Authorized;
+    case AuthorizationStatusAuthorizing:
+      return asset::AuthorizationStatus::Authorizing;
+    case AuthorizationStatusFailed:
+      return asset::AuthorizationStatus::Failed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_authorization_status_t
+convert(asset::AuthorizationStatus ty)
+{
+  switch (ty) {
+    case asset::AuthorizationStatus::Unknown:
+      return AuthorizationStatusUnknown;
+    case asset::AuthorizationStatus::Unauthorized:
+      return AuthorizationStatusUnauthorized;
+    case asset::AuthorizationStatus::Authorized:
+      return AuthorizationStatusAuthorized;
+    case asset::AuthorizationStatus::Authorizing:
+      return AuthorizationStatusAuthorizing;
+    case asset::AuthorizationStatus::Failed:
+      return AuthorizationStatusFailed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::StockTransferInState
+convert(lb_stock_transfer_in_state_t ty)
+{
+  switch (ty) {
+    case StockTransferInStateUnknown:
+      return asset::StockTransferInState::Unknown;
+    case StockTransferInStateSubmitted:
+      return asset::StockTransferInState::Submitted;
+    case StockTransferInStateCancelled:
+      return asset::StockTransferInState::Cancelled;
+    case StockTransferInStateCompleted:
+      return asset::StockTransferInState::Completed;
+    case StockTransferInStateProcessing:
+      return asset::StockTransferInState::Processing;
+    case StockTransferInStatePartiallyCompleted:
+      return asset::StockTransferInState::PartiallyCompleted;
+    case StockTransferInStateFailed:
+      return asset::StockTransferInState::Failed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_stock_transfer_in_state_t
+convert(asset::StockTransferInState ty)
+{
+  switch (ty) {
+    case asset::StockTransferInState::Unknown:
+      return StockTransferInStateUnknown;
+    case asset::StockTransferInState::Submitted:
+      return StockTransferInStateSubmitted;
+    case asset::StockTransferInState::Cancelled:
+      return StockTransferInStateCancelled;
+    case asset::StockTransferInState::Completed:
+      return StockTransferInStateCompleted;
+    case asset::StockTransferInState::Processing:
+      return StockTransferInStateProcessing;
+    case asset::StockTransferInState::PartiallyCompleted:
+      return StockTransferInStatePartiallyCompleted;
+    case asset::StockTransferInState::Failed:
+      return StockTransferInStateFailed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::StockTransferOutState
+convert(lb_stock_transfer_out_state_t ty)
+{
+  switch (ty) {
+    case StockTransferOutStateUnknown:
+      return asset::StockTransferOutState::Unknown;
+    case StockTransferOutStateSubmitted:
+      return asset::StockTransferOutState::Submitted;
+    case StockTransferOutStateProcessing:
+      return asset::StockTransferOutState::Processing;
+    case StockTransferOutStateExecuting:
+      return asset::StockTransferOutState::Executing;
+    case StockTransferOutStateCompleted:
+      return asset::StockTransferOutState::Completed;
+    case StockTransferOutStateCancelled:
+      return asset::StockTransferOutState::Cancelled;
+    case StockTransferOutStatePartiallyCompleted:
+      return asset::StockTransferOutState::PartiallyCompleted;
+    case StockTransferOutStateFailed:
+      return asset::StockTransferOutState::Failed;
+    case StockTransferOutStateRejected:
+      return asset::StockTransferOutState::Rejected;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_stock_transfer_out_state_t
+convert(asset::StockTransferOutState ty)
+{
+  switch (ty) {
+    case asset::StockTransferOutState::Unknown:
+      return StockTransferOutStateUnknown;
+    case asset::StockTransferOutState::Submitted:
+      return StockTransferOutStateSubmitted;
+    case asset::StockTransferOutState::Processing:
+      return StockTransferOutStateProcessing;
+    case asset::StockTransferOutState::Executing:
+      return StockTransferOutStateExecuting;
+    case asset::StockTransferOutState::Completed:
+      return StockTransferOutStateCompleted;
+    case asset::StockTransferOutState::Cancelled:
+      return StockTransferOutStateCancelled;
+    case asset::StockTransferOutState::PartiallyCompleted:
+      return StockTransferOutStatePartiallyCompleted;
+    case asset::StockTransferOutState::Failed:
+      return StockTransferOutStateFailed;
+    case asset::StockTransferOutState::Rejected:
+      return StockTransferOutStateRejected;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::TransferStockState
+convert(lb_transfer_stock_state_t ty)
+{
+  switch (ty) {
+    case TransferStockStateUnknown:
+      return asset::TransferStockState::Unknown;
+    case TransferStockStateProcessing:
+      return asset::TransferStockState::Processing;
+    case TransferStockStateSucceeded:
+      return asset::TransferStockState::Succeeded;
+    case TransferStockStateFailed:
+      return asset::TransferStockState::Failed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_transfer_stock_state_t
+convert(asset::TransferStockState ty)
+{
+  switch (ty) {
+    case asset::TransferStockState::Unknown:
+      return TransferStockStateUnknown;
+    case asset::TransferStockState::Processing:
+      return TransferStockStateProcessing;
+    case asset::TransferStockState::Succeeded:
+      return TransferStockStateSucceeded;
+    case asset::TransferStockState::Failed:
+      return TransferStockStateFailed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::RewardType
+convert(lb_reward_type_t ty)
+{
+  switch (ty) {
+    case RewardTypeUnknown:
+      return asset::RewardType::Unknown;
+    case RewardTypeCash:
+      return asset::RewardType::Cash;
+    case RewardTypeGift:
+      return asset::RewardType::Gift;
+    case RewardTypeCoupon:
+      return asset::RewardType::Coupon;
+    case RewardTypeTask:
+      return asset::RewardType::Task;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_reward_type_t
+convert(asset::RewardType ty)
+{
+  switch (ty) {
+    case asset::RewardType::Unknown:
+      return RewardTypeUnknown;
+    case asset::RewardType::Cash:
+      return RewardTypeCash;
+    case asset::RewardType::Gift:
+      return RewardTypeGift;
+    case asset::RewardType::Coupon:
+      return RewardTypeCoupon;
+    case asset::RewardType::Task:
+      return RewardTypeTask;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::RewardStatus
+convert(lb_reward_status_t ty)
+{
+  switch (ty) {
+    case RewardStatusUnknown:
+      return asset::RewardStatus::Unknown;
+    case RewardStatusUpcoming:
+      return asset::RewardStatus::Upcoming;
+    case RewardStatusCancelled:
+      return asset::RewardStatus::Cancelled;
+    case RewardStatusExitedActivity:
+      return asset::RewardStatus::ExitedActivity;
+    case RewardStatusUnclaimed:
+      return asset::RewardStatus::Unclaimed;
+    case RewardStatusIssuing:
+      return asset::RewardStatus::Issuing;
+    case RewardStatusIssued:
+      return asset::RewardStatus::Issued;
+    case RewardStatusFailed:
+      return asset::RewardStatus::Failed;
+    case RewardStatusExchanged:
+      return asset::RewardStatus::Exchanged;
+    case RewardStatusExpired:
+      return asset::RewardStatus::Expired;
+    case RewardStatusRefunded:
+      return asset::RewardStatus::Refunded;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_reward_status_t
+convert(asset::RewardStatus ty)
+{
+  switch (ty) {
+    case asset::RewardStatus::Unknown:
+      return RewardStatusUnknown;
+    case asset::RewardStatus::Upcoming:
+      return RewardStatusUpcoming;
+    case asset::RewardStatus::Cancelled:
+      return RewardStatusCancelled;
+    case asset::RewardStatus::ExitedActivity:
+      return RewardStatusExitedActivity;
+    case asset::RewardStatus::Unclaimed:
+      return RewardStatusUnclaimed;
+    case asset::RewardStatus::Issuing:
+      return RewardStatusIssuing;
+    case asset::RewardStatus::Issued:
+      return RewardStatusIssued;
+    case asset::RewardStatus::Failed:
+      return RewardStatusFailed;
+    case asset::RewardStatus::Exchanged:
+      return RewardStatusExchanged;
+    case asset::RewardStatus::Expired:
+      return RewardStatusExpired;
+    case asset::RewardStatus::Refunded:
+      return RewardStatusRefunded;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::RewardDeliverStatus
+convert(lb_reward_deliver_status_t ty)
+{
+  switch (ty) {
+    case RewardDeliverStatusUnknown:
+      return asset::RewardDeliverStatus::Unknown;
+    case RewardDeliverStatusNotActivated:
+      return asset::RewardDeliverStatus::NotActivated;
+    case RewardDeliverStatusActivatedOrShipping:
+      return asset::RewardDeliverStatus::ActivatedOrShipping;
+    case RewardDeliverStatusConsumed:
+      return asset::RewardDeliverStatus::Consumed;
+    case RewardDeliverStatusEVoucherActivating:
+      return asset::RewardDeliverStatus::EVoucherActivating;
+    case RewardDeliverStatusEVoucherExpired:
+      return asset::RewardDeliverStatus::EVoucherExpired;
+    case RewardDeliverStatusEVoucherInvalid:
+      return asset::RewardDeliverStatus::EVoucherInvalid;
+    case RewardDeliverStatusAddressMissing:
+      return asset::RewardDeliverStatus::AddressMissing;
+    case RewardDeliverStatusAddressFilled:
+      return asset::RewardDeliverStatus::AddressFilled;
+    case RewardDeliverStatusShipping:
+      return asset::RewardDeliverStatus::Shipping;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_reward_deliver_status_t
+convert(asset::RewardDeliverStatus ty)
+{
+  switch (ty) {
+    case asset::RewardDeliverStatus::Unknown:
+      return RewardDeliverStatusUnknown;
+    case asset::RewardDeliverStatus::NotActivated:
+      return RewardDeliverStatusNotActivated;
+    case asset::RewardDeliverStatus::ActivatedOrShipping:
+      return RewardDeliverStatusActivatedOrShipping;
+    case asset::RewardDeliverStatus::Consumed:
+      return RewardDeliverStatusConsumed;
+    case asset::RewardDeliverStatus::EVoucherActivating:
+      return RewardDeliverStatusEVoucherActivating;
+    case asset::RewardDeliverStatus::EVoucherExpired:
+      return RewardDeliverStatusEVoucherExpired;
+    case asset::RewardDeliverStatus::EVoucherInvalid:
+      return RewardDeliverStatusEVoucherInvalid;
+    case asset::RewardDeliverStatus::AddressMissing:
+      return RewardDeliverStatusAddressMissing;
+    case asset::RewardDeliverStatus::AddressFilled:
+      return RewardDeliverStatusAddressFilled;
+    case asset::RewardDeliverStatus::Shipping:
+      return RewardDeliverStatusShipping;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::CouponStatus
+convert(lb_coupon_status_t ty)
+{
+  switch (ty) {
+    case CouponStatusUnknown:
+      return asset::CouponStatus::Unknown;
+    case CouponStatusUnused:
+      return asset::CouponStatus::Unused;
+    case CouponStatusUsed:
+      return asset::CouponStatus::Used;
+    case CouponStatusExpired:
+      return asset::CouponStatus::Expired;
+    case CouponStatusRedeeming:
+      return asset::CouponStatus::Redeeming;
+    case CouponStatusInUse:
+      return asset::CouponStatus::InUse;
+    case CouponStatusProcessing:
+      return asset::CouponStatus::Processing;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_coupon_status_t
+convert(asset::CouponStatus ty)
+{
+  switch (ty) {
+    case asset::CouponStatus::Unknown:
+      return CouponStatusUnknown;
+    case asset::CouponStatus::Unused:
+      return CouponStatusUnused;
+    case asset::CouponStatus::Used:
+      return CouponStatusUsed;
+    case asset::CouponStatus::Expired:
+      return CouponStatusExpired;
+    case asset::CouponStatus::Redeeming:
+      return CouponStatusRedeeming;
+    case asset::CouponStatus::InUse:
+      return CouponStatusInUse;
+    case asset::CouponStatus::Processing:
+      return CouponStatusProcessing;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::DepositState
+convert(lb_deposit_state_t ty)
+{
+  switch (ty) {
+    case DepositStateUnknown:
+      return asset::DepositState::Unknown;
+    case DepositStateProcessing:
+      return asset::DepositState::Processing;
+    case DepositStateCredited:
+      return asset::DepositState::Credited;
+    case DepositStateFailed:
+      return asset::DepositState::Failed;
+    case DepositStateCancelled:
+      return asset::DepositState::Cancelled;
+    case DepositStateInvalidated:
+      return asset::DepositState::Invalidated;
+    case DepositStateRejected:
+      return asset::DepositState::Rejected;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_deposit_state_t
+convert(asset::DepositState ty)
+{
+  switch (ty) {
+    case asset::DepositState::Unknown:
+      return DepositStateUnknown;
+    case asset::DepositState::Processing:
+      return DepositStateProcessing;
+    case asset::DepositState::Credited:
+      return DepositStateCredited;
+    case asset::DepositState::Failed:
+      return DepositStateFailed;
+    case asset::DepositState::Cancelled:
+      return DepositStateCancelled;
+    case asset::DepositState::Invalidated:
+      return DepositStateInvalidated;
+    case asset::DepositState::Rejected:
+      return DepositStateRejected;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::WithdrawalState
+convert(lb_withdrawal_state_t ty)
+{
+  switch (ty) {
+    case WithdrawalStateUnknown:
+      return asset::WithdrawalState::Unknown;
+    case WithdrawalStateSubmitted:
+      return asset::WithdrawalState::Submitted;
+    case WithdrawalStateProcessing:
+      return asset::WithdrawalState::Processing;
+    case WithdrawalStateRejected:
+      return asset::WithdrawalState::Rejected;
+    case WithdrawalStateCancelled:
+      return asset::WithdrawalState::Cancelled;
+    case WithdrawalStateRemitted:
+      return asset::WithdrawalState::Remitted;
+    case WithdrawalStateFailed:
+      return asset::WithdrawalState::Failed;
+    case WithdrawalStateRefunded:
+      return asset::WithdrawalState::Refunded;
+    case WithdrawalStateApprovedAwaitingPayout:
+      return asset::WithdrawalState::ApprovedAwaitingPayout;
+    case WithdrawalStateLargeAmountReview:
+      return asset::WithdrawalState::LargeAmountReview;
+    case WithdrawalStateChangePendingApproval:
+      return asset::WithdrawalState::ChangePendingApproval;
+    case WithdrawalStateDeletionPendingApproval:
+      return asset::WithdrawalState::DeletionPendingApproval;
+    case WithdrawalStateDeleted:
+      return asset::WithdrawalState::Deleted;
+    case WithdrawalStateRejectionPendingApproval:
+      return asset::WithdrawalState::RejectionPendingApproval;
+    case WithdrawalStateAwaitingConfirmation:
+      return asset::WithdrawalState::AwaitingConfirmation;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_withdrawal_state_t
+convert(asset::WithdrawalState ty)
+{
+  switch (ty) {
+    case asset::WithdrawalState::Unknown:
+      return WithdrawalStateUnknown;
+    case asset::WithdrawalState::Submitted:
+      return WithdrawalStateSubmitted;
+    case asset::WithdrawalState::Processing:
+      return WithdrawalStateProcessing;
+    case asset::WithdrawalState::Rejected:
+      return WithdrawalStateRejected;
+    case asset::WithdrawalState::Cancelled:
+      return WithdrawalStateCancelled;
+    case asset::WithdrawalState::Remitted:
+      return WithdrawalStateRemitted;
+    case asset::WithdrawalState::Failed:
+      return WithdrawalStateFailed;
+    case asset::WithdrawalState::Refunded:
+      return WithdrawalStateRefunded;
+    case asset::WithdrawalState::ApprovedAwaitingPayout:
+      return WithdrawalStateApprovedAwaitingPayout;
+    case asset::WithdrawalState::LargeAmountReview:
+      return WithdrawalStateLargeAmountReview;
+    case asset::WithdrawalState::ChangePendingApproval:
+      return WithdrawalStateChangePendingApproval;
+    case asset::WithdrawalState::DeletionPendingApproval:
+      return WithdrawalStateDeletionPendingApproval;
+    case asset::WithdrawalState::Deleted:
+      return WithdrawalStateDeleted;
+    case asset::WithdrawalState::RejectionPendingApproval:
+      return WithdrawalStateRejectionPendingApproval;
+    case asset::WithdrawalState::AwaitingConfirmation:
+      return WithdrawalStateAwaitingConfirmation;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::CouponOrderType
+convert(lb_coupon_order_type_t ty)
+{
+  switch (ty) {
+    case CouponOrderTypeLocked:
+      return asset::CouponOrderType::Locked;
+    case CouponOrderTypeSettled:
+      return asset::CouponOrderType::Settled;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_coupon_order_type_t
+convert(asset::CouponOrderType ty)
+{
+  switch (ty) {
+    case asset::CouponOrderType::Locked:
+      return CouponOrderTypeLocked;
+    case asset::CouponOrderType::Settled:
+      return CouponOrderTypeSettled;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::BankCardAuthorization
+convert(const lb_bank_card_authorization_t* info);
+
+inline asset::BankCard
+convert(const lb_bank_card_t* info);
+
+inline asset::EddaApplication
+convert(const lb_edda_application_t* info);
+
+inline asset::TransferStock
+convert(const lb_transfer_stock_t* info);
+
+inline asset::StockTransferIn
+convert(const lb_stock_transfer_in_t* info);
+
+inline asset::StockTransferInResponse
+convert(const lb_stock_transfer_in_response_t* info);
+
+inline asset::StockTransferOut
+convert(const lb_stock_transfer_out_t* info);
+
+inline asset::RewardRecord
+convert(const lb_reward_record_t* info);
+
+inline asset::RewardRecordsResponse
+convert(const lb_reward_records_response_t* info);
+
+inline asset::CouponCommission
+convert(const lb_coupon_commission_t* info);
+
+inline asset::Coupon
+convert(const lb_coupon_t* info);
+
+inline asset::CouponsResponse
+convert(const lb_coupons_response_t* info);
+
+inline asset::CouponOrder
+convert(const lb_coupon_order_t* info);
+
+inline asset::Deposit
+convert(const lb_deposit_t* info);
+
+inline asset::Withdrawal
+convert(const lb_withdrawal_t* info);
+
+inline asset::WithdrawalsResponse
+convert(const lb_withdrawals_response_t* info);
+
+template<typename T, typename C>
+inline std::vector<T>
+convert_asset_list(const C* items, size_t len)
+{
+  std::vector<T> out;
+  out.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    out.push_back(convert(&items[i]));
+  }
+  return out;
+}
+
+inline asset::BankCardAuthorization
+convert(const lb_bank_card_authorization_t* info)
+{
+  asset::BankCardAuthorization out;
+  out.flow_id = std::string(info->flow_id ? info->flow_id : "");
+  out.name = std::string(info->name ? info->name : "");
+  out.currency = std::string(info->currency ? info->currency : "");
+  out.status = convert(info->status);
+  out.message = std::string(info->message ? info->message : "");
+  out.is_support = info->is_support;
+  out.max_amount = info->max_amount ? std::optional<Decimal>(Decimal(info->max_amount)) : std::nullopt;
+  out.max_amount_unlimited = info->max_amount_unlimited;
+  out.daily_max_count = info->daily_max_count ? std::optional<int64_t>(*info->daily_max_count) : std::nullopt;
+  out.daily_max_count_unlimited = info->daily_max_count_unlimited;
+  out.expiry_date = info->expiry_date ? std::optional<int64_t>(*info->expiry_date) : std::nullopt;
+  out.long_term_valid = info->long_term_valid;
+  out.doc_reviewing = info->doc_reviewing;
+  out.no_prior_deposit_reviewing = info->no_prior_deposit_reviewing;
+  return out;
+}
+
+inline asset::BankCard
+convert(const lb_bank_card_t* info)
+{
+  asset::BankCard out;
+  out.id = std::string(info->id ? info->id : "");
+  out.bank_id = std::string(info->bank_id ? info->bank_id : "");
+  out.bank = std::string(info->bank ? info->bank : "");
+  out.bank_en = std::string(info->bank_en ? info->bank_en : "");
+  out.bank_code = std::string(info->bank_code ? info->bank_code : "");
+  out.account = std::string(info->account ? info->account : "");
+  out.account_type = std::string(info->account_type ? info->account_type : "");
+  out.country = std::string(info->country ? info->country : "");
+  out.region = std::string(info->region ? info->region : "");
+  out.region_name = std::string(info->region_name ? info->region_name : "");
+  out.swift_code = std::string(info->swift_code ? info->swift_code : "");
+  out.remark = std::string(info->remark ? info->remark : "");
+  out.status = convert(info->status);
+  out.witness_state = convert(info->witness_state);
+  out.support_witness = info->support_witness;
+  out.bind_state = convert(info->bind_state);
+  out.bind_tip = std::string(info->bind_tip ? info->bind_tip : "");
+  out.withdraw_fee = std::string(info->withdraw_fee ? info->withdraw_fee : "");
+  out.created_at = info->created_at ? std::optional<int64_t>(*info->created_at) : std::nullopt;
+  out.auth_list = convert_asset_list<asset::BankCardAuthorization>(info->auth_list, info->num_auth_list);
+  return out;
+}
+
+inline asset::EddaApplication
+convert(const lb_edda_application_t* info)
+{
+  asset::EddaApplication out;
+  out.id = std::string(info->id ? info->id : "");
+  out.status = convert(info->status);
+  out.message = std::string(info->message ? info->message : "");
+  return out;
+}
+
+inline asset::TransferStock
+convert(const lb_transfer_stock_t* info)
+{
+  asset::TransferStock out;
+  out.code = std::string(info->code ? info->code : "");
+  out.name = std::string(info->name ? info->name : "");
+  out.name_en = std::string(info->name_en ? info->name_en : "");
+  out.market = std::string(info->market ? info->market : "");
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
+  out.currency = std::string(info->currency ? info->currency : "");
+  out.cost = info->cost ? std::optional<Decimal>(Decimal(info->cost)) : std::nullopt;
+  out.state = convert(info->state);
+  out.position_side = std::string(info->position_side ? info->position_side : "");
+  return out;
+}
+
+inline asset::StockTransferIn
+convert(const lb_stock_transfer_in_t* info)
+{
+  asset::StockTransferIn out;
+  out.id = std::string(info->id ? info->id : "");
+  out.order_id = std::string(info->order_id ? info->order_id : "");
+  out.market = std::string(info->market ? info->market : "");
+  out.broker = std::string(info->broker ? info->broker : "");
+  out.broker_en = std::string(info->broker_en ? info->broker_en : "");
+  out.broker_code = std::string(info->broker_code ? info->broker_code : "");
+  out.account = std::string(info->account ? info->account : "");
+  out.state = std::string(info->state ? info->state : "");
+  out.state_code = convert(info->state_code);
+  out.app_state = std::string(info->app_state ? info->app_state : "");
+  out.can_modify = info->can_modify;
+  out.created_at = info->created_at ? std::optional<int64_t>(*info->created_at) : std::nullopt;
+  out.updated_at = info->updated_at ? std::optional<int64_t>(*info->updated_at) : std::nullopt;
+  out.process_at = info->process_at ? std::optional<int64_t>(*info->process_at) : std::nullopt;
+  out.exec_at = info->exec_at ? std::optional<int64_t>(*info->exec_at) : std::nullopt;
+  out.remark = std::string(info->remark ? info->remark : "");
+  out.reason = std::string(info->reason ? info->reason : "");
+  out.stocks = convert_asset_list<asset::TransferStock>(info->stocks, info->num_stocks);
+  return out;
+}
+
+inline asset::StockTransferInResponse
+convert(const lb_stock_transfer_in_response_t* info)
+{
+  asset::StockTransferInResponse out;
+  out.records = convert_asset_list<asset::StockTransferIn>(info->records, info->num_records);
+  out.total = info->total;
+  return out;
+}
+
+inline asset::StockTransferOut
+convert(const lb_stock_transfer_out_t* info)
+{
+  asset::StockTransferOut out;
+  out.id = std::string(info->id ? info->id : "");
+  out.order_id = std::string(info->order_id ? info->order_id : "");
+  out.market = std::string(info->market ? info->market : "");
+  out.broker = std::string(info->broker ? info->broker : "");
+  out.broker_en = std::string(info->broker_en ? info->broker_en : "");
+  out.broker_code = std::string(info->broker_code ? info->broker_code : "");
+  out.account = std::string(info->account ? info->account : "");
+  out.state = std::string(info->state ? info->state : "");
+  out.state_code = convert(info->state_code);
+  out.created_at = info->created_at ? std::optional<int64_t>(*info->created_at) : std::nullopt;
+  out.updated_at = info->updated_at ? std::optional<int64_t>(*info->updated_at) : std::nullopt;
+  out.process_at = info->process_at ? std::optional<int64_t>(*info->process_at) : std::nullopt;
+  out.exec_at = info->exec_at ? std::optional<int64_t>(*info->exec_at) : std::nullopt;
+  out.agree_at = info->agree_at ? std::optional<int64_t>(*info->agree_at) : std::nullopt;
+  out.refuse_at = info->refuse_at ? std::optional<int64_t>(*info->refuse_at) : std::nullopt;
+  out.cancel_at = info->cancel_at ? std::optional<int64_t>(*info->cancel_at) : std::nullopt;
+  out.remark = std::string(info->remark ? info->remark : "");
+  out.reason = std::string(info->reason ? info->reason : "");
+  out.stocks = convert_asset_list<asset::TransferStock>(info->stocks, info->num_stocks);
+  return out;
+}
+
+inline asset::RewardRecord
+convert(const lb_reward_record_t* info)
+{
+  asset::RewardRecord out;
+  out.reward_type = convert(info->reward_type);
+  out.record_id = std::string(info->record_id ? info->record_id : "");
+  out.activity_title = std::string(info->activity_title ? info->activity_title : "");
+  out.title = std::string(info->title ? info->title : "");
+  out.description = std::string(info->description ? info->description : "");
+  out.card_type = std::string(info->card_type ? info->card_type : "");
+  out.card_status = info->card_status;
+  out.prize_type = info->prize_type ? std::optional<int32_t>(*info->prize_type) : std::nullopt;
+  out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
+  out.currency = std::string(info->currency ? info->currency : "");
+  out.status = convert(info->status);
+  out.deliver_status = convert(info->deliver_status);
+  out.exit_status = info->exit_status;
+  out.send_time = info->send_time ? std::optional<int64_t>(*info->send_time) : std::nullopt;
+  out.start_time = info->start_time ? std::optional<int64_t>(*info->start_time) : std::nullopt;
+  out.end_time = info->end_time ? std::optional<int64_t>(*info->end_time) : std::nullopt;
+  out.effective_time = info->effective_time ? std::optional<int64_t>(*info->effective_time) : std::nullopt;
+  out.receive_deadline = info->receive_deadline ? std::optional<int64_t>(*info->receive_deadline) : std::nullopt;
+  return out;
+}
+
+inline asset::RewardRecordsResponse
+convert(const lb_reward_records_response_t* info)
+{
+  asset::RewardRecordsResponse out;
+  out.list = convert_asset_list<asset::RewardRecord>(info->list, info->num_list);
+  out.total = info->total;
+  return out;
+}
+
+inline asset::CouponCommission
+convert(const lb_coupon_commission_t* info)
+{
+  asset::CouponCommission out;
+  out.markets = std::vector<std::string>(info->markets, info->markets + info->num_markets);
+  out.rebate_rate = std::string(info->rebate_rate ? info->rebate_rate : "");
+  out.bz_types = std::vector<int32_t>(info->bz_types, info->bz_types + info->num_bz_types);
+  out.commission_balance = info->commission_balance ? std::optional<Decimal>(Decimal(info->commission_balance)) : std::nullopt;
+  out.commission_duration = std::string(info->commission_duration ? info->commission_duration : "");
+  out.unlimited = info->unlimited;
+  out.commission_expired_time = info->commission_expired_time ? std::optional<int64_t>(*info->commission_expired_time) : std::nullopt;
+  out.usage_count = info->usage_count;
+  out.lave_usage_count = info->lave_usage_count;
+  out.settlement_model = std::string(info->settlement_model ? info->settlement_model : "");
+  return out;
+}
+
+inline asset::Coupon
+convert(const lb_coupon_t* info)
+{
+  asset::Coupon out;
+  out.card_id = std::string(info->card_id ? info->card_id : "");
+  out.card_type = std::string(info->card_type ? info->card_type : "");
+  out.title = std::string(info->title ? info->title : "");
+  out.title_sec = std::string(info->title_sec ? info->title_sec : "");
+  out.description = std::string(info->description ? info->description : "");
+  out.detail = std::string(info->detail ? info->detail : "");
+  out.card_status = convert(info->card_status);
+  out.start_time = info->start_time ? std::optional<int64_t>(*info->start_time) : std::nullopt;
+  out.end_time = info->end_time ? std::optional<int64_t>(*info->end_time) : std::nullopt;
+  out.activate_time = info->activate_time ? std::optional<int64_t>(*info->activate_time) : std::nullopt;
+  out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
+  out.currency = std::string(info->currency ? info->currency : "");
+  out.available_trade_session = std::string(info->available_trade_session ? info->available_trade_session : "");
+  out.commission = convert(&info->commission);
+  return out;
+}
+
+inline asset::CouponsResponse
+convert(const lb_coupons_response_t* info)
+{
+  asset::CouponsResponse out;
+  out.top_list = convert_asset_list<asset::Coupon>(info->top_list, info->num_top_list);
+  out.list = convert_asset_list<asset::Coupon>(info->list, info->num_list);
+  out.bottom_list = convert_asset_list<asset::Coupon>(info->bottom_list, info->num_bottom_list);
+  out.total = info->total;
+  out.expired_count = info->expired_count;
+  return out;
+}
+
+inline asset::CouponOrder
+convert(const lb_coupon_order_t* info)
+{
+  asset::CouponOrder out;
+  out.order_id = std::string(info->order_id ? info->order_id : "");
+  out.state = std::string(info->state ? info->state : "");
+  out.state_val = std::string(info->state_val ? info->state_val : "");
+  out.executed_price = info->executed_price ? std::optional<Decimal>(Decimal(info->executed_price)) : std::nullopt;
+  out.executed_quantity = info->executed_quantity ? std::optional<Decimal>(Decimal(info->executed_quantity)) : std::nullopt;
+  out.currency = std::string(info->currency ? info->currency : "");
+  out.settlement_currency = std::string(info->settlement_currency ? info->settlement_currency : "");
+  out.rebate = info->rebate ? std::optional<Decimal>(Decimal(info->rebate)) : std::nullopt;
+  out.rebate_dt = std::string(info->rebate_dt ? info->rebate_dt : "");
+  return out;
+}
+
+inline asset::Deposit
+convert(const lb_deposit_t* info)
+{
+  asset::Deposit out;
+  out.id = std::string(info->id ? info->id : "");
+  out.created_at = info->created_at ? std::optional<int64_t>(*info->created_at) : std::nullopt;
+  out.updated_at = info->updated_at ? std::optional<int64_t>(*info->updated_at) : std::nullopt;
+  out.currency = std::string(info->currency ? info->currency : "");
+  out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
+  out.receivable_amount = info->receivable_amount ? std::optional<Decimal>(Decimal(info->receivable_amount)) : std::nullopt;
+  out.state = std::string(info->state ? info->state : "");
+  out.state_code = convert(info->state_code);
+  out.sub_state_code = info->sub_state_code;
+  out.bank_operation_type_id = std::string(info->bank_operation_type_id ? info->bank_operation_type_id : "");
+  out.bank_operation_type_name = std::string(info->bank_operation_type_name ? info->bank_operation_type_name : "");
+  out.reference_no = std::string(info->reference_no ? info->reference_no : "");
+  out.can_cancel = info->can_cancel;
+  out.user_bank_swift_code = std::string(info->user_bank_swift_code ? info->user_bank_swift_code : "");
+  return out;
+}
+
+inline asset::Withdrawal
+convert(const lb_withdrawal_t* info)
+{
+  asset::Withdrawal out;
+  out.id = std::string(info->id ? info->id : "");
+  out.order_id = std::string(info->order_id ? info->order_id : "");
+  out.created_at = info->created_at ? std::optional<int64_t>(*info->created_at) : std::nullopt;
+  out.currency = std::string(info->currency ? info->currency : "");
+  out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
+  out.fee = info->fee ? std::optional<Decimal>(Decimal(info->fee)) : std::nullopt;
+  out.settlement_amount = info->settlement_amount ? std::optional<Decimal>(Decimal(info->settlement_amount)) : std::nullopt;
+  out.state = convert(info->state);
+  out.raw_state = std::string(info->raw_state ? info->raw_state : "");
+  out.state_description = std::string(info->state_description ? info->state_description : "");
+  out.bank_account = std::string(info->bank_account ? info->bank_account : "");
+  out.display_bank_account = std::string(info->display_bank_account ? info->display_bank_account : "");
+  out.user_bank_swift_code = std::string(info->user_bank_swift_code ? info->user_bank_swift_code : "");
+  out.account_channel = std::string(info->account_channel ? info->account_channel : "");
+  return out;
+}
+
+inline asset::WithdrawalsResponse
+convert(const lb_withdrawals_response_t* info)
+{
+  asset::WithdrawalsResponse out;
+  out.list = convert_asset_list<asset::Withdrawal>(info->list, info->num_list);
+  out.total = info->total;
+  return out;
+}
+
 
 } // namespace convert
 

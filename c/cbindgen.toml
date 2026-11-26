@@ -231,6 +231,41 @@ cpp_compat = true
 "CMarketContext" = "lb_market_context_t"
 "CAssetContext" = "lb_asset_context_t"
 "CStatementItem" = "lb_statement_item_t"
+"CBankCardStatus" = "lb_bank_card_status_t"
+"CBankCardWitnessState" = "lb_bank_card_witness_state_t"
+"CBankCardBindState" = "lb_bank_card_bind_state_t"
+"CAuthorizationStatus" = "lb_authorization_status_t"
+"CStockTransferInState" = "lb_stock_transfer_in_state_t"
+"CStockTransferOutState" = "lb_stock_transfer_out_state_t"
+"CTransferStockState" = "lb_transfer_stock_state_t"
+"CRewardType" = "lb_reward_type_t"
+"CRewardStatus" = "lb_reward_status_t"
+"CRewardDeliverStatus" = "lb_reward_deliver_status_t"
+"CCouponStatus" = "lb_coupon_status_t"
+"CDepositState" = "lb_deposit_state_t"
+"CWithdrawalState" = "lb_withdrawal_state_t"
+"CCouponOrderType" = "lb_coupon_order_type_t"
+"CBankCardAuthorization" = "lb_bank_card_authorization_t"
+"CBankCard" = "lb_bank_card_t"
+"CEddaApplication" = "lb_edda_application_t"
+"CTransferStock" = "lb_transfer_stock_t"
+"CStockTransferIn" = "lb_stock_transfer_in_t"
+"CStockTransferInResponse" = "lb_stock_transfer_in_response_t"
+"CStockTransferOut" = "lb_stock_transfer_out_t"
+"CRewardRecord" = "lb_reward_record_t"
+"CRewardRecordsResponse" = "lb_reward_records_response_t"
+"CCouponCommission" = "lb_coupon_commission_t"
+"CCoupon" = "lb_coupon_t"
+"CCouponsResponse" = "lb_coupons_response_t"
+"CCouponOrder" = "lb_coupon_order_t"
+"CDeposit" = "lb_deposit_t"
+"CWithdrawal" = "lb_withdrawal_t"
+"CWithdrawalsResponse" = "lb_withdrawals_response_t"
+"CGetStockTransfersOptions" = "lb_get_stock_transfers_options_t"
+"CGetRewardRecordsOptions" = "lb_get_reward_records_options_t"
+"CGetCouponsOptions" = "lb_get_coupons_options_t"
+"CGetDepositsOptions" = "lb_get_deposits_options_t"
+"CGetWithdrawalsOptions" = "lb_get_withdrawals_options_t"
 # MarketContext types
 "CMarketTimeItem" = "lb_market_time_item_t"
 "CMarketStatusResponse" = "lb_market_status_response_t"
@@ -500,8 +535,25 @@ include = [
     "CRiskAssessmentApproval",
     "CRiskAssessmentDeadline",
     "COrderDetail",
-    # AssetContext: statements (reachable only via void* async data pointer)
+    # AssetContext: statements and account records (reachable only via void*
+    # async data pointer)
     "CStatementItem",
+    "CBankCardAuthorization",
+    "CBankCard",
+    "CEddaApplication",
+    "CTransferStock",
+    "CStockTransferIn",
+    "CStockTransferInResponse",
+    "CStockTransferOut",
+    "CRewardRecord",
+    "CRewardRecordsResponse",
+    "CCouponCommission",
+    "CCoupon",
+    "CCouponsResponse",
+    "CCouponOrder",
+    "CDeposit",
+    "CWithdrawal",
+    "CWithdrawalsResponse",
     # GridContext: grid trading (reachable only via void* async data pointer)
     "CSubmitGridOrderResponse",
     "CGridOrder", "CGridOrderSubOrder", "CGridOrderHistory", "CGridOrderDetail",
