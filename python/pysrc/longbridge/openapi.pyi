@@ -403,8 +403,9 @@ class Config:
                 check, not a client-side guarantee.**  The US data center
                 (LBUS) has no paper trading environment: the server answers
                 with the **real-money** account instead of rejecting the
-                request, so the SDK refuses order submission,
-                replacement and multi-leg submission locally while reads
+                request, so the SDK refuses every order-placing call
+                locally — submit, replace, multi-leg, grid submit and
+                replace, and fund subscription — while reads
                 still return real-money data.  Under OAuth
                 authentication the server does not apply the check at all, in
                 any region.  Do not rely on this option as the only thing
@@ -496,8 +497,9 @@ class Config:
                 check, not a client-side guarantee.**  The US data center
                 (LBUS) has no paper trading environment: the server answers
                 with the **real-money** account instead of rejecting the
-                request, so the SDK refuses order submission,
-                replacement and multi-leg submission locally while reads
+                request, so the SDK refuses every order-placing call
+                locally — submit, replace, multi-leg, grid submit and
+                replace, and fund subscription — while reads
                 still return real-money data.  Under OAuth
                 authentication the server does not apply the check at all, in
                 any region.  Do not rely on this option as the only thing

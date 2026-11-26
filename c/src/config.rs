@@ -200,9 +200,10 @@ pub unsafe extern "C" fn lb_config_disable_print_quote_packages(config: *mut CCo
 ///
 /// - The US data center (LBUS) has no paper trading environment. There is no
 ///   paper trading account to serve, and the server answers with the real-money
-///   account instead of rejecting the request. The SDK therefore refuses order
-///   submission, replacement and multi-leg submission locally; reads are not
-///   refused and return real-money data.
+///   account instead of rejecting the request. The SDK therefore refuses every
+///   order-placing call (submit, replace, multi-leg, grid submit and replace,
+///   fund subscription) locally; reads are not refused and return real-money
+///   data.
 /// - Under OAuth authentication the server does not apply the check at all, in
 ///   any region: a real-money token is accepted and reads return real-money
 ///   data without an error.

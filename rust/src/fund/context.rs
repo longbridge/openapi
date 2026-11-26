@@ -625,6 +625,10 @@ impl FundContext {
     }
 
     /// Submit a fund order (buy / sell).
+    ///
+    /// Refused locally when paper trading is enabled on a US (LBUS)
+    /// credential, which has no paper trading account to serve; see
+    /// [`Config::enable_papertrading`](crate::Config::enable_papertrading).
     pub async fn submit_order(
         &self,
         options: SubmitFundOrderOptions,
@@ -633,6 +637,7 @@ impl FundContext {
             .0
             .http_cli
             .request(Method::POST, "/v1/fund/orders")
+            .papertrading_restrict()
             .body(Json(options))
             .response::<Json<FundOrderSubmitResponse>>()
             .send()

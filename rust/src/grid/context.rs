@@ -86,11 +86,16 @@ impl GridContext {
     }
 
     /// Submit a grid trading order
+    ///
+    /// Refused locally when paper trading is enabled on a US (LBUS)
+    /// credential, which has no paper trading account to serve; see
+    /// [`Config::enable_papertrading`](crate::Config::enable_papertrading).
     pub async fn submit(&self, options: SubmitGridOrderOptions) -> Result<SubmitGridOrderResponse> {
         Ok(self
             .0
             .http_cli
             .request(Method::POST, "/v1/gridtrading/submit")
+            .papertrading_restrict()
             .body(Json(options))
             .response::<Json<SubmitGridOrderResponse>>()
             .send()
@@ -100,10 +105,15 @@ impl GridContext {
     }
 
     /// Replace (modify) a grid trading order
+    ///
+    /// Refused locally when paper trading is enabled on a US (LBUS)
+    /// credential, which has no paper trading account to serve; see
+    /// [`Config::enable_papertrading`](crate::Config::enable_papertrading).
     pub async fn replace(&self, options: ReplaceGridOrderOptions) -> Result<()> {
         self.0
             .http_cli
             .request(Method::POST, "/v1/gridtrading/replace")
+            .papertrading_restrict()
             .body(Json(options))
             .response::<Json<EmptyResponse>>()
             .send()
@@ -183,29 +193,48 @@ impl GridContext {
 
     /// Cancel a grid trading order
     pub async fn cancel(&self, order_id: impl Into<String>) -> Result<()> {
-        self.grid_action("/v1/gridtrading/cancel", order_id).await
+        self.grid_action("/v1/gridtrading/cancel", order_id, false)
+            .await
     }
 
     /// Suspend a grid trading order
     pub async fn suspend(&self, order_id: impl Into<String>) -> Result<()> {
-        self.grid_action("/v1/gridtrading/suspend", order_id).await
+        self.grid_action("/v1/gridtrading/suspend", order_id, false)
+            .await
     }
 
     /// Restart a grid trading order
+    ///
+    /// Refused locally when paper trading is enabled on a US (LBUS)
+    /// credential, which has no paper trading account to serve; see
+    /// [`Config::enable_papertrading`](crate::Config::enable_papertrading).
     pub async fn restart(&self, order_id: impl Into<String>) -> Result<()> {
-        self.grid_action("/v1/gridtrading/restart", order_id).await
+        self.grid_action("/v1/gridtrading/restart", order_id, true)
+            .await
     }
 
     /// Shared body for the cancel / suspend / restart grid actions.
-    async fn grid_action(&self, path: &'static str, order_id: impl Into<String>) -> Result<()> {
+    ///
+    /// `guard_papertrading` is set by the actions that put orders back on the
+    /// book (restart). Cancel and suspend only ever reduce exposure, so they
+    /// stay available even when paper trading is misconfigured — refusing them
+    /// would strand a live grid the caller is trying to stop.
+    async fn grid_action(
+        &self,
+        path: &'static str,
+        order_id: impl Into<String>,
+        guard_papertrading: bool,
+    ) -> Result<()> {
         #[derive(Debug, Serialize)]
         struct Body {
             order_id: String,
         }
 
-        self.0
-            .http_cli
-            .request(Method::POST, path)
+        let mut request = self.0.http_cli.request(Method::POST, path);
+        if guard_papertrading {
+            request = request.papertrading_restrict();
+        }
+        request
             .body(Json(Body {
                 order_id: order_id.into(),
             }))
