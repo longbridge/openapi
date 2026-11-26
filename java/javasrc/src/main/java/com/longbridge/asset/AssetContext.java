@@ -189,9 +189,10 @@ public class AssetContext implements AutoCloseable {
     }
 
     /**
-     * Get deposit records. The server's total follows the page size rather
-     * than the record count, so it is not returned; a full page means there
-     * may be more.
+     * Get one page of deposit records. The server's total follows the page
+     * size rather than the record count, so it is not returned;
+     * {@link DepositsResponse#getHasMore()} reports a full page instead. The
+     * page size is always sent: at most 20, default 20.
      * <p>
      * AP accounts only: US data-center accounts get a region error.
      *
@@ -199,7 +200,8 @@ public class AssetContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public synchronized CompletableFuture<Deposit[]> getDeposits(GetDepositsOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<DepositsResponse> getDeposits(GetDepositsOptions opts)
+            throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.assetContextDeposits(raw(), opts, callback);
         });

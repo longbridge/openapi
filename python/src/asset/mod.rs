@@ -60,6 +60,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::CouponOrder>()?;
     parent.add_class::<types::Deposit>()?;
     parent.add_class::<types::Withdrawal>()?;
+    parent.add_class::<types::DepositsResponse>()?;
     parent.add_class::<types::WithdrawalsResponse>()?;
     parent.add_class::<context::AssetContext>()?;
     parent.add_class::<context_async::AsyncAssetContext>()?;

@@ -10,9 +10,9 @@ use crate::{
             GetStockTransfersOutOptions, GetWithdrawalsOptions, StatementType,
         },
         types::{
-            BankCard, CouponOrder, CouponOrderType, CouponsResponse, Deposit, EddaApplication,
-            GetStatementDownloadUrlResponse, GetStatementListResponse, RewardRecordsResponse,
-            StockTransferInResponse, StockTransferOut, WithdrawalsResponse,
+            BankCard, CouponOrder, CouponOrderType, CouponsResponse, DepositsResponse,
+            EddaApplication, GetStatementDownloadUrlResponse, GetStatementListResponse,
+            RewardRecordsResponse, StockTransferInResponse, StockTransferOut, WithdrawalsResponse,
         },
     },
     config::Config,
@@ -275,10 +275,11 @@ impl AssetContext {
             .collect()
     }
 
-    /// Get deposit records
+    /// Get one page of deposit records
     ///
     /// The server's total follows the page size rather than the record
-    /// count, so it is not returned; a full page means there may be more.
+    /// count, so it is not returned; `hasMore` reports a full page instead.
+    /// The page size is always sent: at most 20, default 20.
     ///
     /// AP accounts only: US data-center accounts get a region error.
     ///
@@ -290,17 +291,15 @@ impl AssetContext {
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
     /// const ctx = AssetContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.deposits({ size: 20 });
-    /// console.log(resp);
+    /// console.log(resp.items, resp.hasMore);
     /// ```
     #[napi]
-    pub async fn deposits(&self, opts: Option<GetDepositsOptions>) -> Result<Vec<Deposit>> {
+    pub async fn deposits(&self, opts: Option<GetDepositsOptions>) -> Result<DepositsResponse> {
         self.ctx
             .deposits(opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect()
+            .try_into()
     }
 
     /// Get withdrawal records

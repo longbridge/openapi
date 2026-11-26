@@ -5,7 +5,7 @@ use tokio::sync::mpsc;
 use crate::{
     Config, Result,
     asset::{
-        AssetContext, BankCard, CouponOrder, CouponOrderType, CouponsResponse, Deposit,
+        AssetContext, BankCard, CouponOrder, CouponOrderType, CouponsResponse, DepositsResponse,
         EddaApplication, GetCouponsOptions, GetDepositsOptions, GetRewardRecordsOptions,
         GetStatementListOptions, GetStatementListResponse, GetStatementOptions,
         GetStatementResponse, GetStockTransfersInOptions, GetStockTransfersOutOptions,
@@ -144,8 +144,12 @@ impl AssetContextSync {
             .call(move |ctx| async move { ctx.coupon_orders(card_id, order_type).await })
     }
 
-    /// Get deposit records
-    pub fn deposits(&self, options: impl Into<Option<GetDepositsOptions>>) -> Result<Vec<Deposit>> {
+    /// Get one page of deposit records (see
+    /// [`crate::AssetContext::deposits`])
+    pub fn deposits(
+        &self,
+        options: impl Into<Option<GetDepositsOptions>>,
+    ) -> Result<DepositsResponse> {
         let options = options.into();
         self.rt
             .call(move |ctx| async move { ctx.deposits(options).await })

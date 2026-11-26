@@ -75,7 +75,7 @@ public class CouponStockFragment {
     /**
      * The server's numeric code of underlying_type, also when it is a code
      * this SDK does not know (underlying_type is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */

@@ -744,6 +744,7 @@ module.exports.DcaContext = nativeBinding.DcaContext
 module.exports.DCAContext = nativeBinding.DCAContext
 module.exports.Decimal = nativeBinding.Decimal
 module.exports.Deposit = nativeBinding.Deposit
+module.exports.DepositsResponse = nativeBinding.DepositsResponse
 module.exports.Depth = nativeBinding.Depth
 module.exports.EddaApplication = nativeBinding.EddaApplication
 module.exports.EstimateMaxPurchaseQuantityResponse = nativeBinding.EstimateMaxPurchaseQuantityResponse

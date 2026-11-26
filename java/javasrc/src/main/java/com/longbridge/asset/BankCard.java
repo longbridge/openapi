@@ -151,7 +151,7 @@ public class BankCard {
     /**
      * The server's numeric code of status, also when it is a code
      * this SDK does not know (status is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */
@@ -171,7 +171,7 @@ public class BankCard {
     /**
      * The server's numeric code of witness_state, also when it is a code
      * this SDK does not know (witness_state is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */
@@ -200,7 +200,7 @@ public class BankCard {
     /**
      * The server's numeric code of bind_state, also when it is a code
      * this SDK does not know (bind_state is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */

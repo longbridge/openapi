@@ -481,7 +481,7 @@ pub struct BankCardAuthorization {
     status: AuthorizationStatus,
     /// The server's numeric code of `status`, also when it is a code
     /// this SDK does not know (`status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     status_raw: Option<i32>,
     /// Failure reason (empty unless the authorization failed)
@@ -544,14 +544,14 @@ pub struct BankCard {
     status: BankCardStatus,
     /// The server's numeric code of `status`, also when it is a code
     /// this SDK does not know (`status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     status_raw: Option<i32>,
     /// Witness state
     witness_state: BankCardWitnessState,
     /// The server's numeric code of `witness_state`, also when it is a code
     /// this SDK does not know (`witness_state` is then `Unknown`); null when
-    /// the server sent none
+    /// the value is missing or is not a code
     #[js(opt)]
     witness_state_raw: Option<i32>,
     /// Whether the card supports witnessing
@@ -560,7 +560,7 @@ pub struct BankCard {
     bind_state: BankCardBindState,
     /// The server's numeric code of `bind_state`, also when it is a code
     /// this SDK does not know (`bind_state` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     bind_state_raw: Option<i32>,
     /// Binding hint text
@@ -593,7 +593,7 @@ pub struct EddaApplication {
     status: AuthorizationStatus,
     /// The server's numeric code of `status`, also when it is a code
     /// this SDK does not know (`status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     status_raw: Option<i32>,
     /// Failure reason (empty unless the application failed)
@@ -633,7 +633,7 @@ pub struct TransferStock {
     state_code: TransferStockState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     state_code_raw: Option<i32>,
     /// Position side
@@ -668,7 +668,7 @@ pub struct StockTransferIn {
     state_code: StockTransferInState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     state_code_raw: Option<i32>,
     /// App-side state: `noticed` means the user tapped "I have notified the
@@ -738,7 +738,7 @@ pub struct StockTransferOut {
     state_code: StockTransferOutState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     state_code_raw: Option<i32>,
     /// App-side state: `noticed` means the user tapped "I have notified the
@@ -788,7 +788,7 @@ pub struct RewardRecord {
     reward_type: RewardType,
     /// The server's numeric code of `reward_type`, also when it is a code
     /// this SDK does not know (`reward_type` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     reward_type_raw: Option<i32>,
     /// Record ID
@@ -805,7 +805,7 @@ pub struct RewardRecord {
     card_status: CouponStatus,
     /// The server's numeric code of `card_status`, also when it is a code
     /// this SDK does not know (`card_status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     card_status_raw: Option<i32>,
     /// Prize type code (gift rewards; `0` = physical goods), none when not set
@@ -820,15 +820,15 @@ pub struct RewardRecord {
     status: RewardStatus,
     /// The server's numeric code of `status`, also when it is a code
     /// this SDK does not know (`status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     status_raw: Option<i32>,
     /// Delivery status (issued gift rewards only)
     deliver_status: RewardDeliverStatus,
     /// The server's numeric code of `deliver_status` (e.g. 11 where
     /// `deliver_status` reads `AddressFilled`), also when it is a code this SDK
-    /// does not know (`deliver_status` is then `Unknown`); null when the server
-    /// sent none
+    /// does not know (`deliver_status` is then `Unknown`); null when the value
+    /// is missing or is not a code
     #[js(opt)]
     deliver_status_raw: Option<i32>,
     /// Exit status code, as returned by the server
@@ -875,8 +875,10 @@ pub struct CouponCommission {
     /// Instrument types the coupon applies to
     #[js(array)]
     bz_types: Vec<CouponTargetType>,
-    /// The server's numeric codes of `bz_types`, in order, including codes this
-    /// SDK does not know (which are `Unknown` in `bz_types`)
+    /// The server's numeric codes of `bz_types`, including codes this
+    /// SDK does not know (`Unknown` in `bz_types`); always the same
+    /// length and order as `bz_types`: elements that are neither a code
+    /// nor a known name are left out of both
     #[js(array)]
     bz_types_raw: Vec<i32>,
     /// Remaining commission balance
@@ -889,7 +891,7 @@ pub struct CouponCommission {
     unlimited: CommissionUnlimitedType,
     /// The server's numeric code of `unlimited`, also when it is a code
     /// this SDK does not know (`unlimited` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     unlimited_raw: Option<i32>,
     /// Commission expiry time (none when not set)
@@ -1059,7 +1061,7 @@ pub struct CouponQuote {
     investor_type: QuoteInvestorType,
     /// The server's numeric code of `investor_type`, also when it is a code
     /// this SDK does not know (`investor_type` is then `Unknown`); null when
-    /// the server sent none
+    /// the value is missing or is not a code
     #[js(opt)]
     investor_type_raw: Option<i32>,
     /// Whether the coupon is activated manually
@@ -1099,8 +1101,10 @@ pub struct CouponIpoCommission {
     /// IPO subscription types the coupon applies to
     #[js(array)]
     bz_types: Vec<IpoCouponTargetType>,
-    /// The server's numeric codes of `bz_types`, in order, including codes this
-    /// SDK does not know (which are `Unknown` in `bz_types`)
+    /// The server's numeric codes of `bz_types`, including codes this
+    /// SDK does not know (`Unknown` in `bz_types`); always the same
+    /// length and order as `bz_types`: elements that are neither a code
+    /// nor a known name are left out of both
     #[js(array)]
     bz_types_raw: Vec<i32>,
     /// Counter ID
@@ -1129,8 +1133,10 @@ pub struct CouponPlatformFeeDeduct {
     /// Instrument types the coupon applies to
     #[js(array)]
     bz_types: Vec<CouponTargetType>,
-    /// The server's numeric codes of `bz_types`, in order, including codes this
-    /// SDK does not know (which are `Unknown` in `bz_types`)
+    /// The server's numeric codes of `bz_types`, including codes this
+    /// SDK does not know (`Unknown` in `bz_types`); always the same
+    /// length and order as `bz_types`: elements that are neither a code
+    /// nor a known name are left out of both
     #[js(array)]
     bz_types_raw: Vec<i32>,
     /// Counter ID
@@ -1217,7 +1223,7 @@ pub struct CouponStockFragment {
     underlying_type: CouponTargetType,
     /// The server's numeric code of `underlying_type`, also when it is a code
     /// this SDK does not know (`underlying_type` is then `Unknown`); null when
-    /// the server sent none
+    /// the value is missing or is not a code
     #[js(opt)]
     underlying_type_raw: Option<i32>,
     /// Amounts, as returned by the server (an object of strings)
@@ -1246,7 +1252,7 @@ pub struct Coupon {
     card_status: CouponStatus,
     /// The server's numeric code of `card_status`, also when it is a code
     /// this SDK does not know (`card_status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     card_status_raw: Option<i32>,
     /// Start of validity
@@ -1396,7 +1402,7 @@ pub struct Deposit {
     state_code: DepositState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     state_code_raw: Option<i32>,
     /// Sub-state code, as returned by the server
@@ -1442,7 +1448,7 @@ pub struct Withdrawal {
     state_code: WithdrawalState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     #[js(opt)]
     state_code_raw: Option<i32>,
     /// Raw state, as returned by the server
@@ -1457,6 +1463,22 @@ pub struct Withdrawal {
     user_bank_swift_code: String,
     /// Account channel
     account_channel: String,
+}
+
+/// One page of deposit records
+///
+/// The server also returns a `total`, but it follows the page size rather
+/// than the record count, so it is not modelled; see `hasMore`.
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::asset::DepositsResponse")]
+pub struct DepositsResponse {
+    /// Deposit records, newest first
+    #[js(array)]
+    items: Vec<Deposit>,
+    /// A full page came back (as many records as the page size sent, at
+    /// most 20), so the next page may hold more
+    has_more: bool,
 }
 
 /// Response for the withdrawal list

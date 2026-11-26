@@ -8,7 +8,7 @@ use crate::{
     Config, Result,
     asset::{
         BankCard, BankCardsResponse, CouponOrder, CouponOrderType, CouponOrdersResponse,
-        CouponsResponse, Deposit, DepositsResponse, EddaApplication, EddaApplicationsResponse,
+        CouponsResponse, DepositsResponse, EddaApplication, EddaApplicationsResponse,
         GetCouponsOptions, GetDepositsOptions, GetRewardRecordsOptions, GetStatementListOptions,
         GetStatementListResponse, GetStatementOptions, GetStatementResponse,
         GetStockTransfersInOptions, GetStockTransfersOutOptions, GetWithdrawalsOptions,
@@ -91,6 +91,21 @@ impl AssetContext {
         R: DeserializeOwned + Send + Sync + 'static,
         Q: Serialize + Send + Sync,
     {
+        self.get_account_route(path, query, true).await
+    }
+
+    /// [`Self::get_account`] with `account_channel` sent only when
+    /// `send_channel` is set.
+    async fn get_account_route<R, Q>(
+        &self,
+        path: &'static str,
+        query: Q,
+        send_channel: bool,
+    ) -> Result<R>
+    where
+        R: DeserializeOwned + Send + Sync + 'static,
+        Q: Serialize + Send + Sync,
+    {
         #[derive(Serialize)]
         struct AccountQuery<Q> {
             #[serde(flatten)]
@@ -99,13 +114,16 @@ impl AssetContext {
             account_channel: Option<String>,
         }
 
-        let account_channel = self
-            .0
-            .http_cli
-            .access_token()
-            .await
-            .ok()
-            .and_then(|token| token::account_channel(&token));
+        let account_channel = if send_channel {
+            self.0
+                .http_cli
+                .access_token()
+                .await
+                .ok()
+                .and_then(|token| token::account_channel(&token))
+        } else {
+            None
+        };
         Ok(self
             .0
             .http_cli
@@ -296,7 +314,9 @@ impl AssetContext {
             order_type: order_type.as_str(),
         };
         Ok(self
-            .get_account::<CouponOrdersResponse, _>(core::COUPON_ORDERS_PATH, query)
+            // Like the app and the MCP server, the coupon-orders route is
+            // called without an account channel.
+            .get_account_route::<CouponOrdersResponse, _>(core::COUPON_ORDERS_PATH, query, false)
             .await?
             .orders)
     }
@@ -304,8 +324,9 @@ impl AssetContext {
     /// Get deposit records
     ///
     /// The server's `total` follows the page size rather than the record
-    /// count, so it is not returned; a full page means there may be more.
-    /// The page size is at most 20 (see [`GetDepositsOptions::size`]).
+    /// count, so it is not returned; [`DepositsResponse::has_more`] reports
+    /// a full page instead. The page size is at most 20 and defaults to 20
+    /// (see [`GetDepositsOptions::size`]); it is always sent.
     ///
     /// AP accounts only: US data-center accounts get a region error.
     ///
@@ -313,14 +334,14 @@ impl AssetContext {
     pub async fn deposits(
         &self,
         options: impl Into<Option<GetDepositsOptions>>,
-    ) -> Result<Vec<Deposit>> {
-        Ok(self
-            .get_account::<DepositsResponse, _>(
-                core::DEPOSITS_PATH,
-                options.into().unwrap_or_default(),
-            )
-            .await?
-            .items)
+    ) -> Result<DepositsResponse> {
+        let options = options.into().unwrap_or_default();
+        let page_size = options.page_size();
+        let mut resp: DepositsResponse = self
+            .get_account(core::DEPOSITS_PATH, options.size(page_size))
+            .await?;
+        resp.has_more = usize::try_from(page_size).is_ok_and(|size| resp.items.len() >= size);
+        Ok(resp)
     }
 
     /// Get withdrawal records
@@ -400,6 +421,21 @@ mod tests {
             json(r#"{"size":15}"#),
             "smaller deposit page size kept"
         );
+        assert_eq!(
+            query(&GetDepositsOptions::new().size(0)),
+            json(r#"{"size":20}"#),
+            "zero page size is the default"
+        );
+        assert_eq!(
+            query(&GetDepositsOptions::new().size(-3)),
+            json(r#"{"size":20}"#),
+            "negative page size is the default"
+        );
+        assert_eq!(
+            GetDepositsOptions::new().page_size(),
+            20,
+            "default page size"
+        );
 
         let q = query(&GetWithdrawalsOptions::new().start(datetime!(2026-01-01 0:00 +8)));
         assert_eq!(q, json(r#"{"begin":1767196800}"#), "withdrawal options");
@@ -458,7 +494,8 @@ mod tests {
         );
     }
 
-    /// Every account route sends the token's account channel.
+    /// The account routes send the token's account channel, except the
+    /// coupon-orders route (as in the app and the MCP server).
     #[tokio::test(flavor = "multi_thread")]
     async fn account_routes_send_the_account_channel() {
         use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -468,16 +505,21 @@ mod tests {
             .expect("bind a local port");
         let addr = listener.local_addr().expect("local address");
         let server = tokio::spawn(async move {
-            let (mut socket, _) = listener.accept().await.expect("accept");
-            let mut buf = vec![0u8; 8192];
-            let n = socket.read(&mut buf).await.expect("read request");
-            let body = r#"{"code":0,"message":"","data":{"orders":[]}}"#;
-            let reply = format!(
-                "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",
-                body.len()
-            );
-            socket.write_all(reply.as_bytes()).await.expect("reply");
-            String::from_utf8_lossy(&buf[..n]).to_string()
+            let mut lines = Vec::new();
+            for _ in 0..2 {
+                let (mut socket, _) = listener.accept().await.expect("accept");
+                let mut buf = vec![0u8; 8192];
+                let n = socket.read(&mut buf).await.expect("read request");
+                let body = r#"{"code":0,"message":"","data":{}}"#;
+                let reply = format!(
+                    "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                socket.write_all(reply.as_bytes()).await.expect("reply");
+                let request = String::from_utf8_lossy(&buf[..n]).to_string();
+                lines.push(request.lines().next().unwrap_or_default().to_string());
+            }
+            lines
         });
         // A synthetic unsigned JWT: {"alg":"none"} . {"ac":"lb_test"} . sig
         let token = "eyJhbGciOiJub25lIn0.eyJhYyI6ImxiX3Rlc3QifQ.sig";
@@ -485,19 +527,104 @@ mod tests {
             Config::from_apikey("app_key", "app_secret", token).http_url(format!("http://{addr}")),
         );
         let ctx = AssetContext::new(config);
+        let coupons = ctx.coupons(None).await.expect("coupons");
+        assert!(coupons.list.is_empty(), "empty list");
         let orders = ctx
             .coupon_orders("c1", CouponOrderType::Locked)
             .await
             .expect("coupon orders");
         assert!(orders.is_empty(), "empty list");
-        let request = server.await.expect("server task");
-        let line = request.lines().next().unwrap_or_default();
-        assert!(line.starts_with("GET /v1/account/card-orders?"), "{line}");
-        assert!(line.contains("card_id=c1"), "own query kept: {line}");
-        assert!(line.contains("order_type=locked"), "own query kept: {line}");
+        let lines = server.await.expect("server task");
         assert!(
-            line.contains("account_channel=lb_test"),
-            "channel sent: {line}"
+            lines[0].starts_with("GET /v1/account/cards?"),
+            "{}",
+            lines[0]
+        );
+        assert!(
+            lines[0].contains("card_status=-1"),
+            "own query kept: {}",
+            lines[0]
+        );
+        assert!(
+            lines[0].contains("account_channel=lb_test"),
+            "channel sent: {}",
+            lines[0]
+        );
+        assert!(
+            lines[1].starts_with("GET /v1/account/card-orders?"),
+            "{}",
+            lines[1]
+        );
+        assert!(
+            lines[1].contains("card_id=c1"),
+            "own query kept: {}",
+            lines[1]
+        );
+        assert!(
+            !lines[1].contains("account_channel"),
+            "no channel on card-orders: {}",
+            lines[1]
+        );
+    }
+
+    /// `has_more` follows the page size actually sent.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn deposits_report_a_full_page() {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind a local port");
+        let addr = listener.local_addr().expect("local address");
+        let server = tokio::spawn(async move {
+            let mut lines = Vec::new();
+            for count in [20, 15] {
+                let (mut socket, _) = listener.accept().await.expect("accept");
+                let mut buf = vec![0u8; 8192];
+                let n = socket.read(&mut buf).await.expect("read request");
+                let items = vec![r#"{"id":"1"}"#; count].join(",");
+                let body = format!(r#"{{"code":0,"message":"","data":{{"items":[{items}]}}}}"#);
+                let reply = format!(
+                    "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                socket.write_all(reply.as_bytes()).await.expect("reply");
+                let request = String::from_utf8_lossy(&buf[..n]).to_string();
+                lines.push(request.lines().next().unwrap_or_default().to_string());
+            }
+            lines
+        });
+        let config = Arc::new(
+            Config::from_apikey("app_key", "app_secret", "opaque")
+                .http_url(format!("http://{addr}")),
+        );
+        let ctx = AssetContext::new(config);
+        let full = ctx
+            .deposits(GetDepositsOptions::new().size(50))
+            .await
+            .expect("deposits");
+        assert_eq!(full.items.len(), 20, "a full capped page");
+        assert!(
+            full.has_more,
+            "size 50 is sent as 20, so 20 records is a full page"
+        );
+        let short = ctx.deposits(None).await.expect("deposits");
+        assert!(!short.has_more, "15 of the default 20 is the last page");
+        let lines = server.await.expect("server task");
+        assert!(
+            lines[0].contains("size=20"),
+            "capped size sent: {}",
+            lines[0]
+        );
+        assert!(
+            lines[1].contains("size=20"),
+            "default size sent: {}",
+            lines[1]
+        );
+        assert!(
+            !lines[1].contains("account_channel"),
+            "an opaque token sends no channel: {}",
+            lines[1]
         );
     }
 

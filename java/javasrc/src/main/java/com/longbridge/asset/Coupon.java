@@ -107,7 +107,7 @@ public class Coupon {
     /**
      * The server's numeric code of card_status, also when it is a code
      * this SDK does not know (card_status is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */

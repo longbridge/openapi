@@ -11,7 +11,7 @@ use crate::{
     asset_context::{
         enum_types::CCouponOrderType,
         types::{
-            CBankCardOwned, CCouponOrderOwned, CCouponsResponseOwned, CDepositOwned,
+            CBankCardOwned, CCouponOrderOwned, CCouponsResponseOwned, CDepositsResponseOwned,
             CEddaApplicationOwned, CGetCouponsOptions, CGetDepositsOptions,
             CGetRewardRecordsOptions, CGetStockTransfersInOptions, CGetStockTransfersOutOptions,
             CGetWithdrawalsOptions, CRewardRecordsResponseOwned, CStatementItemOwned,
@@ -337,11 +337,15 @@ pub unsafe extern "C" fn lb_asset_context_coupon_orders(
     });
 }
 
-/// Get deposit records
+/// Get one page of deposit records
+///
+/// The server's total follows the page size rather than the record count, so
+/// it is not returned; `has_more` reports a full page instead. The page size
+/// is always sent: at most 20, default 20.
 ///
 /// AP accounts only: US data-center accounts get a region error.
 ///
-/// The callback data is an array of `lb_deposit_t`.
+/// The callback data is a `lb_deposits_response_t`.
 ///
 /// @param[in] opts Options (can be null)
 #[unsafe(no_mangle)]
@@ -376,8 +380,8 @@ pub unsafe extern "C" fn lb_asset_context_deposits(
         }
     }
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CDepositOwned> = ctx_inner.deposits(opts2).await?.into();
-        Ok(rows)
+        let resp: CCow<CDepositsResponseOwned> = CCow::new(ctx_inner.deposits(opts2).await?);
+        Ok(resp)
     });
 }
 

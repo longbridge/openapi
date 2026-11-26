@@ -3994,7 +3994,8 @@ typedef struct lb_get_deposits_options_t {
    */
   const int32_t *page;
   /**
-   * Page size (can be null; max 20, larger values are sent as 20)
+   * Page size (can be null; default 20, max 20: larger values are sent as
+   * 20, and 0 or a negative value as the default 20)
    */
   const int32_t *size;
   /**
@@ -7561,7 +7562,7 @@ typedef struct lb_bank_card_authorization_t {
   /**
    * The server's numeric code of `status`, also when it is a code
    * this SDK does not know (`status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *status_raw;
   /**
@@ -7667,7 +7668,7 @@ typedef struct lb_bank_card_t {
   /**
    * The server's numeric code of `status`, also when it is a code
    * this SDK does not know (`status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *status_raw;
   /**
@@ -7677,7 +7678,7 @@ typedef struct lb_bank_card_t {
   /**
    * The server's numeric code of `witness_state`, also when it is a code
    * this SDK does not know (`witness_state` is then `Unknown`); null when
-   * the server sent none
+   * the value is missing or is not a code
    */
   const int32_t *witness_state_raw;
   /**
@@ -7691,7 +7692,7 @@ typedef struct lb_bank_card_t {
   /**
    * The server's numeric code of `bind_state`, also when it is a code
    * this SDK does not know (`bind_state` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *bind_state_raw;
   /**
@@ -7744,7 +7745,7 @@ typedef struct lb_edda_application_t {
   /**
    * The server's numeric code of `status`, also when it is a code
    * this SDK does not know (`status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *status_raw;
   /**
@@ -7806,7 +7807,7 @@ typedef struct lb_transfer_stock_t {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *state_code_raw;
   /**
@@ -7863,7 +7864,7 @@ typedef struct lb_stock_transfer_in_t {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *state_code_raw;
   /**
@@ -7975,7 +7976,7 @@ typedef struct lb_stock_transfer_out_t {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *state_code_raw;
   /**
@@ -8046,7 +8047,7 @@ typedef struct lb_reward_record_t {
   /**
    * The server's numeric code of `reward_type`, also when it is a code
    * this SDK does not know (`reward_type` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *reward_type_raw;
   /**
@@ -8076,7 +8077,7 @@ typedef struct lb_reward_record_t {
   /**
    * The server's numeric code of `card_status`, also when it is a code
    * this SDK does not know (`card_status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *card_status_raw;
   /**
@@ -8098,7 +8099,7 @@ typedef struct lb_reward_record_t {
   /**
    * The server's numeric code of `status`, also when it is a code
    * this SDK does not know (`status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *status_raw;
   /**
@@ -8108,8 +8109,8 @@ typedef struct lb_reward_record_t {
   /**
    * The server's numeric code of `deliver_status` (e.g. 11 where
    * `deliver_status` reads `AddressFilled`), also when it is a code this SDK
-   * does not know (`deliver_status` is then `Unknown`); null when the server
-   * sent none
+   * does not know (`deliver_status` is then `Unknown`); null when the value
+   * is missing or is not a code
    */
   const int32_t *deliver_status_raw;
   /**
@@ -8177,16 +8178,18 @@ typedef struct lb_coupon_commission_t {
    */
   const enum lb_coupon_target_type_t *bz_types;
   /**
-   * Number of `bz_types`
+   * Number of `bz_types` (always equal to `num_bz_types_raw`)
    */
   uintptr_t num_bz_types;
   /**
-   * The server's numeric codes of `bz_types`, in order, including codes this
-   * SDK does not know (which are `Unknown` in `bz_types`)
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
    */
   const int32_t *bz_types_raw;
   /**
-   * Number of `bz_types_raw`
+   * Number of `bz_types_raw` (always equal to `num_bz_types`)
    */
   uintptr_t num_bz_types_raw;
   /**
@@ -8205,7 +8208,7 @@ typedef struct lb_coupon_commission_t {
   /**
    * The server's numeric code of `unlimited`, also when it is a code
    * this SDK does not know (`unlimited` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *unlimited_raw;
   /**
@@ -8459,7 +8462,7 @@ typedef struct lb_coupon_quote_t {
   /**
    * The server's numeric code of `investor_type`, also when it is a code
    * this SDK does not know (`investor_type` is then `Unknown`); null when
-   * the server sent none
+   * the value is missing or is not a code
    */
   const int32_t *investor_type_raw;
   /**
@@ -8523,16 +8526,18 @@ typedef struct lb_coupon_ipo_commission_t {
    */
   const enum lb_ipo_coupon_target_type_t *bz_types;
   /**
-   * Number of `bz_types`
+   * Number of `bz_types` (always equal to `num_bz_types_raw`)
    */
   uintptr_t num_bz_types;
   /**
-   * The server's numeric codes of `bz_types`, in order, including codes this
-   * SDK does not know (which are `Unknown` in `bz_types`)
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
    */
   const int32_t *bz_types_raw;
   /**
-   * Number of `bz_types_raw`
+   * Number of `bz_types_raw` (always equal to `num_bz_types`)
    */
   uintptr_t num_bz_types_raw;
   /**
@@ -8569,16 +8574,18 @@ typedef struct lb_coupon_platform_fee_deduct_t {
    */
   const enum lb_coupon_target_type_t *bz_types;
   /**
-   * Number of `bz_types`
+   * Number of `bz_types` (always equal to `num_bz_types_raw`)
    */
   uintptr_t num_bz_types;
   /**
-   * The server's numeric codes of `bz_types`, in order, including codes this
-   * SDK does not know (which are `Unknown` in `bz_types`)
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
    */
   const int32_t *bz_types_raw;
   /**
-   * Number of `bz_types_raw`
+   * Number of `bz_types_raw` (always equal to `num_bz_types`)
    */
   uintptr_t num_bz_types_raw;
   /**
@@ -8732,7 +8739,7 @@ typedef struct lb_coupon_stock_fragment_t {
   /**
    * The server's numeric code of `underlying_type`, also when it is a code
    * this SDK does not know (`underlying_type` is then `Unknown`); null when
-   * the server sent none
+   * the value is missing or is not a code
    */
   const int32_t *underlying_type_raw;
   /**
@@ -8781,7 +8788,7 @@ typedef struct lb_coupon_t {
   /**
    * The server's numeric code of `card_status`, also when it is a code
    * this SDK does not know (`card_status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *card_status_raw;
   /**
@@ -9008,7 +9015,7 @@ typedef struct lb_deposit_t {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *state_code_raw;
   /**
@@ -9080,7 +9087,7 @@ typedef struct lb_withdrawal_t {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   const int32_t *state_code_raw;
   /**
@@ -9108,6 +9115,28 @@ typedef struct lb_withdrawal_t {
    */
   const char *account_channel;
 } lb_withdrawal_t;
+
+/**
+ * One page of deposit records
+ *
+ * The server also returns a `total`, but it follows the page size rather
+ * than the record count, so it is not modelled; see `has_more`.
+ */
+typedef struct lb_deposits_response_t {
+  /**
+   * Deposit records, newest first
+   */
+  const struct lb_deposit_t *items;
+  /**
+   * Number of `items`
+   */
+  uintptr_t num_items;
+  /**
+   * A full page came back (as many records as the page size sent, at most
+   * 20), so the next page may hold more
+   */
+  bool has_more;
+} lb_deposits_response_t;
 
 /**
  * Response for the withdrawal list
@@ -16984,11 +17013,15 @@ void lb_asset_context_coupon_orders(const struct lb_asset_context_t *ctx,
                                     void *userdata);
 
 /**
- * Get deposit records
+ * Get one page of deposit records
+ *
+ * The server's total follows the page size rather than the record count, so
+ * it is not returned; `has_more` reports a full page instead. The page size
+ * is always sent: at most 20, default 20.
  *
  * AP accounts only: US data-center accounts get a region error.
  *
- * The callback data is an array of `lb_deposit_t`.
+ * The callback data is a `lb_deposits_response_t`.
  *
  * @param[in] opts Options (can be null)
  */

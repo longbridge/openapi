@@ -807,6 +807,46 @@ where
     })
 }
 
+/// [`lenient_int_opt`] for the account (ATM / reward-center) records, which
+/// also accepts an integral float (`4.0`, `"4.0"`); a fractional,
+/// non-finite or out-of-range float is `None`.
+pub(crate) fn account_int_opt(value: &serde_json::Value) -> Option<i64> {
+    // 2^63 as f64: the first value past `i64::MAX`.
+    const LIMIT: f64 = 9_223_372_036_854_775_808.0;
+    let integral = |f: f64| {
+        (f.is_finite() && f.fract() == 0.0 && (-LIMIT..LIMIT).contains(&f)).then_some(f as i64)
+    };
+    match value {
+        serde_json::Value::Number(n) => n.as_i64().or_else(|| n.as_f64().and_then(integral)),
+        serde_json::Value::String(s) => {
+            let s = s.trim();
+            s.parse()
+                .ok()
+                .or_else(|| s.parse::<f64>().ok().and_then(integral))
+        }
+        _ => None,
+    }
+}
+
+/// Deserializes an account `i64` via [`account_int_opt`]; anything else is 0.
+pub(crate) fn account_int64<'de, D>(d: D) -> Result<i64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(account_int_opt(&serde_json::Value::deserialize(d)?).unwrap_or_default())
+}
+
+/// Deserializes an account `i32` via [`account_int_opt`]; anything else,
+/// including a value outside `i32`, is 0.
+pub(crate) fn account_int32<'de, D>(d: D) -> Result<i32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(account_int_opt(&serde_json::Value::deserialize(d)?)
+        .and_then(|v| i32::try_from(v).ok())
+        .unwrap_or_default())
+}
+
 /// Parse a JSON value as an integer when it is one: a JSON integer or an
 /// integer string. Anything else is `None`.
 pub(crate) fn lenient_int_opt(value: &serde_json::Value) -> Option<i64> {

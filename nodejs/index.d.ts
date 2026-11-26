@@ -316,10 +316,11 @@ export declare class AssetContext {
    */
   couponOrders(cardId: string, orderType: CouponOrderType): Promise<Array<CouponOrder>>
   /**
-   * Get deposit records
+   * Get one page of deposit records
    *
    * The server's total follows the page size rather than the record
-   * count, so it is not returned; a full page means there may be more.
+   * count, so it is not returned; `hasMore` reports a full page instead.
+   * The page size is always sent: at most 20, default 20.
    *
    * AP accounts only: US data-center accounts get a region error.
    *
@@ -331,10 +332,10 @@ export declare class AssetContext {
    * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
    * const ctx = AssetContext.new(Config.fromOAuth(oauth));
    * const resp = await ctx.deposits({ size: 20 });
-   * console.log(resp);
+   * console.log(resp.items, resp.hasMore);
    * ```
    */
-  deposits(opts?: GetDepositsOptions | undefined | null): Promise<Array<Deposit>>
+  deposits(opts?: GetDepositsOptions | undefined | null): Promise<DepositsResponse>
   /**
    * Get withdrawal records
    *
@@ -437,7 +438,7 @@ export declare class BankCard {
   /**
    * The server's numeric code of `status`, also when it is a code
    * this SDK does not know (`status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get statusRaw(): number | null
   /** Witness state */
@@ -445,7 +446,7 @@ export declare class BankCard {
   /**
    * The server's numeric code of `witness_state`, also when it is a code
    * this SDK does not know (`witness_state` is then `Unknown`); null when
-   * the server sent none
+   * the value is missing or is not a code
    */
   get witnessStateRaw(): number | null
   /** Whether the card supports witnessing */
@@ -455,7 +456,7 @@ export declare class BankCard {
   /**
    * The server's numeric code of `bind_state`, also when it is a code
    * this SDK does not know (`bind_state` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get bindStateRaw(): number | null
   /** Binding hint text */
@@ -489,7 +490,7 @@ export declare class BankCardAuthorization {
   /**
    * The server's numeric code of `status`, also when it is a code
    * this SDK does not know (`status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get statusRaw(): number | null
   /** Failure reason (empty unless the authorization failed) */
@@ -783,7 +784,7 @@ export declare class Coupon {
   /**
    * The server's numeric code of `card_status`, also when it is a code
    * this SDK does not know (`card_status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get cardStatusRaw(): number | null
   /** Start of validity */
@@ -914,8 +915,10 @@ export declare class CouponCommission {
   /** Instrument types the coupon applies to */
   get bzTypes(): Array<CouponTargetType>
   /**
-   * The server's numeric codes of `bz_types`, in order, including codes this
-   * SDK does not know (which are `Unknown` in `bz_types`)
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
    */
   get bzTypesRaw(): Array<number>
   /** Remaining commission balance */
@@ -930,7 +933,7 @@ export declare class CouponCommission {
   /**
    * The server's numeric code of `unlimited`, also when it is a code
    * this SDK does not know (`unlimited` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get unlimitedRaw(): number | null
   /** Commission expiry time (none when not set) */
@@ -1026,8 +1029,10 @@ export declare class CouponIpoCommission {
   /** IPO subscription types the coupon applies to */
   get bzTypes(): Array<IpoCouponTargetType>
   /**
-   * The server's numeric codes of `bz_types`, in order, including codes this
-   * SDK does not know (which are `Unknown` in `bz_types`)
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
    */
   get bzTypesRaw(): Array<number>
   /** Counter ID */
@@ -1080,8 +1085,10 @@ export declare class CouponPlatformFeeDeduct {
   /** Instrument types the coupon applies to */
   get bzTypes(): Array<CouponTargetType>
   /**
-   * The server's numeric codes of `bz_types`, in order, including codes this
-   * SDK does not know (which are `Unknown` in `bz_types`)
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
    */
   get bzTypesRaw(): Array<number>
   /** Counter ID */
@@ -1114,7 +1121,7 @@ export declare class CouponQuote {
   /**
    * The server's numeric code of `investor_type`, also when it is a code
    * this SDK does not know (`investor_type` is then `Unknown`); null when
-   * the server sent none
+   * the value is missing or is not a code
    */
   get investorTypeRaw(): number | null
   /** Whether the coupon is activated manually */
@@ -1218,7 +1225,7 @@ export declare class CouponStockFragment {
   /**
    * The server's numeric code of `underlying_type`, also when it is a code
    * this SDK does not know (`underlying_type` is then `Unknown`); null when
-   * the server sent none
+   * the value is missing or is not a code
    */
   get underlyingTypeRaw(): number | null
   /** Amounts, as returned by the server (an object of strings) */
@@ -1450,7 +1457,7 @@ export declare class Deposit {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get stateCodeRaw(): number | null
   /** Sub-state code, as returned by the server */
@@ -1467,6 +1474,24 @@ export declare class Deposit {
   get userBankSwiftCode(): string
   /** Number of receipts uploaded with the deposit */
   get voucherCount(): number
+}
+
+/**
+ * One page of deposit records
+ *
+ * The server also returns a `total`, but it follows the page size rather
+ * than the record count, so it is not modelled; see `hasMore`.
+ */
+export declare class DepositsResponse {
+  toString(): string
+  toJSON(): any
+  /** Deposit records, newest first */
+  get items(): Array<Deposit>
+  /**
+   * A full page came back (as many records as the page size sent, at
+   * most 20), so the next page may hold more
+   */
+  get hasMore(): boolean
 }
 
 /** Depth */
@@ -1503,7 +1528,7 @@ export declare class EddaApplication {
   /**
    * The server's numeric code of `status`, also when it is a code
    * this SDK does not know (`status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get statusRaw(): number | null
   /** Failure reason (empty unless the application failed) */
@@ -4735,7 +4760,7 @@ export declare class RewardRecord {
   /**
    * The server's numeric code of `reward_type`, also when it is a code
    * this SDK does not know (`reward_type` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get rewardTypeRaw(): number | null
   /** Record ID */
@@ -4753,7 +4778,7 @@ export declare class RewardRecord {
   /**
    * The server's numeric code of `card_status`, also when it is a code
    * this SDK does not know (`card_status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get cardStatusRaw(): number | null
   /** Prize type code (gift rewards; `0` = physical goods), none when not set */
@@ -4767,7 +4792,7 @@ export declare class RewardRecord {
   /**
    * The server's numeric code of `status`, also when it is a code
    * this SDK does not know (`status` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get statusRaw(): number | null
   /** Delivery status (issued gift rewards only) */
@@ -4775,8 +4800,8 @@ export declare class RewardRecord {
   /**
    * The server's numeric code of `deliver_status` (e.g. 11 where
    * `deliver_status` reads `AddressFilled`), also when it is a code this SDK
-   * does not know (`deliver_status` is then `Unknown`); null when the server
-   * sent none
+   * does not know (`deliver_status` is then `Unknown`); null when the value
+   * is missing or is not a code
    */
   get deliverStatusRaw(): number | null
   /** Exit status code, as returned by the server */
@@ -5140,7 +5165,7 @@ export declare class StockTransferIn {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get stateCodeRaw(): number | null
   /**
@@ -5207,7 +5232,7 @@ export declare class StockTransferOut {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get stateCodeRaw(): number | null
   /**
@@ -5808,7 +5833,7 @@ export declare class TransferStock {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get stateCodeRaw(): number | null
   /** Position side */
@@ -6020,7 +6045,7 @@ export declare class Withdrawal {
   /**
    * The server's numeric code of `state_code`, also when it is a code
    * this SDK does not know (`state_code` is then `Unknown`); null when the
-   * server sent none
+   * value is missing or is not a code
    */
   get stateCodeRaw(): number | null
   /** Raw state, as returned by the server */
@@ -7888,7 +7913,11 @@ export interface GetCouponsOptions {
 export interface GetDepositsOptions {
   /** Page number (default 1) */
   page?: number
-  /** Page size (max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them) */
+  /**
+   * Page size (default 20, max 20; larger values are sent as 20, because
+   * the deposit list returns a short 10-record page for them, and 0 or a
+   * negative value as the default 20)
+   */
   size?: number
   /** Filter by states (`Unknown` is ignored) */
   states?: Array<DepositState>

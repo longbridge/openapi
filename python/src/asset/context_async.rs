@@ -10,10 +10,10 @@ use crate::{
             withdrawals_options,
         },
         types::{
-            BankCard, CouponOrder, CouponOrderType, CouponsResponse, Deposit, DepositState,
-            EddaApplication, GetStatementListResponse, GetStatementResponse, RewardRecordsResponse,
-            RewardType, StatementType, StockTransferInResponse, StockTransferInState,
-            StockTransferOut, StockTransferOutState, WithdrawalsResponse,
+            BankCard, CouponOrder, CouponOrderType, CouponsResponse, DepositState,
+            DepositsResponse, EddaApplication, GetStatementListResponse, GetStatementResponse,
+            RewardRecordsResponse, RewardType, StatementType, StockTransferInResponse,
+            StockTransferInState, StockTransferOut, StockTransferOutState, WithdrawalsResponse,
         },
     },
     config::Config,
@@ -223,7 +223,7 @@ impl AsyncAssetContext {
         .map(|b| b.unbind())
     }
 
-    /// Get deposit records. Returns awaitable.
+    /// Get one page of deposit records. Returns awaitable.
     #[pyo3(signature = (page = None, size = None, states = None, currencies = None, start = None, end = None))]
     #[allow(clippy::too_many_arguments)]
     fn deposits(
@@ -239,12 +239,8 @@ impl AsyncAssetContext {
         let opts = deposits_options(page, size, states, currencies, start, end);
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            ctx.deposits(opts)
-                .await
-                .map_err(ErrorNewType)?
-                .into_iter()
-                .map(|x| -> PyResult<Deposit> { x.try_into() })
-                .collect::<PyResult<Vec<Deposit>>>()
+            let v: DepositsResponse = ctx.deposits(opts).await.map_err(ErrorNewType)?.try_into()?;
+            Ok(v)
         })
         .map(|b| b.unbind())
     }

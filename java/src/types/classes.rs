@@ -5053,6 +5053,16 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/asset/DepositsResponse",
+    longbridge::asset::DepositsResponse,
+    [
+        #[java(objarray)]
+        items,
+        has_more
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/asset/WithdrawalsResponse",
     longbridge::asset::WithdrawalsResponse,
     [

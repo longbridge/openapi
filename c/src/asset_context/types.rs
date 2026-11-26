@@ -7,7 +7,7 @@ use longbridge::asset::{
     CouponCryptoFallback, CouponFinanceInterest, CouponFundDeduct, CouponIpo, CouponIpoCommission,
     CouponIpoInterest, CouponOrder, CouponPlatformFeeDeduct, CouponQuote, CouponStatus,
     CouponStock, CouponStockCounter, CouponStockFallback, CouponStockFragment, CouponTargetType,
-    CouponsResponse, Deposit, DepositState, EddaApplication, QuoteInvestorType,
+    CouponsResponse, Deposit, DepositState, DepositsResponse, EddaApplication, QuoteInvestorType,
     RewardDeliverStatus, RewardRecord, RewardRecordsResponse, RewardStatus, RewardType,
     StatementItem, StockTransferIn, StockTransferInResponse, StockTransferInState,
     StockTransferOut, StockTransferOutState, TransferStock, TransferStockState, Withdrawal,
@@ -74,7 +74,7 @@ pub struct CBankCardAuthorization {
     pub status: CAuthorizationStatus,
     /// The server's numeric code of `status`, also when it is a code
     /// this SDK does not know (`status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub status_raw: *const i32,
     /// Failure reason (empty unless the authorization failed)
     pub message: *const c_char,
@@ -212,13 +212,13 @@ pub struct CBankCard {
     pub status: CBankCardStatus,
     /// The server's numeric code of `status`, also when it is a code
     /// this SDK does not know (`status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub status_raw: *const i32,
     /// Witness state
     pub witness_state: CBankCardWitnessState,
     /// The server's numeric code of `witness_state`, also when it is a code
     /// this SDK does not know (`witness_state` is then `Unknown`); null when
-    /// the server sent none
+    /// the value is missing or is not a code
     pub witness_state_raw: *const i32,
     /// Whether the card supports witnessing
     pub support_witness: bool,
@@ -226,7 +226,7 @@ pub struct CBankCard {
     pub bind_state: CBankCardBindState,
     /// The server's numeric code of `bind_state`, also when it is a code
     /// this SDK does not know (`bind_state` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub bind_state_raw: *const i32,
     /// Binding hint text
     pub bind_tip: *const c_char,
@@ -362,7 +362,7 @@ pub struct CEddaApplication {
     pub status: CAuthorizationStatus,
     /// The server's numeric code of `status`, also when it is a code
     /// this SDK does not know (`status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub status_raw: *const i32,
     /// Failure reason (empty unless the application failed)
     pub message: *const c_char,
@@ -456,7 +456,7 @@ pub struct CTransferStock {
     pub state_code: CTransferStockState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub state_code_raw: *const i32,
     /// Position side
     pub position_side: *const c_char,
@@ -553,7 +553,7 @@ pub struct CStockTransferIn {
     pub state_code: CStockTransferInState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub state_code_raw: *const i32,
     /// App-side state: `noticed` means the user tapped "I have notified the
     /// broker" in the app; `default` otherwise
@@ -743,7 +743,7 @@ pub struct CStockTransferOut {
     pub state_code: CStockTransferOutState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub state_code_raw: *const i32,
     /// App-side state: `noticed` means the user tapped "I have notified the
     /// broker" in the app (the user's own confirmation, not a Longbridge
@@ -904,7 +904,7 @@ pub struct CRewardRecord {
     pub reward_type: CRewardType,
     /// The server's numeric code of `reward_type`, also when it is a code
     /// this SDK does not know (`reward_type` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub reward_type_raw: *const i32,
     /// Record ID
     pub record_id: *const c_char,
@@ -920,7 +920,7 @@ pub struct CRewardRecord {
     pub card_status: CCouponStatus,
     /// The server's numeric code of `card_status`, also when it is a code
     /// this SDK does not know (`card_status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub card_status_raw: *const i32,
     /// Prize type code (gift rewards; `0` = physical goods), null when not set
     pub prize_type: *const i32,
@@ -932,14 +932,14 @@ pub struct CRewardRecord {
     pub status: CRewardStatus,
     /// The server's numeric code of `status`, also when it is a code
     /// this SDK does not know (`status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub status_raw: *const i32,
     /// Delivery status (issued gift rewards only)
     pub deliver_status: CRewardDeliverStatus,
     /// The server's numeric code of `deliver_status` (e.g. 11 where
     /// `deliver_status` reads `AddressFilled`), also when it is a code this SDK
-    /// does not know (`deliver_status` is then `Unknown`); null when the server
-    /// sent none
+    /// does not know (`deliver_status` is then `Unknown`); null when the value
+    /// is missing or is not a code
     pub deliver_status_raw: *const i32,
     /// Exit status code, as returned by the server
     pub exit_status: i32,
@@ -1134,12 +1134,14 @@ pub struct CCouponCommission {
     pub rebate_rate: *const c_char,
     /// Instrument types the coupon applies to
     pub bz_types: *const CCouponTargetType,
-    /// Number of `bz_types`
+    /// Number of `bz_types` (always equal to `num_bz_types_raw`)
     pub num_bz_types: usize,
-    /// The server's numeric codes of `bz_types`, in order, including codes this
-    /// SDK does not know (which are `Unknown` in `bz_types`)
+    /// The server's numeric codes of `bz_types`, including codes this
+    /// SDK does not know (`Unknown` in `bz_types`); always the same
+    /// length and order as `bz_types`: elements that are neither a code
+    /// nor a known name are left out of both
     pub bz_types_raw: *const i32,
-    /// Number of `bz_types_raw`
+    /// Number of `bz_types_raw` (always equal to `num_bz_types`)
     pub num_bz_types_raw: usize,
     /// Remaining commission balance (null when not set)
     pub commission_balance: *const CDecimal,
@@ -1150,7 +1152,7 @@ pub struct CCouponCommission {
     pub unlimited: CCommissionUnlimitedType,
     /// The server's numeric code of `unlimited`, also when it is a code
     /// this SDK does not know (`unlimited` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub unlimited_raw: *const i32,
     /// Commission expiry time as a unix timestamp (null when not set)
     pub commission_expired_time: *const i64,
@@ -1670,7 +1672,7 @@ pub struct CCouponQuote {
     pub investor_type: CQuoteInvestorType,
     /// The server's numeric code of `investor_type`, also when it is a code
     /// this SDK does not know (`investor_type` is then `Unknown`); null when
-    /// the server sent none
+    /// the value is missing or is not a code
     pub investor_type_raw: *const i32,
     /// Whether the coupon is activated manually
     pub manual_activate: bool,
@@ -1795,12 +1797,14 @@ impl ToFFI for CCouponIpoOwned {
 pub struct CCouponIpoCommission {
     /// IPO subscription types the coupon applies to
     pub bz_types: *const CIpoCouponTargetType,
-    /// Number of `bz_types`
+    /// Number of `bz_types` (always equal to `num_bz_types_raw`)
     pub num_bz_types: usize,
-    /// The server's numeric codes of `bz_types`, in order, including codes this
-    /// SDK does not know (which are `Unknown` in `bz_types`)
+    /// The server's numeric codes of `bz_types`, including codes this
+    /// SDK does not know (`Unknown` in `bz_types`); always the same
+    /// length and order as `bz_types`: elements that are neither a code
+    /// nor a known name are left out of both
     pub bz_types_raw: *const i32,
-    /// Number of `bz_types_raw`
+    /// Number of `bz_types_raw` (always equal to `num_bz_types`)
     pub num_bz_types_raw: usize,
     /// Counter ID
     pub counter_id: *const c_char,
@@ -1883,12 +1887,14 @@ impl ToFFI for CCouponIpoInterestOwned {
 pub struct CCouponPlatformFeeDeduct {
     /// Instrument types the coupon applies to
     pub bz_types: *const CCouponTargetType,
-    /// Number of `bz_types`
+    /// Number of `bz_types` (always equal to `num_bz_types_raw`)
     pub num_bz_types: usize,
-    /// The server's numeric codes of `bz_types`, in order, including codes this
-    /// SDK does not know (which are `Unknown` in `bz_types`)
+    /// The server's numeric codes of `bz_types`, including codes this
+    /// SDK does not know (`Unknown` in `bz_types`); always the same
+    /// length and order as `bz_types`: elements that are neither a code
+    /// nor a known name are left out of both
     pub bz_types_raw: *const i32,
-    /// Number of `bz_types_raw`
+    /// Number of `bz_types_raw` (always equal to `num_bz_types`)
     pub num_bz_types_raw: usize,
     /// Counter ID
     pub counter_id: *const c_char,
@@ -2154,7 +2160,7 @@ pub struct CCouponStockFragment {
     pub underlying_type: CCouponTargetType,
     /// The server's numeric code of `underlying_type`, also when it is a code
     /// this SDK does not know (`underlying_type` is then `Unknown`); null when
-    /// the server sent none
+    /// the value is missing or is not a code
     pub underlying_type_raw: *const i32,
     /// Amounts, as returned by the server, key-sorted
     pub amounts: *const CCouponStockFragmentAmount,
@@ -2230,7 +2236,7 @@ pub struct CCoupon {
     pub card_status: CCouponStatus,
     /// The server's numeric code of `card_status`, also when it is a code
     /// this SDK does not know (`card_status` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub card_status_raw: *const i32,
     /// Start of validity as a unix timestamp (null when not set)
     pub start_time: *const i64,
@@ -2604,7 +2610,7 @@ pub struct CDeposit {
     pub state_code: CDepositState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub state_code_raw: *const i32,
     /// Sub-state code, as returned by the server
     pub sub_state_code: i32,
@@ -2731,7 +2737,7 @@ pub struct CWithdrawal {
     pub state_code: CWithdrawalState,
     /// The server's numeric code of `state_code`, also when it is a code
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
-    /// server sent none
+    /// value is missing or is not a code
     pub state_code_raw: *const i32,
     /// Raw state, as returned by the server
     pub raw_state: *const c_char,
@@ -2828,6 +2834,48 @@ impl ToFFI for CWithdrawalOwned {
             display_bank_account: self.display_bank_account.to_ffi_type(),
             user_bank_swift_code: self.user_bank_swift_code.to_ffi_type(),
             account_channel: self.account_channel.to_ffi_type(),
+        }
+    }
+}
+
+/// One page of deposit records
+///
+/// The server also returns a `total`, but it follows the page size rather
+/// than the record count, so it is not modelled; see `has_more`.
+#[repr(C)]
+pub struct CDepositsResponse {
+    /// Deposit records, newest first
+    pub items: *const CDeposit,
+    /// Number of `items`
+    pub num_items: usize,
+    /// A full page came back (as many records as the page size sent, at most
+    /// 20), so the next page may hold more
+    pub has_more: bool,
+}
+
+#[derive(Debug)]
+pub(crate) struct CDepositsResponseOwned {
+    items: CVec<CDepositOwned>,
+    has_more: bool,
+}
+
+impl From<DepositsResponse> for CDepositsResponseOwned {
+    fn from(v: DepositsResponse) -> Self {
+        Self {
+            items: v.items.into(),
+            has_more: v.has_more,
+        }
+    }
+}
+
+impl ToFFI for CDepositsResponseOwned {
+    type FFIType = CDepositsResponse;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CDepositsResponse {
+            items: self.items.to_ffi_type(),
+            num_items: self.items.len(),
+            has_more: self.has_more,
         }
     }
 }
@@ -2942,7 +2990,8 @@ pub struct CGetCouponsOptions {
 pub struct CGetDepositsOptions {
     /// Page number (can be null, default 1)
     pub page: *const i32,
-    /// Page size (can be null; max 20, larger values are sent as 20)
+    /// Page size (can be null; default 20, max 20: larger values are sent as
+    /// 20, and 0 or a negative value as the default 20)
     pub size: *const i32,
     /// State filter (can be null)
     pub states: *const CDepositState,

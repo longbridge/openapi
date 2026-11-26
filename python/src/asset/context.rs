@@ -5,7 +5,7 @@ use pyo3::prelude::*;
 
 use crate::{
     asset::types::{
-        BankCard, CouponOrder, CouponOrderType, CouponsResponse, Deposit, DepositState,
+        BankCard, CouponOrder, CouponOrderType, CouponsResponse, DepositState, DepositsResponse,
         EddaApplication, GetStatementListResponse, GetStatementResponse, RewardRecordsResponse,
         RewardType, StatementType, StockTransferInResponse, StockTransferInState, StockTransferOut,
         StockTransferOutState, WithdrawalsResponse,
@@ -292,7 +292,7 @@ impl AssetContext {
             .collect()
     }
 
-    /// Get deposit records
+    /// Get one page of deposit records
     #[pyo3(signature = (page = None, size = None, states = None, currencies = None, start = None, end = None))]
     fn deposits(
         &self,
@@ -302,14 +302,9 @@ impl AssetContext {
         currencies: Option<Vec<String>>,
         start: Option<PyInstantWrapper>,
         end: Option<PyInstantWrapper>,
-    ) -> PyResult<Vec<Deposit>> {
+    ) -> PyResult<DepositsResponse> {
         let opts = deposits_options(page, size, states, currencies, start, end);
-        self.ctx
-            .deposits(opts)
-            .map_err(ErrorNewType)?
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect()
+        self.ctx.deposits(opts).map_err(ErrorNewType)?.try_into()
     }
 
     /// Get withdrawal records

@@ -43,7 +43,7 @@ public class RewardRecord {
     /**
      * The server's numeric code of reward_type, also when it is a code
      * this SDK does not know (reward_type is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */
@@ -109,7 +109,7 @@ public class RewardRecord {
     /**
      * The server's numeric code of card_status, also when it is a code
      * this SDK does not know (card_status is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */
@@ -156,7 +156,7 @@ public class RewardRecord {
     /**
      * The server's numeric code of status, also when it is a code
      * this SDK does not know (status is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */
@@ -176,7 +176,7 @@ public class RewardRecord {
     /**
      * The server's numeric code of deliver_status (e.g. 11 where deliver_status reads AddressFilled), also when it is a code
      * this SDK does not know (deliver_status is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */

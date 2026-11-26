@@ -13564,7 +13564,7 @@ class BankCardAuthorization:
     """
     The server's numeric code of `status`, also when it is a code
     this SDK does not know (`status` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     message: str
@@ -13693,7 +13693,7 @@ class BankCard:
     """
     The server's numeric code of `status`, also when it is a code
     this SDK does not know (`status` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     witness_state: Type[BankCardWitnessState]
@@ -13705,7 +13705,7 @@ class BankCard:
     """
     The server's numeric code of `witness_state`, also when it is a code
     this SDK does not know (`witness_state` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     support_witness: bool
@@ -13722,7 +13722,7 @@ class BankCard:
     """
     The server's numeric code of `bind_state`, also when it is a code
     this SDK does not know (`bind_state` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     bind_tip: str
@@ -13779,7 +13779,7 @@ class EddaApplication:
     """
     The server's numeric code of `status`, also when it is a code
     this SDK does not know (`status` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     message: str
@@ -13851,7 +13851,7 @@ class TransferStock:
     """
     The server's numeric code of `state_code`, also when it is a code
     this SDK does not know (`state_code` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     position_side: str
@@ -13918,7 +13918,7 @@ class StockTransferIn:
     """
     The server's numeric code of `state_code`, also when it is a code
     this SDK does not know (`state_code` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     app_state: str
@@ -14042,7 +14042,7 @@ class StockTransferOut:
     """
     The server's numeric code of `state_code`, also when it is a code
     this SDK does not know (`state_code` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     app_state: str
@@ -14116,7 +14116,7 @@ class RewardRecord:
     """
     The server's numeric code of `reward_type`, also when it is a code
     this SDK does not know (`reward_type` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     record_id: str
@@ -14153,7 +14153,7 @@ class RewardRecord:
     """
     The server's numeric code of `card_status`, also when it is a code
     this SDK does not know (`card_status` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     prize_type: Optional[int]
@@ -14180,7 +14180,7 @@ class RewardRecord:
     """
     The server's numeric code of `status`, also when it is a code
     this SDK does not know (`status` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     deliver_status: Type[RewardDeliverStatus]
@@ -14192,7 +14192,7 @@ class RewardRecord:
     """
     The server's numeric code of `deliver_status` (e.g. 11 where `deliver_status` reads `AddressFilled`), also when it is a code
     this SDK does not know (`deliver_status` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     exit_status: int
@@ -14262,8 +14262,10 @@ class CouponCommission:
 
     bz_types_raw: List[int]
     """
-    The server's numeric codes of `bz_types`, in order, including codes this
-    SDK does not know (which are `Unknown` in `bz_types`)
+    The server's numeric codes of `bz_types`, including codes this
+    SDK does not know (`Unknown` in `bz_types`); always the same
+    length and order as `bz_types`: elements that are neither a code
+    nor a known name are left out of both
     """
 
     commission_balance: Optional[Decimal]
@@ -14285,7 +14287,7 @@ class CouponCommission:
     """
     The server's numeric code of `unlimited`, also when it is a code
     this SDK does not know (`unlimited` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     commission_expired_time: Optional[datetime]
@@ -14543,7 +14545,7 @@ class CouponQuote:
     """
     The server's numeric code of `investor_type`, also when it is a code
     this SDK does not know (`investor_type` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     manual_activate: bool
@@ -14608,8 +14610,10 @@ class CouponIpoCommission:
 
     bz_types_raw: List[int]
     """
-    The server's numeric codes of `bz_types`, in order, including codes this
-    SDK does not know (which are `Unknown` in `bz_types`)
+    The server's numeric codes of `bz_types`, including codes this
+    SDK does not know (`Unknown` in `bz_types`); always the same
+    length and order as `bz_types`: elements that are neither a code
+    nor a known name are left out of both
     """
 
     counter_id: str
@@ -14649,8 +14653,10 @@ class CouponPlatformFeeDeduct:
 
     bz_types_raw: List[int]
     """
-    The server's numeric codes of `bz_types`, in order, including codes this
-    SDK does not know (which are `Unknown` in `bz_types`)
+    The server's numeric codes of `bz_types`, including codes this
+    SDK does not know (`Unknown` in `bz_types`); always the same
+    length and order as `bz_types`: elements that are neither a code
+    nor a known name are left out of both
     """
 
     counter_id: str
@@ -14799,7 +14805,7 @@ class CouponStockFragment:
     """
     The server's numeric code of `underlying_type`, also when it is a code
     this SDK does not know (`underlying_type` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     amounts: dict[str, str]
@@ -14852,7 +14858,7 @@ class Coupon:
     """
     The server's numeric code of `card_status`, also when it is a code
     this SDK does not know (`card_status` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     start_time: Optional[datetime]
@@ -15106,7 +15112,7 @@ class Deposit:
     """
     The server's numeric code of `state_code`, also when it is a code
     this SDK does not know (`state_code` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     sub_state_code: int
@@ -15193,7 +15199,7 @@ class Withdrawal:
     """
     The server's numeric code of `state_code`, also when it is a code
     this SDK does not know (`state_code` is then `Unknown`); none when the
-    server sent none
+    value is missing or is not a code
     """
 
     raw_state: str
@@ -15224,6 +15230,23 @@ class Withdrawal:
     account_channel: str
     """
     Account channel
+    """
+
+class DepositsResponse:
+    """
+    One page of deposit records
+
+    The server also returns a ``total``, but it follows the page size rather than the record count, so it is not modelled; see ``has_more``.
+    """
+
+    items: List[Deposit]
+    """
+    Deposit records, newest first
+    """
+
+    has_more: bool
+    """
+    A full page came back (as many records as the page size sent, at most 20), so the next page may hold more
     """
 
 class WithdrawalsResponse:
@@ -15565,22 +15588,22 @@ class AssetContext:
         currencies: Optional[List[str]] = None,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None,
-    ) -> List[Deposit]:
+    ) -> DepositsResponse:
         """
-        Get deposit records. The server's total follows the page size rather than the record count, so it is not returned; a full page means there may be more.
+        Get one page of deposit records. The server's total follows the page size rather than the record count, so it is not returned; ``has_more`` reports a full page instead. The page size is always sent: at most 20, default 20.
 
         AP accounts only: US data-center accounts get a region error.
 
         Args:
             page: Page number (default 1)
-            size: Page size (max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them)
+            size: Page size (default 20, max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them, and 0 or a negative value as the default 20)
             states: Filter by states (``DepositState.Unknown`` is ignored)
             currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
             start: Only deposits applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
             end: Only deposits applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
 
         Returns:
-            List[Deposit]
+            DepositsResponse
 
         Examples:
             ::
@@ -15594,8 +15617,9 @@ class AssetContext:
                 ctx = AssetContext(config)
 
                 resp = ctx.deposits(currencies=["HKD"])
-                for deposit in resp:
+                for deposit in resp.items:
                     print(deposit.amount, deposit.state_code)
+                print("more:", resp.has_more)
         """
         ...
 
@@ -16016,22 +16040,22 @@ class AsyncAssetContext:
         currencies: Optional[List[str]] = None,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None,
-    ) -> Awaitable[List[Deposit]]:
+    ) -> Awaitable[DepositsResponse]:
         """
-        Get deposit records. The server's total follows the page size rather than the record count, so it is not returned; a full page means there may be more.
+        Get one page of deposit records. The server's total follows the page size rather than the record count, so it is not returned; ``has_more`` reports a full page instead. The page size is always sent: at most 20, default 20.
 
         AP accounts only: US data-center accounts get a region error. Returns an awaitable.
 
         Args:
             page: Page number (default 1)
-            size: Page size (max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them)
+            size: Page size (default 20, max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them, and 0 or a negative value as the default 20)
             states: Filter by states (``DepositState.Unknown`` is ignored)
             currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
             start: Only deposits applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
             end: Only deposits applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
 
         Returns:
-            List[Deposit]
+            DepositsResponse
 
         Examples:
             ::
@@ -16046,8 +16070,9 @@ class AsyncAssetContext:
                     config = Config.from_oauth(oauth)
                     ctx = AsyncAssetContext.create(config)
                     resp = await ctx.deposits(currencies=["HKD"])
-                    for deposit in resp:
+                    for deposit in resp.items:
                         print(deposit.amount, deposit.state_code)
+                    print("more:", resp.has_more)
 
                 asyncio.run(main())
         """

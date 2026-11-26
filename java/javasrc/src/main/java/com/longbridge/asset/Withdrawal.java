@@ -98,7 +98,7 @@ public class Withdrawal {
     /**
      * The server's numeric code of state_code, also when it is a code
      * this SDK does not know (state_code is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */

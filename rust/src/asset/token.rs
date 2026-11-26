@@ -16,8 +16,9 @@ const DEFAULT_ACCOUNT_CHANNEL: &str = "lb";
 /// The account channel of an access token, or `None` when the token is not a
 /// decodable JWT (the parameter is then not sent).
 ///
-/// Read from the top-level `ac` claim, else from `account_channel` inside the
-/// `sub` claim (a JSON string); a decodable token naming neither yields
+/// Read from the top-level `ac` claim, else a top-level `account_channel`
+/// claim, else `account_channel` inside the `sub` claim (a JSON string), with
+/// surrounding whitespace trimmed; a decodable token naming none yields
 /// [`DEFAULT_ACCOUNT_CHANNEL`].
 pub(crate) fn account_channel(token: &str) -> Option<String> {
     let token = token.strip_prefix("Bearer ").unwrap_or(token);
@@ -26,7 +27,12 @@ pub(crate) fn account_channel(token: &str) -> Option<String> {
     if !claims.is_object() {
         return None;
     }
-    let non_empty = |v: &Value| v.as_str().filter(|s| !s.is_empty()).map(str::to_owned);
+    let non_empty = |v: &Value| {
+        v.as_str()
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .map(str::to_owned)
+    };
     let from_sub = || {
         let sub: Value = serde_json::from_str(claims.get("sub")?.as_str()?).ok()?;
         non_empty(sub.get("account_channel")?)
@@ -35,6 +41,7 @@ pub(crate) fn account_channel(token: &str) -> Option<String> {
         claims
             .get("ac")
             .and_then(non_empty)
+            .or_else(|| claims.get("account_channel").and_then(non_empty))
             .or_else(from_sub)
             .unwrap_or_else(|| DEFAULT_ACCOUNT_CHANNEL.to_string()),
     )
@@ -117,6 +124,11 @@ mod tests {
             account_channel(&format!("Bearer {}", token(r#"{"ac":"","sub":"x"}"#))).as_deref(),
             Some("lb"),
             "a JWT naming no channel gets the default"
+        );
+        assert_eq!(
+            account_channel(&token(r#"{"account_channel":" lb_paper "}"#)).as_deref(),
+            Some("lb_paper"),
+            "top-level account_channel claim, trimmed"
         );
         assert_eq!(account_channel("opaque-token"), None, "not a JWT");
         assert_eq!(account_channel("a.!!!.c"), None, "invalid base64");

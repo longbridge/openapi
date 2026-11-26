@@ -22,8 +22,10 @@ public class CouponIpoCommission {
     }
 
     /**
-     * The server's numeric codes of bz_types, in order, including codes this
-     * SDK does not know (which are Unknown in bz_types)
+     * The server's numeric codes of bz_types, including codes this
+     * SDK does not know (Unknown in bz_types); always the same
+     * length and order as bz_types: elements that are neither a code
+     * nor a known name are left out of both
      *
      * @return the raw codes
      */

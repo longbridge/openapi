@@ -283,6 +283,7 @@ cpp_compat = true
 "CCouponOrder" = "lb_coupon_order_t"
 "CDeposit" = "lb_deposit_t"
 "CWithdrawal" = "lb_withdrawal_t"
+"CDepositsResponse" = "lb_deposits_response_t"
 "CWithdrawalsResponse" = "lb_withdrawals_response_t"
 "CGetStockTransfersInOptions" = "lb_get_stock_transfers_in_options_t"
 "CGetStockTransfersOutOptions" = "lb_get_stock_transfers_out_options_t"
@@ -596,6 +597,7 @@ include = [
     "CCouponOrder",
     "CDeposit",
     "CWithdrawal",
+    "CDepositsResponse",
     "CWithdrawalsResponse",
     # GridContext: grid trading (reachable only via void* async data pointer)
     "CSubmitGridOrderResponse",

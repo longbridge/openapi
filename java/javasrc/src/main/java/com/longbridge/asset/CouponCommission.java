@@ -51,8 +51,10 @@ public class CouponCommission {
     }
 
     /**
-     * The server's numeric codes of bz_types, in order, including codes this
-     * SDK does not know (which are Unknown in bz_types)
+     * The server's numeric codes of bz_types, including codes this
+     * SDK does not know (Unknown in bz_types); always the same
+     * length and order as bz_types: elements that are neither a code
+     * nor a known name are left out of both
      *
      * @return the raw codes
      */
@@ -90,7 +92,7 @@ public class CouponCommission {
     /**
      * The server's numeric code of unlimited, also when it is a code
      * this SDK does not know (unlimited is then Unknown); null when the
-     * server sent none
+     * value is missing or is not a code
      *
      * @return the raw code
      */

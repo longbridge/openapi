@@ -410,7 +410,7 @@ struct BankCardAuthorization
   AuthorizationStatus status;
   /// The server's numeric code of `status`, also when it is a code
   /// this SDK does not know (`status` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> status_raw;
   /// Failure reason (empty unless the authorization failed)
   std::string message;
@@ -467,13 +467,13 @@ struct BankCard
   BankCardStatus status;
   /// The server's numeric code of `status`, also when it is a code
   /// this SDK does not know (`status` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> status_raw;
   /// Witness state
   BankCardWitnessState witness_state;
   /// The server's numeric code of `witness_state`, also when it is a code
   /// this SDK does not know (`witness_state` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> witness_state_raw;
   /// Whether the card supports witnessing
   bool support_witness;
@@ -481,7 +481,7 @@ struct BankCard
   BankCardBindState bind_state;
   /// The server's numeric code of `bind_state`, also when it is a code
   /// this SDK does not know (`bind_state` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> bind_state_raw;
   /// Binding hint text
   std::string bind_tip;
@@ -509,7 +509,7 @@ struct EddaApplication
   AuthorizationStatus status;
   /// The server's numeric code of `status`, also when it is a code
   /// this SDK does not know (`status` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> status_raw;
   /// Failure reason (empty unless the application failed)
   std::string message;
@@ -543,7 +543,7 @@ struct TransferStock
   TransferStockState state_code;
   /// The server's numeric code of `state_code`, also when it is a code
   /// this SDK does not know (`state_code` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> state_code_raw;
   /// Position side
   std::string position_side;
@@ -574,7 +574,7 @@ struct StockTransferIn
   StockTransferInState state_code;
   /// The server's numeric code of `state_code`, also when it is a code
   /// this SDK does not know (`state_code` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> state_code_raw;
   /// App-side state: `noticed` means the user tapped "I have notified the
   /// broker" in the app (the user's own confirmation, not a Longbridge
@@ -632,7 +632,7 @@ struct StockTransferOut
   StockTransferOutState state_code;
   /// The server's numeric code of `state_code`, also when it is a code
   /// this SDK does not know (`state_code` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> state_code_raw;
   /// App-side state: `noticed` means the user tapped "I have notified the
   /// broker" in the app (the user's own confirmation, not a Longbridge
@@ -667,7 +667,7 @@ struct RewardRecord
   RewardType reward_type;
   /// The server's numeric code of `reward_type`, also when it is a code
   /// this SDK does not know (`reward_type` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> reward_type_raw;
   /// Record ID
   std::string record_id;
@@ -683,7 +683,7 @@ struct RewardRecord
   CouponStatus card_status;
   /// The server's numeric code of `card_status`, also when it is a code
   /// this SDK does not know (`card_status` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> card_status_raw;
   /// Prize type code (gift rewards; `0` = physical goods), null when not set
   std::optional<int32_t> prize_type;
@@ -695,13 +695,13 @@ struct RewardRecord
   RewardStatus status;
   /// The server's numeric code of `status`, also when it is a code
   /// this SDK does not know (`status` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> status_raw;
   /// Delivery status (issued gift rewards only)
   RewardDeliverStatus deliver_status;
   /// The server's numeric code of `deliver_status` (e.g. 11 where `deliver_status` reads `AddressFilled`), also when it is a code
   /// this SDK does not know (`deliver_status` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> deliver_status_raw;
   /// Exit status code, as returned by the server
   int32_t exit_status;
@@ -735,8 +735,11 @@ struct CouponCommission
   std::string rebate_rate;
   /// Instrument types the coupon applies to
   std::vector<CouponTargetType> bz_types;
-  /// The server's numeric codes of `bz_types`, in order, including codes this
-  /// SDK does not know (which are `Unknown` in `bz_types`)
+  /// The server's numeric codes of `bz_types`, including codes this
+  /// SDK does not know (`Unknown` in `bz_types`); always the same
+  /// length and order as `bz_types`: elements that are neither a code
+  /// nor a known name are left out of both (so `bz_types_raw.size()` always
+  /// equals `bz_types.size()`)
   std::vector<int32_t> bz_types_raw;
   /// Remaining commission balance (null when not set)
   std::optional<Decimal> commission_balance;
@@ -746,7 +749,7 @@ struct CouponCommission
   CommissionUnlimitedType unlimited;
   /// The server's numeric code of `unlimited`, also when it is a code
   /// this SDK does not know (`unlimited` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> unlimited_raw;
   /// Commission expiry time as a unix timestamp (null when not set)
   std::optional<int64_t> commission_expired_time;
@@ -881,7 +884,7 @@ struct CouponQuote
   QuoteInvestorType investor_type;
   /// The server's numeric code of `investor_type`, also when it is a code
   /// this SDK does not know (`investor_type` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> investor_type_raw;
   /// Whether the coupon is activated manually
   bool manual_activate;
@@ -913,8 +916,11 @@ struct CouponIpoCommission
 {
   /// IPO subscription types the coupon applies to
   std::vector<IpoCouponTargetType> bz_types;
-  /// The server's numeric codes of `bz_types`, in order, including codes this
-  /// SDK does not know (which are `Unknown` in `bz_types`)
+  /// The server's numeric codes of `bz_types`, including codes this
+  /// SDK does not know (`Unknown` in `bz_types`); always the same
+  /// length and order as `bz_types`: elements that are neither a code
+  /// nor a known name are left out of both (so `bz_types_raw.size()` always
+  /// equals `bz_types.size()`)
   std::vector<int32_t> bz_types_raw;
   /// Counter ID
   std::string counter_id;
@@ -936,8 +942,11 @@ struct CouponPlatformFeeDeduct
 {
   /// Instrument types the coupon applies to
   std::vector<CouponTargetType> bz_types;
-  /// The server's numeric codes of `bz_types`, in order, including codes this
-  /// SDK does not know (which are `Unknown` in `bz_types`)
+  /// The server's numeric codes of `bz_types`, including codes this
+  /// SDK does not know (`Unknown` in `bz_types`); always the same
+  /// length and order as `bz_types`: elements that are neither a code
+  /// nor a known name are left out of both (so `bz_types_raw.size()` always
+  /// equals `bz_types.size()`)
   std::vector<int32_t> bz_types_raw;
   /// Counter ID
   std::string counter_id;
@@ -1009,7 +1018,7 @@ struct CouponStockFragment
   CouponTargetType underlying_type;
   /// The server's numeric code of `underlying_type`, also when it is a code
   /// this SDK does not know (`underlying_type` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> underlying_type_raw;
   /// Amounts, as returned by the server
   std::map<std::string, std::string> amounts;
@@ -1034,7 +1043,7 @@ struct Coupon
   CouponStatus card_status;
   /// The server's numeric code of `card_status`, also when it is a code
   /// this SDK does not know (`card_status` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> card_status_raw;
   /// Start of validity as a unix timestamp (null when not set)
   std::optional<int64_t> start_time;
@@ -1145,7 +1154,7 @@ struct Deposit
   DepositState state_code;
   /// The server's numeric code of `state_code`, also when it is a code
   /// this SDK does not know (`state_code` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> state_code_raw;
   /// Sub-state code, as returned by the server
   int32_t sub_state_code;
@@ -1184,7 +1193,7 @@ struct Withdrawal
   WithdrawalState state_code;
   /// The server's numeric code of `state_code`, also when it is a code
   /// this SDK does not know (`state_code` is then `Unknown`); null when the
-  /// server sent none
+  /// value is missing or is not a code
   std::optional<int32_t> state_code_raw;
   /// Raw state, as returned by the server
   std::string raw_state;
@@ -1198,6 +1207,19 @@ struct Withdrawal
   std::string user_bank_swift_code;
   /// Account channel
   std::string account_channel;
+};
+
+/// One page of deposit records
+///
+/// The server also returns a `total`, but it follows the page size rather
+/// than the record count, so it is not modelled; see `has_more`.
+struct DepositsResponse
+{
+  /// Deposit records, newest first
+  std::vector<Deposit> items;
+  /// A full page came back (as many records as the page size sent, at most
+  /// 20), so the next page may hold more
+  bool has_more;
 };
 
 /// Response for the withdrawal list
@@ -1276,7 +1298,9 @@ struct GetDepositsOptions
 {
   /// Page number (default 1)
   std::optional<int32_t> page;
-  /// Page size (max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them)
+  /// Page size (default 20, max 20; larger values are sent as 20, because the
+  /// deposit list returns a short 10-record page for them, and 0 or a negative
+  /// value as the default 20)
   std::optional<int32_t> size;
   /// State filter
   std::optional<std::vector<DepositState>> states;
@@ -1370,9 +1394,10 @@ public:
     CouponOrderType order_type,
     AsyncCallback<AssetContext, std::vector<CouponOrder>> callback) const;
 
-  /// Get deposit records (AP accounts only)
+  /// Get one page of deposit records (AP accounts only); `has_more` reports a
+  /// full page. The page size is always sent: at most 20, default 20.
   void deposits(const std::optional<GetDepositsOptions>& opts,
-                AsyncCallback<AssetContext, std::vector<Deposit>> callback) const;
+                AsyncCallback<AssetContext, DepositsResponse> callback) const;
 
   /// Get withdrawal records (AP accounts only)
   void withdrawals(

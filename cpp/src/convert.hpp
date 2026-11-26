@@ -5714,6 +5714,9 @@ convert(const lb_deposit_t* info);
 inline asset::Withdrawal
 convert(const lb_withdrawal_t* info);
 
+inline asset::DepositsResponse
+convert(const lb_deposits_response_t* info);
+
 inline asset::WithdrawalsResponse
 convert(const lb_withdrawals_response_t* info);
 
@@ -6267,6 +6270,15 @@ convert(const lb_withdrawal_t* info)
   out.display_bank_account = std::string(info->display_bank_account ? info->display_bank_account : "");
   out.user_bank_swift_code = std::string(info->user_bank_swift_code ? info->user_bank_swift_code : "");
   out.account_channel = std::string(info->account_channel ? info->account_channel : "");
+  return out;
+}
+
+inline asset::DepositsResponse
+convert(const lb_deposits_response_t* info)
+{
+  asset::DepositsResponse out;
+  out.items = convert_asset_list<asset::Deposit>(info->items, info->num_items);
+  out.has_more = info->has_more;
   return out;
 }
 

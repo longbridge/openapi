@@ -260,6 +260,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::asset::CouponsResponse,
         longbridge::asset::CouponOrder,
         longbridge::asset::Deposit,
+        longbridge::asset::DepositsResponse,
         longbridge::asset::Withdrawal,
         longbridge::asset::WithdrawalsResponse,
         longbridge::trade::OrderHistoryDetail,

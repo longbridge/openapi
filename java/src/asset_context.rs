@@ -350,7 +350,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextDeposits
             }
         }
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.deposits(options).await?))
+            Ok(__owned_ctx.deposits(options).await?)
         })?;
         Ok(())
     })

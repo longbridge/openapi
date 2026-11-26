@@ -358,7 +358,7 @@ AssetContext::coupon_orders(
 void
 AssetContext::deposits(
   const std::optional<GetDepositsOptions>& opts,
-  AsyncCallback<AssetContext, std::vector<Deposit>> callback) const
+  AsyncCallback<AssetContext, DepositsResponse> callback) const
 {
   lb_get_deposits_options_t opts2 = {
     nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr, nullptr,
@@ -396,8 +396,8 @@ AssetContext::deposits(
   lb_asset_context_deposits(
     ctx_,
     &opts2,
-    on_list_result<Deposit, lb_deposit_t>,
-    new AsyncCallback<AssetContext, std::vector<Deposit>>(callback));
+    on_value_result<DepositsResponse, lb_deposits_response_t>,
+    new AsyncCallback<AssetContext, DepositsResponse>(callback));
 }
 
 void
