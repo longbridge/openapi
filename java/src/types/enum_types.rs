@@ -948,6 +948,37 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/asset/CouponTargetType",
+    longbridge::asset::CouponTargetType,
+    [Unknown, Stock, UsOption, HkWarrant, Etf, Lof]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/IpoCouponTargetType",
+    longbridge::asset::IpoCouponTargetType,
+    [Unknown, Financing, Cash]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/CommissionUnlimitedType",
+    longbridge::asset::CommissionUnlimitedType,
+    [
+        Unknown,
+        Proportionate,
+        Full,
+        Lifetime,
+        ByAmountPer,
+        ByRatePer
+    ]
+);
+
+impl_java_enum!(
+    "com/longbridge/asset/QuoteInvestorType",
+    longbridge::asset::QuoteInvestorType,
+    [Unknown, Any, NonProfessional, Professional]
+);
+
+impl_java_enum!(
     "com/longbridge/asset/CouponStatus",
     longbridge::asset::CouponStatus,
     [Unknown, Unused, Used, Expired, Redeeming, InUse, Processing]

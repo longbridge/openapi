@@ -2236,6 +2236,119 @@ typedef enum lb_reward_deliver_status_t {
 } lb_reward_deliver_status_t;
 
 /**
+ * Instrument type a coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_coupon_target_type_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  CouponTargetTypeUnknown,
+  /**
+   * Stocks (server code 0, `StockTrade`)
+   */
+  CouponTargetTypeStock,
+  /**
+   * US stock options (server code 1, `UsStockOptions`)
+   */
+  CouponTargetTypeUsOption,
+  /**
+   * HK warrants (server code 2, `HkStockWarrant`)
+   */
+  CouponTargetTypeHkWarrant,
+  /**
+   * ETF (server code 3)
+   */
+  CouponTargetTypeEtf,
+  /**
+   * LOF (server code 4)
+   */
+  CouponTargetTypeLof,
+} lb_coupon_target_type_t;
+
+/**
+ * The server's `unlimited` code of a commission coupon
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_commission_unlimited_type_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  CommissionUnlimitedTypeUnknown,
+  /**
+   * `Proportionate` (server code 0)
+   */
+  CommissionUnlimitedTypeProportionate,
+  /**
+   * `Full` (server code 1)
+   */
+  CommissionUnlimitedTypeFull,
+  /**
+   * `Lifetime` (server code 2)
+   */
+  CommissionUnlimitedTypeLifetime,
+  /**
+   * `ByAmountPer` (server code 6)
+   */
+  CommissionUnlimitedTypeByAmountPer,
+  /**
+   * `ByRatePer` (server code 7)
+   */
+  CommissionUnlimitedTypeByRatePer,
+} lb_commission_unlimited_type_t;
+
+/**
+ * Investor type a quote coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_quote_investor_type_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  QuoteInvestorTypeUnknown,
+  /**
+   * Any investor (server code 0, `INVESTOR_TYPE_ANY`)
+   */
+  QuoteInvestorTypeAny,
+  /**
+   * Non-professional investors (server code 1,
+   * `INVESTOR_TYPE_NON_PROFESSIONAL`)
+   */
+  QuoteInvestorTypeNonProfessional,
+  /**
+   * Professional investors (server code 2, `INVESTOR_TYPE_PROFESSIONAL`)
+   */
+  QuoteInvestorTypeProfessional,
+} lb_quote_investor_type_t;
+
+/**
+ * IPO subscription type an IPO commission coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_ipo_coupon_target_type_t {
+  /**
+   * Unknown: unset or an undocumented code (never sent to the server)
+   */
+  IpoCouponTargetTypeUnknown,
+  /**
+   * Financing (margin) IPO subscription (server code 1, `FinancingIPO`)
+   */
+  IpoCouponTargetTypeFinancing,
+  /**
+   * Cash IPO subscription (server code 2, `CashIPO`)
+   */
+  IpoCouponTargetTypeCash,
+} lb_ipo_coupon_target_type_t;
+
+/**
  * State of a withdrawal record
  *
  * The numeric values of this enum are not the server codes; each
@@ -7964,7 +8077,7 @@ typedef struct lb_reward_records_response_t {
 } lb_reward_records_response_t;
 
 /**
- * Commission terms of a commission coupon
+ * Commission terms of a commission coupon (`commission`)
  */
 typedef struct lb_coupon_commission_t {
   /**
@@ -7980,10 +8093,9 @@ typedef struct lb_coupon_commission_t {
    */
   const char *rebate_rate;
   /**
-   * Instrument types the coupon applies to: `0` stocks, `1` options, `2`
-   * warrants, `3` ETF, `4` LOF
+   * Instrument types the coupon applies to
    */
-  const int32_t *bz_types;
+  const enum lb_coupon_target_type_t *bz_types;
   /**
    * Number of `bz_types`
    */
@@ -7995,11 +8107,11 @@ typedef struct lb_coupon_commission_t {
   /**
    * Commission duration, as returned by the server
    */
-  const char *commission_duration;
+  int64_t commission_duration;
   /**
-   * Whether the coupon is unlimited
+   * The server's `unlimited` code
    */
-  bool unlimited;
+  enum lb_commission_unlimited_type_t unlimited;
   /**
    * Commission expiry time as a unix timestamp (null when not set)
    */
@@ -8016,7 +8128,492 @@ typedef struct lb_coupon_commission_t {
    * Settlement model, as returned by the server
    */
   const char *settlement_model;
+  /**
+   * Amount limit, as returned by the server
+   */
+  int64_t amount_limit;
+  /**
+   * Whether the coupon can be combined with other coupons
+   */
+  bool superposition;
 } lb_coupon_commission_t;
+
+/**
+ * Terms of an AI benefit coupon (`ai_benefit`)
+ */
+typedef struct lb_coupon_ai_benefit_t {
+  /**
+   * Benefit days, as returned by the server
+   */
+  int32_t benefit_days;
+  /**
+   * Start of the benefit as a unix timestamp (null when not set)
+   */
+  const int64_t *benefit_start;
+  /**
+   * End of the benefit as a unix timestamp (null when not set)
+   */
+  const int64_t *benefit_end;
+  /**
+   * Benefit tag, as returned by the server
+   */
+  const char *benefit_tag;
+} lb_coupon_ai_benefit_t;
+
+/**
+ * Terms of a cash coupon (`cash`)
+ */
+typedef struct lb_coupon_cash_t {
+  /**
+   * Receive duration, as returned by the server
+   */
+  int64_t receive_duration;
+} lb_coupon_cash_t;
+
+/**
+ * A store of a coffee coupon
+ */
+typedef struct lb_coupon_coffee_store_t {
+  /**
+   * Store ID
+   */
+  int64_t store_id;
+  /**
+   * Store name
+   */
+  const char *store_name;
+} lb_coupon_coffee_store_t;
+
+/**
+ * Terms of a coffee coupon (`coffee_coupon`)
+ */
+typedef struct lb_coupon_coffee_t {
+  /**
+   * Coupon channel, as returned by the server
+   */
+  const char *coupon_channel;
+  /**
+   * Coupon ID, as returned by the server
+   */
+  const char *coupon_id;
+  /**
+   * Coupon number, as returned by the server
+   */
+  const char *coupon_no;
+  /**
+   * Whether the coupon can be used at every store
+   */
+  bool is_available_all_store;
+  /**
+   * Period type (e.g. `day`), as returned by the server
+   */
+  const char *period_type;
+  /**
+   * ID of the store the coupon was settled at (`0` when not settled)
+   */
+  int64_t settled_store_id;
+  /**
+   * IDs of the stores the coupon can be used at
+   */
+  const int64_t *store_id_list;
+  /**
+   * Number of `store_id_list`
+   */
+  uintptr_t num_store_id_list;
+  /**
+   * Stores the coupon can be used at
+   */
+  const struct lb_coupon_coffee_store_t *store_list;
+  /**
+   * Number of `store_list`
+   */
+  uintptr_t num_store_list;
+  /**
+   * Threshold, as returned by the server
+   */
+  int64_t threshold;
+  /**
+   * Use limit (`total` or `period`), as returned by the server
+   */
+  const char *use_limit;
+} lb_coupon_coffee_t;
+
+/**
+ * A counter (security) of a crypto coupon
+ */
+typedef struct lb_coupon_crypto_counter_t {
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+} lb_coupon_crypto_counter_t;
+
+/**
+ * Fallback of a crypto coupon
+ */
+typedef struct lb_coupon_crypto_fallback_t {
+  /**
+   * Whether the fallback is enabled
+   */
+  bool enabled;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+} lb_coupon_crypto_fallback_t;
+
+/**
+ * Terms of a crypto coupon (`crypto`)
+ */
+typedef struct lb_coupon_crypto_t {
+  /**
+   * Fallback
+   */
+  struct lb_coupon_crypto_fallback_t fallback;
+  /**
+   * Optional counters
+   */
+  const struct lb_coupon_crypto_counter_t *optional_counters;
+  /**
+   * Number of `optional_counters`
+   */
+  uintptr_t num_optional_counters;
+} lb_coupon_crypto_t;
+
+/**
+ * Terms of a finance interest coupon (`finance_interest`)
+ */
+typedef struct lb_coupon_finance_interest_t {
+  /**
+   * Discount mode, as returned by the server
+   */
+  int32_t discount_mode;
+  /**
+   * Discount rate (null when not set)
+   */
+  const struct lb_decimal_t *discount_rate;
+  /**
+   * Whether the coupon can be combined with other coupons
+   */
+  bool superposition;
+} lb_coupon_finance_interest_t;
+
+/**
+ * Terms of a fund deduction coupon (`fund_deduct`)
+ */
+typedef struct lb_coupon_fund_deduct_t {
+  /**
+   * Maximum risk level, as returned by the server
+   */
+  int32_t max_risk_level;
+  /**
+   * Minimum order amount, as returned by the server
+   */
+  const char *min_order_amount;
+  /**
+   * Order types, as returned by the server
+   */
+  const char *const *order_types;
+  /**
+   * Number of `order_types`
+   */
+  uintptr_t num_order_types;
+  /**
+   * Underlying type, as returned by the server
+   */
+  const char *underlying_type;
+  /**
+   * Underlying values, as returned by the server
+   */
+  const char *const *underlying_values;
+  /**
+   * Number of `underlying_values`
+   */
+  uintptr_t num_underlying_values;
+  /**
+   * Underlying names, as returned by the server
+   */
+  const char *const *underlying_names;
+  /**
+   * Number of `underlying_names`
+   */
+  uintptr_t num_underlying_names;
+} lb_coupon_fund_deduct_t;
+
+/**
+ * Terms of a quote (market data) or fundamental-data coupon (`quote` /
+ * `fundamental`)
+ */
+typedef struct lb_coupon_quote_t {
+  /**
+   * Current end time as a unix timestamp (null when not set)
+   */
+  const int64_t *current_end_time;
+  /**
+   * Whether the coupon is inapplicable, as returned by the server
+   */
+  bool inapplicable;
+  /**
+   * Investor type the coupon applies to
+   */
+  enum lb_quote_investor_type_t investor_type;
+  /**
+   * Whether the coupon is activated manually
+   */
+  bool manual_activate;
+  /**
+   * Markets
+   */
+  const char *const *markets;
+  /**
+   * Number of `markets`
+   */
+  uintptr_t num_markets;
+  /**
+   * Investor type of the member, as returned by the server
+   */
+  int32_t member_investor_type;
+  /**
+   * Paired SPU number, as returned by the server
+   */
+  const char *pair_spu_no;
+  /**
+   * Quote duration, as returned by the server
+   */
+  int64_t quote_duration;
+  /**
+   * Quote market
+   */
+  const char *quote_market;
+  /**
+   * Quote tags
+   */
+  const char *const *quote_tags;
+  /**
+   * Number of `quote_tags`
+   */
+  uintptr_t num_quote_tags;
+  /**
+   * Whether the coupon can be combined with other coupons
+   */
+  bool superposition;
+} lb_coupon_quote_t;
+
+/**
+ * Terms of an IPO coupon (`ipo`)
+ */
+typedef struct lb_coupon_ipo_t {
+  /**
+   * Subscription ID
+   */
+  const char *subscription_id;
+} lb_coupon_ipo_t;
+
+/**
+ * Terms of an IPO commission coupon (`ipo_commission`)
+ */
+typedef struct lb_coupon_ipo_commission_t {
+  /**
+   * IPO subscription types the coupon applies to
+   */
+  const enum lb_ipo_coupon_target_type_t *bz_types;
+  /**
+   * Number of `bz_types`
+   */
+  uintptr_t num_bz_types;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Counter name
+   */
+  const char *counter_name;
+  /**
+   * Financing limit, as returned by the server
+   */
+  const char *financing_limit;
+} lb_coupon_ipo_commission_t;
+
+/**
+ * Terms of an IPO interest coupon (`ipo_interest`)
+ */
+typedef struct lb_coupon_ipo_interest_t {
+  /**
+   * Discount rate, as returned by the server
+   */
+  const char *discount_rate;
+} lb_coupon_ipo_interest_t;
+
+/**
+ * Terms of a platform fee deduction coupon (`platform_fee_deduct`)
+ */
+typedef struct lb_coupon_platform_fee_deduct_t {
+  /**
+   * Instrument types the coupon applies to
+   */
+  const enum lb_coupon_target_type_t *bz_types;
+  /**
+   * Number of `bz_types`
+   */
+  uintptr_t num_bz_types;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Counter name
+   */
+  const char *counter_name;
+  /**
+   * Markets the coupon applies to
+   */
+  const char *const *markets;
+  /**
+   * Number of `markets`
+   */
+  uintptr_t num_markets;
+  /**
+   * Number of times used
+   */
+  int64_t usage_count;
+  /**
+   * Number of uses left
+   */
+  int64_t lave_usage_count;
+  /**
+   * Whether the coupon can be combined with other coupons
+   */
+  bool superposition;
+} lb_coupon_platform_fee_deduct_t;
+
+/**
+ * An optional counter of a stock coupon
+ */
+typedef struct lb_coupon_stock_counter_t {
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Shares, as returned by the server
+   */
+  const char *shares;
+} lb_coupon_stock_counter_t;
+
+/**
+ * Fallback of a stock coupon
+ */
+typedef struct lb_coupon_stock_fallback_t {
+  /**
+   * Whether the fallback is enabled
+   */
+  bool enabled;
+  /**
+   * Fallback type (the server's `type`), as returned by the server
+   */
+  const char *fallback_type;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Shares, as returned by the server
+   */
+  const char *shares;
+} lb_coupon_stock_fallback_t;
+
+/**
+ * Terms of a stock coupon (`stock`)
+ */
+typedef struct lb_coupon_stock_t {
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Counter name
+   */
+  const char *counter_name;
+  /**
+   * Amount (null when not set)
+   */
+  const struct lb_decimal_t *amount;
+  /**
+   * Redemption type (`by_card_value` or `shares_number`), as returned by the
+   * server
+   */
+  const char *redemption_type;
+  /**
+   * Delivery way (`card_exchange` or `account_transfer`), as returned by the
+   * server
+   */
+  const char *send_way;
+  /**
+   * Optional counters
+   */
+  const struct lb_coupon_stock_counter_t *optional_counters;
+  /**
+   * Number of `optional_counters`
+   */
+  uintptr_t num_optional_counters;
+  /**
+   * Fallback
+   */
+  struct lb_coupon_stock_fallback_t fallback;
+} lb_coupon_stock_t;
+
+/**
+ * One `amounts` entry of [`CCouponStockFragment`]
+ */
+typedef struct lb_coupon_stock_fragment_amount_t {
+  /**
+   * Key, as returned by the server
+   */
+  const char *key;
+  /**
+   * Value, as returned by the server
+   */
+  const char *value;
+} lb_coupon_stock_fragment_amount_t;
+
+/**
+ * Terms of a stock fragment coupon (`stock_fragment`)
+ */
+typedef struct lb_coupon_stock_fragment_t {
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Counter name
+   */
+  const char *counter_name;
+  /**
+   * Market
+   */
+  const char *market;
+  /**
+   * Markets
+   */
+  const char *const *markets;
+  /**
+   * Number of `markets`
+   */
+  uintptr_t num_markets;
+  /**
+   * Instrument type the coupon applies to
+   */
+  enum lb_coupon_target_type_t underlying_type;
+  /**
+   * Amounts, as returned by the server, key-sorted
+   */
+  const struct lb_coupon_stock_fragment_amount_t *amounts;
+  /**
+   * Number of `amounts`
+   */
+  uintptr_t num_amounts;
+} lb_coupon_stock_fragment_t;
 
 /**
  * A coupon (reward card)
@@ -8056,8 +8653,8 @@ typedef struct lb_coupon_t {
    */
   const int64_t *start_time;
   /**
-   * End of validity as a unix timestamp (null when not set or when the
-   * coupon never expires; see `no_expiry`)
+   * End of validity (none when not set or when the coupon never expires;
+   * see `no_expiry`) as a unix timestamp (null when not set)
    */
   const int64_t *end_time;
   /**
@@ -8066,7 +8663,8 @@ typedef struct lb_coupon_t {
    */
   bool no_expiry;
   /**
-   * Activation time as a unix timestamp (null when not activated)
+   * Activation time (none when not activated) as a unix timestamp (null when
+   * not set)
    */
   const int64_t *activate_time;
   /**
@@ -8090,9 +8688,69 @@ typedef struct lb_coupon_t {
    */
   uintptr_t num_trade_sessions;
   /**
-   * Commission terms (commission coupons only; empty otherwise)
+   * Subscription ID, as returned by the server
    */
-  struct lb_coupon_commission_t commission;
+  const char *subscription_id;
+  /**
+   * Terms of an AI benefit coupon (null for other coupon types)
+   */
+  const struct lb_coupon_ai_benefit_t *ai_benefit;
+  /**
+   * Terms of a cash coupon (null for other coupon types)
+   */
+  const struct lb_coupon_cash_t *cash;
+  /**
+   * Terms of a coffee coupon (null for other coupon types)
+   */
+  const struct lb_coupon_coffee_t *coffee_coupon;
+  /**
+   * Terms of a commission coupon (null for other coupon types)
+   */
+  const struct lb_coupon_commission_t *commission;
+  /**
+   * Terms of a crypto coupon (null for other coupon types)
+   */
+  const struct lb_coupon_crypto_t *crypto;
+  /**
+   * Terms of a finance interest coupon (null for other coupon types)
+   */
+  const struct lb_coupon_finance_interest_t *finance_interest;
+  /**
+   * Terms of a fund deduction coupon (null for other coupon types)
+   */
+  const struct lb_coupon_fund_deduct_t *fund_deduct;
+  /**
+   * Terms of a fundamental-data coupon (null for other coupon types)
+   */
+  const struct lb_coupon_quote_t *fundamental;
+  /**
+   * Terms of an IPO coupon (null for other coupon types)
+   */
+  const struct lb_coupon_ipo_t *ipo;
+  /**
+   * Terms of an IPO commission coupon (null for other coupon types)
+   */
+  const struct lb_coupon_ipo_commission_t *ipo_commission;
+  /**
+   * Terms of an IPO interest coupon (null for other coupon types)
+   */
+  const struct lb_coupon_ipo_interest_t *ipo_interest;
+  /**
+   * Terms of a platform fee deduction coupon (null for other coupon types)
+   */
+  const struct lb_coupon_platform_fee_deduct_t *platform_fee_deduct;
+  /**
+   * Terms of a quote (market data) coupon (null for other coupon types)
+   */
+  const struct lb_coupon_quote_t *quote;
+  /**
+   * Terms of a stock coupon (null for other coupon types)
+   */
+  const struct lb_coupon_stock_t *stock;
+  /**
+   * Terms of a stock fragment coupon (null for other coupon types)
+   */
+  const struct lb_coupon_stock_fragment_t *stock_fragment;
 } lb_coupon_t;
 
 /**

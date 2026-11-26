@@ -5271,6 +5271,154 @@ convert(asset::RewardDeliverStatus ty)
   }
 }
 
+inline asset::CouponTargetType
+convert(lb_coupon_target_type_t ty)
+{
+  switch (ty) {
+    case CouponTargetTypeUnknown:
+      return asset::CouponTargetType::Unknown;
+    case CouponTargetTypeStock:
+      return asset::CouponTargetType::Stock;
+    case CouponTargetTypeUsOption:
+      return asset::CouponTargetType::UsOption;
+    case CouponTargetTypeHkWarrant:
+      return asset::CouponTargetType::HkWarrant;
+    case CouponTargetTypeEtf:
+      return asset::CouponTargetType::Etf;
+    case CouponTargetTypeLof:
+      return asset::CouponTargetType::Lof;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_coupon_target_type_t
+convert(asset::CouponTargetType ty)
+{
+  switch (ty) {
+    case asset::CouponTargetType::Unknown:
+      return CouponTargetTypeUnknown;
+    case asset::CouponTargetType::Stock:
+      return CouponTargetTypeStock;
+    case asset::CouponTargetType::UsOption:
+      return CouponTargetTypeUsOption;
+    case asset::CouponTargetType::HkWarrant:
+      return CouponTargetTypeHkWarrant;
+    case asset::CouponTargetType::Etf:
+      return CouponTargetTypeEtf;
+    case asset::CouponTargetType::Lof:
+      return CouponTargetTypeLof;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::IpoCouponTargetType
+convert(lb_ipo_coupon_target_type_t ty)
+{
+  switch (ty) {
+    case IpoCouponTargetTypeUnknown:
+      return asset::IpoCouponTargetType::Unknown;
+    case IpoCouponTargetTypeFinancing:
+      return asset::IpoCouponTargetType::Financing;
+    case IpoCouponTargetTypeCash:
+      return asset::IpoCouponTargetType::Cash;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_ipo_coupon_target_type_t
+convert(asset::IpoCouponTargetType ty)
+{
+  switch (ty) {
+    case asset::IpoCouponTargetType::Unknown:
+      return IpoCouponTargetTypeUnknown;
+    case asset::IpoCouponTargetType::Financing:
+      return IpoCouponTargetTypeFinancing;
+    case asset::IpoCouponTargetType::Cash:
+      return IpoCouponTargetTypeCash;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::CommissionUnlimitedType
+convert(lb_commission_unlimited_type_t ty)
+{
+  switch (ty) {
+    case CommissionUnlimitedTypeUnknown:
+      return asset::CommissionUnlimitedType::Unknown;
+    case CommissionUnlimitedTypeProportionate:
+      return asset::CommissionUnlimitedType::Proportionate;
+    case CommissionUnlimitedTypeFull:
+      return asset::CommissionUnlimitedType::Full;
+    case CommissionUnlimitedTypeLifetime:
+      return asset::CommissionUnlimitedType::Lifetime;
+    case CommissionUnlimitedTypeByAmountPer:
+      return asset::CommissionUnlimitedType::ByAmountPer;
+    case CommissionUnlimitedTypeByRatePer:
+      return asset::CommissionUnlimitedType::ByRatePer;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_commission_unlimited_type_t
+convert(asset::CommissionUnlimitedType ty)
+{
+  switch (ty) {
+    case asset::CommissionUnlimitedType::Unknown:
+      return CommissionUnlimitedTypeUnknown;
+    case asset::CommissionUnlimitedType::Proportionate:
+      return CommissionUnlimitedTypeProportionate;
+    case asset::CommissionUnlimitedType::Full:
+      return CommissionUnlimitedTypeFull;
+    case asset::CommissionUnlimitedType::Lifetime:
+      return CommissionUnlimitedTypeLifetime;
+    case asset::CommissionUnlimitedType::ByAmountPer:
+      return CommissionUnlimitedTypeByAmountPer;
+    case asset::CommissionUnlimitedType::ByRatePer:
+      return CommissionUnlimitedTypeByRatePer;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline asset::QuoteInvestorType
+convert(lb_quote_investor_type_t ty)
+{
+  switch (ty) {
+    case QuoteInvestorTypeUnknown:
+      return asset::QuoteInvestorType::Unknown;
+    case QuoteInvestorTypeAny:
+      return asset::QuoteInvestorType::Any;
+    case QuoteInvestorTypeNonProfessional:
+      return asset::QuoteInvestorType::NonProfessional;
+    case QuoteInvestorTypeProfessional:
+      return asset::QuoteInvestorType::Professional;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_quote_investor_type_t
+convert(asset::QuoteInvestorType ty)
+{
+  switch (ty) {
+    case asset::QuoteInvestorType::Unknown:
+      return QuoteInvestorTypeUnknown;
+    case asset::QuoteInvestorType::Any:
+      return QuoteInvestorTypeAny;
+    case asset::QuoteInvestorType::NonProfessional:
+      return QuoteInvestorTypeNonProfessional;
+    case asset::QuoteInvestorType::Professional:
+      return QuoteInvestorTypeProfessional;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
 inline asset::CouponStatus
 convert(lb_coupon_status_t ty)
 {
@@ -5497,6 +5645,60 @@ convert(const lb_reward_records_response_t* info);
 inline asset::CouponCommission
 convert(const lb_coupon_commission_t* info);
 
+inline asset::CouponAiBenefit
+convert(const lb_coupon_ai_benefit_t* info);
+
+inline asset::CouponCash
+convert(const lb_coupon_cash_t* info);
+
+inline asset::CouponCoffeeStore
+convert(const lb_coupon_coffee_store_t* info);
+
+inline asset::CouponCoffee
+convert(const lb_coupon_coffee_t* info);
+
+inline asset::CouponCryptoCounter
+convert(const lb_coupon_crypto_counter_t* info);
+
+inline asset::CouponCryptoFallback
+convert(const lb_coupon_crypto_fallback_t* info);
+
+inline asset::CouponCrypto
+convert(const lb_coupon_crypto_t* info);
+
+inline asset::CouponFinanceInterest
+convert(const lb_coupon_finance_interest_t* info);
+
+inline asset::CouponFundDeduct
+convert(const lb_coupon_fund_deduct_t* info);
+
+inline asset::CouponQuote
+convert(const lb_coupon_quote_t* info);
+
+inline asset::CouponIpo
+convert(const lb_coupon_ipo_t* info);
+
+inline asset::CouponIpoCommission
+convert(const lb_coupon_ipo_commission_t* info);
+
+inline asset::CouponIpoInterest
+convert(const lb_coupon_ipo_interest_t* info);
+
+inline asset::CouponPlatformFeeDeduct
+convert(const lb_coupon_platform_fee_deduct_t* info);
+
+inline asset::CouponStockCounter
+convert(const lb_coupon_stock_counter_t* info);
+
+inline asset::CouponStockFallback
+convert(const lb_coupon_stock_fallback_t* info);
+
+inline asset::CouponStock
+convert(const lb_coupon_stock_t* info);
+
+inline asset::CouponStockFragment
+convert(const lb_coupon_stock_fragment_t* info);
+
 inline asset::Coupon
 convert(const lb_coupon_t* info);
 
@@ -5710,14 +5912,231 @@ convert(const lb_coupon_commission_t* info)
   asset::CouponCommission out;
   out.markets = std::vector<std::string>(info->markets, info->markets + info->num_markets);
   out.rebate_rate = std::string(info->rebate_rate ? info->rebate_rate : "");
-  out.bz_types = std::vector<int32_t>(info->bz_types, info->bz_types + info->num_bz_types);
+  for (size_t i = 0; i < info->num_bz_types; ++i) {
+    out.bz_types.push_back(convert(info->bz_types[i]));
+  }
   out.commission_balance = info->commission_balance ? std::optional<Decimal>(Decimal(info->commission_balance)) : std::nullopt;
-  out.commission_duration = std::string(info->commission_duration ? info->commission_duration : "");
-  out.unlimited = info->unlimited;
+  out.commission_duration = info->commission_duration;
+  out.unlimited = convert(info->unlimited);
   out.commission_expired_time = info->commission_expired_time ? std::optional<int64_t>(*info->commission_expired_time) : std::nullopt;
   out.usage_count = info->usage_count;
   out.lave_usage_count = info->lave_usage_count;
   out.settlement_model = std::string(info->settlement_model ? info->settlement_model : "");
+  out.amount_limit = info->amount_limit;
+  out.superposition = info->superposition;
+  return out;
+}
+
+inline asset::CouponAiBenefit
+convert(const lb_coupon_ai_benefit_t* info)
+{
+  asset::CouponAiBenefit out;
+  out.benefit_days = info->benefit_days;
+  out.benefit_start = info->benefit_start ? std::optional<int64_t>(*info->benefit_start) : std::nullopt;
+  out.benefit_end = info->benefit_end ? std::optional<int64_t>(*info->benefit_end) : std::nullopt;
+  out.benefit_tag = std::string(info->benefit_tag ? info->benefit_tag : "");
+  return out;
+}
+
+inline asset::CouponCash
+convert(const lb_coupon_cash_t* info)
+{
+  asset::CouponCash out;
+  out.receive_duration = info->receive_duration;
+  return out;
+}
+
+inline asset::CouponCoffeeStore
+convert(const lb_coupon_coffee_store_t* info)
+{
+  asset::CouponCoffeeStore out;
+  out.store_id = info->store_id;
+  out.store_name = std::string(info->store_name ? info->store_name : "");
+  return out;
+}
+
+inline asset::CouponCoffee
+convert(const lb_coupon_coffee_t* info)
+{
+  asset::CouponCoffee out;
+  out.coupon_channel = std::string(info->coupon_channel ? info->coupon_channel : "");
+  out.coupon_id = std::string(info->coupon_id ? info->coupon_id : "");
+  out.coupon_no = std::string(info->coupon_no ? info->coupon_no : "");
+  out.is_available_all_store = info->is_available_all_store;
+  out.period_type = std::string(info->period_type ? info->period_type : "");
+  out.settled_store_id = info->settled_store_id;
+  out.store_id_list = std::vector<int64_t>(info->store_id_list, info->store_id_list + info->num_store_id_list);
+  for (size_t i = 0; i < info->num_store_list; ++i) {
+    out.store_list.push_back(convert(&info->store_list[i]));
+  }
+  out.threshold = info->threshold;
+  out.use_limit = std::string(info->use_limit ? info->use_limit : "");
+  return out;
+}
+
+inline asset::CouponCryptoCounter
+convert(const lb_coupon_crypto_counter_t* info)
+{
+  asset::CouponCryptoCounter out;
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  return out;
+}
+
+inline asset::CouponCryptoFallback
+convert(const lb_coupon_crypto_fallback_t* info)
+{
+  asset::CouponCryptoFallback out;
+  out.enabled = info->enabled;
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  return out;
+}
+
+inline asset::CouponCrypto
+convert(const lb_coupon_crypto_t* info)
+{
+  asset::CouponCrypto out;
+  out.fallback = convert(&info->fallback);
+  for (size_t i = 0; i < info->num_optional_counters; ++i) {
+    out.optional_counters.push_back(convert(&info->optional_counters[i]));
+  }
+  return out;
+}
+
+inline asset::CouponFinanceInterest
+convert(const lb_coupon_finance_interest_t* info)
+{
+  asset::CouponFinanceInterest out;
+  out.discount_mode = info->discount_mode;
+  out.discount_rate = info->discount_rate ? std::optional<Decimal>(Decimal(info->discount_rate)) : std::nullopt;
+  out.superposition = info->superposition;
+  return out;
+}
+
+inline asset::CouponFundDeduct
+convert(const lb_coupon_fund_deduct_t* info)
+{
+  asset::CouponFundDeduct out;
+  out.max_risk_level = info->max_risk_level;
+  out.min_order_amount = std::string(info->min_order_amount ? info->min_order_amount : "");
+  out.order_types = std::vector<std::string>(info->order_types, info->order_types + info->num_order_types);
+  out.underlying_type = std::string(info->underlying_type ? info->underlying_type : "");
+  out.underlying_values = std::vector<std::string>(info->underlying_values, info->underlying_values + info->num_underlying_values);
+  out.underlying_names = std::vector<std::string>(info->underlying_names, info->underlying_names + info->num_underlying_names);
+  return out;
+}
+
+inline asset::CouponQuote
+convert(const lb_coupon_quote_t* info)
+{
+  asset::CouponQuote out;
+  out.current_end_time = info->current_end_time ? std::optional<int64_t>(*info->current_end_time) : std::nullopt;
+  out.inapplicable = info->inapplicable;
+  out.investor_type = convert(info->investor_type);
+  out.manual_activate = info->manual_activate;
+  out.markets = std::vector<std::string>(info->markets, info->markets + info->num_markets);
+  out.member_investor_type = info->member_investor_type;
+  out.pair_spu_no = std::string(info->pair_spu_no ? info->pair_spu_no : "");
+  out.quote_duration = info->quote_duration;
+  out.quote_market = std::string(info->quote_market ? info->quote_market : "");
+  out.quote_tags = std::vector<std::string>(info->quote_tags, info->quote_tags + info->num_quote_tags);
+  out.superposition = info->superposition;
+  return out;
+}
+
+inline asset::CouponIpo
+convert(const lb_coupon_ipo_t* info)
+{
+  asset::CouponIpo out;
+  out.subscription_id = std::string(info->subscription_id ? info->subscription_id : "");
+  return out;
+}
+
+inline asset::CouponIpoCommission
+convert(const lb_coupon_ipo_commission_t* info)
+{
+  asset::CouponIpoCommission out;
+  for (size_t i = 0; i < info->num_bz_types; ++i) {
+    out.bz_types.push_back(convert(info->bz_types[i]));
+  }
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  out.counter_name = std::string(info->counter_name ? info->counter_name : "");
+  out.financing_limit = std::string(info->financing_limit ? info->financing_limit : "");
+  return out;
+}
+
+inline asset::CouponIpoInterest
+convert(const lb_coupon_ipo_interest_t* info)
+{
+  asset::CouponIpoInterest out;
+  out.discount_rate = std::string(info->discount_rate ? info->discount_rate : "");
+  return out;
+}
+
+inline asset::CouponPlatformFeeDeduct
+convert(const lb_coupon_platform_fee_deduct_t* info)
+{
+  asset::CouponPlatformFeeDeduct out;
+  for (size_t i = 0; i < info->num_bz_types; ++i) {
+    out.bz_types.push_back(convert(info->bz_types[i]));
+  }
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  out.counter_name = std::string(info->counter_name ? info->counter_name : "");
+  out.markets = std::vector<std::string>(info->markets, info->markets + info->num_markets);
+  out.usage_count = info->usage_count;
+  out.lave_usage_count = info->lave_usage_count;
+  out.superposition = info->superposition;
+  return out;
+}
+
+inline asset::CouponStockCounter
+convert(const lb_coupon_stock_counter_t* info)
+{
+  asset::CouponStockCounter out;
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  out.shares = std::string(info->shares ? info->shares : "");
+  return out;
+}
+
+inline asset::CouponStockFallback
+convert(const lb_coupon_stock_fallback_t* info)
+{
+  asset::CouponStockFallback out;
+  out.enabled = info->enabled;
+  out.fallback_type = std::string(info->fallback_type ? info->fallback_type : "");
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  out.shares = std::string(info->shares ? info->shares : "");
+  return out;
+}
+
+inline asset::CouponStock
+convert(const lb_coupon_stock_t* info)
+{
+  asset::CouponStock out;
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  out.counter_name = std::string(info->counter_name ? info->counter_name : "");
+  out.amount = info->amount ? std::optional<Decimal>(Decimal(info->amount)) : std::nullopt;
+  out.redemption_type = std::string(info->redemption_type ? info->redemption_type : "");
+  out.send_way = std::string(info->send_way ? info->send_way : "");
+  for (size_t i = 0; i < info->num_optional_counters; ++i) {
+    out.optional_counters.push_back(convert(&info->optional_counters[i]));
+  }
+  out.fallback = convert(&info->fallback);
+  return out;
+}
+
+inline asset::CouponStockFragment
+convert(const lb_coupon_stock_fragment_t* info)
+{
+  asset::CouponStockFragment out;
+  out.counter_id = std::string(info->counter_id ? info->counter_id : "");
+  out.counter_name = std::string(info->counter_name ? info->counter_name : "");
+  out.market = std::string(info->market ? info->market : "");
+  out.markets = std::vector<std::string>(info->markets, info->markets + info->num_markets);
+  out.underlying_type = convert(info->underlying_type);
+  for (size_t i = 0; i < info->num_amounts; ++i) {
+    const auto& entry = info->amounts[i];
+    out.amounts.emplace(entry.key ? entry.key : "", entry.value ? entry.value : "");
+  }
   return out;
 }
 
@@ -5740,7 +6159,22 @@ convert(const lb_coupon_t* info)
   out.currency = std::string(info->currency ? info->currency : "");
   out.available_trade_session = std::string(info->available_trade_session ? info->available_trade_session : "");
   out.trade_sessions = std::vector<std::string>(info->trade_sessions, info->trade_sessions + info->num_trade_sessions);
-  out.commission = convert(&info->commission);
+  out.subscription_id = std::string(info->subscription_id ? info->subscription_id : "");
+  out.ai_benefit = info->ai_benefit ? std::optional<asset::CouponAiBenefit>(convert(info->ai_benefit)) : std::nullopt;
+  out.cash = info->cash ? std::optional<asset::CouponCash>(convert(info->cash)) : std::nullopt;
+  out.coffee_coupon = info->coffee_coupon ? std::optional<asset::CouponCoffee>(convert(info->coffee_coupon)) : std::nullopt;
+  out.commission = info->commission ? std::optional<asset::CouponCommission>(convert(info->commission)) : std::nullopt;
+  out.crypto = info->crypto ? std::optional<asset::CouponCrypto>(convert(info->crypto)) : std::nullopt;
+  out.finance_interest = info->finance_interest ? std::optional<asset::CouponFinanceInterest>(convert(info->finance_interest)) : std::nullopt;
+  out.fund_deduct = info->fund_deduct ? std::optional<asset::CouponFundDeduct>(convert(info->fund_deduct)) : std::nullopt;
+  out.fundamental = info->fundamental ? std::optional<asset::CouponQuote>(convert(info->fundamental)) : std::nullopt;
+  out.ipo = info->ipo ? std::optional<asset::CouponIpo>(convert(info->ipo)) : std::nullopt;
+  out.ipo_commission = info->ipo_commission ? std::optional<asset::CouponIpoCommission>(convert(info->ipo_commission)) : std::nullopt;
+  out.ipo_interest = info->ipo_interest ? std::optional<asset::CouponIpoInterest>(convert(info->ipo_interest)) : std::nullopt;
+  out.platform_fee_deduct = info->platform_fee_deduct ? std::optional<asset::CouponPlatformFeeDeduct>(convert(info->platform_fee_deduct)) : std::nullopt;
+  out.quote = info->quote ? std::optional<asset::CouponQuote>(convert(info->quote)) : std::nullopt;
+  out.stock = info->stock ? std::optional<asset::CouponStock>(convert(info->stock)) : std::nullopt;
+  out.stock_fragment = info->stock_fragment ? std::optional<asset::CouponStockFragment>(convert(info->stock_fragment)) : std::nullopt;
   return out;
 }
 

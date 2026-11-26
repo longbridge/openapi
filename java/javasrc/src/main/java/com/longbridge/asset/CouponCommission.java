@@ -5,19 +5,21 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 
 /**
- * Commission terms of a commission coupon
+ * Commission terms of a commission coupon ({@code commission})
  */
 public class CouponCommission {
     private String[] markets;
     private String rebateRate;
-    private int[] bzTypes;
+    private CouponTargetType[] bzTypes;
     private BigDecimal commissionBalance;
-    private String commissionDuration;
-    private boolean unlimited;
+    private long commissionDuration;
+    private CommissionUnlimitedType unlimited;
     private OffsetDateTime commissionExpiredTime;
     private long usageCount;
     private long laveUsageCount;
     private String settlementModel;
+    private long amountLimit;
+    private boolean superposition;
 
     /**
      * Returns the markets the coupon applies to.
@@ -38,11 +40,11 @@ public class CouponCommission {
     }
 
     /**
-     * Returns the instrument types the coupon applies to: 0 stocks, 1 options, 2 warrants, 3 ETF, 4 LOF.
+     * Returns the instrument types the coupon applies to.
      *
-     * @return the instrument types the coupon applies to: 0 stocks, 1 options, 2 warrants, 3 ETF, 4 LOF
+     * @return the instrument types the coupon applies to
      */
-    public int[] getBzTypes() {
+    public CouponTargetType[] getBzTypes() {
         return bzTypes;
     }
 
@@ -60,16 +62,16 @@ public class CouponCommission {
      *
      * @return the commission duration, as returned by the server
      */
-    public String getCommissionDuration() {
+    public long getCommissionDuration() {
         return commissionDuration;
     }
 
     /**
-     * Returns whether the coupon is unlimited.
+     * Returns the the server's {@code unlimited} code.
      *
-     * @return whether the coupon is unlimited
+     * @return the the server's {@code unlimited} code
      */
-    public boolean isUnlimited() {
+    public CommissionUnlimitedType getUnlimited() {
         return unlimited;
     }
 
@@ -109,8 +111,26 @@ public class CouponCommission {
         return settlementModel;
     }
 
+    /**
+     * Returns the amount limit, as returned by the server.
+     *
+     * @return the amount limit, as returned by the server
+     */
+    public long getAmountLimit() {
+        return amountLimit;
+    }
+
+    /**
+     * Returns the whether the coupon can be combined with other coupons.
+     *
+     * @return the whether the coupon can be combined with other coupons
+     */
+    public boolean getSuperposition() {
+        return superposition;
+    }
+
     @Override
     public String toString() {
-        return "CouponCommission [" + "markets=" + Arrays.toString(markets) + ", " + "rebateRate=" + rebateRate + ", " + "bzTypes=" + Arrays.toString(bzTypes) + ", " + "commissionBalance=" + commissionBalance + ", " + "commissionDuration=" + commissionDuration + ", " + "unlimited=" + unlimited + ", " + "commissionExpiredTime=" + commissionExpiredTime + ", " + "usageCount=" + usageCount + ", " + "laveUsageCount=" + laveUsageCount + ", " + "settlementModel=" + settlementModel + "]";
+        return "CouponCommission [" + "markets=" + Arrays.toString(markets) + ", " + "rebateRate=" + rebateRate + ", " + "bzTypes=" + Arrays.toString(bzTypes) + ", " + "commissionBalance=" + commissionBalance + ", " + "commissionDuration=" + commissionDuration + ", " + "unlimited=" + unlimited + ", " + "commissionExpiredTime=" + commissionExpiredTime + ", " + "usageCount=" + usageCount + ", " + "laveUsageCount=" + laveUsageCount + ", " + "settlementModel=" + settlementModel + ", " + "amountLimit=" + amountLimit + ", " + "superposition=" + superposition + "]";
     }
 }

@@ -4692,7 +4692,7 @@ impl_java_class!(
         #[java(objarray)]
         markets,
         rebate_rate,
-        #[java(priarray)]
+        #[java(objarray)]
         bz_types,
         commission_balance,
         commission_duration,
@@ -4700,7 +4700,216 @@ impl_java_class!(
         commission_expired_time,
         usage_count,
         lave_usage_count,
-        settlement_model
+        settlement_model,
+        amount_limit,
+        superposition
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponAiBenefit",
+    longbridge::asset::CouponAiBenefit,
+    [benefit_days, benefit_start, benefit_end, benefit_tag]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCash",
+    longbridge::asset::CouponCash,
+    [receive_duration]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCoffeeStore",
+    longbridge::asset::CouponCoffeeStore,
+    [store_id, store_name]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCoffee",
+    longbridge::asset::CouponCoffee,
+    [
+        coupon_channel,
+        coupon_id,
+        coupon_no,
+        is_available_all_store,
+        period_type,
+        settled_store_id,
+        #[java(priarray)]
+        store_id_list,
+        #[java(objarray)]
+        store_list,
+        threshold,
+        use_limit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCryptoCounter",
+    longbridge::asset::CouponCryptoCounter,
+    [counter_id]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCryptoFallback",
+    longbridge::asset::CouponCryptoFallback,
+    [enabled, counter_id]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCrypto",
+    longbridge::asset::CouponCrypto,
+    [
+        fallback,
+        #[java(objarray)]
+        optional_counters
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponFinanceInterest",
+    longbridge::asset::CouponFinanceInterest,
+    [discount_mode, discount_rate, superposition]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponFundDeduct",
+    longbridge::asset::CouponFundDeduct,
+    [
+        max_risk_level,
+        min_order_amount,
+        #[java(objarray)]
+        order_types,
+        underlying_type,
+        #[java(objarray)]
+        underlying_values,
+        #[java(objarray)]
+        underlying_names
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponQuote",
+    longbridge::asset::CouponQuote,
+    [
+        current_end_time,
+        inapplicable,
+        investor_type,
+        manual_activate,
+        #[java(objarray)]
+        markets,
+        member_investor_type,
+        pair_spu_no,
+        quote_duration,
+        quote_market,
+        #[java(objarray)]
+        quote_tags,
+        superposition
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponIpo",
+    longbridge::asset::CouponIpo,
+    [subscription_id]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponIpoCommission",
+    longbridge::asset::CouponIpoCommission,
+    [
+        #[java(objarray)]
+        bz_types,
+        counter_id,
+        counter_name,
+        financing_limit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponIpoInterest",
+    longbridge::asset::CouponIpoInterest,
+    [discount_rate]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponPlatformFeeDeduct",
+    longbridge::asset::CouponPlatformFeeDeduct,
+    [
+        #[java(objarray)]
+        bz_types,
+        counter_id,
+        counter_name,
+        #[java(objarray)]
+        markets,
+        usage_count,
+        lave_usage_count,
+        superposition
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponStockCounter",
+    longbridge::asset::CouponStockCounter,
+    [counter_id, shares]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponStockFallback",
+    longbridge::asset::CouponStockFallback,
+    [enabled, fallback_type, counter_id, shares]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponStock",
+    longbridge::asset::CouponStock,
+    [
+        counter_id,
+        counter_name,
+        amount,
+        redemption_type,
+        send_way,
+        #[java(objarray)]
+        optional_counters,
+        fallback
+    ]
+);
+
+/// JNI-side view of [`longbridge::asset::CouponStockFragment`]: the
+/// `amounts` map crosses the boundary as JSON text, which the Java class
+/// parses into a `Map` with gson.
+pub(crate) struct CouponStockFragment {
+    pub(crate) counter_id: String,
+    pub(crate) counter_name: String,
+    pub(crate) market: String,
+    pub(crate) markets: Vec<String>,
+    pub(crate) underlying_type: longbridge::asset::CouponTargetType,
+    pub(crate) amounts: serde_json::Value,
+}
+
+impl From<longbridge::asset::CouponStockFragment> for CouponStockFragment {
+    fn from(value: longbridge::asset::CouponStockFragment) -> Self {
+        Self {
+            counter_id: value.counter_id,
+            counter_name: value.counter_name,
+            market: value.market,
+            markets: value.markets,
+            underlying_type: value.underlying_type,
+            amounts: serde_json::to_value(value.amounts).unwrap_or_default(),
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/asset/CouponStockFragment",
+    CouponStockFragment,
+    [
+        counter_id,
+        counter_name,
+        market,
+        #[java(objarray)]
+        markets,
+        underlying_type,
+        amounts
     ]
 );
 
@@ -4724,7 +4933,23 @@ impl_java_class!(
         available_trade_session,
         #[java(objarray)]
         trade_sessions,
-        commission
+        subscription_id,
+        ai_benefit,
+        cash,
+        coffee_coupon,
+        commission,
+        crypto,
+        finance_interest,
+        fund_deduct,
+        fundamental,
+        ipo,
+        ipo_commission,
+        ipo_interest,
+        platform_fee_deduct,
+        quote,
+        stock,
+        #[java(set_as_opt = CouponStockFragment)]
+        stock_fragment
     ]
 );
 

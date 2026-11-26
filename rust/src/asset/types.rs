@@ -913,7 +913,181 @@ pub struct RewardRecordsResponse {
     pub total: i64,
 }
 
-/// Commission terms of a commission coupon
+/// Implements `Serialize` (as the integer code) and a lenient `Deserialize`
+/// for a proto enum that the server sends either as its name or as its number
+/// (a JSON integer or an integer string). Anything else, including an
+/// undocumented name or code, becomes `Unknown`.
+macro_rules! impl_named_code_enum {
+    ($($ty:ty { $($name:literal => $variant:ident),* $(,)? })*) => {
+        $(
+            impl Serialize for $ty {
+                fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                    let value: i32 = (*self).into();
+                    value.serialize(serializer)
+                }
+            }
+
+            impl<'de> Deserialize<'de> for $ty {
+                fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+                    let value = serde_json::Value::deserialize(deserializer)?;
+                    if let serde_json::Value::String(name) = &value {
+                        match name.trim() {
+                            $($name => return Ok(<$ty>::$variant),)*
+                            _ => {}
+                        }
+                    }
+                    Ok(serde_utils::lenient_int_opt(&value)
+                        .and_then(|v| i32::try_from(v).ok())
+                        .map(<$ty>::from)
+                        .unwrap_or_default())
+                }
+            }
+        )*
+    };
+}
+
+/// Instrument type a coupon applies to (the server's `bz_types` /
+/// `underlying_type`)
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Default, FromPrimitive, IntoPrimitive)]
+#[repr(i32)]
+pub enum CouponTargetType {
+    /// Unknown (an undocumented code)
+    #[default]
+    Unknown = -1,
+    /// Stocks (`StockTrade`)
+    Stock = 0,
+    /// US stock options (`UsStockOptions`)
+    UsOption = 1,
+    /// HK warrants (`HkStockWarrant`)
+    HkWarrant = 2,
+    /// ETF
+    Etf = 3,
+    /// LOF
+    Lof = 4,
+}
+
+/// IPO subscription type an IPO commission coupon applies to
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Default, FromPrimitive, IntoPrimitive)]
+#[repr(i32)]
+pub enum IpoCouponTargetType {
+    /// Unknown (unset, or an undocumented code)
+    #[default]
+    Unknown = -1,
+    /// Financing (margin) IPO subscription (`FinancingIPO`)
+    Financing = 1,
+    /// Cash IPO subscription (`CashIPO`)
+    Cash = 2,
+}
+
+/// The server's `unlimited` code of a commission coupon
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Default, FromPrimitive, IntoPrimitive)]
+#[repr(i32)]
+pub enum CommissionUnlimitedType {
+    /// Unknown (an undocumented code)
+    #[default]
+    Unknown = -1,
+    /// `Proportionate`
+    Proportionate = 0,
+    /// `Full`
+    Full = 1,
+    /// `Lifetime`
+    Lifetime = 2,
+    /// `ByAmountPer`
+    ByAmountPer = 6,
+    /// `ByRatePer`
+    ByRatePer = 7,
+}
+
+/// Investor type a quote coupon applies to
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Default, FromPrimitive, IntoPrimitive)]
+#[repr(i32)]
+pub enum QuoteInvestorType {
+    /// Unknown (an undocumented code)
+    #[default]
+    Unknown = -1,
+    /// Any investor (`INVESTOR_TYPE_ANY`)
+    Any = 0,
+    /// Non-professional investors (`INVESTOR_TYPE_NON_PROFESSIONAL`)
+    NonProfessional = 1,
+    /// Professional investors (`INVESTOR_TYPE_PROFESSIONAL`)
+    Professional = 2,
+}
+
+impl_named_code_enum!(
+    CouponTargetType {
+        "StockTrade" => Stock,
+        "UsStockOptions" => UsOption,
+        "HkStockWarrant" => HkWarrant,
+        "ETF" => Etf,
+        "LOF" => Lof,
+    }
+    IpoCouponTargetType {
+        "FinancingIPO" => Financing,
+        "CashIPO" => Cash,
+    }
+    CommissionUnlimitedType {
+        "Proportionate" => Proportionate,
+        "Full" => Full,
+        "Lifetime" => Lifetime,
+        "ByAmountPer" => ByAmountPer,
+        "ByRatePer" => ByRatePer,
+    }
+    QuoteInvestorType {
+        "INVESTOR_TYPE_ANY" => Any,
+        "INVESTOR_TYPE_NON_PROFESSIONAL" => NonProfessional,
+        "INVESTOR_TYPE_PROFESSIONAL" => Professional,
+    }
+);
+
+/// Decodes a list of enum values (each a name or a code); anything other
+/// than a JSON array becomes empty.
+fn enum_vec<'de, D, T>(deserializer: D) -> Result<Vec<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: serde::de::DeserializeOwned,
+{
+    match serde_json::Value::deserialize(deserializer)? {
+        serde_json::Value::Array(items) => items
+            .into_iter()
+            .map(serde_json::from_value)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(D::Error::custom),
+        _ => Ok(Vec::new()),
+    }
+}
+
+/// Decodes an optional nested object: `null` or anything other than a JSON
+/// object (the server sends `null` for the detail objects of other coupon
+/// types) becomes `None`.
+fn object_opt<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: serde::de::DeserializeOwned,
+{
+    match serde_json::Value::deserialize(deserializer)? {
+        value @ serde_json::Value::Object(_) => serde_json::from_value(value)
+            .map(Some)
+            .map_err(D::Error::custom),
+        _ => Ok(None),
+    }
+}
+
+/// Decodes a list of 64-bit integers leniently (numbers or integer strings);
+/// anything other than a JSON array becomes empty.
+fn int64_vec<'de, D>(deserializer: D) -> Result<Vec<i64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(match serde_json::Value::deserialize(deserializer)? {
+        serde_json::Value::Array(items) => items
+            .iter()
+            .map(|v| serde_utils::lenient_int_opt(v).unwrap_or_default())
+            .collect(),
+        _ => Vec::new(),
+    })
+}
+
+/// Commission terms of a commission coupon (`commission`)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CouponCommission {
@@ -923,19 +1097,17 @@ pub struct CouponCommission {
     /// Rebate rate, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub rebate_rate: String,
-    /// Instrument types the coupon applies to: `0` stocks, `1` options, `2`
-    /// warrants, `3` ETF, `4` LOF
-    #[serde(deserialize_with = "serde_utils::int32_vec_lenient")]
-    pub bz_types: Vec<i32>,
+    /// Instrument types the coupon applies to
+    #[serde(deserialize_with = "enum_vec")]
+    pub bz_types: Vec<CouponTargetType>,
     /// Remaining commission balance
     #[serde(with = "serde_utils::decimal_opt_lenient")]
     pub commission_balance: Option<Decimal>,
     /// Commission duration, as returned by the server
-    #[serde(deserialize_with = "serde_utils::string_lenient")]
-    pub commission_duration: String,
-    /// Whether the coupon is unlimited
-    #[serde(deserialize_with = "serde_utils::bool_lenient")]
-    pub unlimited: bool,
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub commission_duration: i64,
+    /// The server's `unlimited` code
+    pub unlimited: CommissionUnlimitedType,
     /// Commission expiry time (`None` when not set)
     #[serde(with = "serde_utils::account_time_opt")]
     pub commission_expired_time: Option<OffsetDateTime>,
@@ -948,9 +1120,356 @@ pub struct CouponCommission {
     /// Settlement model, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub settlement_model: String,
+    /// Amount limit, as returned by the server
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub amount_limit: i64,
+    /// Whether the coupon can be combined with other coupons
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub superposition: bool,
+}
+
+/// Terms of an AI benefit coupon (`ai_benefit`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponAiBenefit {
+    /// Benefit days, as returned by the server
+    #[serde(deserialize_with = "serde_utils::int32_lenient")]
+    pub benefit_days: i32,
+    /// Start of the benefit (`None` when not set)
+    #[serde(with = "serde_utils::account_time_opt")]
+    pub benefit_start: Option<OffsetDateTime>,
+    /// End of the benefit (`None` when not set)
+    #[serde(with = "serde_utils::account_time_opt")]
+    pub benefit_end: Option<OffsetDateTime>,
+    /// Benefit tag, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub benefit_tag: String,
+}
+
+/// Terms of a cash coupon (`cash`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponCash {
+    /// Receive duration, as returned by the server
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub receive_duration: i64,
+}
+
+/// A store of a coffee coupon
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponCoffeeStore {
+    /// Store ID
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub store_id: i64,
+    /// Store name
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub store_name: String,
+}
+
+/// Terms of a coffee coupon (`coffee_coupon`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponCoffee {
+    /// Coupon channel, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub coupon_channel: String,
+    /// Coupon ID, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub coupon_id: String,
+    /// Coupon number, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub coupon_no: String,
+    /// Whether the coupon can be used at every store
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub is_available_all_store: bool,
+    /// Period type (e.g. `day`), as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub period_type: String,
+    /// ID of the store the coupon was settled at (`0` when not settled)
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub settled_store_id: i64,
+    /// IDs of the stores the coupon can be used at
+    #[serde(deserialize_with = "int64_vec")]
+    pub store_id_list: Vec<i64>,
+    /// Stores the coupon can be used at
+    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    pub store_list: Vec<CouponCoffeeStore>,
+    /// Threshold, as returned by the server
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub threshold: i64,
+    /// Use limit (`total` or `period`), as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub use_limit: String,
+}
+
+/// A counter (security) of a crypto coupon
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponCryptoCounter {
+    /// Counter ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_id: String,
+}
+
+/// Fallback of a crypto coupon
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponCryptoFallback {
+    /// Whether the fallback is enabled
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub enabled: bool,
+    /// Counter ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_id: String,
+}
+
+/// Terms of a crypto coupon (`crypto`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponCrypto {
+    /// Fallback
+    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    pub fallback: CouponCryptoFallback,
+    /// Optional counters
+    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    pub optional_counters: Vec<CouponCryptoCounter>,
+}
+
+/// Terms of a finance interest coupon (`finance_interest`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponFinanceInterest {
+    /// Discount mode, as returned by the server
+    #[serde(deserialize_with = "serde_utils::int32_lenient")]
+    pub discount_mode: i32,
+    /// Discount rate
+    #[serde(with = "serde_utils::decimal_opt_lenient")]
+    pub discount_rate: Option<Decimal>,
+    /// Whether the coupon can be combined with other coupons
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub superposition: bool,
+}
+
+/// Terms of a fund deduction coupon (`fund_deduct`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponFundDeduct {
+    /// Maximum risk level, as returned by the server
+    #[serde(deserialize_with = "serde_utils::int32_lenient")]
+    pub max_risk_level: i32,
+    /// Minimum order amount, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub min_order_amount: String,
+    /// Order types, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
+    pub order_types: Vec<String>,
+    /// Underlying type, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub underlying_type: String,
+    /// Underlying values, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
+    pub underlying_values: Vec<String>,
+    /// Underlying names, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
+    pub underlying_names: Vec<String>,
+}
+
+/// Terms of a quote (market data) or fundamental-data coupon (`quote` /
+/// `fundamental`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponQuote {
+    /// Current end time (`None` when not set)
+    #[serde(with = "serde_utils::account_time_opt")]
+    pub current_end_time: Option<OffsetDateTime>,
+    /// Whether the coupon is inapplicable, as returned by the server
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub inapplicable: bool,
+    /// Investor type the coupon applies to
+    pub investor_type: QuoteInvestorType,
+    /// Whether the coupon is activated manually
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub manual_activate: bool,
+    /// Markets
+    #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
+    pub markets: Vec<String>,
+    /// Investor type of the member, as returned by the server
+    #[serde(deserialize_with = "serde_utils::int32_lenient")]
+    pub member_investor_type: i32,
+    /// Paired SPU number, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub pair_spu_no: String,
+    /// Quote duration, as returned by the server
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub quote_duration: i64,
+    /// Quote market
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub quote_market: String,
+    /// Quote tags
+    #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
+    pub quote_tags: Vec<String>,
+    /// Whether the coupon can be combined with other coupons
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub superposition: bool,
+}
+
+/// Terms of an IPO coupon (`ipo`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponIpo {
+    /// Subscription ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub subscription_id: String,
+}
+
+/// Terms of an IPO commission coupon (`ipo_commission`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponIpoCommission {
+    /// IPO subscription types the coupon applies to
+    #[serde(deserialize_with = "enum_vec")]
+    pub bz_types: Vec<IpoCouponTargetType>,
+    /// Counter ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_id: String,
+    /// Counter name
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_name: String,
+    /// Financing limit, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub financing_limit: String,
+}
+
+/// Terms of an IPO interest coupon (`ipo_interest`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponIpoInterest {
+    /// Discount rate, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub discount_rate: String,
+}
+
+/// Terms of a platform fee deduction coupon (`platform_fee_deduct`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponPlatformFeeDeduct {
+    /// Instrument types the coupon applies to
+    #[serde(deserialize_with = "enum_vec")]
+    pub bz_types: Vec<CouponTargetType>,
+    /// Counter ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_id: String,
+    /// Counter name
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_name: String,
+    /// Markets the coupon applies to
+    #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
+    pub markets: Vec<String>,
+    /// Number of times used
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub usage_count: i64,
+    /// Number of uses left
+    #[serde(deserialize_with = "serde_utils::int64_lenient")]
+    pub lave_usage_count: i64,
+    /// Whether the coupon can be combined with other coupons
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub superposition: bool,
+}
+
+/// An optional counter of a stock coupon
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponStockCounter {
+    /// Counter ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_id: String,
+    /// Shares, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub shares: String,
+}
+
+/// Fallback of a stock coupon
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponStockFallback {
+    /// Whether the fallback is enabled
+    #[serde(deserialize_with = "serde_utils::bool_lenient")]
+    pub enabled: bool,
+    /// Fallback type (the server's `type`), as returned by the server
+    #[serde(
+        rename(deserialize = "type"),
+        alias = "fallback_type",
+        deserialize_with = "serde_utils::string_lenient"
+    )]
+    pub fallback_type: String,
+    /// Counter ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_id: String,
+    /// Shares, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub shares: String,
+}
+
+/// Terms of a stock coupon (`stock`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponStock {
+    /// Counter ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_id: String,
+    /// Counter name
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_name: String,
+    /// Amount
+    #[serde(with = "serde_utils::decimal_opt_lenient")]
+    pub amount: Option<Decimal>,
+    /// Redemption type (`by_card_value` or `shares_number`), as returned by
+    /// the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub redemption_type: String,
+    /// Delivery way (`card_exchange` or `account_transfer`), as returned by
+    /// the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub send_way: String,
+    /// Optional counters
+    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    pub optional_counters: Vec<CouponStockCounter>,
+    /// Fallback
+    #[serde(deserialize_with = "serde_utils::null_as_default")]
+    pub fallback: CouponStockFallback,
+}
+
+/// Terms of a stock fragment coupon (`stock_fragment`)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CouponStockFragment {
+    /// Counter ID
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_id: String,
+    /// Counter name
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub counter_name: String,
+    /// Market
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub market: String,
+    /// Markets
+    #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
+    pub markets: Vec<String>,
+    /// Instrument type the coupon applies to
+    pub underlying_type: CouponTargetType,
+    /// Amounts, as returned by the server (key-ordered)
+    #[serde(deserialize_with = "serde_utils::string_map_lenient")]
+    pub amounts: std::collections::BTreeMap<String, String>,
 }
 
 /// A coupon (reward card)
+///
+/// The type-specific terms are in the field named after the coupon type
+/// (`commission`, `quote`, `stock`, …); the fields of other types are
+/// `None`. App styling (cover, background, …) and the server's deprecated
+/// top-level duplicates of the commission terms are not modelled, nor is the
+/// `fund_interest` object, which the server does not describe.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Coupon {
@@ -1002,9 +1521,54 @@ pub struct Coupon {
     /// Trading sessions the coupon applies to, as returned by the server
     #[serde(deserialize_with = "serde_utils::string_vec_lenient")]
     pub trade_sessions: Vec<String>,
-    /// Commission terms (commission coupons only; empty otherwise)
-    #[serde(deserialize_with = "serde_utils::null_as_default")]
-    pub commission: CouponCommission,
+    /// Subscription ID, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub subscription_id: String,
+    /// Terms of an AI benefit coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub ai_benefit: Option<CouponAiBenefit>,
+    /// Terms of a cash coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub cash: Option<CouponCash>,
+    /// Terms of a coffee coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub coffee_coupon: Option<CouponCoffee>,
+    /// Terms of a commission coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub commission: Option<CouponCommission>,
+    /// Terms of a crypto coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub crypto: Option<CouponCrypto>,
+    /// Terms of a finance interest coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub finance_interest: Option<CouponFinanceInterest>,
+    /// Terms of a fund deduction coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub fund_deduct: Option<CouponFundDeduct>,
+    /// Terms of a fundamental-data coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub fundamental: Option<CouponQuote>,
+    /// Terms of an IPO coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub ipo: Option<CouponIpo>,
+    /// Terms of an IPO commission coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub ipo_commission: Option<CouponIpoCommission>,
+    /// Terms of an IPO interest coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub ipo_interest: Option<CouponIpoInterest>,
+    /// Terms of a platform fee deduction coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub platform_fee_deduct: Option<CouponPlatformFeeDeduct>,
+    /// Terms of a quote (market data) coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub quote: Option<CouponQuote>,
+    /// Terms of a stock coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub stock: Option<CouponStock>,
+    /// Terms of a stock fragment coupon
+    #[serde(deserialize_with = "object_opt")]
+    pub stock_fragment: Option<CouponStockFragment>,
 }
 
 /// Response for the coupon list
@@ -1446,9 +2010,11 @@ mod tests {
             r#"{"top_list":null,"list":[{"card_id":"bd6b0000000000000000000000000000",
                 "card_type":"commission","start_time":1750313704,"end_time":"8061747303",
                 "card_status":4,"activate_time":"0","cover":"x","trade_sessions":["intraday","overnight"],
-                "commission":{"markets":["US"],"bz_types":[0,"2",3],"rebate_rate":"1",
-                    "commission_expired_time":"0","unlimited":true,"usage_count":"2"}},
-                {"card_id":"c2","card_status":2,"end_time":1798732800000}],
+                "commission":{"markets":["US"],"bz_types":[0,"HkStockWarrant",3],"rebate_rate":"1",
+                    "commission_expired_time":"0","unlimited":2,"usage_count":"2",
+                    "amount_limit":"500","superposition":true},
+                "cash":null,"quote":null,"stock":[]},
+                {"card_id":"c2","card_status":2,"end_time":1798732800000,"commission":null}],
                 "bottom_list":[],"total":"2","expired_count":5}"#,
         )
         .expect("coupons decode");
@@ -1460,16 +2026,33 @@ mod tests {
         assert!(lifetime.end_time.is_none(), "far future end time is None");
         assert!(lifetime.no_expiry, "far future means never expires");
         assert!(lifetime.activate_time.is_none(), "\"0\" placeholder");
-        assert_eq!(lifetime.commission.bz_types, vec![0, 2, 3], "targets");
+        let commission = lifetime.commission.as_ref().expect("commission terms");
+        assert_eq!(
+            commission.bz_types,
+            vec![
+                CouponTargetType::Stock,
+                CouponTargetType::HkWarrant,
+                CouponTargetType::Etf
+            ],
+            "targets by code or name"
+        );
+        assert!(lifetime.cash.is_none(), "null detail is None");
+        assert!(lifetime.stock.is_none(), "non-object detail is None");
         assert_eq!(
             lifetime.trade_sessions,
             vec!["intraday", "overnight"],
             "trade sessions"
         );
-        assert!(lifetime.commission.unlimited, "unlimited");
-        assert_eq!(lifetime.commission.usage_count, 2, "usage count");
+        assert_eq!(
+            commission.unlimited,
+            CommissionUnlimitedType::Lifetime,
+            "unlimited code"
+        );
+        assert_eq!(commission.usage_count, 2, "usage count");
+        assert_eq!(commission.amount_limit, 500, "amount limit");
+        assert!(commission.superposition, "superposition");
         assert!(
-            lifetime.commission.commission_expired_time.is_none(),
+            commission.commission_expired_time.is_none(),
             "nested placeholder"
         );
         let ms = &resp.list[1];
@@ -1479,11 +2062,117 @@ mod tests {
             "milliseconds converted"
         );
         assert!(!ms.no_expiry, "a real end time expires");
-        assert!(ms.commission.markets.is_empty(), "no commission terms");
+        assert!(ms.commission.is_none(), "no commission terms");
         let json = serde_json::to_value(lifetime).expect("serialize");
         assert_eq!(json["no_expiry"], true, "no_expiry serialized");
         let back: Coupon = serde_json::from_value(json).expect("round trip");
         assert!(back.no_expiry, "no_expiry survives a round trip");
+        assert_eq!(
+            back.commission.map(|c| c.unlimited),
+            Some(CommissionUnlimitedType::Lifetime),
+            "commission survives a round trip"
+        );
+    }
+
+    #[test]
+    fn coupon_type_terms_decode() {
+        // Synthetic values in the server's wire format: int64 as strings,
+        // enums as numbers or names, "0" for unset times.
+        let coupon: Coupon = serde_json::from_str(
+            r#"{"card_id":"c","card_type":"x","subscription_id":"",
+                "ai_benefit":{"benefit_days":30,"benefit_start":"1767196800",
+                    "benefit_end":"0","benefit_tag":"tag"},
+                "cash":{"receive_duration":"7"},
+                "coffee_coupon":{"coupon_channel":"chan","coupon_id":"","coupon_no":"N1",
+                    "is_available_all_store":true,"period_type":"day","settled_store_id":"0",
+                    "store_id_list":["11",12],"store_list":[{"store_id":"11","store_name":"S"}],
+                    "threshold":"2","use_limit":"total"},
+                "crypto":{"fallback":{"enabled":true,"counter_id":"C1"},
+                    "optional_counters":[{"counter_id":"C2"}]},
+                "finance_interest":{"discount_mode":1,"discount_rate":"0.5","superposition":false},
+                "fund_deduct":{"max_risk_level":"3","min_order_amount":"100",
+                    "order_types":["buy"],"underlying_type":"fund","underlying_values":["F1"],
+                    "underlying_names":["Fund"]},
+                "fund_interest":{},
+                "fundamental":{"investor_type":"INVESTOR_TYPE_PROFESSIONAL","markets":["US"]},
+                "ipo":{"subscription_id":"S1"},
+                "ipo_commission":{"bz_types":[1,"CashIPO",0],"counter_id":"C3",
+                    "counter_name":"IPO","financing_limit":"10"},
+                "ipo_interest":{"discount_rate":"0.8"},
+                "platform_fee_deduct":{"bz_types":["UsStockOptions"],"markets":["US"],
+                    "usage_count":"1","lave_usage_count":"4","superposition":true},
+                "quote":{"current_end_time":"1767196800","investor_type":1,
+                    "member_investor_type":"2","quote_duration":"30","quote_tags":["L2"],
+                    "manual_activate":true},
+                "stock":{"amount":12.5,"counter_id":"C4","redemption_type":"shares_number",
+                    "send_way":"account_transfer","optional_counters":[{"counter_id":"C5",
+                    "shares":"3"}],"fallback":{"enabled":true,"type":"cash","shares":"1"}},
+                "stock_fragment":{"amounts":{"a":"1"},"market":"US","markets":["US"],
+                    "underlying_type":"ETF"}}"#,
+        )
+        .expect("coupon decodes");
+        let ai = coupon.ai_benefit.as_ref().expect("ai benefit");
+        assert_eq!(ai.benefit_days, 30, "days");
+        assert!(
+            ai.benefit_start.is_some() && ai.benefit_end.is_none(),
+            "times"
+        );
+        assert_eq!(coupon.cash.as_ref().map(|c| c.receive_duration), Some(7));
+        let coffee = coupon.coffee_coupon.as_ref().expect("coffee");
+        assert_eq!(coffee.store_id_list, vec![11, 12], "store ids");
+        assert_eq!(coffee.store_list[0].store_id, 11, "store");
+        assert_eq!(coffee.settled_store_id, 0, "unset store");
+        let crypto = coupon.crypto.as_ref().expect("crypto");
+        assert!(crypto.fallback.enabled, "fallback");
+        assert_eq!(crypto.optional_counters[0].counter_id, "C2", "counters");
+        let finance = coupon.finance_interest.as_ref().expect("finance");
+        assert_eq!(finance.discount_rate, Some(dec("0.5")), "rate");
+        assert_eq!(
+            coupon.fund_deduct.as_ref().map(|f| f.max_risk_level),
+            Some(3),
+            "risk level"
+        );
+        assert_eq!(
+            coupon.fundamental.as_ref().map(|q| q.investor_type),
+            Some(QuoteInvestorType::Professional),
+            "investor type by name"
+        );
+        assert_eq!(
+            coupon.ipo_commission.as_ref().map(|i| i.bz_types.clone()),
+            Some(vec![
+                IpoCouponTargetType::Financing,
+                IpoCouponTargetType::Cash,
+                IpoCouponTargetType::Unknown
+            ]),
+            "IPO types"
+        );
+        assert_eq!(
+            coupon
+                .platform_fee_deduct
+                .as_ref()
+                .map(|p| p.bz_types.clone()),
+            Some(vec![CouponTargetType::UsOption]),
+            "platform fee types"
+        );
+        let quote = coupon.quote.as_ref().expect("quote");
+        assert!(quote.current_end_time.is_some(), "time");
+        assert_eq!(quote.investor_type, QuoteInvestorType::NonProfessional);
+        assert_eq!(quote.member_investor_type, 2, "member type");
+        let stock = coupon.stock.as_ref().expect("stock");
+        assert_eq!(stock.amount, Some(dec("12.5")), "amount");
+        assert_eq!(stock.fallback.fallback_type, "cash", "fallback type");
+        assert_eq!(stock.optional_counters[0].shares, "3", "shares");
+        let fragment = coupon.stock_fragment.as_ref().expect("fragment");
+        assert_eq!(fragment.underlying_type, CouponTargetType::Etf, "by name");
+        assert_eq!(fragment.amounts.get("a").map(String::as_str), Some("1"));
+        let back: Coupon =
+            serde_json::from_value(serde_json::to_value(&coupon).expect("serialize"))
+                .expect("round trip");
+        assert_eq!(
+            back.stock.map(|s| s.fallback.fallback_type),
+            Some("cash".to_string()),
+            "renamed field survives a round trip"
+        );
     }
 
     #[test]

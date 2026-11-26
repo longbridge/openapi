@@ -300,6 +300,108 @@ pub enum CRewardDeliverStatus {
     RewardDeliverStatusShipping,
 }
 
+/// Instrument type a coupon applies to
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::asset::CouponTargetType")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CCouponTargetType {
+    /// Unknown: an undocumented code (never sent to the server)
+    #[c(remote = "Unknown")]
+    CouponTargetTypeUnknown,
+    /// Stocks (server code 0, `StockTrade`)
+    #[c(remote = "Stock")]
+    CouponTargetTypeStock,
+    /// US stock options (server code 1, `UsStockOptions`)
+    #[c(remote = "UsOption")]
+    CouponTargetTypeUsOption,
+    /// HK warrants (server code 2, `HkStockWarrant`)
+    #[c(remote = "HkWarrant")]
+    CouponTargetTypeHkWarrant,
+    /// ETF (server code 3)
+    #[c(remote = "Etf")]
+    CouponTargetTypeEtf,
+    /// LOF (server code 4)
+    #[c(remote = "Lof")]
+    CouponTargetTypeLof,
+}
+
+/// IPO subscription type an IPO commission coupon applies to
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::asset::IpoCouponTargetType")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CIpoCouponTargetType {
+    /// Unknown: unset or an undocumented code (never sent to the server)
+    #[c(remote = "Unknown")]
+    IpoCouponTargetTypeUnknown,
+    /// Financing (margin) IPO subscription (server code 1, `FinancingIPO`)
+    #[c(remote = "Financing")]
+    IpoCouponTargetTypeFinancing,
+    /// Cash IPO subscription (server code 2, `CashIPO`)
+    #[c(remote = "Cash")]
+    IpoCouponTargetTypeCash,
+}
+
+/// The server's `unlimited` code of a commission coupon
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::asset::CommissionUnlimitedType")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CCommissionUnlimitedType {
+    /// Unknown: an undocumented code (never sent to the server)
+    #[c(remote = "Unknown")]
+    CommissionUnlimitedTypeUnknown,
+    /// `Proportionate` (server code 0)
+    #[c(remote = "Proportionate")]
+    CommissionUnlimitedTypeProportionate,
+    /// `Full` (server code 1)
+    #[c(remote = "Full")]
+    CommissionUnlimitedTypeFull,
+    /// `Lifetime` (server code 2)
+    #[c(remote = "Lifetime")]
+    CommissionUnlimitedTypeLifetime,
+    /// `ByAmountPer` (server code 6)
+    #[c(remote = "ByAmountPer")]
+    CommissionUnlimitedTypeByAmountPer,
+    /// `ByRatePer` (server code 7)
+    #[c(remote = "ByRatePer")]
+    CommissionUnlimitedTypeByRatePer,
+}
+
+/// Investor type a quote coupon applies to
+///
+/// The numeric values of this enum are not the server codes; each
+/// member's description names its server code.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::asset::QuoteInvestorType")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CQuoteInvestorType {
+    /// Unknown: an undocumented code (never sent to the server)
+    #[c(remote = "Unknown")]
+    QuoteInvestorTypeUnknown,
+    /// Any investor (server code 0, `INVESTOR_TYPE_ANY`)
+    #[c(remote = "Any")]
+    QuoteInvestorTypeAny,
+    /// Non-professional investors (server code 1,
+    /// `INVESTOR_TYPE_NON_PROFESSIONAL`)
+    #[c(remote = "NonProfessional")]
+    QuoteInvestorTypeNonProfessional,
+    /// Professional investors (server code 2, `INVESTOR_TYPE_PROFESSIONAL`)
+    #[c(remote = "Professional")]
+    QuoteInvestorTypeProfessional,
+}
+
 /// Status of a coupon
 ///
 /// The numeric values of this enum are not the server codes; each

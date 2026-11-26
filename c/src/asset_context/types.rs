@@ -2,21 +2,27 @@ use std::os::raw::c_char;
 
 use longbridge::asset::{
     AuthorizationStatus, BankCard, BankCardAuthorization, BankCardBindState, BankCardStatus,
-    BankCardWitnessState, Coupon, CouponCommission, CouponOrder, CouponStatus, CouponsResponse,
-    Deposit, DepositState, EddaApplication, RewardDeliverStatus, RewardRecord,
-    RewardRecordsResponse, RewardStatus, RewardType, StatementItem, StockTransferIn,
-    StockTransferInResponse, StockTransferInState, StockTransferOut, StockTransferOutState,
-    TransferStock, TransferStockState, Withdrawal, WithdrawalState, WithdrawalsResponse,
+    BankCardWitnessState, CommissionUnlimitedType, Coupon, CouponAiBenefit, CouponCash,
+    CouponCoffee, CouponCoffeeStore, CouponCommission, CouponCrypto, CouponCryptoCounter,
+    CouponCryptoFallback, CouponFinanceInterest, CouponFundDeduct, CouponIpo, CouponIpoCommission,
+    CouponIpoInterest, CouponOrder, CouponPlatformFeeDeduct, CouponQuote, CouponStatus,
+    CouponStock, CouponStockCounter, CouponStockFallback, CouponStockFragment, CouponTargetType,
+    CouponsResponse, Deposit, DepositState, EddaApplication, QuoteInvestorType,
+    RewardDeliverStatus, RewardRecord, RewardRecordsResponse, RewardStatus, RewardType,
+    StatementItem, StockTransferIn, StockTransferInResponse, StockTransferInState,
+    StockTransferOut, StockTransferOutState, TransferStock, TransferStockState, Withdrawal,
+    WithdrawalState, WithdrawalsResponse,
 };
 use time::OffsetDateTime;
 
 use crate::{
     asset_context::enum_types::{
         CAuthorizationStatus, CBankCardBindState, CBankCardStatus, CBankCardWitnessState,
-        CCouponStatus, CDepositState, CRewardDeliverStatus, CRewardStatus, CRewardType,
+        CCommissionUnlimitedType, CCouponStatus, CCouponTargetType, CDepositState,
+        CIpoCouponTargetType, CQuoteInvestorType, CRewardDeliverStatus, CRewardStatus, CRewardType,
         CStockTransferInState, CStockTransferOutState, CTransferStockState, CWithdrawalState,
     },
-    types::{CDecimal, CString, CVec, ToFFI},
+    types::{CDecimal, COption, CString, CVec, ToFFI},
 };
 
 /// Statement item
@@ -981,7 +987,7 @@ impl ToFFI for CRewardRecordsResponseOwned {
     }
 }
 
-/// Commission terms of a commission coupon
+/// Commission terms of a commission coupon (`commission`)
 #[repr(C)]
 pub struct CCouponCommission {
     /// Markets the coupon applies to
@@ -990,17 +996,16 @@ pub struct CCouponCommission {
     pub num_markets: usize,
     /// Rebate rate, as returned by the server
     pub rebate_rate: *const c_char,
-    /// Instrument types the coupon applies to: `0` stocks, `1` options, `2`
-    /// warrants, `3` ETF, `4` LOF
-    pub bz_types: *const i32,
+    /// Instrument types the coupon applies to
+    pub bz_types: *const CCouponTargetType,
     /// Number of `bz_types`
     pub num_bz_types: usize,
     /// Remaining commission balance (null when not set)
     pub commission_balance: *const CDecimal,
     /// Commission duration, as returned by the server
-    pub commission_duration: *const c_char,
-    /// Whether the coupon is unlimited
-    pub unlimited: bool,
+    pub commission_duration: i64,
+    /// The server's `unlimited` code
+    pub unlimited: CCommissionUnlimitedType,
     /// Commission expiry time as a unix timestamp (null when not set)
     pub commission_expired_time: *const i64,
     /// Number of times used
@@ -1009,20 +1014,26 @@ pub struct CCouponCommission {
     pub lave_usage_count: i64,
     /// Settlement model, as returned by the server
     pub settlement_model: *const c_char,
+    /// Amount limit, as returned by the server
+    pub amount_limit: i64,
+    /// Whether the coupon can be combined with other coupons
+    pub superposition: bool,
 }
 
 #[derive(Debug)]
 pub(crate) struct CCouponCommissionOwned {
     markets: CVec<CString>,
     rebate_rate: CString,
-    bz_types: CVec<i32>,
+    bz_types: CVec<CCouponTargetType>,
     commission_balance: Option<CDecimal>,
-    commission_duration: CString,
-    unlimited: bool,
+    commission_duration: i64,
+    unlimited: CommissionUnlimitedType,
     commission_expired_time: Option<i64>,
     usage_count: i64,
     lave_usage_count: i64,
     settlement_model: CString,
+    amount_limit: i64,
+    superposition: bool,
 }
 
 impl From<CouponCommission> for CCouponCommissionOwned {
@@ -1032,7 +1043,7 @@ impl From<CouponCommission> for CCouponCommissionOwned {
             rebate_rate: v.rebate_rate.into(),
             bz_types: v.bz_types.into(),
             commission_balance: v.commission_balance.map(Into::into),
-            commission_duration: v.commission_duration.into(),
+            commission_duration: v.commission_duration,
             unlimited: v.unlimited,
             commission_expired_time: v
                 .commission_expired_time
@@ -1040,6 +1051,8 @@ impl From<CouponCommission> for CCouponCommissionOwned {
             usage_count: v.usage_count,
             lave_usage_count: v.lave_usage_count,
             settlement_model: v.settlement_model.into(),
+            amount_limit: v.amount_limit,
+            superposition: v.superposition,
         }
     }
 }
@@ -1059,8 +1072,8 @@ impl ToFFI for CCouponCommissionOwned {
                 .as_ref()
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
-            commission_duration: self.commission_duration.to_ffi_type(),
-            unlimited: self.unlimited,
+            commission_duration: self.commission_duration,
+            unlimited: self.unlimited.into(),
             commission_expired_time: self
                 .commission_expired_time
                 .as_ref()
@@ -1069,6 +1082,929 @@ impl ToFFI for CCouponCommissionOwned {
             usage_count: self.usage_count,
             lave_usage_count: self.lave_usage_count,
             settlement_model: self.settlement_model.to_ffi_type(),
+            amount_limit: self.amount_limit,
+            superposition: self.superposition,
+        }
+    }
+}
+
+/// Terms of an AI benefit coupon (`ai_benefit`)
+#[repr(C)]
+pub struct CCouponAiBenefit {
+    /// Benefit days, as returned by the server
+    pub benefit_days: i32,
+    /// Start of the benefit as a unix timestamp (null when not set)
+    pub benefit_start: *const i64,
+    /// End of the benefit as a unix timestamp (null when not set)
+    pub benefit_end: *const i64,
+    /// Benefit tag, as returned by the server
+    pub benefit_tag: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponAiBenefitOwned {
+    benefit_days: i32,
+    benefit_start: Option<i64>,
+    benefit_end: Option<i64>,
+    benefit_tag: CString,
+}
+
+impl From<CouponAiBenefit> for CCouponAiBenefitOwned {
+    fn from(v: CouponAiBenefit) -> Self {
+        Self {
+            benefit_days: v.benefit_days,
+            benefit_start: v.benefit_start.map(OffsetDateTime::unix_timestamp),
+            benefit_end: v.benefit_end.map(OffsetDateTime::unix_timestamp),
+            benefit_tag: v.benefit_tag.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponAiBenefitOwned {
+    type FFIType = CCouponAiBenefit;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponAiBenefit {
+            benefit_days: self.benefit_days,
+            benefit_start: self
+                .benefit_start
+                .as_ref()
+                .map(|v| v as *const i64)
+                .unwrap_or(std::ptr::null()),
+            benefit_end: self
+                .benefit_end
+                .as_ref()
+                .map(|v| v as *const i64)
+                .unwrap_or(std::ptr::null()),
+            benefit_tag: self.benefit_tag.to_ffi_type(),
+        }
+    }
+}
+
+/// Terms of a cash coupon (`cash`)
+#[repr(C)]
+pub struct CCouponCash {
+    /// Receive duration, as returned by the server
+    pub receive_duration: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponCashOwned {
+    receive_duration: i64,
+}
+
+impl From<CouponCash> for CCouponCashOwned {
+    fn from(v: CouponCash) -> Self {
+        Self {
+            receive_duration: v.receive_duration,
+        }
+    }
+}
+
+impl ToFFI for CCouponCashOwned {
+    type FFIType = CCouponCash;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponCash {
+            receive_duration: self.receive_duration,
+        }
+    }
+}
+
+/// A store of a coffee coupon
+#[repr(C)]
+pub struct CCouponCoffeeStore {
+    /// Store ID
+    pub store_id: i64,
+    /// Store name
+    pub store_name: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponCoffeeStoreOwned {
+    store_id: i64,
+    store_name: CString,
+}
+
+impl From<CouponCoffeeStore> for CCouponCoffeeStoreOwned {
+    fn from(v: CouponCoffeeStore) -> Self {
+        Self {
+            store_id: v.store_id,
+            store_name: v.store_name.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponCoffeeStoreOwned {
+    type FFIType = CCouponCoffeeStore;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponCoffeeStore {
+            store_id: self.store_id,
+            store_name: self.store_name.to_ffi_type(),
+        }
+    }
+}
+
+/// Terms of a coffee coupon (`coffee_coupon`)
+#[repr(C)]
+pub struct CCouponCoffee {
+    /// Coupon channel, as returned by the server
+    pub coupon_channel: *const c_char,
+    /// Coupon ID, as returned by the server
+    pub coupon_id: *const c_char,
+    /// Coupon number, as returned by the server
+    pub coupon_no: *const c_char,
+    /// Whether the coupon can be used at every store
+    pub is_available_all_store: bool,
+    /// Period type (e.g. `day`), as returned by the server
+    pub period_type: *const c_char,
+    /// ID of the store the coupon was settled at (`0` when not settled)
+    pub settled_store_id: i64,
+    /// IDs of the stores the coupon can be used at
+    pub store_id_list: *const i64,
+    /// Number of `store_id_list`
+    pub num_store_id_list: usize,
+    /// Stores the coupon can be used at
+    pub store_list: *const CCouponCoffeeStore,
+    /// Number of `store_list`
+    pub num_store_list: usize,
+    /// Threshold, as returned by the server
+    pub threshold: i64,
+    /// Use limit (`total` or `period`), as returned by the server
+    pub use_limit: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponCoffeeOwned {
+    coupon_channel: CString,
+    coupon_id: CString,
+    coupon_no: CString,
+    is_available_all_store: bool,
+    period_type: CString,
+    settled_store_id: i64,
+    store_id_list: CVec<i64>,
+    store_list: CVec<CCouponCoffeeStoreOwned>,
+    threshold: i64,
+    use_limit: CString,
+}
+
+impl From<CouponCoffee> for CCouponCoffeeOwned {
+    fn from(v: CouponCoffee) -> Self {
+        Self {
+            coupon_channel: v.coupon_channel.into(),
+            coupon_id: v.coupon_id.into(),
+            coupon_no: v.coupon_no.into(),
+            is_available_all_store: v.is_available_all_store,
+            period_type: v.period_type.into(),
+            settled_store_id: v.settled_store_id,
+            store_id_list: v.store_id_list.into(),
+            store_list: v.store_list.into(),
+            threshold: v.threshold,
+            use_limit: v.use_limit.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponCoffeeOwned {
+    type FFIType = CCouponCoffee;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponCoffee {
+            coupon_channel: self.coupon_channel.to_ffi_type(),
+            coupon_id: self.coupon_id.to_ffi_type(),
+            coupon_no: self.coupon_no.to_ffi_type(),
+            is_available_all_store: self.is_available_all_store,
+            period_type: self.period_type.to_ffi_type(),
+            settled_store_id: self.settled_store_id,
+            store_id_list: self.store_id_list.to_ffi_type(),
+            num_store_id_list: self.store_id_list.len(),
+            store_list: self.store_list.to_ffi_type(),
+            num_store_list: self.store_list.len(),
+            threshold: self.threshold,
+            use_limit: self.use_limit.to_ffi_type(),
+        }
+    }
+}
+
+/// A counter (security) of a crypto coupon
+#[repr(C)]
+pub struct CCouponCryptoCounter {
+    /// Counter ID
+    pub counter_id: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponCryptoCounterOwned {
+    counter_id: CString,
+}
+
+impl From<CouponCryptoCounter> for CCouponCryptoCounterOwned {
+    fn from(v: CouponCryptoCounter) -> Self {
+        Self {
+            counter_id: v.counter_id.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponCryptoCounterOwned {
+    type FFIType = CCouponCryptoCounter;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponCryptoCounter {
+            counter_id: self.counter_id.to_ffi_type(),
+        }
+    }
+}
+
+/// Fallback of a crypto coupon
+#[repr(C)]
+pub struct CCouponCryptoFallback {
+    /// Whether the fallback is enabled
+    pub enabled: bool,
+    /// Counter ID
+    pub counter_id: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponCryptoFallbackOwned {
+    enabled: bool,
+    counter_id: CString,
+}
+
+impl From<CouponCryptoFallback> for CCouponCryptoFallbackOwned {
+    fn from(v: CouponCryptoFallback) -> Self {
+        Self {
+            enabled: v.enabled,
+            counter_id: v.counter_id.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponCryptoFallbackOwned {
+    type FFIType = CCouponCryptoFallback;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponCryptoFallback {
+            enabled: self.enabled,
+            counter_id: self.counter_id.to_ffi_type(),
+        }
+    }
+}
+
+/// Terms of a crypto coupon (`crypto`)
+#[repr(C)]
+pub struct CCouponCrypto {
+    /// Fallback
+    pub fallback: CCouponCryptoFallback,
+    /// Optional counters
+    pub optional_counters: *const CCouponCryptoCounter,
+    /// Number of `optional_counters`
+    pub num_optional_counters: usize,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponCryptoOwned {
+    fallback: CCouponCryptoFallbackOwned,
+    optional_counters: CVec<CCouponCryptoCounterOwned>,
+}
+
+impl From<CouponCrypto> for CCouponCryptoOwned {
+    fn from(v: CouponCrypto) -> Self {
+        Self {
+            fallback: v.fallback.into(),
+            optional_counters: v.optional_counters.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponCryptoOwned {
+    type FFIType = CCouponCrypto;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponCrypto {
+            fallback: self.fallback.to_ffi_type(),
+            optional_counters: self.optional_counters.to_ffi_type(),
+            num_optional_counters: self.optional_counters.len(),
+        }
+    }
+}
+
+/// Terms of a finance interest coupon (`finance_interest`)
+#[repr(C)]
+pub struct CCouponFinanceInterest {
+    /// Discount mode, as returned by the server
+    pub discount_mode: i32,
+    /// Discount rate (null when not set)
+    pub discount_rate: *const CDecimal,
+    /// Whether the coupon can be combined with other coupons
+    pub superposition: bool,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponFinanceInterestOwned {
+    discount_mode: i32,
+    discount_rate: Option<CDecimal>,
+    superposition: bool,
+}
+
+impl From<CouponFinanceInterest> for CCouponFinanceInterestOwned {
+    fn from(v: CouponFinanceInterest) -> Self {
+        Self {
+            discount_mode: v.discount_mode,
+            discount_rate: v.discount_rate.map(Into::into),
+            superposition: v.superposition,
+        }
+    }
+}
+
+impl ToFFI for CCouponFinanceInterestOwned {
+    type FFIType = CCouponFinanceInterest;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponFinanceInterest {
+            discount_mode: self.discount_mode,
+            discount_rate: self
+                .discount_rate
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            superposition: self.superposition,
+        }
+    }
+}
+
+/// Terms of a fund deduction coupon (`fund_deduct`)
+#[repr(C)]
+pub struct CCouponFundDeduct {
+    /// Maximum risk level, as returned by the server
+    pub max_risk_level: i32,
+    /// Minimum order amount, as returned by the server
+    pub min_order_amount: *const c_char,
+    /// Order types, as returned by the server
+    pub order_types: *const *const c_char,
+    /// Number of `order_types`
+    pub num_order_types: usize,
+    /// Underlying type, as returned by the server
+    pub underlying_type: *const c_char,
+    /// Underlying values, as returned by the server
+    pub underlying_values: *const *const c_char,
+    /// Number of `underlying_values`
+    pub num_underlying_values: usize,
+    /// Underlying names, as returned by the server
+    pub underlying_names: *const *const c_char,
+    /// Number of `underlying_names`
+    pub num_underlying_names: usize,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponFundDeductOwned {
+    max_risk_level: i32,
+    min_order_amount: CString,
+    order_types: CVec<CString>,
+    underlying_type: CString,
+    underlying_values: CVec<CString>,
+    underlying_names: CVec<CString>,
+}
+
+impl From<CouponFundDeduct> for CCouponFundDeductOwned {
+    fn from(v: CouponFundDeduct) -> Self {
+        Self {
+            max_risk_level: v.max_risk_level,
+            min_order_amount: v.min_order_amount.into(),
+            order_types: v.order_types.into(),
+            underlying_type: v.underlying_type.into(),
+            underlying_values: v.underlying_values.into(),
+            underlying_names: v.underlying_names.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponFundDeductOwned {
+    type FFIType = CCouponFundDeduct;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponFundDeduct {
+            max_risk_level: self.max_risk_level,
+            min_order_amount: self.min_order_amount.to_ffi_type(),
+            order_types: self.order_types.to_ffi_type(),
+            num_order_types: self.order_types.len(),
+            underlying_type: self.underlying_type.to_ffi_type(),
+            underlying_values: self.underlying_values.to_ffi_type(),
+            num_underlying_values: self.underlying_values.len(),
+            underlying_names: self.underlying_names.to_ffi_type(),
+            num_underlying_names: self.underlying_names.len(),
+        }
+    }
+}
+
+/// Terms of a quote (market data) or fundamental-data coupon (`quote` /
+/// `fundamental`)
+#[repr(C)]
+pub struct CCouponQuote {
+    /// Current end time as a unix timestamp (null when not set)
+    pub current_end_time: *const i64,
+    /// Whether the coupon is inapplicable, as returned by the server
+    pub inapplicable: bool,
+    /// Investor type the coupon applies to
+    pub investor_type: CQuoteInvestorType,
+    /// Whether the coupon is activated manually
+    pub manual_activate: bool,
+    /// Markets
+    pub markets: *const *const c_char,
+    /// Number of `markets`
+    pub num_markets: usize,
+    /// Investor type of the member, as returned by the server
+    pub member_investor_type: i32,
+    /// Paired SPU number, as returned by the server
+    pub pair_spu_no: *const c_char,
+    /// Quote duration, as returned by the server
+    pub quote_duration: i64,
+    /// Quote market
+    pub quote_market: *const c_char,
+    /// Quote tags
+    pub quote_tags: *const *const c_char,
+    /// Number of `quote_tags`
+    pub num_quote_tags: usize,
+    /// Whether the coupon can be combined with other coupons
+    pub superposition: bool,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponQuoteOwned {
+    current_end_time: Option<i64>,
+    inapplicable: bool,
+    investor_type: QuoteInvestorType,
+    manual_activate: bool,
+    markets: CVec<CString>,
+    member_investor_type: i32,
+    pair_spu_no: CString,
+    quote_duration: i64,
+    quote_market: CString,
+    quote_tags: CVec<CString>,
+    superposition: bool,
+}
+
+impl From<CouponQuote> for CCouponQuoteOwned {
+    fn from(v: CouponQuote) -> Self {
+        Self {
+            current_end_time: v.current_end_time.map(OffsetDateTime::unix_timestamp),
+            inapplicable: v.inapplicable,
+            investor_type: v.investor_type,
+            manual_activate: v.manual_activate,
+            markets: v.markets.into(),
+            member_investor_type: v.member_investor_type,
+            pair_spu_no: v.pair_spu_no.into(),
+            quote_duration: v.quote_duration,
+            quote_market: v.quote_market.into(),
+            quote_tags: v.quote_tags.into(),
+            superposition: v.superposition,
+        }
+    }
+}
+
+impl ToFFI for CCouponQuoteOwned {
+    type FFIType = CCouponQuote;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponQuote {
+            current_end_time: self
+                .current_end_time
+                .as_ref()
+                .map(|v| v as *const i64)
+                .unwrap_or(std::ptr::null()),
+            inapplicable: self.inapplicable,
+            investor_type: self.investor_type.into(),
+            manual_activate: self.manual_activate,
+            markets: self.markets.to_ffi_type(),
+            num_markets: self.markets.len(),
+            member_investor_type: self.member_investor_type,
+            pair_spu_no: self.pair_spu_no.to_ffi_type(),
+            quote_duration: self.quote_duration,
+            quote_market: self.quote_market.to_ffi_type(),
+            quote_tags: self.quote_tags.to_ffi_type(),
+            num_quote_tags: self.quote_tags.len(),
+            superposition: self.superposition,
+        }
+    }
+}
+
+/// Terms of an IPO coupon (`ipo`)
+#[repr(C)]
+pub struct CCouponIpo {
+    /// Subscription ID
+    pub subscription_id: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponIpoOwned {
+    subscription_id: CString,
+}
+
+impl From<CouponIpo> for CCouponIpoOwned {
+    fn from(v: CouponIpo) -> Self {
+        Self {
+            subscription_id: v.subscription_id.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponIpoOwned {
+    type FFIType = CCouponIpo;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponIpo {
+            subscription_id: self.subscription_id.to_ffi_type(),
+        }
+    }
+}
+
+/// Terms of an IPO commission coupon (`ipo_commission`)
+#[repr(C)]
+pub struct CCouponIpoCommission {
+    /// IPO subscription types the coupon applies to
+    pub bz_types: *const CIpoCouponTargetType,
+    /// Number of `bz_types`
+    pub num_bz_types: usize,
+    /// Counter ID
+    pub counter_id: *const c_char,
+    /// Counter name
+    pub counter_name: *const c_char,
+    /// Financing limit, as returned by the server
+    pub financing_limit: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponIpoCommissionOwned {
+    bz_types: CVec<CIpoCouponTargetType>,
+    counter_id: CString,
+    counter_name: CString,
+    financing_limit: CString,
+}
+
+impl From<CouponIpoCommission> for CCouponIpoCommissionOwned {
+    fn from(v: CouponIpoCommission) -> Self {
+        Self {
+            bz_types: v.bz_types.into(),
+            counter_id: v.counter_id.into(),
+            counter_name: v.counter_name.into(),
+            financing_limit: v.financing_limit.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponIpoCommissionOwned {
+    type FFIType = CCouponIpoCommission;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponIpoCommission {
+            bz_types: self.bz_types.to_ffi_type(),
+            num_bz_types: self.bz_types.len(),
+            counter_id: self.counter_id.to_ffi_type(),
+            counter_name: self.counter_name.to_ffi_type(),
+            financing_limit: self.financing_limit.to_ffi_type(),
+        }
+    }
+}
+
+/// Terms of an IPO interest coupon (`ipo_interest`)
+#[repr(C)]
+pub struct CCouponIpoInterest {
+    /// Discount rate, as returned by the server
+    pub discount_rate: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponIpoInterestOwned {
+    discount_rate: CString,
+}
+
+impl From<CouponIpoInterest> for CCouponIpoInterestOwned {
+    fn from(v: CouponIpoInterest) -> Self {
+        Self {
+            discount_rate: v.discount_rate.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponIpoInterestOwned {
+    type FFIType = CCouponIpoInterest;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponIpoInterest {
+            discount_rate: self.discount_rate.to_ffi_type(),
+        }
+    }
+}
+
+/// Terms of a platform fee deduction coupon (`platform_fee_deduct`)
+#[repr(C)]
+pub struct CCouponPlatformFeeDeduct {
+    /// Instrument types the coupon applies to
+    pub bz_types: *const CCouponTargetType,
+    /// Number of `bz_types`
+    pub num_bz_types: usize,
+    /// Counter ID
+    pub counter_id: *const c_char,
+    /// Counter name
+    pub counter_name: *const c_char,
+    /// Markets the coupon applies to
+    pub markets: *const *const c_char,
+    /// Number of `markets`
+    pub num_markets: usize,
+    /// Number of times used
+    pub usage_count: i64,
+    /// Number of uses left
+    pub lave_usage_count: i64,
+    /// Whether the coupon can be combined with other coupons
+    pub superposition: bool,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponPlatformFeeDeductOwned {
+    bz_types: CVec<CCouponTargetType>,
+    counter_id: CString,
+    counter_name: CString,
+    markets: CVec<CString>,
+    usage_count: i64,
+    lave_usage_count: i64,
+    superposition: bool,
+}
+
+impl From<CouponPlatformFeeDeduct> for CCouponPlatformFeeDeductOwned {
+    fn from(v: CouponPlatformFeeDeduct) -> Self {
+        Self {
+            bz_types: v.bz_types.into(),
+            counter_id: v.counter_id.into(),
+            counter_name: v.counter_name.into(),
+            markets: v.markets.into(),
+            usage_count: v.usage_count,
+            lave_usage_count: v.lave_usage_count,
+            superposition: v.superposition,
+        }
+    }
+}
+
+impl ToFFI for CCouponPlatformFeeDeductOwned {
+    type FFIType = CCouponPlatformFeeDeduct;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponPlatformFeeDeduct {
+            bz_types: self.bz_types.to_ffi_type(),
+            num_bz_types: self.bz_types.len(),
+            counter_id: self.counter_id.to_ffi_type(),
+            counter_name: self.counter_name.to_ffi_type(),
+            markets: self.markets.to_ffi_type(),
+            num_markets: self.markets.len(),
+            usage_count: self.usage_count,
+            lave_usage_count: self.lave_usage_count,
+            superposition: self.superposition,
+        }
+    }
+}
+
+/// An optional counter of a stock coupon
+#[repr(C)]
+pub struct CCouponStockCounter {
+    /// Counter ID
+    pub counter_id: *const c_char,
+    /// Shares, as returned by the server
+    pub shares: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponStockCounterOwned {
+    counter_id: CString,
+    shares: CString,
+}
+
+impl From<CouponStockCounter> for CCouponStockCounterOwned {
+    fn from(v: CouponStockCounter) -> Self {
+        Self {
+            counter_id: v.counter_id.into(),
+            shares: v.shares.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponStockCounterOwned {
+    type FFIType = CCouponStockCounter;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponStockCounter {
+            counter_id: self.counter_id.to_ffi_type(),
+            shares: self.shares.to_ffi_type(),
+        }
+    }
+}
+
+/// Fallback of a stock coupon
+#[repr(C)]
+pub struct CCouponStockFallback {
+    /// Whether the fallback is enabled
+    pub enabled: bool,
+    /// Fallback type (the server's `type`), as returned by the server
+    pub fallback_type: *const c_char,
+    /// Counter ID
+    pub counter_id: *const c_char,
+    /// Shares, as returned by the server
+    pub shares: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponStockFallbackOwned {
+    enabled: bool,
+    fallback_type: CString,
+    counter_id: CString,
+    shares: CString,
+}
+
+impl From<CouponStockFallback> for CCouponStockFallbackOwned {
+    fn from(v: CouponStockFallback) -> Self {
+        Self {
+            enabled: v.enabled,
+            fallback_type: v.fallback_type.into(),
+            counter_id: v.counter_id.into(),
+            shares: v.shares.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponStockFallbackOwned {
+    type FFIType = CCouponStockFallback;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponStockFallback {
+            enabled: self.enabled,
+            fallback_type: self.fallback_type.to_ffi_type(),
+            counter_id: self.counter_id.to_ffi_type(),
+            shares: self.shares.to_ffi_type(),
+        }
+    }
+}
+
+/// Terms of a stock coupon (`stock`)
+#[repr(C)]
+pub struct CCouponStock {
+    /// Counter ID
+    pub counter_id: *const c_char,
+    /// Counter name
+    pub counter_name: *const c_char,
+    /// Amount (null when not set)
+    pub amount: *const CDecimal,
+    /// Redemption type (`by_card_value` or `shares_number`), as returned by the
+    /// server
+    pub redemption_type: *const c_char,
+    /// Delivery way (`card_exchange` or `account_transfer`), as returned by the
+    /// server
+    pub send_way: *const c_char,
+    /// Optional counters
+    pub optional_counters: *const CCouponStockCounter,
+    /// Number of `optional_counters`
+    pub num_optional_counters: usize,
+    /// Fallback
+    pub fallback: CCouponStockFallback,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponStockOwned {
+    counter_id: CString,
+    counter_name: CString,
+    amount: Option<CDecimal>,
+    redemption_type: CString,
+    send_way: CString,
+    optional_counters: CVec<CCouponStockCounterOwned>,
+    fallback: CCouponStockFallbackOwned,
+}
+
+impl From<CouponStock> for CCouponStockOwned {
+    fn from(v: CouponStock) -> Self {
+        Self {
+            counter_id: v.counter_id.into(),
+            counter_name: v.counter_name.into(),
+            amount: v.amount.map(Into::into),
+            redemption_type: v.redemption_type.into(),
+            send_way: v.send_way.into(),
+            optional_counters: v.optional_counters.into(),
+            fallback: v.fallback.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponStockOwned {
+    type FFIType = CCouponStock;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponStock {
+            counter_id: self.counter_id.to_ffi_type(),
+            counter_name: self.counter_name.to_ffi_type(),
+            amount: self
+                .amount
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            redemption_type: self.redemption_type.to_ffi_type(),
+            send_way: self.send_way.to_ffi_type(),
+            optional_counters: self.optional_counters.to_ffi_type(),
+            num_optional_counters: self.optional_counters.len(),
+            fallback: self.fallback.to_ffi_type(),
+        }
+    }
+}
+
+/// One `amounts` entry of [`CCouponStockFragment`]
+#[repr(C)]
+pub struct CCouponStockFragmentAmount {
+    /// Key, as returned by the server
+    pub key: *const c_char,
+    /// Value, as returned by the server
+    pub value: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponStockFragmentAmountOwned {
+    key: CString,
+    value: CString,
+}
+
+impl From<(String, String)> for CCouponStockFragmentAmountOwned {
+    fn from((key, value): (String, String)) -> Self {
+        Self {
+            key: key.into(),
+            value: value.into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponStockFragmentAmountOwned {
+    type FFIType = CCouponStockFragmentAmount;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponStockFragmentAmount {
+            key: self.key.to_ffi_type(),
+            value: self.value.to_ffi_type(),
+        }
+    }
+}
+
+/// Terms of a stock fragment coupon (`stock_fragment`)
+#[repr(C)]
+pub struct CCouponStockFragment {
+    /// Counter ID
+    pub counter_id: *const c_char,
+    /// Counter name
+    pub counter_name: *const c_char,
+    /// Market
+    pub market: *const c_char,
+    /// Markets
+    pub markets: *const *const c_char,
+    /// Number of `markets`
+    pub num_markets: usize,
+    /// Instrument type the coupon applies to
+    pub underlying_type: CCouponTargetType,
+    /// Amounts, as returned by the server, key-sorted
+    pub amounts: *const CCouponStockFragmentAmount,
+    /// Number of `amounts`
+    pub num_amounts: usize,
+}
+
+#[derive(Debug)]
+pub(crate) struct CCouponStockFragmentOwned {
+    counter_id: CString,
+    counter_name: CString,
+    market: CString,
+    markets: CVec<CString>,
+    underlying_type: CouponTargetType,
+    amounts: CVec<CCouponStockFragmentAmountOwned>,
+}
+
+impl From<CouponStockFragment> for CCouponStockFragmentOwned {
+    fn from(v: CouponStockFragment) -> Self {
+        Self {
+            counter_id: v.counter_id.into(),
+            counter_name: v.counter_name.into(),
+            market: v.market.into(),
+            markets: v.markets.into(),
+            underlying_type: v.underlying_type,
+            // `BTreeMap` iterates in key order, so the array is key-sorted.
+            amounts: v.amounts.into_iter().collect::<Vec<_>>().into(),
+        }
+    }
+}
+
+impl ToFFI for CCouponStockFragmentOwned {
+    type FFIType = CCouponStockFragment;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CCouponStockFragment {
+            counter_id: self.counter_id.to_ffi_type(),
+            counter_name: self.counter_name.to_ffi_type(),
+            market: self.market.to_ffi_type(),
+            markets: self.markets.to_ffi_type(),
+            num_markets: self.markets.len(),
+            underlying_type: self.underlying_type.into(),
+            amounts: self.amounts.to_ffi_type(),
+            num_amounts: self.amounts.len(),
         }
     }
 }
@@ -1093,13 +2029,14 @@ pub struct CCoupon {
     pub card_status: CCouponStatus,
     /// Start of validity as a unix timestamp (null when not set)
     pub start_time: *const i64,
-    /// End of validity as a unix timestamp (null when not set or when the
-    /// coupon never expires; see `no_expiry`)
+    /// End of validity (none when not set or when the coupon never expires;
+    /// see `no_expiry`) as a unix timestamp (null when not set)
     pub end_time: *const i64,
     /// Whether the coupon never expires (the server's end time is in or after
     /// 2100)
     pub no_expiry: bool,
-    /// Activation time as a unix timestamp (null when not activated)
+    /// Activation time (none when not activated) as a unix timestamp (null when
+    /// not set)
     pub activate_time: *const i64,
     /// Amount (null when not set)
     pub amount: *const CDecimal,
@@ -1111,8 +2048,38 @@ pub struct CCoupon {
     pub trade_sessions: *const *const c_char,
     /// Number of `trade_sessions`
     pub num_trade_sessions: usize,
-    /// Commission terms (commission coupons only; empty otherwise)
-    pub commission: CCouponCommission,
+    /// Subscription ID, as returned by the server
+    pub subscription_id: *const c_char,
+    /// Terms of an AI benefit coupon (null for other coupon types)
+    pub ai_benefit: *const CCouponAiBenefit,
+    /// Terms of a cash coupon (null for other coupon types)
+    pub cash: *const CCouponCash,
+    /// Terms of a coffee coupon (null for other coupon types)
+    pub coffee_coupon: *const CCouponCoffee,
+    /// Terms of a commission coupon (null for other coupon types)
+    pub commission: *const CCouponCommission,
+    /// Terms of a crypto coupon (null for other coupon types)
+    pub crypto: *const CCouponCrypto,
+    /// Terms of a finance interest coupon (null for other coupon types)
+    pub finance_interest: *const CCouponFinanceInterest,
+    /// Terms of a fund deduction coupon (null for other coupon types)
+    pub fund_deduct: *const CCouponFundDeduct,
+    /// Terms of a fundamental-data coupon (null for other coupon types)
+    pub fundamental: *const CCouponQuote,
+    /// Terms of an IPO coupon (null for other coupon types)
+    pub ipo: *const CCouponIpo,
+    /// Terms of an IPO commission coupon (null for other coupon types)
+    pub ipo_commission: *const CCouponIpoCommission,
+    /// Terms of an IPO interest coupon (null for other coupon types)
+    pub ipo_interest: *const CCouponIpoInterest,
+    /// Terms of a platform fee deduction coupon (null for other coupon types)
+    pub platform_fee_deduct: *const CCouponPlatformFeeDeduct,
+    /// Terms of a quote (market data) coupon (null for other coupon types)
+    pub quote: *const CCouponQuote,
+    /// Terms of a stock coupon (null for other coupon types)
+    pub stock: *const CCouponStock,
+    /// Terms of a stock fragment coupon (null for other coupon types)
+    pub stock_fragment: *const CCouponStockFragment,
 }
 
 #[derive(Debug)]
@@ -1132,7 +2099,22 @@ pub(crate) struct CCouponOwned {
     currency: CString,
     available_trade_session: CString,
     trade_sessions: CVec<CString>,
-    commission: CCouponCommissionOwned,
+    subscription_id: CString,
+    ai_benefit: COption<CCouponAiBenefitOwned>,
+    cash: COption<CCouponCashOwned>,
+    coffee_coupon: COption<CCouponCoffeeOwned>,
+    commission: COption<CCouponCommissionOwned>,
+    crypto: COption<CCouponCryptoOwned>,
+    finance_interest: COption<CCouponFinanceInterestOwned>,
+    fund_deduct: COption<CCouponFundDeductOwned>,
+    fundamental: COption<CCouponQuoteOwned>,
+    ipo: COption<CCouponIpoOwned>,
+    ipo_commission: COption<CCouponIpoCommissionOwned>,
+    ipo_interest: COption<CCouponIpoInterestOwned>,
+    platform_fee_deduct: COption<CCouponPlatformFeeDeductOwned>,
+    quote: COption<CCouponQuoteOwned>,
+    stock: COption<CCouponStockOwned>,
+    stock_fragment: COption<CCouponStockFragmentOwned>,
 }
 
 impl From<Coupon> for CCouponOwned {
@@ -1153,7 +2135,22 @@ impl From<Coupon> for CCouponOwned {
             currency: v.currency.into(),
             available_trade_session: v.available_trade_session.into(),
             trade_sessions: v.trade_sessions.into(),
+            subscription_id: v.subscription_id.into(),
+            ai_benefit: v.ai_benefit.into(),
+            cash: v.cash.into(),
+            coffee_coupon: v.coffee_coupon.into(),
             commission: v.commission.into(),
+            crypto: v.crypto.into(),
+            finance_interest: v.finance_interest.into(),
+            fund_deduct: v.fund_deduct.into(),
+            fundamental: v.fundamental.into(),
+            ipo: v.ipo.into(),
+            ipo_commission: v.ipo_commission.into(),
+            ipo_interest: v.ipo_interest.into(),
+            platform_fee_deduct: v.platform_fee_deduct.into(),
+            quote: v.quote.into(),
+            stock: v.stock.into(),
+            stock_fragment: v.stock_fragment.into(),
         }
     }
 }
@@ -1195,8 +2192,41 @@ impl ToFFI for CCouponOwned {
             available_trade_session: self.available_trade_session.to_ffi_type(),
             trade_sessions: self.trade_sessions.to_ffi_type(),
             num_trade_sessions: self.trade_sessions.len(),
+            subscription_id: self.subscription_id.to_ffi_type(),
+            ai_benefit: self.ai_benefit.to_ffi_type(),
+            cash: self.cash.to_ffi_type(),
+            coffee_coupon: self.coffee_coupon.to_ffi_type(),
             commission: self.commission.to_ffi_type(),
+            crypto: self.crypto.to_ffi_type(),
+            finance_interest: self.finance_interest.to_ffi_type(),
+            fund_deduct: self.fund_deduct.to_ffi_type(),
+            fundamental: self.fundamental.to_ffi_type(),
+            ipo: self.ipo.to_ffi_type(),
+            ipo_commission: self.ipo_commission.to_ffi_type(),
+            ipo_interest: self.ipo_interest.to_ffi_type(),
+            platform_fee_deduct: self.platform_fee_deduct.to_ffi_type(),
+            quote: self.quote.to_ffi_type(),
+            stock: self.stock.to_ffi_type(),
+            stock_fragment: self.stock_fragment.to_ffi_type(),
         }
+    }
+}
+
+impl ToFFI for CCouponTargetType {
+    type FFIType = CCouponTargetType;
+
+    #[inline]
+    fn to_ffi_type(&self) -> Self::FFIType {
+        *self
+    }
+}
+
+impl ToFFI for CIpoCouponTargetType {
+    type FFIType = CIpoCouponTargetType;
+
+    #[inline]
+    fn to_ffi_type(&self) -> Self::FFIType {
+        *self
     }
 }
 

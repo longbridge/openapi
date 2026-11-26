@@ -13066,6 +13066,204 @@ class RewardDeliverStatus:
         """
         ...
 
+class CouponTargetType:
+    """
+    Instrument type a coupon applies to
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(CouponTargetType):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Stock(CouponTargetType):
+        """
+        Stocks (server code 0, `StockTrade`)
+        """
+
+        ...
+
+    class UsOption(CouponTargetType):
+        """
+        US stock options (server code 1, `UsStockOptions`)
+        """
+
+        ...
+
+    class HkWarrant(CouponTargetType):
+        """
+        HK warrants (server code 2, `HkStockWarrant`)
+        """
+
+        ...
+
+    class Etf(CouponTargetType):
+        """
+        ETF (server code 3)
+        """
+
+        ...
+
+    class Lof(CouponTargetType):
+        """
+        LOF (server code 4)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class IpoCouponTargetType:
+    """
+    IPO subscription type an IPO commission coupon applies to
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(IpoCouponTargetType):
+        """
+        Unknown: unset or an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Financing(IpoCouponTargetType):
+        """
+        Financing (margin) IPO subscription (server code 1, `FinancingIPO`)
+        """
+
+        ...
+
+    class Cash(IpoCouponTargetType):
+        """
+        Cash IPO subscription (server code 2, `CashIPO`)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class CommissionUnlimitedType:
+    """
+    The server's `unlimited` code of a commission coupon
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(CommissionUnlimitedType):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Proportionate(CommissionUnlimitedType):
+        """
+        `Proportionate` (server code 0)
+        """
+
+        ...
+
+    class Full(CommissionUnlimitedType):
+        """
+        `Full` (server code 1)
+        """
+
+        ...
+
+    class Lifetime(CommissionUnlimitedType):
+        """
+        `Lifetime` (server code 2)
+        """
+
+        ...
+
+    class ByAmountPer(CommissionUnlimitedType):
+        """
+        `ByAmountPer` (server code 6)
+        """
+
+        ...
+
+    class ByRatePer(CommissionUnlimitedType):
+        """
+        `ByRatePer` (server code 7)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class QuoteInvestorType:
+    """
+    Investor type a quote coupon applies to
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(QuoteInvestorType):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Any(QuoteInvestorType):
+        """
+        Any investor (server code 0, `INVESTOR_TYPE_ANY`)
+        """
+
+        ...
+
+    class NonProfessional(QuoteInvestorType):
+        """
+        Non-professional investors (server code 1,
+        `INVESTOR_TYPE_NON_PROFESSIONAL`)
+        """
+
+        ...
+
+    class Professional(QuoteInvestorType):
+        """
+        Professional investors (server code 2, `INVESTOR_TYPE_PROFESSIONAL`)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
 class CouponStatus:
     """
     Status of a coupon
@@ -13960,7 +14158,7 @@ class RewardRecordsResponse:
 
 class CouponCommission:
     """
-    Commission terms of a commission coupon
+    Commission terms of a commission coupon (`commission`)
     """
 
     markets: List[str]
@@ -13973,10 +14171,9 @@ class CouponCommission:
     Rebate rate, as returned by the server
     """
 
-    bz_types: List[int]
+    bz_types: List[Type[CouponTargetType]]
     """
-    Instrument types the coupon applies to: `0` stocks, `1` options, `2` warrants,
-    `3` ETF, `4` LOF
+    Instrument types the coupon applies to
     """
 
     commission_balance: Optional[Decimal]
@@ -13984,14 +14181,14 @@ class CouponCommission:
     Remaining commission balance
     """
 
-    commission_duration: str
+    commission_duration: int
     """
     Commission duration, as returned by the server
     """
 
-    unlimited: bool
+    unlimited: Type[CommissionUnlimitedType]
     """
-    Whether the coupon is unlimited
+    The server's `unlimited` code
     """
 
     commission_expired_time: Optional[datetime]
@@ -14014,6 +14211,479 @@ class CouponCommission:
     Settlement model, as returned by the server
     """
 
+    amount_limit: int
+    """
+    Amount limit, as returned by the server
+    """
+
+    superposition: bool
+    """
+    Whether the coupon can be combined with other coupons
+    """
+
+class CouponAiBenefit:
+    """
+    Terms of an AI benefit coupon (`ai_benefit`)
+    """
+
+    benefit_days: int
+    """
+    Benefit days, as returned by the server
+    """
+
+    benefit_start: Optional[datetime]
+    """
+    Start of the benefit (none when not set)
+    """
+
+    benefit_end: Optional[datetime]
+    """
+    End of the benefit (none when not set)
+    """
+
+    benefit_tag: str
+    """
+    Benefit tag, as returned by the server
+    """
+
+class CouponCash:
+    """
+    Terms of a cash coupon (`cash`)
+    """
+
+    receive_duration: int
+    """
+    Receive duration, as returned by the server
+    """
+
+class CouponCoffeeStore:
+    """
+    A store of a coffee coupon
+    """
+
+    store_id: int
+    """
+    Store ID
+    """
+
+    store_name: str
+    """
+    Store name
+    """
+
+class CouponCoffee:
+    """
+    Terms of a coffee coupon (`coffee_coupon`)
+    """
+
+    coupon_channel: str
+    """
+    Coupon channel, as returned by the server
+    """
+
+    coupon_id: str
+    """
+    Coupon ID, as returned by the server
+    """
+
+    coupon_no: str
+    """
+    Coupon number, as returned by the server
+    """
+
+    is_available_all_store: bool
+    """
+    Whether the coupon can be used at every store
+    """
+
+    period_type: str
+    """
+    Period type (e.g. `day`), as returned by the server
+    """
+
+    settled_store_id: int
+    """
+    ID of the store the coupon was settled at (`0` when not settled)
+    """
+
+    store_id_list: List[int]
+    """
+    IDs of the stores the coupon can be used at
+    """
+
+    store_list: List[CouponCoffeeStore]
+    """
+    Stores the coupon can be used at
+    """
+
+    threshold: int
+    """
+    Threshold, as returned by the server
+    """
+
+    use_limit: str
+    """
+    Use limit (`total` or `period`), as returned by the server
+    """
+
+class CouponCryptoCounter:
+    """
+    A counter (security) of a crypto coupon
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+class CouponCryptoFallback:
+    """
+    Fallback of a crypto coupon
+    """
+
+    enabled: bool
+    """
+    Whether the fallback is enabled
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+class CouponCrypto:
+    """
+    Terms of a crypto coupon (`crypto`)
+    """
+
+    fallback: CouponCryptoFallback
+    """
+    Fallback
+    """
+
+    optional_counters: List[CouponCryptoCounter]
+    """
+    Optional counters
+    """
+
+class CouponFinanceInterest:
+    """
+    Terms of a finance interest coupon (`finance_interest`)
+    """
+
+    discount_mode: int
+    """
+    Discount mode, as returned by the server
+    """
+
+    discount_rate: Optional[Decimal]
+    """
+    Discount rate
+    """
+
+    superposition: bool
+    """
+    Whether the coupon can be combined with other coupons
+    """
+
+class CouponFundDeduct:
+    """
+    Terms of a fund deduction coupon (`fund_deduct`)
+    """
+
+    max_risk_level: int
+    """
+    Maximum risk level, as returned by the server
+    """
+
+    min_order_amount: str
+    """
+    Minimum order amount, as returned by the server
+    """
+
+    order_types: List[str]
+    """
+    Order types, as returned by the server
+    """
+
+    underlying_type: str
+    """
+    Underlying type, as returned by the server
+    """
+
+    underlying_values: List[str]
+    """
+    Underlying values, as returned by the server
+    """
+
+    underlying_names: List[str]
+    """
+    Underlying names, as returned by the server
+    """
+
+class CouponQuote:
+    """
+    Terms of a quote (market data) or fundamental-data coupon (`quote` /
+    `fundamental`)
+    """
+
+    current_end_time: Optional[datetime]
+    """
+    Current end time (none when not set)
+    """
+
+    inapplicable: bool
+    """
+    Whether the coupon is inapplicable, as returned by the server
+    """
+
+    investor_type: Type[QuoteInvestorType]
+    """
+    Investor type the coupon applies to
+    """
+
+    manual_activate: bool
+    """
+    Whether the coupon is activated manually
+    """
+
+    markets: List[str]
+    """
+    Markets
+    """
+
+    member_investor_type: int
+    """
+    Investor type of the member, as returned by the server
+    """
+
+    pair_spu_no: str
+    """
+    Paired SPU number, as returned by the server
+    """
+
+    quote_duration: int
+    """
+    Quote duration, as returned by the server
+    """
+
+    quote_market: str
+    """
+    Quote market
+    """
+
+    quote_tags: List[str]
+    """
+    Quote tags
+    """
+
+    superposition: bool
+    """
+    Whether the coupon can be combined with other coupons
+    """
+
+class CouponIpo:
+    """
+    Terms of an IPO coupon (`ipo`)
+    """
+
+    subscription_id: str
+    """
+    Subscription ID
+    """
+
+class CouponIpoCommission:
+    """
+    Terms of an IPO commission coupon (`ipo_commission`)
+    """
+
+    bz_types: List[Type[IpoCouponTargetType]]
+    """
+    IPO subscription types the coupon applies to
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    counter_name: str
+    """
+    Counter name
+    """
+
+    financing_limit: str
+    """
+    Financing limit, as returned by the server
+    """
+
+class CouponIpoInterest:
+    """
+    Terms of an IPO interest coupon (`ipo_interest`)
+    """
+
+    discount_rate: str
+    """
+    Discount rate, as returned by the server
+    """
+
+class CouponPlatformFeeDeduct:
+    """
+    Terms of a platform fee deduction coupon (`platform_fee_deduct`)
+    """
+
+    bz_types: List[Type[CouponTargetType]]
+    """
+    Instrument types the coupon applies to
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    counter_name: str
+    """
+    Counter name
+    """
+
+    markets: List[str]
+    """
+    Markets the coupon applies to
+    """
+
+    usage_count: int
+    """
+    Number of times used
+    """
+
+    lave_usage_count: int
+    """
+    Number of uses left
+    """
+
+    superposition: bool
+    """
+    Whether the coupon can be combined with other coupons
+    """
+
+class CouponStockCounter:
+    """
+    An optional counter of a stock coupon
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    shares: str
+    """
+    Shares, as returned by the server
+    """
+
+class CouponStockFallback:
+    """
+    Fallback of a stock coupon
+    """
+
+    enabled: bool
+    """
+    Whether the fallback is enabled
+    """
+
+    fallback_type: str
+    """
+    Fallback type (the server's `type`), as returned by the server
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    shares: str
+    """
+    Shares, as returned by the server
+    """
+
+class CouponStock:
+    """
+    Terms of a stock coupon (`stock`)
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    counter_name: str
+    """
+    Counter name
+    """
+
+    amount: Optional[Decimal]
+    """
+    Amount
+    """
+
+    redemption_type: str
+    """
+    Redemption type (`by_card_value` or `shares_number`), as returned by the
+    server
+    """
+
+    send_way: str
+    """
+    Delivery way (`card_exchange` or `account_transfer`), as returned by the
+    server
+    """
+
+    optional_counters: List[CouponStockCounter]
+    """
+    Optional counters
+    """
+
+    fallback: CouponStockFallback
+    """
+    Fallback
+    """
+
+class CouponStockFragment:
+    """
+    Terms of a stock fragment coupon (`stock_fragment`)
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    counter_name: str
+    """
+    Counter name
+    """
+
+    market: str
+    """
+    Market
+    """
+
+    markets: List[str]
+    """
+    Markets
+    """
+
+    underlying_type: Type[CouponTargetType]
+    """
+    Instrument type the coupon applies to
+    """
+
+    amounts: dict[str, str]
+    """
+    Amounts, as returned by the server (a `dict` of strings)
+    """
+
 class Coupon:
     """
     A coupon (reward card)
@@ -14026,7 +14696,8 @@ class Coupon:
 
     card_type: str
     """
-    Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`, `cash`
+    Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`,
+    `cash`
     """
 
     title: str
@@ -14061,13 +14732,14 @@ class Coupon:
 
     end_time: Optional[datetime]
     """
-    End of validity (none when not set or when the coupon never expires; see
-    ``no_expiry``)
+    End of validity (none when not set or when the coupon never expires;
+    see `no_expiry`)
     """
 
     no_expiry: bool
     """
-    Whether the coupon never expires (the server's end time is in or after 2100)
+    Whether the coupon never expires (the server's end time is in or after
+    2100)
     """
 
     activate_time: Optional[datetime]
@@ -14095,9 +14767,84 @@ class Coupon:
     Trading sessions the coupon applies to, as returned by the server
     """
 
-    commission: CouponCommission
+    subscription_id: str
     """
-    Commission terms (commission coupons only; empty otherwise)
+    Subscription ID, as returned by the server
+    """
+
+    ai_benefit: Optional[CouponAiBenefit]
+    """
+    Terms of an AI benefit coupon (none for other coupon types)
+    """
+
+    cash: Optional[CouponCash]
+    """
+    Terms of a cash coupon (none for other coupon types)
+    """
+
+    coffee_coupon: Optional[CouponCoffee]
+    """
+    Terms of a coffee coupon (none for other coupon types)
+    """
+
+    commission: Optional[CouponCommission]
+    """
+    Terms of a commission coupon (none for other coupon types)
+    """
+
+    crypto: Optional[CouponCrypto]
+    """
+    Terms of a crypto coupon (none for other coupon types)
+    """
+
+    finance_interest: Optional[CouponFinanceInterest]
+    """
+    Terms of a finance interest coupon (none for other coupon types)
+    """
+
+    fund_deduct: Optional[CouponFundDeduct]
+    """
+    Terms of a fund deduction coupon (none for other coupon types)
+    """
+
+    fundamental: Optional[CouponQuote]
+    """
+    Terms of a fundamental-data coupon (none for other coupon types)
+    """
+
+    ipo: Optional[CouponIpo]
+    """
+    Terms of an IPO coupon (none for other coupon types)
+    """
+
+    ipo_commission: Optional[CouponIpoCommission]
+    """
+    Terms of an IPO commission coupon (none for other coupon types)
+    """
+
+    ipo_interest: Optional[CouponIpoInterest]
+    """
+    Terms of an IPO interest coupon (none for other coupon types)
+    """
+
+    platform_fee_deduct: Optional[CouponPlatformFeeDeduct]
+    """
+    Terms of a platform fee deduction coupon (none for other coupon types)
+    """
+
+    quote: Optional[CouponQuote]
+    """
+    Terms of a quote (market data) coupon (none for other coupon types)
+    """
+
+    stock: Optional[CouponStock]
+    """
+    Terms of a stock coupon (none for other coupon types)
+    """
+
+    stock_fragment: Optional[CouponStockFragment]
+    """
+    Terms of a stock fragment coupon (none for other coupon types)
     """
 
 class CouponsResponse:

@@ -275,6 +275,73 @@ pub(crate) enum RewardDeliverStatus {
     Shipping,
 }
 
+/// Instrument type a coupon applies to
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::asset::CouponTargetType")]
+pub(crate) enum CouponTargetType {
+    /// Unknown: an undocumented code (never sent to the server)
+    Unknown,
+    /// Stocks (server code 0, `StockTrade`)
+    Stock,
+    /// US stock options (server code 1, `UsStockOptions`)
+    UsOption,
+    /// HK warrants (server code 2, `HkStockWarrant`)
+    HkWarrant,
+    /// ETF (server code 3)
+    Etf,
+    /// LOF (server code 4)
+    Lof,
+}
+
+/// IPO subscription type an IPO commission coupon applies to
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::asset::IpoCouponTargetType")]
+pub(crate) enum IpoCouponTargetType {
+    /// Unknown: unset or an undocumented code (never sent to the server)
+    Unknown,
+    /// Financing (margin) IPO subscription (server code 1, `FinancingIPO`)
+    Financing,
+    /// Cash IPO subscription (server code 2, `CashIPO`)
+    Cash,
+}
+
+/// The server's `unlimited` code of a commission coupon
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::asset::CommissionUnlimitedType")]
+pub(crate) enum CommissionUnlimitedType {
+    /// Unknown: an undocumented code (never sent to the server)
+    Unknown,
+    /// `Proportionate` (server code 0)
+    Proportionate,
+    /// `Full` (server code 1)
+    Full,
+    /// `Lifetime` (server code 2)
+    Lifetime,
+    /// `ByAmountPer` (server code 6)
+    ByAmountPer,
+    /// `ByRatePer` (server code 7)
+    ByRatePer,
+}
+
+/// Investor type a quote coupon applies to
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::asset::QuoteInvestorType")]
+pub(crate) enum QuoteInvestorType {
+    /// Unknown: an undocumented code (never sent to the server)
+    Unknown,
+    /// Any investor (server code 0, `INVESTOR_TYPE_ANY`)
+    Any,
+    /// Non-professional investors (server code 1,
+    /// `INVESTOR_TYPE_NON_PROFESSIONAL`)
+    NonProfessional,
+    /// Professional investors (server code 2, `INVESTOR_TYPE_PROFESSIONAL`)
+    Professional,
+}
+
 /// Status of a coupon
 #[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
@@ -698,7 +765,7 @@ pub(crate) struct RewardRecordsResponse {
     total: i64,
 }
 
-/// Commission terms of a commission coupon
+/// Commission terms of a commission coupon (`commission`)
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::asset::CouponCommission")]
@@ -707,16 +774,16 @@ pub(crate) struct CouponCommission {
     markets: Vec<String>,
     /// Rebate rate, as returned by the server
     rebate_rate: String,
-    /// Instrument types the coupon applies to: `0` stocks, `1` options, `2`
-    /// warrants, `3` ETF, `4` LOF
-    bz_types: Vec<i32>,
+    /// Instrument types the coupon applies to
+    #[py(array)]
+    bz_types: Vec<CouponTargetType>,
     /// Remaining commission balance
     #[py(opt)]
     commission_balance: Option<PyDecimal>,
     /// Commission duration, as returned by the server
-    commission_duration: String,
-    /// Whether the coupon is unlimited
-    unlimited: bool,
+    commission_duration: i64,
+    /// The server's `unlimited` code
+    unlimited: CommissionUnlimitedType,
     /// Commission expiry time (none when not set)
     #[py(opt)]
     commission_expired_time: Option<PyOffsetDateTimeWrapper>,
@@ -726,6 +793,297 @@ pub(crate) struct CouponCommission {
     lave_usage_count: i64,
     /// Settlement model, as returned by the server
     settlement_model: String,
+    /// Amount limit, as returned by the server
+    amount_limit: i64,
+    /// Whether the coupon can be combined with other coupons
+    superposition: bool,
+}
+
+/// Terms of an AI benefit coupon (`ai_benefit`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponAiBenefit")]
+pub(crate) struct CouponAiBenefit {
+    /// Benefit days, as returned by the server
+    benefit_days: i32,
+    /// Start of the benefit (none when not set)
+    #[py(opt)]
+    benefit_start: Option<PyOffsetDateTimeWrapper>,
+    /// End of the benefit (none when not set)
+    #[py(opt)]
+    benefit_end: Option<PyOffsetDateTimeWrapper>,
+    /// Benefit tag, as returned by the server
+    benefit_tag: String,
+}
+
+/// Terms of a cash coupon (`cash`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponCash")]
+pub(crate) struct CouponCash {
+    /// Receive duration, as returned by the server
+    receive_duration: i64,
+}
+
+/// A store of a coffee coupon
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponCoffeeStore")]
+pub(crate) struct CouponCoffeeStore {
+    /// Store ID
+    store_id: i64,
+    /// Store name
+    store_name: String,
+}
+
+/// Terms of a coffee coupon (`coffee_coupon`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponCoffee")]
+pub(crate) struct CouponCoffee {
+    /// Coupon channel, as returned by the server
+    coupon_channel: String,
+    /// Coupon ID, as returned by the server
+    coupon_id: String,
+    /// Coupon number, as returned by the server
+    coupon_no: String,
+    /// Whether the coupon can be used at every store
+    is_available_all_store: bool,
+    /// Period type (e.g. `day`), as returned by the server
+    period_type: String,
+    /// ID of the store the coupon was settled at (`0` when not settled)
+    settled_store_id: i64,
+    /// IDs of the stores the coupon can be used at
+    store_id_list: Vec<i64>,
+    /// Stores the coupon can be used at
+    #[py(array)]
+    store_list: Vec<CouponCoffeeStore>,
+    /// Threshold, as returned by the server
+    threshold: i64,
+    /// Use limit (`total` or `period`), as returned by the server
+    use_limit: String,
+}
+
+/// A counter (security) of a crypto coupon
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponCryptoCounter")]
+pub(crate) struct CouponCryptoCounter {
+    /// Counter ID
+    counter_id: String,
+}
+
+/// Fallback of a crypto coupon
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponCryptoFallback")]
+pub(crate) struct CouponCryptoFallback {
+    /// Whether the fallback is enabled
+    enabled: bool,
+    /// Counter ID
+    counter_id: String,
+}
+
+/// Terms of a crypto coupon (`crypto`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponCrypto")]
+pub(crate) struct CouponCrypto {
+    /// Fallback
+    fallback: CouponCryptoFallback,
+    /// Optional counters
+    #[py(array)]
+    optional_counters: Vec<CouponCryptoCounter>,
+}
+
+/// Terms of a finance interest coupon (`finance_interest`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponFinanceInterest")]
+pub(crate) struct CouponFinanceInterest {
+    /// Discount mode, as returned by the server
+    discount_mode: i32,
+    /// Discount rate
+    #[py(opt)]
+    discount_rate: Option<PyDecimal>,
+    /// Whether the coupon can be combined with other coupons
+    superposition: bool,
+}
+
+/// Terms of a fund deduction coupon (`fund_deduct`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponFundDeduct")]
+pub(crate) struct CouponFundDeduct {
+    /// Maximum risk level, as returned by the server
+    max_risk_level: i32,
+    /// Minimum order amount, as returned by the server
+    min_order_amount: String,
+    /// Order types, as returned by the server
+    order_types: Vec<String>,
+    /// Underlying type, as returned by the server
+    underlying_type: String,
+    /// Underlying values, as returned by the server
+    underlying_values: Vec<String>,
+    /// Underlying names, as returned by the server
+    underlying_names: Vec<String>,
+}
+
+/// Terms of a quote (market data) or fundamental-data coupon (`quote` /
+/// `fundamental`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponQuote")]
+pub(crate) struct CouponQuote {
+    /// Current end time (none when not set)
+    #[py(opt)]
+    current_end_time: Option<PyOffsetDateTimeWrapper>,
+    /// Whether the coupon is inapplicable, as returned by the server
+    inapplicable: bool,
+    /// Investor type the coupon applies to
+    investor_type: QuoteInvestorType,
+    /// Whether the coupon is activated manually
+    manual_activate: bool,
+    /// Markets
+    markets: Vec<String>,
+    /// Investor type of the member, as returned by the server
+    member_investor_type: i32,
+    /// Paired SPU number, as returned by the server
+    pair_spu_no: String,
+    /// Quote duration, as returned by the server
+    quote_duration: i64,
+    /// Quote market
+    quote_market: String,
+    /// Quote tags
+    quote_tags: Vec<String>,
+    /// Whether the coupon can be combined with other coupons
+    superposition: bool,
+}
+
+/// Terms of an IPO coupon (`ipo`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponIpo")]
+pub(crate) struct CouponIpo {
+    /// Subscription ID
+    subscription_id: String,
+}
+
+/// Terms of an IPO commission coupon (`ipo_commission`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponIpoCommission")]
+pub(crate) struct CouponIpoCommission {
+    /// IPO subscription types the coupon applies to
+    #[py(array)]
+    bz_types: Vec<IpoCouponTargetType>,
+    /// Counter ID
+    counter_id: String,
+    /// Counter name
+    counter_name: String,
+    /// Financing limit, as returned by the server
+    financing_limit: String,
+}
+
+/// Terms of an IPO interest coupon (`ipo_interest`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponIpoInterest")]
+pub(crate) struct CouponIpoInterest {
+    /// Discount rate, as returned by the server
+    discount_rate: String,
+}
+
+/// Terms of a platform fee deduction coupon (`platform_fee_deduct`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponPlatformFeeDeduct")]
+pub(crate) struct CouponPlatformFeeDeduct {
+    /// Instrument types the coupon applies to
+    #[py(array)]
+    bz_types: Vec<CouponTargetType>,
+    /// Counter ID
+    counter_id: String,
+    /// Counter name
+    counter_name: String,
+    /// Markets the coupon applies to
+    markets: Vec<String>,
+    /// Number of times used
+    usage_count: i64,
+    /// Number of uses left
+    lave_usage_count: i64,
+    /// Whether the coupon can be combined with other coupons
+    superposition: bool,
+}
+
+/// An optional counter of a stock coupon
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponStockCounter")]
+pub(crate) struct CouponStockCounter {
+    /// Counter ID
+    counter_id: String,
+    /// Shares, as returned by the server
+    shares: String,
+}
+
+/// Fallback of a stock coupon
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponStockFallback")]
+pub(crate) struct CouponStockFallback {
+    /// Whether the fallback is enabled
+    enabled: bool,
+    /// Fallback type (the server's `type`), as returned by the server
+    fallback_type: String,
+    /// Counter ID
+    counter_id: String,
+    /// Shares, as returned by the server
+    shares: String,
+}
+
+/// Terms of a stock coupon (`stock`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponStock")]
+pub(crate) struct CouponStock {
+    /// Counter ID
+    counter_id: String,
+    /// Counter name
+    counter_name: String,
+    /// Amount
+    #[py(opt)]
+    amount: Option<PyDecimal>,
+    /// Redemption type (`by_card_value` or `shares_number`), as returned by the
+    /// server
+    redemption_type: String,
+    /// Delivery way (`card_exchange` or `account_transfer`), as returned by the
+    /// server
+    send_way: String,
+    /// Optional counters
+    #[py(array)]
+    optional_counters: Vec<CouponStockCounter>,
+    /// Fallback
+    fallback: CouponStockFallback,
+}
+
+/// Terms of a stock fragment coupon (`stock_fragment`)
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::asset::CouponStockFragment")]
+pub(crate) struct CouponStockFragment {
+    /// Counter ID
+    counter_id: String,
+    /// Counter name
+    counter_name: String,
+    /// Market
+    market: String,
+    /// Markets
+    markets: Vec<String>,
+    /// Instrument type the coupon applies to
+    underlying_type: CouponTargetType,
+    /// Amounts, as returned by the server (a `dict` of strings)
+    amounts: std::collections::BTreeMap<String, String>,
 }
 
 /// A coupon (reward card)
@@ -770,8 +1128,53 @@ pub(crate) struct Coupon {
     available_trade_session: String,
     /// Trading sessions the coupon applies to, as returned by the server
     trade_sessions: Vec<String>,
-    /// Commission terms (commission coupons only; empty otherwise)
-    commission: CouponCommission,
+    /// Subscription ID, as returned by the server
+    subscription_id: String,
+    /// Terms of an AI benefit coupon (none for other coupon types)
+    #[py(opt)]
+    ai_benefit: Option<CouponAiBenefit>,
+    /// Terms of a cash coupon (none for other coupon types)
+    #[py(opt)]
+    cash: Option<CouponCash>,
+    /// Terms of a coffee coupon (none for other coupon types)
+    #[py(opt)]
+    coffee_coupon: Option<CouponCoffee>,
+    /// Terms of a commission coupon (none for other coupon types)
+    #[py(opt)]
+    commission: Option<CouponCommission>,
+    /// Terms of a crypto coupon (none for other coupon types)
+    #[py(opt)]
+    crypto: Option<CouponCrypto>,
+    /// Terms of a finance interest coupon (none for other coupon types)
+    #[py(opt)]
+    finance_interest: Option<CouponFinanceInterest>,
+    /// Terms of a fund deduction coupon (none for other coupon types)
+    #[py(opt)]
+    fund_deduct: Option<CouponFundDeduct>,
+    /// Terms of a fundamental-data coupon (none for other coupon types)
+    #[py(opt)]
+    fundamental: Option<CouponQuote>,
+    /// Terms of an IPO coupon (none for other coupon types)
+    #[py(opt)]
+    ipo: Option<CouponIpo>,
+    /// Terms of an IPO commission coupon (none for other coupon types)
+    #[py(opt)]
+    ipo_commission: Option<CouponIpoCommission>,
+    /// Terms of an IPO interest coupon (none for other coupon types)
+    #[py(opt)]
+    ipo_interest: Option<CouponIpoInterest>,
+    /// Terms of a platform fee deduction coupon (none for other coupon types)
+    #[py(opt)]
+    platform_fee_deduct: Option<CouponPlatformFeeDeduct>,
+    /// Terms of a quote (market data) coupon (none for other coupon types)
+    #[py(opt)]
+    quote: Option<CouponQuote>,
+    /// Terms of a stock coupon (none for other coupon types)
+    #[py(opt)]
+    stock: Option<CouponStock>,
+    /// Terms of a stock fragment coupon (none for other coupon types)
+    #[py(opt)]
+    stock_fragment: Option<CouponStockFragment>,
 }
 
 /// Response for the coupon list
@@ -1021,6 +1424,46 @@ impl CouponStatus {
     #[getter]
     fn code(&self) -> i32 {
         longbridge::asset::CouponStatus::from(*self).into()
+    }
+}
+
+#[pymethods]
+impl CouponTargetType {
+    /// The server code of this value (`-1` for `Unknown`, which is not a
+    /// server code); the Python enum value itself is not the server code
+    #[getter]
+    fn code(&self) -> i32 {
+        longbridge::asset::CouponTargetType::from(*self).into()
+    }
+}
+
+#[pymethods]
+impl IpoCouponTargetType {
+    /// The server code of this value (`-1` for `Unknown`, which is not a
+    /// server code); the Python enum value itself is not the server code
+    #[getter]
+    fn code(&self) -> i32 {
+        longbridge::asset::IpoCouponTargetType::from(*self).into()
+    }
+}
+
+#[pymethods]
+impl CommissionUnlimitedType {
+    /// The server code of this value (`-1` for `Unknown`, which is not a
+    /// server code); the Python enum value itself is not the server code
+    #[getter]
+    fn code(&self) -> i32 {
+        longbridge::asset::CommissionUnlimitedType::from(*self).into()
+    }
+}
+
+#[pymethods]
+impl QuoteInvestorType {
+    /// The server code of this value (`-1` for `Unknown`, which is not a
+    /// server code); the Python enum value itself is not the server code
+    #[getter]
+    fn code(&self) -> i32 {
+        longbridge::asset::QuoteInvestorType::from(*self).into()
     }
 }
 
