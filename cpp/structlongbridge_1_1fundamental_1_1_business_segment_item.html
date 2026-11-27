@@ -73,7 +73,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>One business segment item (latest snapshot).  
+<p>One business or regional segment item (latest snapshot).  
  <a href="structlongbridge_1_1fundamental_1_1_business_segment_item.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="types_8hpp_source.html">types.hpp</a>&gt;</code></p>
@@ -84,10 +84,31 @@ Public Attributes</h2></td></tr>
 <tr class="separator:adbb59106a1d2731cb298daa0a2458b87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc110764d697ab15c23a3ba44d931915"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_business_segment_item.html#acc110764d697ab15c23a3ba44d931915">percent</a></td></tr>
 <tr class="separator:acc110764d697ab15c23a3ba44d931915"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8866f5057859bac0bc0a7d9b312e912b"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_business_segment_item.html#a8866f5057859bac0bc0a7d9b312e912b">value</a></td></tr>
+<tr class="separator:a8866f5057859bac0bc0a7d9b312e912b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dc13d0eba69fc5aa8474f859a80980c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_business_segment_item.html#a9dc13d0eba69fc5aa8474f859a80980c">id</a></td></tr>
+<tr class="separator:a9dc13d0eba69fc5aa8474f859a80980c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a516b6fb1fe26697be83858ca76c8729b"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_business_segment_item.html#a516b6fb1fe26697be83858ca76c8729b">yoy</a></td></tr>
+<tr class="separator:a516b6fb1fe26697be83858ca76c8729b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>One business segment item (latest snapshot). </p>
+<div class="textblock"><p>One business or regional segment item (latest snapshot). </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a9dc13d0eba69fc5aa8474f859a80980c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9dc13d0eba69fc5aa8474f859a80980c">&#9670;&nbsp;</a></span>id</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string longbridge::fundamental::BusinessSegmentItem::id</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Stable identifier for the segment. Empty when the server does not supply one. </p>
+
+</div>
+</div>
 <a id="adbb59106a1d2731cb298daa0a2458b87"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adbb59106a1d2731cb298daa0a2458b87">&#9670;&nbsp;</a></span>name</h2>
 
@@ -113,6 +134,36 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8866f5057859bac0bc0a7d9b312e912b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8866f5057859bac0bc0a7d9b312e912b">&#9670;&nbsp;</a></span>value</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string longbridge::fundamental::BusinessSegmentItem::value</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Absolute value, in the response's currency. Empty when the server does not supply one. </p>
+
+</div>
+</div>
+<a id="a516b6fb1fe26697be83858ca76c8729b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a516b6fb1fe26697be83858ca76c8729b">&#9670;&nbsp;</a></span>yoy</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string longbridge::fundamental::BusinessSegmentItem::yoy</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Year-on-year change for this segment. Empty when the server does not supply one. </p>
 
 </div>
 </div>

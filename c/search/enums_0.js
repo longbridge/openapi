@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['cattachedordertype_4704',['CAttachedOrderType',['../longbridge_8h.html#ad5e410269200c2f7af8397d355b3e95f',1,'longbridge.h']]],
-  ['ccontractdirection_4705',['CContractDirection',['../longbridge_8h.html#aea8ff37056cd3c4895ddfc432317c2be',1,'longbridge.h']]],
-  ['cmultilegposition_4706',['CMultiLegPosition',['../longbridge_8h.html#a35ab0651899cda535b1eb90287b7951d',1,'longbridge.h']]],
-  ['cmultilegstrategy_4707',['CMultiLegStrategy',['../longbridge_8h.html#ae0d9beb0c0105a9ee5d1fac115be0b51',1,'longbridge.h']]]
+  ['cattachedordertype_5356',['CAttachedOrderType',['../longbridge_8h.html#ad5e410269200c2f7af8397d355b3e95f',1,'longbridge.h']]],
+  ['ccontractdirection_5357',['CContractDirection',['../longbridge_8h.html#aea8ff37056cd3c4895ddfc432317c2be',1,'longbridge.h']]],
+  ['cmultilegposition_5358',['CMultiLegPosition',['../longbridge_8h.html#a35ab0651899cda535b1eb90287b7951d',1,'longbridge.h']]],
+  ['cmultilegstrategy_5359',['CMultiLegStrategy',['../longbridge_8h.html#ae0d9beb0c0105a9ee5d1fac115be0b51',1,'longbridge.h']]]
 ];

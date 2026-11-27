@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['quarterly_5freturns_2766',['quarterly_returns',['../classlongbridge_1_1fund_1_1_fund_context.html#afd6eed09e6e8d2ffe4956ae3707082fa',1,'longbridge::fund::FundContext']]],
-  ['quote_2767',['quote',['../classlongbridge_1_1quote_1_1_quote_context.html#aa7a4595e9eb5830e935322a8ddc601f5',1,'longbridge::quote::QuoteContext']]],
-  ['quote_2768',['QUOTE',['../classlongbridge_1_1quote_1_1_sub_flags.html#a031ea4bba3c4514cb020bd52af6c386d',1,'longbridge::quote::SubFlags']]],
-  ['quote_5flevel_2769',['quote_level',['../classlongbridge_1_1quote_1_1_quote_context.html#aa28060b66320368658d016a95c38b0d0',1,'longbridge::quote::QuoteContext']]],
-  ['quote_5fpackage_5fdetails_2770',['quote_package_details',['../classlongbridge_1_1quote_1_1_quote_context.html#afa25e57c5ac723f23f0bde05790d0bda',1,'longbridge::quote::QuoteContext']]],
-  ['quotecontext_2771',['QuoteContext',['../classlongbridge_1_1quote_1_1_quote_context.html#ae6156ce8bbaf55b9affa3533512a5173',1,'longbridge::quote::QuoteContext::QuoteContext()'],['../classlongbridge_1_1quote_1_1_quote_context.html#ac04f458d59b984afa27d228c116bcb44',1,'longbridge::quote::QuoteContext::QuoteContext(const lb_quote_context_t *ctx)'],['../classlongbridge_1_1quote_1_1_quote_context.html#acdad313a86ea1e63bf6dc1d77e4e1c4a',1,'longbridge::quote::QuoteContext::QuoteContext(const QuoteContext &amp;ctx)'],['../classlongbridge_1_1quote_1_1_quote_context.html#ad6a56f706ee0d07fcf2dcbd7f9a9f5db',1,'longbridge::quote::QuoteContext::QuoteContext(QuoteContext &amp;&amp;ctx)']]]
+  ['quarterly_5freturns_3113',['quarterly_returns',['../classlongbridge_1_1fund_1_1_fund_context.html#afd6eed09e6e8d2ffe4956ae3707082fa',1,'longbridge::fund::FundContext']]],
+  ['quote_3114',['QUOTE',['../classlongbridge_1_1quote_1_1_sub_flags.html#a031ea4bba3c4514cb020bd52af6c386d',1,'longbridge::quote::SubFlags']]],
+  ['quote_3115',['quote',['../classlongbridge_1_1quote_1_1_quote_context.html#aa7a4595e9eb5830e935322a8ddc601f5',1,'longbridge::quote::QuoteContext']]],
+  ['quote_5flevel_3116',['quote_level',['../classlongbridge_1_1quote_1_1_quote_context.html#aa28060b66320368658d016a95c38b0d0',1,'longbridge::quote::QuoteContext']]],
+  ['quote_5fpackage_5fdetails_3117',['quote_package_details',['../classlongbridge_1_1quote_1_1_quote_context.html#afa25e57c5ac723f23f0bde05790d0bda',1,'longbridge::quote::QuoteContext']]],
+  ['quotecontext_3118',['QuoteContext',['../classlongbridge_1_1quote_1_1_quote_context.html#ae6156ce8bbaf55b9affa3533512a5173',1,'longbridge::quote::QuoteContext::QuoteContext()'],['../classlongbridge_1_1quote_1_1_quote_context.html#ac04f458d59b984afa27d228c116bcb44',1,'longbridge::quote::QuoteContext::QuoteContext(const lb_quote_context_t *ctx)'],['../classlongbridge_1_1quote_1_1_quote_context.html#acdad313a86ea1e63bf6dc1d77e4e1c4a',1,'longbridge::quote::QuoteContext::QuoteContext(const QuoteContext &amp;ctx)'],['../classlongbridge_1_1quote_1_1_quote_context.html#ad6a56f706ee0d07fcf2dcbd7f9a9f5db',1,'longbridge::quote::QuoteContext::QuoteContext(QuoteContext &amp;&amp;ctx)']]]
 ];

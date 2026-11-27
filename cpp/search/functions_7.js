@@ -1,15 +1,15 @@
 var searchData=
 [
-  ['has_5foption_2659',['has_option',['../structlongbridge_1_1quote_1_1_derivative_type.html#a8dbb56100378e9f5f3513def984555a5',1,'longbridge::quote::DerivativeType']]],
-  ['has_5fwarrant_2660',['has_warrant',['../structlongbridge_1_1quote_1_1_derivative_type.html#aa9d3a398fceb107676666da2603704ba',1,'longbridge::quote::DerivativeType']]],
-  ['history_2661',['history',['../classlongbridge_1_1dca_1_1_d_c_a_context.html#aa62aa53a8b82f374ce9a72ebfbe29e72',1,'longbridge::dca::DCAContext']]],
-  ['history_5fcandlesticks_5fby_5fdate_2662',['history_candlesticks_by_date',['../classlongbridge_1_1quote_1_1_quote_context.html#a8adf7d1d2bcb8dc1369e397c7859bc1a',1,'longbridge::quote::QuoteContext']]],
-  ['history_5fcandlesticks_5fby_5foffset_2663',['history_candlesticks_by_offset',['../classlongbridge_1_1quote_1_1_quote_context.html#ae295ca3676f3b39d1b34103a35c07429',1,'longbridge::quote::QuoteContext']]],
-  ['history_5fexecutions_2664',['history_executions',['../classlongbridge_1_1trade_1_1_trade_context.html#a323b4e7185bf067e622db373e96bcc75',1,'longbridge::trade::TradeContext']]],
-  ['history_5fmarket_5ftemperature_2665',['history_market_temperature',['../classlongbridge_1_1quote_1_1_quote_context.html#aa766f5cdb11ac2ebec96e942a4bf97fd',1,'longbridge::quote::QuoteContext']]],
-  ['history_5forders_2666',['history_orders',['../classlongbridge_1_1trade_1_1_trade_context.html#a042c94acf87d282f7c106a44efeedbbd',1,'longbridge::trade::TradeContext']]],
-  ['holdings_2667',['holdings',['../classlongbridge_1_1fund_1_1_fund_context.html#ace8f1a161deccf8e96f22f24fefa7db5',1,'longbridge::fund::FundContext']]],
-  ['hot_5ffunds_2668',['hot_funds',['../classlongbridge_1_1fund_1_1_fund_context.html#af3d8b2a2f9a12788a130fa21bb0eb491',1,'longbridge::fund::FundContext']]],
-  ['httpclient_2669',['HttpClient',['../classlongbridge_1_1_http_client.html#ac8018bc18a53858db8e23228fabe291c',1,'longbridge::HttpClient::HttpClient()'],['../classlongbridge_1_1_http_client.html#a7715f50929b7f8173cf3ea2d5c6dc9fd',1,'longbridge::HttpClient::HttpClient(HttpClient &amp;)=delete'],['../classlongbridge_1_1_http_client.html#a641086780e53420fd32a3b9c7105a840',1,'longbridge::HttpClient::HttpClient(HttpClient &amp;&amp;) noexcept']]],
-  ['httpresult_2670',['HttpResult',['../structlongbridge_1_1_http_result.html#a81aec7e09782dc72c8bdaaaad70d1ab9',1,'longbridge::HttpResult']]]
+  ['has_5foption_3006',['has_option',['../structlongbridge_1_1quote_1_1_derivative_type.html#a8dbb56100378e9f5f3513def984555a5',1,'longbridge::quote::DerivativeType']]],
+  ['has_5fwarrant_3007',['has_warrant',['../structlongbridge_1_1quote_1_1_derivative_type.html#aa9d3a398fceb107676666da2603704ba',1,'longbridge::quote::DerivativeType']]],
+  ['history_3008',['history',['../classlongbridge_1_1dca_1_1_d_c_a_context.html#aa62aa53a8b82f374ce9a72ebfbe29e72',1,'longbridge::dca::DCAContext']]],
+  ['history_5fcandlesticks_5fby_5fdate_3009',['history_candlesticks_by_date',['../classlongbridge_1_1quote_1_1_quote_context.html#a8adf7d1d2bcb8dc1369e397c7859bc1a',1,'longbridge::quote::QuoteContext']]],
+  ['history_5fcandlesticks_5fby_5foffset_3010',['history_candlesticks_by_offset',['../classlongbridge_1_1quote_1_1_quote_context.html#ae295ca3676f3b39d1b34103a35c07429',1,'longbridge::quote::QuoteContext']]],
+  ['history_5fexecutions_3011',['history_executions',['../classlongbridge_1_1trade_1_1_trade_context.html#a323b4e7185bf067e622db373e96bcc75',1,'longbridge::trade::TradeContext']]],
+  ['history_5fmarket_5ftemperature_3012',['history_market_temperature',['../classlongbridge_1_1quote_1_1_quote_context.html#aa766f5cdb11ac2ebec96e942a4bf97fd',1,'longbridge::quote::QuoteContext']]],
+  ['history_5forders_3013',['history_orders',['../classlongbridge_1_1trade_1_1_trade_context.html#a042c94acf87d282f7c106a44efeedbbd',1,'longbridge::trade::TradeContext']]],
+  ['holdings_3014',['holdings',['../classlongbridge_1_1fund_1_1_fund_context.html#ace8f1a161deccf8e96f22f24fefa7db5',1,'longbridge::fund::FundContext']]],
+  ['hot_5ffunds_3015',['hot_funds',['../classlongbridge_1_1fund_1_1_fund_context.html#af3d8b2a2f9a12788a130fa21bb0eb491',1,'longbridge::fund::FundContext']]],
+  ['httpclient_3016',['HttpClient',['../classlongbridge_1_1_http_client.html#ac8018bc18a53858db8e23228fabe291c',1,'longbridge::HttpClient::HttpClient()'],['../classlongbridge_1_1_http_client.html#a7715f50929b7f8173cf3ea2d5c6dc9fd',1,'longbridge::HttpClient::HttpClient(HttpClient &amp;)=delete'],['../classlongbridge_1_1_http_client.html#a641086780e53420fd32a3b9c7105a840',1,'longbridge::HttpClient::HttpClient(HttpClient &amp;&amp;) noexcept']]],
+  ['httpresult_3017',['HttpResult',['../structlongbridge_1_1_http_result.html#a81aec7e09782dc72c8bdaaaad70d1ab9',1,'longbridge::HttpResult']]]
 ];

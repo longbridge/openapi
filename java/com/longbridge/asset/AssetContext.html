@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":9,"i2":10,"i3":10};
+var data = {"i0":10,"i1":9,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -194,17 +194,84 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="BankCard.html" title="class in com.longbridge.asset">BankCard</a>[]&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBankCards()">getBankCards</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the linked bank cards, with their verification, binding and
+ authorization (eDDA, bank securities account, FPS) status.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="CouponOrder.html" title="class in com.longbridge.asset">CouponOrder</a>[]&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCouponOrders(java.lang.String,com.longbridge.asset.CouponOrderType)">getCouponOrders</a></span>&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cardId,
+               <a href="CouponOrderType.html" title="enum in com.longbridge.asset">CouponOrderType</a>&nbsp;orderType)</code></th>
+<td class="colLast">
+<div class="block">Get the orders a coupon was applied to.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="CouponsResponse.html" title="class in com.longbridge.asset">CouponsResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCoupons(com.longbridge.asset.GetCouponsOptions)">getCoupons</a></span>&#8203;(<a href="GetCouponsOptions.html" title="class in com.longbridge.asset">GetCouponsOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get coupons (reward cards).</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="DepositsResponse.html" title="class in com.longbridge.asset">DepositsResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDeposits(com.longbridge.asset.GetDepositsOptions)">getDeposits</a></span>&#8203;(<a href="GetDepositsOptions.html" title="class in com.longbridge.asset">GetDepositsOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get one page of deposit records.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="EddaApplication.html" title="class in com.longbridge.asset">EddaApplication</a>[]&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEddaApplications(java.lang.String,java.lang.String)">getEddaApplications</a></span>&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cardId,
+                   <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;currency)</code></th>
+<td class="colLast">
+<div class="block">Get the eDDA authorization applications of a bank card in one currency.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="RewardRecordsResponse.html" title="class in com.longbridge.asset">RewardRecordsResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRewardRecords(com.longbridge.asset.GetRewardRecordsOptions)">getRewardRecords</a></span>&#8203;(<a href="GetRewardRecordsOptions.html" title="class in com.longbridge.asset">GetRewardRecordsOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get reward records from the reward center (cash, gifts, coupons, task
+ rewards).</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStatementDownloadUrl(java.lang.String)">getStatementDownloadUrl</a></span>&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;fileKey)</code></th>
 <td class="colLast">
 <div class="block">Get statement data download URL</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStatements(com.longbridge.asset.GetStatementListOptions)">getStatements</a></span>&#8203;(<a href="GetStatementListOptions.html" title="class in com.longbridge.asset">GetStatementListOptions</a>&nbsp;opts)</code></th>
 <td class="colLast">
 <div class="block">Get statement data list</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="StockTransferInResponse.html" title="class in com.longbridge.asset">StockTransferInResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStockTransfersIn(com.longbridge.asset.GetStockTransfersInOptions)">getStockTransfersIn</a></span>&#8203;(<a href="GetStockTransfersInOptions.html" title="class in com.longbridge.asset">GetStockTransfersInOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get stock transfer-in applications (another broker to this account).</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="StockTransferOut.html" title="class in com.longbridge.asset">StockTransferOut</a>[]&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStockTransfersOut(com.longbridge.asset.GetStockTransfersOutOptions)">getStockTransfersOut</a></span>&#8203;(<a href="GetStockTransfersOutOptions.html" title="class in com.longbridge.asset">GetStockTransfersOutOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get stock transfer-out applications (this account to another broker).</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="WithdrawalsResponse.html" title="class in com.longbridge.asset">WithdrawalsResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getWithdrawals(com.longbridge.asset.GetWithdrawalsOptions)">getWithdrawals</a></span>&#8203;(<a href="GetWithdrawalsOptions.html" title="class in com.longbridge.asset">GetWithdrawalsOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get withdrawal records.</div>
 </td>
 </tr>
 </table>
@@ -304,7 +371,7 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <a id="getStatementDownloadUrl(java.lang.String)">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getStatementDownloadUrl</h4>
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&gt;&nbsp;getStatementDownloadUrl&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;fileKey)
@@ -313,6 +380,213 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>fileKey</code> - File key obtained from getStatements</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getBankCards()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getBankCards</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="BankCard.html" title="class in com.longbridge.asset">BankCard</a>[]&gt;&nbsp;getBankCards()
+                                           throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get the linked bank cards, with their verification, binding and
+ authorization (eDDA, bank securities account, FPS) status.
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getEddaApplications(java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getEddaApplications</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="EddaApplication.html" title="class in com.longbridge.asset">EddaApplication</a>[]&gt;&nbsp;getEddaApplications&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cardId,
+                                                                <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;currency)
+                                                         throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get the eDDA authorization applications of a bank card in one currency.
+ The card id must be all digits; any other value fails with an error
+ before anything is sent.
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>cardId</code> - Bank card ID (<a href="BankCard.html#getId()"><code>BankCard.getId()</code></a>)</dd>
+<dd><code>currency</code> - Currency, e.g. <code>HKD</code> or <code>USD</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getStockTransfersIn(com.longbridge.asset.GetStockTransfersInOptions)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getStockTransfersIn</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="StockTransferInResponse.html" title="class in com.longbridge.asset">StockTransferInResponse</a>&gt;&nbsp;getStockTransfersIn&#8203;(<a href="GetStockTransfersInOptions.html" title="class in com.longbridge.asset">GetStockTransfersInOptions</a>&nbsp;opts)
+                                                               throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get stock transfer-in applications (another broker to this account).
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>opts</code> - Query options; may be null</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getStockTransfersOut(com.longbridge.asset.GetStockTransfersOutOptions)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getStockTransfersOut</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="StockTransferOut.html" title="class in com.longbridge.asset">StockTransferOut</a>[]&gt;&nbsp;getStockTransfersOut&#8203;(<a href="GetStockTransfersOutOptions.html" title="class in com.longbridge.asset">GetStockTransfersOutOptions</a>&nbsp;opts)
+                                                           throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get stock transfer-out applications (this account to another broker).
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>opts</code> - Query options; may be null</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getRewardRecords(com.longbridge.asset.GetRewardRecordsOptions)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getRewardRecords</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="RewardRecordsResponse.html" title="class in com.longbridge.asset">RewardRecordsResponse</a>&gt;&nbsp;getRewardRecords&#8203;(<a href="GetRewardRecordsOptions.html" title="class in com.longbridge.asset">GetRewardRecordsOptions</a>&nbsp;opts)
+                                                          throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get reward records from the reward center (cash, gifts, coupons, task
+ rewards).
+ <p>
+ The route has no date filter: to find rewards in a time range, page
+ through the records and filter on their times.
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>opts</code> - Query options; may be null</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getCoupons(com.longbridge.asset.GetCouponsOptions)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCoupons</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="CouponsResponse.html" title="class in com.longbridge.asset">CouponsResponse</a>&gt;&nbsp;getCoupons&#8203;(<a href="GetCouponsOptions.html" title="class in com.longbridge.asset">GetCouponsOptions</a>&nbsp;opts)
+                                              throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get coupons (reward cards). By default lists the coupons that have not
+ expired. The pinned top / bottom lists are repeated on every page.
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>opts</code> - Query options; may be null</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getCouponOrders(java.lang.String,com.longbridge.asset.CouponOrderType)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCouponOrders</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="CouponOrder.html" title="class in com.longbridge.asset">CouponOrder</a>[]&gt;&nbsp;getCouponOrders&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cardId,
+                                                        <a href="CouponOrderType.html" title="enum in com.longbridge.asset">CouponOrderType</a>&nbsp;orderType)
+                                                 throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get the orders a coupon was applied to. The gateway rate-limits this
+ route tightly per member, so avoid calling it concurrently. The card id
+ must be 32 hex characters; any other value fails with an error before
+ anything is sent.
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>cardId</code> - Coupon ID (<a href="Coupon.html#getCardId()"><code>Coupon.getCardId()</code></a>, 32 hex
+                  characters; not a bank card ID)</dd>
+<dd><code>orderType</code> - Which orders to list</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getDeposits(com.longbridge.asset.GetDepositsOptions)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDeposits</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="DepositsResponse.html" title="class in com.longbridge.asset">DepositsResponse</a>&gt;&nbsp;getDeposits&#8203;(<a href="GetDepositsOptions.html" title="class in com.longbridge.asset">GetDepositsOptions</a>&nbsp;opts)
+                                                throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get one page of deposit records. The server's total follows the page
+ size rather than the record count, so it is not returned;
+ <a href="DepositsResponse.html#getHasMore()"><code>DepositsResponse.getHasMore()</code></a> reports a full page instead. The
+ page size is always sent: at most 20, default 20.
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>opts</code> - Query options; may be null</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A Future representing the result of the operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></code> - If an error occurs</dd>
+</dl>
+</li>
+</ul>
+<a id="getWithdrawals(com.longbridge.asset.GetWithdrawalsOptions)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getWithdrawals</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="WithdrawalsResponse.html" title="class in com.longbridge.asset">WithdrawalsResponse</a>&gt;&nbsp;getWithdrawals&#8203;(<a href="GetWithdrawalsOptions.html" title="class in com.longbridge.asset">GetWithdrawalsOptions</a>&nbsp;opts)
+                                                      throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
+<div class="block">Get withdrawal records. <a href="WithdrawalsResponse.html#getHasMore()"><code>WithdrawalsResponse.getHasMore()</code></a> reports
+ a full page of the size sent (default 20, at most 50).
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>opts</code> - Query options; may be null</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A Future representing the result of the operation</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>

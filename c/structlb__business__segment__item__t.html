@@ -76,10 +76,31 @@ Data Fields</h2></td></tr>
 <tr class="separator:a8f8f80d37794cde9472343e4487ba3eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1961b98c926cf13e6ede1b7d78f5517f"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segment__item__t.html#a1961b98c926cf13e6ede1b7d78f5517f">percent</a></td></tr>
 <tr class="separator:a1961b98c926cf13e6ede1b7d78f5517f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8556878012feffc9e0beb86cd78f424d"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segment__item__t.html#a8556878012feffc9e0beb86cd78f424d">value</a></td></tr>
+<tr class="separator:a8556878012feffc9e0beb86cd78f424d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeffa2f0815ce90fecbda9aac199143db"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segment__item__t.html#aeffa2f0815ce90fecbda9aac199143db">id</a></td></tr>
+<tr class="separator:aeffa2f0815ce90fecbda9aac199143db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d532e633df437100ff405c870d950f0"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segment__item__t.html#a2d532e633df437100ff405c870d950f0">yoy</a></td></tr>
+<tr class="separator:a2d532e633df437100ff405c870d950f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>One business segment item (latest snapshot). </p>
+<div class="textblock"><p>One business or regional segment item (latest snapshot). </p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="aeffa2f0815ce90fecbda9aac199143db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeffa2f0815ce90fecbda9aac199143db">&#9670;&nbsp;</a></span>id</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* id</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Stable identifier for the segment. Empty when the server does not supply one. </p>
+
+</div>
+</div>
 <a id="a8f8f80d37794cde9472343e4487ba3eb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8f8f80d37794cde9472343e4487ba3eb">&#9670;&nbsp;</a></span>name</h2>
 
@@ -107,6 +128,36 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Percentage of total revenue. </p>
+
+</div>
+</div>
+<a id="a8556878012feffc9e0beb86cd78f424d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8556878012feffc9e0beb86cd78f424d">&#9670;&nbsp;</a></span>value</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* value</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Absolute value, in the response's currency. Empty when the server does not supply one. </p>
+
+</div>
+</div>
+<a id="a2d532e633df437100ff405c870d950f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d532e633df437100ff405c870d950f0">&#9670;&nbsp;</a></span>yoy</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* yoy</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Year-on-year change for this segment. Empty when the server does not supply one. </p>
 
 </div>
 </div>

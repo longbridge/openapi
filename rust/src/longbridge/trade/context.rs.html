@@ -1389,7 +1389,7 @@
 <a href=#1389 id=1389 data-nosnippet>1389</a>    <span class="kw">use </span><span class="kw">crate</span>::trade::{
 <a href=#1390 id=1390 data-nosnippet>1390</a>        GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
 <a href=#1391 id=1391 data-nosnippet>1391</a>        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-<a href=#1392 id=1392 data-nosnippet>1392</a>        OrderType, SubmitOrderOptions, TimeInForceType,
+<a href=#1392 id=1392 data-nosnippet>1392</a>        OrderType, SubmitMultiLegOrderLeg, SubmitOrderOptions, TimeInForceType,
 <a href=#1393 id=1393 data-nosnippet>1393</a>    };
 <a href=#1394 id=1394 data-nosnippet>1394</a>
 <a href=#1395 id=1395 data-nosnippet>1395</a>    <span class="kw">fn </span>query(value: <span class="kw-2">&amp;</span><span class="kw">impl </span>Serialize) -&gt; String {
@@ -1443,5 +1443,16 @@
 <a href=#1443 id=1443 data-nosnippet>1443</a>        <span class="kw">let </span>body = serde_json::to_value(<span class="kw-2">&amp;</span>opts).unwrap();
 <a href=#1444 id=1444 data-nosnippet>1444</a>        <span class="macro">assert_eq!</span>(body[<span class="string">"symbol"</span>], <span class="string">"700.HK"</span>);
 <a href=#1445 id=1445 data-nosnippet>1445</a>    }
-<a href=#1446 id=1446 data-nosnippet>1446</a>}
+<a href=#1446 id=1446 data-nosnippet>1446</a>
+<a href=#1447 id=1447 data-nosnippet>1447</a>    <span class="attr">#[test]
+<a href=#1448 id=1448 data-nosnippet>1448</a>    </span><span class="kw">fn </span>submit_multileg_normalizes_leg_symbols() {
+<a href=#1449 id=1449 data-nosnippet>1449</a>        <span class="kw">let </span>leg = SubmitMultiLegOrderLeg::new(<span class="string">"00700.HK"</span>, <span class="macro">decimal!</span>(<span class="number">1i32</span>));
+<a href=#1450 id=1450 data-nosnippet>1450</a>        <span class="macro">assert_eq!</span>(serde_json::to_value(<span class="kw-2">&amp;</span>leg).unwrap()[<span class="string">"symbol"</span>], <span class="string">"700.HK"</span>);
+<a href=#1451 id=1451 data-nosnippet>1451</a>        <span class="kw">let </span>leg = SubmitMultiLegOrderLeg::new(<span class="string">"QQQ260731C764000.US"</span>, <span class="macro">decimal!</span>(<span class="number">1i32</span>));
+<a href=#1452 id=1452 data-nosnippet>1452</a>        <span class="macro">assert_eq!</span>(
+<a href=#1453 id=1453 data-nosnippet>1453</a>            serde_json::to_value(<span class="kw-2">&amp;</span>leg).unwrap()[<span class="string">"symbol"</span>],
+<a href=#1454 id=1454 data-nosnippet>1454</a>            <span class="string">"QQQ260731C764000.US"
+<a href=#1455 id=1455 data-nosnippet>1455</a>        </span>);
+<a href=#1456 id=1456 data-nosnippet>1456</a>    }
+<a href=#1457 id=1457 data-nosnippet>1457</a>}
 </code></pre></div></section></main></body></html>

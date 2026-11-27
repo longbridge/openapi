@@ -1,11 +1,23 @@
 var searchData=
 [
-  ['balancetypecash_4794',['BalanceTypeCash',['../longbridge_8h.html#ac0ec531aeaece7112d0f70761dfd7d10a2a4479d6fa3788dde90ffcb1ef24e759',1,'longbridge.h']]],
-  ['balancetypefund_4795',['BalanceTypeFund',['../longbridge_8h.html#ac0ec531aeaece7112d0f70761dfd7d10afc55415409b79138d06adaded57e475d',1,'longbridge.h']]],
-  ['balancetypestock_4796',['BalanceTypeStock',['../longbridge_8h.html#ac0ec531aeaece7112d0f70761dfd7d10ad371abf75f381d861e12f1c4d3cb9e6e',1,'longbridge.h']]],
-  ['balancetypeunknown_4797',['BalanceTypeUnknown',['../longbridge_8h.html#ac0ec531aeaece7112d0f70761dfd7d10a3f561b5d4efd099efd4cf47e3016f973',1,'longbridge.h']]],
-  ['brokerholdingperiodrct1_4798',['BrokerHoldingPeriodRct1',['../longbridge_8h.html#a56173eb622f04e1fd8d888f2d89d0be5aeee1fa715e89aefe7b5199a63404653c',1,'longbridge.h']]],
-  ['brokerholdingperiodrct20_4799',['BrokerHoldingPeriodRct20',['../longbridge_8h.html#a56173eb622f04e1fd8d888f2d89d0be5a1044ac317ecfda3e88df55805c1ae24a',1,'longbridge.h']]],
-  ['brokerholdingperiodrct5_4800',['BrokerHoldingPeriodRct5',['../longbridge_8h.html#a56173eb622f04e1fd8d888f2d89d0be5a191b0983d4e46bd73d9a36dc28724bf7',1,'longbridge.h']]],
-  ['brokerholdingperiodrct60_4801',['BrokerHoldingPeriodRct60',['../longbridge_8h.html#a56173eb622f04e1fd8d888f2d89d0be5a92989b52f0414db4cbb4f0976a8e0633',1,'longbridge.h']]]
+  ['balancetypecash_5470',['BalanceTypeCash',['../longbridge_8h.html#ac0ec531aeaece7112d0f70761dfd7d10a2a4479d6fa3788dde90ffcb1ef24e759',1,'longbridge.h']]],
+  ['balancetypefund_5471',['BalanceTypeFund',['../longbridge_8h.html#ac0ec531aeaece7112d0f70761dfd7d10afc55415409b79138d06adaded57e475d',1,'longbridge.h']]],
+  ['balancetypestock_5472',['BalanceTypeStock',['../longbridge_8h.html#ac0ec531aeaece7112d0f70761dfd7d10ad371abf75f381d861e12f1c4d3cb9e6e',1,'longbridge.h']]],
+  ['balancetypeunknown_5473',['BalanceTypeUnknown',['../longbridge_8h.html#ac0ec531aeaece7112d0f70761dfd7d10a3f561b5d4efd099efd4cf47e3016f973',1,'longbridge.h']]],
+  ['bankcardbindstatebinding_5474',['BankCardBindStateBinding',['../longbridge_8h.html#a75ad7b8f699398b14e386c23e7f28884a340662894243d21be49181c9bbcae393',1,'longbridge.h']]],
+  ['bankcardbindstatebound_5475',['BankCardBindStateBound',['../longbridge_8h.html#a75ad7b8f699398b14e386c23e7f28884a905b535df6a33f79c21720b60c105e0e',1,'longbridge.h']]],
+  ['bankcardbindstatefailed_5476',['BankCardBindStateFailed',['../longbridge_8h.html#a75ad7b8f699398b14e386c23e7f28884a1e402acb4b1a6fb479d394657a736f97',1,'longbridge.h']]],
+  ['bankcardbindstateunknown_5477',['BankCardBindStateUnknown',['../longbridge_8h.html#a75ad7b8f699398b14e386c23e7f28884ace043f7a508d1fa6de2c9294b0237f1c',1,'longbridge.h']]],
+  ['bankcardstatusunderreview_5478',['BankCardStatusUnderReview',['../longbridge_8h.html#aa21b38f1985bfb50ba8eaf4c0badf1b1aaeb4932adadec97d4de522b950d7c867',1,'longbridge.h']]],
+  ['bankcardstatusunknown_5479',['BankCardStatusUnknown',['../longbridge_8h.html#aa21b38f1985bfb50ba8eaf4c0badf1b1a31b507b6c1d7cc6e8d05acbebab5fb2b',1,'longbridge.h']]],
+  ['bankcardstatusunverified_5480',['BankCardStatusUnverified',['../longbridge_8h.html#aa21b38f1985bfb50ba8eaf4c0badf1b1ac1ceb7967be1f43f65eb1e7660e5b8e2',1,'longbridge.h']]],
+  ['bankcardstatusverified_5481',['BankCardStatusVerified',['../longbridge_8h.html#aa21b38f1985bfb50ba8eaf4c0badf1b1adca2e676c108d0a50c3049c04781abc3',1,'longbridge.h']]],
+  ['bankcardwitnessstatenotrequired_5482',['BankCardWitnessStateNotRequired',['../longbridge_8h.html#a52e89ac00e6311f282e4deabd6a2ec60a173af4f20e197717c3f4d657689df2f2',1,'longbridge.h']]],
+  ['bankcardwitnessstatepending_5483',['BankCardWitnessStatePending',['../longbridge_8h.html#a52e89ac00e6311f282e4deabd6a2ec60a9f6e6d94bc289954ea82e7f975745fea',1,'longbridge.h']]],
+  ['bankcardwitnessstateunknown_5484',['BankCardWitnessStateUnknown',['../longbridge_8h.html#a52e89ac00e6311f282e4deabd6a2ec60a574d797a693035595a3923b38c54ebdb',1,'longbridge.h']]],
+  ['bankcardwitnessstatewitnessed_5485',['BankCardWitnessStateWitnessed',['../longbridge_8h.html#a52e89ac00e6311f282e4deabd6a2ec60a138fefa9f0fa014357e15563eac2bd8f',1,'longbridge.h']]],
+  ['brokerholdingperiodrct1_5486',['BrokerHoldingPeriodRct1',['../longbridge_8h.html#a56173eb622f04e1fd8d888f2d89d0be5aeee1fa715e89aefe7b5199a63404653c',1,'longbridge.h']]],
+  ['brokerholdingperiodrct20_5487',['BrokerHoldingPeriodRct20',['../longbridge_8h.html#a56173eb622f04e1fd8d888f2d89d0be5a1044ac317ecfda3e88df55805c1ae24a',1,'longbridge.h']]],
+  ['brokerholdingperiodrct5_5488',['BrokerHoldingPeriodRct5',['../longbridge_8h.html#a56173eb622f04e1fd8d888f2d89d0be5a191b0983d4e46bd73d9a36dc28724bf7',1,'longbridge.h']]],
+  ['brokerholdingperiodrct60_5489',['BrokerHoldingPeriodRct60',['../longbridge_8h.html#a56173eb622f04e1fd8d888f2d89d0be5a92989b52f0414db4cbb4f0976a8e0633',1,'longbridge.h']]]
 ];

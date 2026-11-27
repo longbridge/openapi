@@ -27,6 +27,15 @@
 <div class="tsd-index-list"><a href="#new" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>new</span></a>
 <a href="#statements" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>statements</span></a>
 <a href="#statementdownloadurl" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>statement<wbr/>Download<wbr/>Url</span></a>
+<a href="#bankcards" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>bank<wbr/>Cards</span></a>
+<a href="#eddaapplications" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>edda<wbr/>Applications</span></a>
+<a href="#stocktransfersin" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>stock<wbr/>Transfers<wbr/>In</span></a>
+<a href="#stocktransfersout" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>stock<wbr/>Transfers<wbr/>Out</span></a>
+<a href="#rewardrecords" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>reward<wbr/>Records</span></a>
+<a href="#coupons" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>coupons</span></a>
+<a href="#couponorders" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>coupon<wbr/>Orders</span></a>
+<a href="#deposits" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>deposits</span></a>
+<a href="#withdrawals" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>withdrawals</span></a>
 </div></section></div></details></section></section>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="constructors-1">Constructors<a href="#constructors-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
@@ -79,7 +88,186 @@
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">req</span>: <a href="../interfaces/GetStatementDownloadUrlRequest.html" class="tsd-signature-type tsd-kind-interface">GetStatementDownloadUrlRequest</a></span></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/GetStatementDownloadUrlResponse.html" class="tsd-signature-type tsd-kind-interface">GetStatementDownloadUrlResponse</a><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section></section></details></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/GetStatementDownloadUrlResponse.html" class="tsd-signature-type tsd-kind-interface">GetStatementDownloadUrlResponse</a><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="bankcards"><span>bank<wbr/>Cards</span><a href="#bankcards" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="bankcards-1"><span class="tsd-kind-call-signature">bankCards</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="BankCard.html" class="tsd-signature-type tsd-kind-class">BankCard</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#bankcards-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the linked bank cards, with their verification, binding and
+authorization (eDDA, bank securities account, FPS) status</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<h4 id="example" class="tsd-anchor-link">Example<a href="#example" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">bankCards</span><span class="hl-1">();</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="BankCard.html" class="tsd-signature-type tsd-kind-class">BankCard</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="eddaapplications"><span>edda<wbr/>Applications</span><a href="#eddaapplications" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="eddaapplications-1"><span class="tsd-kind-call-signature">eddaApplications</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">cardId</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">currency</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="EddaApplication.html" class="tsd-signature-type tsd-kind-class">EddaApplication</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#eddaapplications-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the eDDA authorization applications of a bank card in one
+currency</p>
+<p><code>cardId</code> is <code>BankCard.id</code>; <code>currency</code> is e.g. <code>HKD</code> or <code>USD</code>. The card
+id must be all digits; any other value fails with an error before
+anything is sent.</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<h4 id="example-1" class="tsd-anchor-link">Example<a href="#example-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">eddaApplications</span><span class="hl-1">(</span><span class="hl-2">&#39;12345&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;HKD&#39;</span><span class="hl-1">);</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">cardId</span>: <span class="tsd-signature-type">string</span></span></li>
+<li><span><span class="tsd-kind-parameter">currency</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="EddaApplication.html" class="tsd-signature-type tsd-kind-class">EddaApplication</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="stocktransfersin"><span>stock<wbr/>Transfers<wbr/>In</span><a href="#stocktransfersin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="stocktransfersin-1"><span class="tsd-kind-call-signature">stockTransfersIn</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/GetStockTransfersInOptions.html" class="tsd-signature-type tsd-kind-interface">GetStockTransfersInOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="StockTransferInResponse.html" class="tsd-signature-type tsd-kind-class">StockTransferInResponse</a><span class="tsd-signature-symbol">&gt;</span><a href="#stocktransfersin-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get stock transfer-in applications (another broker to this account)</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<h4 id="example-2" class="tsd-anchor-link">Example<a href="#example-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">stockTransfersIn</span><span class="hl-1">({ </span><span class="hl-8">market:</span><span class="hl-1"> </span><span class="hl-2">&#39;HK&#39;</span><span class="hl-1"> });</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">opts</span>: <a href="../interfaces/GetStockTransfersInOptions.html" class="tsd-signature-type tsd-kind-interface">GetStockTransfersInOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="StockTransferInResponse.html" class="tsd-signature-type tsd-kind-class">StockTransferInResponse</a><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="stocktransfersout"><span>stock<wbr/>Transfers<wbr/>Out</span><a href="#stocktransfersout" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="stocktransfersout-1"><span class="tsd-kind-call-signature">stockTransfersOut</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/GetStockTransfersOutOptions.html" class="tsd-signature-type tsd-kind-interface">GetStockTransfersOutOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="StockTransferOut.html" class="tsd-signature-type tsd-kind-class">StockTransferOut</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#stocktransfersout-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get stock transfer-out applications (this account to another broker)</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<h4 id="example-3" class="tsd-anchor-link">Example<a href="#example-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">stockTransfersOut</span><span class="hl-1">();</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">opts</span>: <a href="../interfaces/GetStockTransfersOutOptions.html" class="tsd-signature-type tsd-kind-interface">GetStockTransfersOutOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="StockTransferOut.html" class="tsd-signature-type tsd-kind-class">StockTransferOut</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="rewardrecords"><span>reward<wbr/>Records</span><a href="#rewardrecords" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="rewardrecords-1"><span class="tsd-kind-call-signature">rewardRecords</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/GetRewardRecordsOptions.html" class="tsd-signature-type tsd-kind-interface">GetRewardRecordsOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="RewardRecordsResponse.html" class="tsd-signature-type tsd-kind-class">RewardRecordsResponse</a><span class="tsd-signature-symbol">&gt;</span><a href="#rewardrecords-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get reward records from the reward center (cash, gifts, coupons, task
+rewards)</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<p>The route has no date filter: to find rewards in a time range, page
+through the records and filter on their times.</p>
+<h4 id="example-4" class="tsd-anchor-link">Example<a href="#example-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">rewardRecords</span><span class="hl-1">({ </span><span class="hl-8">pageSize:</span><span class="hl-1"> </span><span class="hl-10">20</span><span class="hl-1"> });</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">opts</span>: <a href="../interfaces/GetRewardRecordsOptions.html" class="tsd-signature-type tsd-kind-interface">GetRewardRecordsOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="RewardRecordsResponse.html" class="tsd-signature-type tsd-kind-class">RewardRecordsResponse</a><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="coupons"><span>coupons</span><a href="#coupons" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="coupons-1"><span class="tsd-kind-call-signature">coupons</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/GetCouponsOptions.html" class="tsd-signature-type tsd-kind-interface">GetCouponsOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="CouponsResponse.html" class="tsd-signature-type tsd-kind-class">CouponsResponse</a><span class="tsd-signature-symbol">&gt;</span><a href="#coupons-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get coupons (reward cards)</p>
+<p>By default lists the coupons that have not expired (set <code>expired</code>).
+The pinned <code>topList</code> / <code>bottomList</code> are repeated on every page.</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<h4 id="example-5" class="tsd-anchor-link">Example<a href="#example-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">coupons</span><span class="hl-1">({ </span><span class="hl-8">expired:</span><span class="hl-1"> </span><span class="hl-3">false</span><span class="hl-1"> });</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">opts</span>: <a href="../interfaces/GetCouponsOptions.html" class="tsd-signature-type tsd-kind-interface">GetCouponsOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="CouponsResponse.html" class="tsd-signature-type tsd-kind-class">CouponsResponse</a><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="couponorders"><span>coupon<wbr/>Orders</span><a href="#couponorders" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="couponorders-1"><span class="tsd-kind-call-signature">couponOrders</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">cardId</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">orderType</span><span class="tsd-signature-symbol">:</span> <a href="../enums/CouponOrderType.html" class="tsd-signature-type tsd-kind-enum">CouponOrderType</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="CouponOrder.html" class="tsd-signature-type tsd-kind-class">CouponOrder</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#couponorders-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the orders a coupon was applied to</p>
+<p><code>cardId</code> is <code>Coupon.cardId</code> (32 hex characters, not a bank card ID);
+any other value fails with an error before anything is sent.
+The gateway rate-limits this route tightly per member, so avoid
+calling it concurrently.</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<h4 id="example-6" class="tsd-anchor-link">Example<a href="#example-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">couponOrders</span><span class="hl-1">(</span><span class="hl-8">couponId</span><span class="hl-1">, </span><span class="hl-8">CouponOrderType</span><span class="hl-1">.</span><span class="hl-8">Settled</span><span class="hl-1">);</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">cardId</span>: <span class="tsd-signature-type">string</span></span></li>
+<li><span><span class="tsd-kind-parameter">orderType</span>: <a href="../enums/CouponOrderType.html" class="tsd-signature-type tsd-kind-enum">CouponOrderType</a></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="CouponOrder.html" class="tsd-signature-type tsd-kind-class">CouponOrder</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="deposits"><span>deposits</span><a href="#deposits" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="deposits-1"><span class="tsd-kind-call-signature">deposits</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/GetDepositsOptions.html" class="tsd-signature-type tsd-kind-interface">GetDepositsOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="DepositsResponse.html" class="tsd-signature-type tsd-kind-class">DepositsResponse</a><span class="tsd-signature-symbol">&gt;</span><a href="#deposits-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get one page of deposit records</p>
+<p>The server's total follows the page size rather than the record
+count, so it is not returned; <code>hasMore</code> reports a full page instead.
+The page size is always sent: at most 20, default 20.</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<h4 id="example-7" class="tsd-anchor-link">Example<a href="#example-7" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">deposits</span><span class="hl-1">({ </span><span class="hl-8">size:</span><span class="hl-1"> </span><span class="hl-10">20</span><span class="hl-1"> });</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">.</span><span class="hl-8">items</span><span class="hl-1">, </span><span class="hl-8">resp</span><span class="hl-1">.</span><span class="hl-8">hasMore</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">opts</span>: <a href="../interfaces/GetDepositsOptions.html" class="tsd-signature-type tsd-kind-interface">GetDepositsOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="DepositsResponse.html" class="tsd-signature-type tsd-kind-class">DepositsResponse</a><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="withdrawals"><span>withdrawals</span><a href="#withdrawals" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="withdrawals-1"><span class="tsd-kind-call-signature">withdrawals</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/GetWithdrawalsOptions.html" class="tsd-signature-type tsd-kind-interface">GetWithdrawalsOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="WithdrawalsResponse.html" class="tsd-signature-type tsd-kind-class">WithdrawalsResponse</a><span class="tsd-signature-symbol">&gt;</span><a href="#withdrawals-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get withdrawal records</p>
+<p><code>hasMore</code> reports a full page of the size sent (default 20, at most
+50).</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
+<h4 id="example-8" class="tsd-anchor-link">Example<a href="#example-8" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="javascript"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-6">OAuth</span><span class="hl-1">, </span><span class="hl-6">Config</span><span class="hl-1">, </span><span class="hl-6">AssetContext</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;longbridge&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">oauth</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">OAuth</span><span class="hl-1">.</span><span class="hl-0">build</span><span class="hl-1">(</span><span class="hl-2">&#39;your-client-id&#39;</span><span class="hl-1">, (</span><span class="hl-8">_</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Visit:&#39;</span><span class="hl-1">, </span><span class="hl-8">url</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">ctx</span><span class="hl-1"> = </span><span class="hl-8">AssetContext</span><span class="hl-1">.</span><span class="hl-0">new</span><span class="hl-1">(</span><span class="hl-8">Config</span><span class="hl-1">.</span><span class="hl-0">fromOAuth</span><span class="hl-1">(</span><span class="hl-8">oauth</span><span class="hl-1">));</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">resp</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-8">ctx</span><span class="hl-1">.</span><span class="hl-0">withdrawals</span><span class="hl-1">({ </span><span class="hl-8">size:</span><span class="hl-1"> </span><span class="hl-10">20</span><span class="hl-1"> });</span><br/><span class="hl-8">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-8">resp</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">opts</span>: <a href="../interfaces/GetWithdrawalsOptions.html" class="tsd-signature-type tsd-kind-interface">GetWithdrawalsOptions</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="WithdrawalsResponse.html" class="tsd-signature-type tsd-kind-class">WithdrawalsResponse</a><span class="tsd-signature-symbol">&gt;</span></h4></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -98,7 +286,73 @@
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Constructors</summary>
 <div><a href="#constructor"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
-<div><a href="#new"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>new</span></a><a href="#statements"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>statements</span></a><a href="#statementdownloadurl"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>statement<wbr/>Download<wbr/>Url</span></a></div></details></div></details></div>
+<div><a href="#new"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>new</span></a><a href="#statements"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>statements</span></a><a href="#statementdownloadurl"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>statement<wbr/>Download<wbr/>Url</span></a><a href="#bankcards"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>bank<wbr/>Cards</span></a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#example"><span>Example</span></a></li></ul></li></ul></li></ul></li></ul><a href="#eddaapplications"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>edda<wbr/>Applications</span></a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#example-1"><span>Example</span></a></li></ul></li></ul></li></ul></li></ul><a href="#stocktransfersin"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>stock<wbr/>Transfers<wbr/>In</span></a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#example-2"><span>Example</span></a></li></ul></li></ul></li></ul></li></ul><a href="#stocktransfersout"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>stock<wbr/>Transfers<wbr/>Out</span></a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#example-3"><span>Example</span></a></li></ul></li></ul></li></ul></li></ul><a href="#rewardrecords"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>reward<wbr/>Records</span></a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#example-4"><span>Example</span></a></li></ul></li></ul></li></ul></li></ul><a href="#coupons"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>coupons</span></a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#example-5"><span>Example</span></a></li></ul></li></ul></li></ul></li></ul><a href="#couponorders"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>coupon<wbr/>Orders</span></a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#example-6"><span>Example</span></a></li></ul></li></ul></li></ul></li></ul><a href="#deposits"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>deposits</span></a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#example-7"><span>Example</span></a></li></ul></li></ul></li></ul></li></ul><a href="#withdrawals"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>withdrawals</span></a>
+<ul>
+<li><a href="#example-8"><span>Example</span></a></li></ul></div></details></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../modules.html">Longbridge OpenAPI SDK</a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container">

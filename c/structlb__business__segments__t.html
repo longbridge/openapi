@@ -78,10 +78,22 @@ Data Fields</h2></td></tr>
 <tr class="separator:af355c47b2ded5e7d78231e68c79b70d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac677610d010638851abb8ebe76fb508c"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#ac677610d010638851abb8ebe76fb508c">currency</a></td></tr>
 <tr class="separator:ac677610d010638851abb8ebe76fb508c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad228c4fad68605ec6da8582c60de8f83"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#ad228c4fad68605ec6da8582c60de8f83">report_txt</a></td></tr>
+<tr class="separator:ad228c4fad68605ec6da8582c60de8f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab61aacd98aae4975ea2c0e5955b20f8a"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#ab61aacd98aae4975ea2c0e5955b20f8a">fp_start</a></td></tr>
+<tr class="separator:ab61aacd98aae4975ea2c0e5955b20f8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a506b98055bcafa68c139a32678673622"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#a506b98055bcafa68c139a32678673622">fp_end</a></td></tr>
+<tr class="separator:a506b98055bcafa68c139a32678673622"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d532e633df437100ff405c870d950f0"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#a2d532e633df437100ff405c870d950f0">yoy</a></td></tr>
+<tr class="separator:a2d532e633df437100ff405c870d950f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07c4bda6285fde850f013a2ef5260cfc"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structlb__business__segment__item__t.html">lb_business_segment_item_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#a07c4bda6285fde850f013a2ef5260cfc">business</a></td></tr>
 <tr class="separator:a07c4bda6285fde850f013a2ef5260cfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54c0412ebd3f2d24adb738c288cc01b2"><td class="memItemLeft" align="right" valign="top">uintptr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#a54c0412ebd3f2d24adb738c288cc01b2">num_business</a></td></tr>
 <tr class="separator:a54c0412ebd3f2d24adb738c288cc01b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cacdd329e92436310c9be023fd11ae6"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structlb__business__segment__item__t.html">lb_business_segment_item_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#a9cacdd329e92436310c9be023fd11ae6">regionals</a></td></tr>
+<tr class="separator:a9cacdd329e92436310c9be023fd11ae6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a848b677943e166903baa7d9d54e7c7"><td class="memItemLeft" align="right" valign="top">uintptr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__business__segments__t.html#a5a848b677943e166903baa7d9d54e7c7">num_regionals</a></td></tr>
+<tr class="separator:a5a848b677943e166903baa7d9d54e7c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Current business segment breakdown for a security. </p>
@@ -127,7 +139,37 @@ Data Fields</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Report date. </p>
+<p>Report date, <code>YYYYMMDD</code>. </p>
+
+</div>
+</div>
+<a id="a506b98055bcafa68c139a32678673622"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a506b98055bcafa68c139a32678673622">&#9670;&nbsp;</a></span>fp_end</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* fp_end</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Last day of the reported period, <code>YYYY.MM.DD</code>. </p>
+
+</div>
+</div>
+<a id="ab61aacd98aae4975ea2c0e5955b20f8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab61aacd98aae4975ea2c0e5955b20f8a">&#9670;&nbsp;</a></span>fp_start</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* fp_start</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>First day of the reported period, <code>YYYY.MM.DD</code>. </p>
 
 </div>
 </div>
@@ -146,6 +188,51 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
+<a id="a5a848b677943e166903baa7d9d54e7c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a848b677943e166903baa7d9d54e7c7">&#9670;&nbsp;</a></span>num_regionals</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uintptr_t num_regionals</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Number of items in <code>regionals</code>. </p>
+
+</div>
+</div>
+<a id="a9cacdd329e92436310c9be023fd11ae6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9cacdd329e92436310c9be023fd11ae6">&#9670;&nbsp;</a></span>regionals</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const struct <a class="el" href="structlb__business__segment__item__t.html">lb_business_segment_item_t</a>* regionals</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Pointer to regional segment items, in the same shape as <code>business</code>. </p>
+
+</div>
+</div>
+<a id="ad228c4fad68605ec6da8582c60de8f83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad228c4fad68605ec6da8582c60de8f83">&#9670;&nbsp;</a></span>report_txt</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* report_txt</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Fiscal period label, e.g. <code>2026.Q2</code>. Follows the issuer's own fiscal calendar, so it does not always match the calendar year of <code>fp_end</code>. </p>
+
+</div>
+</div>
 <a id="af355c47b2ded5e7d78231e68c79b70d5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af355c47b2ded5e7d78231e68c79b70d5">&#9670;&nbsp;</a></span>total</h2>
 
@@ -158,6 +245,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Total revenue. </p>
+
+</div>
+</div>
+<a id="a2d532e633df437100ff405c870d950f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d532e633df437100ff405c870d950f0">&#9670;&nbsp;</a></span>yoy</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* yoy</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Year-on-year change of <code>total</code>. Empty when the server does not supply one. </p>
 
 </div>
 </div>

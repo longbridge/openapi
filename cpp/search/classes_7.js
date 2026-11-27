@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['historymarkettemperatureresponse_2334',['HistoryMarketTemperatureResponse',['../structlongbridge_1_1quote_1_1_history_market_temperature_response.html',1,'longbridge::quote']]],
-  ['holdingdetail_2335',['HoldingDetail',['../structlongbridge_1_1fundamental_1_1_holding_detail.html',1,'longbridge::fundamental']]],
-  ['hotfund_2336',['HotFund',['../structlongbridge_1_1fund_1_1_hot_fund.html',1,'longbridge::fund']]],
-  ['httpclient_2337',['HttpClient',['../classlongbridge_1_1_http_client.html',1,'longbridge']]],
-  ['httpresult_2338',['HttpResult',['../structlongbridge_1_1_http_result.html',1,'longbridge']]],
-  ['humaninteraction_2339',['HumanInteraction',['../structlongbridge_1_1agent_1_1_human_interaction.html',1,'longbridge::agent']]]
+  ['historymarkettemperatureresponse_2668',['HistoryMarketTemperatureResponse',['../structlongbridge_1_1quote_1_1_history_market_temperature_response.html',1,'longbridge::quote']]],
+  ['holdingdetail_2669',['HoldingDetail',['../structlongbridge_1_1fundamental_1_1_holding_detail.html',1,'longbridge::fundamental']]],
+  ['hotfund_2670',['HotFund',['../structlongbridge_1_1fund_1_1_hot_fund.html',1,'longbridge::fund']]],
+  ['httpclient_2671',['HttpClient',['../classlongbridge_1_1_http_client.html',1,'longbridge']]],
+  ['httpresult_2672',['HttpResult',['../structlongbridge_1_1_http_result.html',1,'longbridge']]],
+  ['humaninteraction_2673',['HumanInteraction',['../structlongbridge_1_1agent_1_1_human_interaction.html',1,'longbridge::agent']]]
 ];

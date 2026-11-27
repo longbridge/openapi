@@ -68,7 +68,8 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle">
 <div class="title">asset_context.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -77,6 +78,10 @@ $(function() {
 <code>#include &quot;<a class="el" href="callback_8hpp_source.html">callback.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="config_8hpp_source.html">config.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="types_8hpp_source.html">types.hpp</a>&quot;</code><br />
+<code>#include &lt;map&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
+<code>#include &lt;string&gt;</code><br />
+<code>#include &lt;vector&gt;</code><br />
 </div>
 <p><a href="asset__context_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -87,6 +92,127 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_statement_download_url_response.html">longbridge::asset::StatementDownloadUrlResponse</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statement download URL response.  <a href="structlongbridge_1_1asset_1_1_statement_download_url_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_bank_card_authorization.html">longbridge::asset::BankCardAuthorization</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An authorization attached to a bank card (eDDA, bank securities account, FPS, ...)  <a href="structlongbridge_1_1asset_1_1_bank_card_authorization.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_bank_card.html">longbridge::asset::BankCard</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A linked bank card (holder name, address and ID documents are not modelled)  <a href="structlongbridge_1_1asset_1_1_bank_card.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_edda_application.html">longbridge::asset::EddaApplication</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An eDDA authorization application of a bank card.  <a href="structlongbridge_1_1asset_1_1_edda_application.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_transfer_stock.html">longbridge::asset::TransferStock</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">One stock in a stock transfer application.  <a href="structlongbridge_1_1asset_1_1_transfer_stock.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_stock_transfer_in.html">longbridge::asset::StockTransferIn</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A stock transfer-in application (another broker -&gt; this account)  <a href="structlongbridge_1_1asset_1_1_stock_transfer_in.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_stock_transfer_in_response.html">longbridge::asset::StockTransferInResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Response for the stock transfer-in list.  <a href="structlongbridge_1_1asset_1_1_stock_transfer_in_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_stock_transfer_out.html">longbridge::asset::StockTransferOut</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A stock transfer-out application (this account -&gt; another broker)  <a href="structlongbridge_1_1asset_1_1_stock_transfer_out.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_reward_record.html">longbridge::asset::RewardRecord</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A reward record from the reward center (prize redemption secrets <code>coupon_secret</code>, cash card codes <code>cash_card_code</code> and shipping contacts are not modelled)  <a href="structlongbridge_1_1asset_1_1_reward_record.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_reward_records_response.html">longbridge::asset::RewardRecordsResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Response for the reward record list.  <a href="structlongbridge_1_1asset_1_1_reward_records_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_commission.html">longbridge::asset::CouponCommission</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Commission terms of a commission coupon (<code>commission</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_commission.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_ai_benefit.html">longbridge::asset::CouponAiBenefit</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of an AI benefit coupon (<code>ai_benefit</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_ai_benefit.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_cash.html">longbridge::asset::CouponCash</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of a cash coupon (<code>cash</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_cash.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_coffee_store.html">longbridge::asset::CouponCoffeeStore</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A store of a coffee coupon.  <a href="structlongbridge_1_1asset_1_1_coupon_coffee_store.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_coffee.html">longbridge::asset::CouponCoffee</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of a coffee coupon (<code>coffee_coupon</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_coffee.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_crypto_counter.html">longbridge::asset::CouponCryptoCounter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A counter (security) of a crypto coupon.  <a href="structlongbridge_1_1asset_1_1_coupon_crypto_counter.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_crypto_fallback.html">longbridge::asset::CouponCryptoFallback</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fallback of a crypto coupon.  <a href="structlongbridge_1_1asset_1_1_coupon_crypto_fallback.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_crypto.html">longbridge::asset::CouponCrypto</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of a crypto coupon (<code>crypto</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_crypto.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_finance_interest.html">longbridge::asset::CouponFinanceInterest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of a finance interest coupon (<code>finance_interest</code>). The meaning of these fields is not confirmed; they are returned as the server sends them.  <a href="structlongbridge_1_1asset_1_1_coupon_finance_interest.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_fund_deduct.html">longbridge::asset::CouponFundDeduct</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of a fund deduction coupon (<code>fund_deduct</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_fund_deduct.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_quote.html">longbridge::asset::CouponQuote</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_ipo.html">longbridge::asset::CouponIpo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of an IPO coupon (<code>ipo</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_ipo.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_ipo_commission.html">longbridge::asset::CouponIpoCommission</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of an IPO commission coupon (<code>ipo_commission</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_ipo_commission.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_ipo_interest.html">longbridge::asset::CouponIpoInterest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of an IPO interest coupon (<code>ipo_interest</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_ipo_interest.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_platform_fee_deduct.html">longbridge::asset::CouponPlatformFeeDeduct</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of a platform fee deduction coupon (<code>platform_fee_deduct</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_platform_fee_deduct.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_stock_counter.html">longbridge::asset::CouponStockCounter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An optional counter of a stock coupon.  <a href="structlongbridge_1_1asset_1_1_coupon_stock_counter.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_stock_fallback.html">longbridge::asset::CouponStockFallback</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fallback of a stock coupon.  <a href="structlongbridge_1_1asset_1_1_coupon_stock_fallback.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_stock.html">longbridge::asset::CouponStock</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of a stock coupon (<code>stock</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_stock.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_stock_fragment.html">longbridge::asset::CouponStockFragment</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terms of a stock fragment coupon (<code>stock_fragment</code>)  <a href="structlongbridge_1_1asset_1_1_coupon_stock_fragment.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon.html">longbridge::asset::Coupon</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coupon (reward card)  <a href="structlongbridge_1_1asset_1_1_coupon.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupons_response.html">longbridge::asset::CouponsResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Response for the coupon list.  <a href="structlongbridge_1_1asset_1_1_coupons_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_coupon_order.html">longbridge::asset::CouponOrder</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An order a coupon was applied to.  <a href="structlongbridge_1_1asset_1_1_coupon_order.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_deposit.html">longbridge::asset::Deposit</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A deposit record (receipt images are not modelled)  <a href="structlongbridge_1_1asset_1_1_deposit.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_withdrawal.html">longbridge::asset::Withdrawal</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A withdrawal record.  <a href="structlongbridge_1_1asset_1_1_withdrawal.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_deposits_response.html">longbridge::asset::DepositsResponse</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_withdrawals_response.html">longbridge::asset::WithdrawalsResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Response for the withdrawal list.  <a href="structlongbridge_1_1asset_1_1_withdrawals_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_get_stock_transfers_in_options.html">longbridge::asset::GetStockTransfersInOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for the stock transfer-in list.  <a href="structlongbridge_1_1asset_1_1_get_stock_transfers_in_options.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_get_stock_transfers_out_options.html">longbridge::asset::GetStockTransfersOutOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for the stock transfer-out list.  <a href="structlongbridge_1_1asset_1_1_get_stock_transfers_out_options.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_get_reward_records_options.html">longbridge::asset::GetRewardRecordsOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for the reward record list.  <a href="structlongbridge_1_1asset_1_1_get_reward_records_options.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_get_coupons_options.html">longbridge::asset::GetCouponsOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for the coupon list.  <a href="structlongbridge_1_1asset_1_1_get_coupons_options.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_get_deposits_options.html">longbridge::asset::GetDepositsOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for the deposit list.  <a href="structlongbridge_1_1asset_1_1_get_deposits_options.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1asset_1_1_get_withdrawals_options.html">longbridge::asset::GetWithdrawalsOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for the withdrawal list.  <a href="structlongbridge_1_1asset_1_1_get_withdrawals_options.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">longbridge::asset::AssetContext</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asset context.  <a href="classlongbridge_1_1asset_1_1_asset_context.html#details">More...</a><br /></td></tr>
@@ -103,6 +229,204 @@ Namespaces</h2></td></tr>
 Typedefs</h2></td></tr>
 <tr class="memitem:aab41e15b72c1c0ade40d6aa8a6229a4f"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="asset__context_8hpp.html#aab41e15b72c1c0ade40d6aa8a6229a4f">lb_asset_context_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="asset__context_8hpp.html#aab41e15b72c1c0ade40d6aa8a6229a4f">lb_asset_context_t</a></td></tr>
 <tr class="separator:aab41e15b72c1c0ade40d6aa8a6229a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a4ec9ccb7ee7dea629c552e4156fef28c"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a4ec9ccb7ee7dea629c552e4156fef28c">longbridge::asset::BankCardStatus</a> { <a class="el" href="namespacelongbridge_1_1asset.html#a4ec9ccb7ee7dea629c552e4156fef28ca88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a4ec9ccb7ee7dea629c552e4156fef28cad5ca088299d5908ca359f17692071761">longbridge::asset::Unverified</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a4ec9ccb7ee7dea629c552e4156fef28ca5eb947ec6b16519870a586a3dc838a95">longbridge::asset::UnderReview</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a4ec9ccb7ee7dea629c552e4156fef28ca3f68e67dc6c397aaa9d1c24c356f754f">longbridge::asset::Verified</a>
+ }</td></tr>
+<tr class="separator:a4ec9ccb7ee7dea629c552e4156fef28c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ef555dde6bb66a1c0f56173830786f3"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a8ef555dde6bb66a1c0f56173830786f3">longbridge::asset::BankCardWitnessState</a> { <a class="el" href="namespacelongbridge_1_1asset.html#a8ef555dde6bb66a1c0f56173830786f3a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a8ef555dde6bb66a1c0f56173830786f3a3c841b03acb069eccf34fa1e6898c992">longbridge::asset::NotRequired</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a8ef555dde6bb66a1c0f56173830786f3a2d13df6f8b5e4c5af9f87e0dc39df69d">longbridge::asset::Pending</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a8ef555dde6bb66a1c0f56173830786f3a9646848267a5242440dc206f661381c4">longbridge::asset::Witnessed</a>
+ }</td></tr>
+<tr class="separator:a8ef555dde6bb66a1c0f56173830786f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc4edec58ed8a00ac8c38c7ca057cdf3"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#abc4edec58ed8a00ac8c38c7ca057cdf3">longbridge::asset::BankCardBindState</a> { <a class="el" href="namespacelongbridge_1_1asset.html#abc4edec58ed8a00ac8c38c7ca057cdf3a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#abc4edec58ed8a00ac8c38c7ca057cdf3aa2ebfe0e8e16f2c81865ce3da74bc605">longbridge::asset::Binding</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#abc4edec58ed8a00ac8c38c7ca057cdf3a685d1f2146dd079015e81918414e8971">longbridge::asset::Bound</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#abc4edec58ed8a00ac8c38c7ca057cdf3ad7c8c85bf79bbe1b7188497c32c3b0ca">longbridge::asset::Failed</a>
+ }</td></tr>
+<tr class="separator:abc4edec58ed8a00ac8c38c7ca057cdf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad10b911b419b10ef067fc2e41af1c7d0"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#ad10b911b419b10ef067fc2e41af1c7d0">longbridge::asset::AuthorizationStatus</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#ad10b911b419b10ef067fc2e41af1c7d0a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ad10b911b419b10ef067fc2e41af1c7d0ae06d1ba70f1331e9f9a113cc2f887d3f">longbridge::asset::Unauthorized</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ad10b911b419b10ef067fc2e41af1c7d0aa206428462686af481cb072b8db11784">longbridge::asset::Authorized</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ad10b911b419b10ef067fc2e41af1c7d0aa9267a2b7377095da7afc925b64d242e">longbridge::asset::Authorizing</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#ad10b911b419b10ef067fc2e41af1c7d0ad7c8c85bf79bbe1b7188497c32c3b0ca">longbridge::asset::Failed</a>
+<br />
+ }</td></tr>
+<tr class="separator:ad10b911b419b10ef067fc2e41af1c7d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac53f9b16fbcdcee6756a2ef9376d2a05"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#ac53f9b16fbcdcee6756a2ef9376d2a05">longbridge::asset::StockTransferInState</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#ac53f9b16fbcdcee6756a2ef9376d2a05a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac53f9b16fbcdcee6756a2ef9376d2a05a5c835c22429f25992b4371691ecde1a4">longbridge::asset::Submitted</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac53f9b16fbcdcee6756a2ef9376d2a05aa149e85a44aeec9140e92733d9ed694e">longbridge::asset::Cancelled</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac53f9b16fbcdcee6756a2ef9376d2a05a07ca5050e697392c9ed47e6453f1453f">longbridge::asset::Completed</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#ac53f9b16fbcdcee6756a2ef9376d2a05a643562a9ae7099c8aabfdc93478db117">longbridge::asset::Processing</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac53f9b16fbcdcee6756a2ef9376d2a05aa0a7efde3e436308629e63d01c6d3197">longbridge::asset::PartiallyCompleted</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac53f9b16fbcdcee6756a2ef9376d2a05ad7c8c85bf79bbe1b7188497c32c3b0ca">longbridge::asset::Failed</a>
+<br />
+ }</td></tr>
+<tr class="separator:ac53f9b16fbcdcee6756a2ef9376d2a05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2908e217e3295db01c2f387756cba6e8"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8">longbridge::asset::StockTransferOutState</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8a5c835c22429f25992b4371691ecde1a4">longbridge::asset::Submitted</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8a643562a9ae7099c8aabfdc93478db117">longbridge::asset::Processing</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8a63c4cc5944eb60b1969f2333ead70fc9">longbridge::asset::Executing</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8a07ca5050e697392c9ed47e6453f1453f">longbridge::asset::Completed</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8aa149e85a44aeec9140e92733d9ed694e">longbridge::asset::Cancelled</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8aa0a7efde3e436308629e63d01c6d3197">longbridge::asset::PartiallyCompleted</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8ad7c8c85bf79bbe1b7188497c32c3b0ca">longbridge::asset::Failed</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a2908e217e3295db01c2f387756cba6e8ad37b1f6c0512e2118cee17fea015b699">longbridge::asset::Rejected</a>
+<br />
+ }</td></tr>
+<tr class="separator:a2908e217e3295db01c2f387756cba6e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25f84dbb9527c6c29daccdbc104df794"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a25f84dbb9527c6c29daccdbc104df794">longbridge::asset::TransferStockState</a> { <a class="el" href="namespacelongbridge_1_1asset.html#a25f84dbb9527c6c29daccdbc104df794a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a25f84dbb9527c6c29daccdbc104df794a643562a9ae7099c8aabfdc93478db117">longbridge::asset::Processing</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a25f84dbb9527c6c29daccdbc104df794a66d02c2f8a582446f8dd8752366002b5">longbridge::asset::Succeeded</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a25f84dbb9527c6c29daccdbc104df794ad7c8c85bf79bbe1b7188497c32c3b0ca">longbridge::asset::Failed</a>
+ }</td></tr>
+<tr class="separator:a25f84dbb9527c6c29daccdbc104df794"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1908349a4aafaae6bf1a8e239ea1fb9"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#ad1908349a4aafaae6bf1a8e239ea1fb9">longbridge::asset::RewardType</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#ad1908349a4aafaae6bf1a8e239ea1fb9a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ad1908349a4aafaae6bf1a8e239ea1fb9a069b30db06d047a398f9eb0940d3279c">longbridge::asset::Cash</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ad1908349a4aafaae6bf1a8e239ea1fb9a0d9175fe89fb80d815e7d03698b6e83a">longbridge::asset::Gift</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ad1908349a4aafaae6bf1a8e239ea1fb9aadb6e651c47c732f9af50ae33748feaa">longbridge::asset::Coupon</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#ad1908349a4aafaae6bf1a8e239ea1fb9aeaeb30f9f18e0c50b178676f3eaef45f">longbridge::asset::Task</a>
+<br />
+ }</td></tr>
+<tr class="separator:ad1908349a4aafaae6bf1a8e239ea1fb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a02f76e1d4608e31d796271839c5765"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a5a02f76e1d4608e31d796271839c5765">longbridge::asset::RewardDetailKind</a> { <a class="el" href="namespacelongbridge_1_1asset.html#a5a02f76e1d4608e31d796271839c5765a6adf97f83acf6453d4a6a4b1070f3754">longbridge::asset::None</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a5a02f76e1d4608e31d796271839c5765a069b30db06d047a398f9eb0940d3279c">longbridge::asset::Cash</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a5a02f76e1d4608e31d796271839c5765a1d565b9e5303987bb1b1938d5d458bca">longbridge::asset::Card</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a5a02f76e1d4608e31d796271839c5765af3c211a1ef557b0560501bc765c84fea">longbridge::asset::Prize</a>
+ }</td></tr>
+<tr class="memdesc:a5a02f76e1d4608e31d796271839c5765"><td class="mdescLeft">&#160;</td><td class="mdescRight">Which upstream detail object a reward record came from.  <a href="namespacelongbridge_1_1asset.html#a5a02f76e1d4608e31d796271839c5765">More...</a><br /></td></tr>
+<tr class="separator:a5a02f76e1d4608e31d796271839c5765"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d524ddbf0ae6f137c3a53d0fb51f664"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664">longbridge::asset::RewardStatus</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664a14ab5b8597ef2c5fc1748c6cf1bdb81d">longbridge::asset::Upcoming</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664aa149e85a44aeec9140e92733d9ed694e">longbridge::asset::Cancelled</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664aa09b64f6a96923fbce023139d0bd9df2">longbridge::asset::ExitedActivity</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664ae0c8e96c49f3dd73abbf509040db57f0">longbridge::asset::Unclaimed</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664a763c702c0db6a92ea502e19b52cc1df8">longbridge::asset::Issuing</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664a76bfc7f2b681dbab03ac439f9a605a3d">longbridge::asset::Issued</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664ad7c8c85bf79bbe1b7188497c32c3b0ca">longbridge::asset::Failed</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664a94485769011b4df992fe0c63945fb920">longbridge::asset::Exchanged</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664a24fe48030f7d3097d5882535b04c3fa8">longbridge::asset::Expired</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a1d524ddbf0ae6f137c3a53d0fb51f664acc61945cbbf46721a053467c395c666f">longbridge::asset::Refunded</a>
+<br />
+ }</td></tr>
+<tr class="separator:a1d524ddbf0ae6f137c3a53d0fb51f664"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ee015ffc9c21d75ad839416b4460b5e"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5e">longbridge::asset::RewardDeliverStatus</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5ea88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5eac1d762327a6a0b6c4ff34fddba5ca029">longbridge::asset::NotActivated</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5ea0d8449fcfb65b1e6a3243aa6a7ec0dbc">longbridge::asset::ActivatedOrShipping</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5ea558a634603a0dc0ad85cfeebf7715762">longbridge::asset::Consumed</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5eafd6eb9cefcad6d847c8f06ac7dd3dad0">longbridge::asset::EVoucherActivating</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5ea372568ee7494a2849febe284d40a28d7">longbridge::asset::EVoucherExpired</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5ead4c24ef02b701db07658a09863e04ced">longbridge::asset::EVoucherInvalid</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5eaab65ff559decc23457d1965158e7928a">longbridge::asset::AddressMissing</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5ea4c8dc1298240050b5a9bd1eae4ddc298">longbridge::asset::AddressFilled</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a0ee015ffc9c21d75ad839416b4460b5eaea9cf7e47ff33b2be14e6dd07cbcefc6">longbridge::asset::Shipping</a>
+<br />
+ }</td></tr>
+<tr class="separator:a0ee015ffc9c21d75ad839416b4460b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac81d3526ceeaa227c9ab8e3847702454"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#ac81d3526ceeaa227c9ab8e3847702454">longbridge::asset::CouponTargetType</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#ac81d3526ceeaa227c9ab8e3847702454a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac81d3526ceeaa227c9ab8e3847702454a27ce7f8b5623b2e2df568d64cf051607">longbridge::asset::Stock</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac81d3526ceeaa227c9ab8e3847702454a0e5b0b880fbfca709cf6a92c3053d1bc">longbridge::asset::UsOption</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac81d3526ceeaa227c9ab8e3847702454a2aa824655e90565ab22b87e123b6b2e4">longbridge::asset::HkWarrant</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#ac81d3526ceeaa227c9ab8e3847702454a5b815c1df45a62cf6d998434add6b144">longbridge::asset::Etf</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ac81d3526ceeaa227c9ab8e3847702454acc336d0860c30c538907871f9342d2ba">longbridge::asset::Lof</a>
+<br />
+ }</td></tr>
+<tr class="separator:ac81d3526ceeaa227c9ab8e3847702454"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcfb47b9b2253d45b4cb592e28a16abf"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#afcfb47b9b2253d45b4cb592e28a16abf">longbridge::asset::IpoCouponTargetType</a> { <a class="el" href="namespacelongbridge_1_1asset.html#afcfb47b9b2253d45b4cb592e28a16abfa88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#afcfb47b9b2253d45b4cb592e28a16abfa917709346cd3cefd00e463f65f1a55d8">longbridge::asset::Financing</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#afcfb47b9b2253d45b4cb592e28a16abfa069b30db06d047a398f9eb0940d3279c">longbridge::asset::Cash</a>
+ }</td></tr>
+<tr class="separator:afcfb47b9b2253d45b4cb592e28a16abf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e14a8508376a53d229a9d47cca8c27e"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a8e14a8508376a53d229a9d47cca8c27e">longbridge::asset::CommissionUnlimitedType</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a8e14a8508376a53d229a9d47cca8c27ea88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a8e14a8508376a53d229a9d47cca8c27eadba96c17ca14de76f68ab4c7220ca712">longbridge::asset::Proportionate</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a8e14a8508376a53d229a9d47cca8c27eabbd47109890259c0127154db1af26c75">longbridge::asset::Full</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a8e14a8508376a53d229a9d47cca8c27ea1a10be3692cec335c74387f33221a6fa">longbridge::asset::Lifetime</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a8e14a8508376a53d229a9d47cca8c27eab5b685d3dc1285120f56447cb156e2e3">longbridge::asset::ByAmountPer</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a8e14a8508376a53d229a9d47cca8c27eace63fab0bd5a0c7dcb127e3c60dc735f">longbridge::asset::ByRatePer</a>
+<br />
+ }</td></tr>
+<tr class="separator:a8e14a8508376a53d229a9d47cca8c27e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae657775cb1db10bd31189926f6a5063c"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#ae657775cb1db10bd31189926f6a5063c">longbridge::asset::QuoteInvestorType</a> { <a class="el" href="namespacelongbridge_1_1asset.html#ae657775cb1db10bd31189926f6a5063ca88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ae657775cb1db10bd31189926f6a5063caed36a1ef76a59ee3f15180e0441188ad">longbridge::asset::Any</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ae657775cb1db10bd31189926f6a5063cab16c51c91712ee5d2d84544411c0ea03">longbridge::asset::NonProfessional</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#ae657775cb1db10bd31189926f6a5063ca9e8b160226c9fe22a910c782ce5076e2">longbridge::asset::Professional</a>
+ }</td></tr>
+<tr class="separator:ae657775cb1db10bd31189926f6a5063c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ca05142eebb768ab25fe78cf0edf304"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a5ca05142eebb768ab25fe78cf0edf304">longbridge::asset::CouponStatus</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a5ca05142eebb768ab25fe78cf0edf304a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a5ca05142eebb768ab25fe78cf0edf304a92e592d90b9548016776a6fb68dccded">longbridge::asset::Unused</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a5ca05142eebb768ab25fe78cf0edf304a019d1ca7d50cc54b995f60d456435e87">longbridge::asset::Used</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a5ca05142eebb768ab25fe78cf0edf304a24fe48030f7d3097d5882535b04c3fa8">longbridge::asset::Expired</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a5ca05142eebb768ab25fe78cf0edf304a177df1ef07206ddb15669aad068e48fe">longbridge::asset::Redeeming</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a5ca05142eebb768ab25fe78cf0edf304ad19e0242c51b633ff754f5b3c032f9bf">longbridge::asset::InUse</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a5ca05142eebb768ab25fe78cf0edf304a643562a9ae7099c8aabfdc93478db117">longbridge::asset::Processing</a>
+<br />
+ }</td></tr>
+<tr class="separator:a5ca05142eebb768ab25fe78cf0edf304"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a441d7c2b350ae440fc4427ffcbba6965"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a441d7c2b350ae440fc4427ffcbba6965">longbridge::asset::DepositState</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a441d7c2b350ae440fc4427ffcbba6965a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a441d7c2b350ae440fc4427ffcbba6965a643562a9ae7099c8aabfdc93478db117">longbridge::asset::Processing</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a441d7c2b350ae440fc4427ffcbba6965aac99ec9411052e84cbfc32ebfcf75c02">longbridge::asset::Credited</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a441d7c2b350ae440fc4427ffcbba6965ad7c8c85bf79bbe1b7188497c32c3b0ca">longbridge::asset::Failed</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a441d7c2b350ae440fc4427ffcbba6965aa149e85a44aeec9140e92733d9ed694e">longbridge::asset::Cancelled</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a441d7c2b350ae440fc4427ffcbba6965a29a29047cd211a4eb34dd1129b3db135">longbridge::asset::Invalidated</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a441d7c2b350ae440fc4427ffcbba6965ad37b1f6c0512e2118cee17fea015b699">longbridge::asset::Rejected</a>
+<br />
+ }</td></tr>
+<tr class="separator:a441d7c2b350ae440fc4427ffcbba6965"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20ed0b5f75af9eec52464b7a465de6ac"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6ac">longbridge::asset::WithdrawalState</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6aca88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::asset::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6aca5c835c22429f25992b4371691ecde1a4">longbridge::asset::Submitted</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6aca643562a9ae7099c8aabfdc93478db117">longbridge::asset::Processing</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6acad37b1f6c0512e2118cee17fea015b699">longbridge::asset::Rejected</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6acaa149e85a44aeec9140e92733d9ed694e">longbridge::asset::Cancelled</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6acaa506a588a1ac5c9df7d769f9fe7b15a4">longbridge::asset::Remitted</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6acad7c8c85bf79bbe1b7188497c32c3b0ca">longbridge::asset::Failed</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6acacc61945cbbf46721a053467c395c666f">longbridge::asset::Refunded</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6acadc520a5266243c06ee6c542f7ad5f6e2">longbridge::asset::ApprovedAwaitingPayout</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6aca72cdf92700d9200402f547da7f48930d">longbridge::asset::LargeAmountReview</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6aca6a72ef5309b483e7126c9f9fb032bc77">longbridge::asset::ChangePendingApproval</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6aca7e0fc1c31674883288854397f11800ac">longbridge::asset::DeletionPendingApproval</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6aca5fe6005bf6e415c950c011fb65f12b8f">longbridge::asset::Deleted</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6aca26cd1b728b7b7e92448f284fcc757e1f">longbridge::asset::RejectionPendingApproval</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#a20ed0b5f75af9eec52464b7a465de6acaedd7646598c2e37983459ecf89c6a62a">longbridge::asset::AwaitingConfirmation</a>
+<br />
+ }</td></tr>
+<tr class="separator:a20ed0b5f75af9eec52464b7a465de6ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf4352887849e5bc8d95ebde282d9c9f"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1asset.html#acf4352887849e5bc8d95ebde282d9c9f">longbridge::asset::CouponOrderType</a> { <a class="el" href="namespacelongbridge_1_1asset.html#acf4352887849e5bc8d95ebde282d9c9fad0f2e5376298c880665077b565ffd7dd">longbridge::asset::Locked</a>
+, <a class="el" href="namespacelongbridge_1_1asset.html#acf4352887849e5bc8d95ebde282d9c9fa30533c6b4e86fa5a13e4269d3385d431">longbridge::asset::Settled</a>
+ }</td></tr>
+<tr class="memdesc:acf4352887849e5bc8d95ebde282d9c9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Which orders of a coupon to list.  <a href="namespacelongbridge_1_1asset.html#acf4352887849e5bc8d95ebde282d9c9f">More...</a><br /></td></tr>
+<tr class="separator:acf4352887849e5bc8d95ebde282d9c9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="aab41e15b72c1c0ade40d6aa8a6229a4f"></a>

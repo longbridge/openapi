@@ -62,14 +62,18 @@
 <div class="tsd-comment tsd-typography"><p>Get financial calendar events.</p>
 <p><code>start</code> and <code>end</code> are date strings in <code>YYYY-MM-DD</code> format.
 <code>market</code> is an optional market filter (e.g. <code>&quot;HK&quot;</code> or <code>&quot;US&quot;</code>).</p>
-<p>The endpoint paginates: the server caps each response (historically 10
-events per page unless a larger <code>count</code> is requested) and returns a
-<code>nextDate</code> cursor. To page through the full window, request a larger
-<code>count</code>, or re-call with the returned <code>nextDate</code> as <code>start</code>.</p>
+<p>Events come back grouped by date. <code>count</code> caps the events returned for
+<em>each date</em> (server default when omitted), and a group's <code>count</code> field
+is that date's total, so a group holding fewer events than its <code>count</code>
+was truncated: fetch the rest by calling again with <code>start</code> = <code>end</code> =
+that date and <code>offset</code> set to the number of events already received. The
+<code>nextDate</code> cursor points at the next date group and moves past truncated
+dates. <code>end</code> is not a hard bound: the server may return later dates, so
+filter by date on the client.</p>
 <ul>
-<li><code>count</code> — maximum number of events per page (server default when
+<li><code>count</code> — maximum number of events per date (server default when
 omitted).</li>
-<li><code>offset</code> — number of events to skip from the start of the window.</li>
+<li><code>offset</code> — number of events to skip within a date.</li>
 <li><code>next</code> — direction to page from the cursor.</li>
 </ul>
 </div>

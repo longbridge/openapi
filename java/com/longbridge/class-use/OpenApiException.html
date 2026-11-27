@@ -343,6 +343,52 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/BankCard.html" title="class in com.longbridge.asset">BankCard</a>[]&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getBankCards()">getBankCards</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the linked bank cards, with their verification, binding and
+ authorization (eDDA, bank securities account, FPS) status.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/CouponOrder.html" title="class in com.longbridge.asset">CouponOrder</a>[]&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getCouponOrders(java.lang.String,com.longbridge.asset.CouponOrderType)">getCouponOrders</a></span>&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cardId,
+               <a href="../asset/CouponOrderType.html" title="enum in com.longbridge.asset">CouponOrderType</a>&nbsp;orderType)</code></th>
+<td class="colLast">
+<div class="block">Get the orders a coupon was applied to.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/CouponsResponse.html" title="class in com.longbridge.asset">CouponsResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getCoupons(com.longbridge.asset.GetCouponsOptions)">getCoupons</a></span>&#8203;(<a href="../asset/GetCouponsOptions.html" title="class in com.longbridge.asset">GetCouponsOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get coupons (reward cards).</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/DepositsResponse.html" title="class in com.longbridge.asset">DepositsResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getDeposits(com.longbridge.asset.GetDepositsOptions)">getDeposits</a></span>&#8203;(<a href="../asset/GetDepositsOptions.html" title="class in com.longbridge.asset">GetDepositsOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get one page of deposit records.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/EddaApplication.html" title="class in com.longbridge.asset">EddaApplication</a>[]&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getEddaApplications(java.lang.String,java.lang.String)">getEddaApplications</a></span>&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cardId,
+                   <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;currency)</code></th>
+<td class="colLast">
+<div class="block">Get the eDDA authorization applications of a bank card in one currency.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/RewardRecordsResponse.html" title="class in com.longbridge.asset">RewardRecordsResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getRewardRecords(com.longbridge.asset.GetRewardRecordsOptions)">getRewardRecords</a></span>&#8203;(<a href="../asset/GetRewardRecordsOptions.html" title="class in com.longbridge.asset">GetRewardRecordsOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get reward records from the reward center (cash, gifts, coupons, task
+ rewards).</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&gt;</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getStatementDownloadUrl(java.lang.String)">getStatementDownloadUrl</a></span>&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;fileKey)</code></th>
 <td class="colLast">
@@ -354,6 +400,27 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getStatements(com.longbridge.asset.GetStatementListOptions)">getStatements</a></span>&#8203;(<a href="../asset/GetStatementListOptions.html" title="class in com.longbridge.asset">GetStatementListOptions</a>&nbsp;opts)</code></th>
 <td class="colLast">
 <div class="block">Get statement data list</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/StockTransferInResponse.html" title="class in com.longbridge.asset">StockTransferInResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getStockTransfersIn(com.longbridge.asset.GetStockTransfersInOptions)">getStockTransfersIn</a></span>&#8203;(<a href="../asset/GetStockTransfersInOptions.html" title="class in com.longbridge.asset">GetStockTransfersInOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get stock transfer-in applications (another broker to this account).</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/StockTransferOut.html" title="class in com.longbridge.asset">StockTransferOut</a>[]&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getStockTransfersOut(com.longbridge.asset.GetStockTransfersOutOptions)">getStockTransfersOut</a></span>&#8203;(<a href="../asset/GetStockTransfersOutOptions.html" title="class in com.longbridge.asset">GetStockTransfersOutOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get stock transfer-out applications (this account to another broker).</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="../asset/WithdrawalsResponse.html" title="class in com.longbridge.asset">WithdrawalsResponse</a>&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">AssetContext.</span><code><span class="memberNameLink"><a href="../asset/AssetContext.html#getWithdrawals(com.longbridge.asset.GetWithdrawalsOptions)">getWithdrawals</a></span>&#8203;(<a href="../asset/GetWithdrawalsOptions.html" title="class in com.longbridge.asset">GetWithdrawalsOptions</a>&nbsp;opts)</code></th>
+<td class="colLast">
+<div class="block">Get withdrawal records.</div>
 </td>
 </tr>
 </tbody>

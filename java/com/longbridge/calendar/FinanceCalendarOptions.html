@@ -160,7 +160,7 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count">count</a></span></code></th>
 <td class="colLast">
-<div class="block">Maximum number of events per page; server default when <code>null</code> (optional).</div>
+<div class="block">Maximum number of events per date; server default when <code>null</code> (optional).</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -188,7 +188,7 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#offset">offset</a></span></code></th>
 <td class="colLast">
-<div class="block">Number of events to skip from the start of the window (optional).</div>
+<div class="block">Number of events to skip within a date (optional).</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -300,7 +300,10 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <li class="blockList">
 <h4>count</h4>
 <pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a> count</pre>
-<div class="block">Maximum number of events per page; server default when <code>null</code> (optional).</div>
+<div class="block">Maximum number of events per date; server default when <code>null</code> (optional).
+ A date group holding fewer events than its <code>count</code> was truncated: call again
+ with <code>start</code> = <code>end</code> = that date and <code>offset</code> set to the events
+ already received.</div>
 </li>
 </ul>
 <a id="offset">
@@ -310,7 +313,7 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <li class="blockList">
 <h4>offset</h4>
 <pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a> offset</pre>
-<div class="block">Number of events to skip from the start of the window (optional).</div>
+<div class="block">Number of events to skip within a date (optional).</div>
 </li>
 </ul>
 <a id="next">

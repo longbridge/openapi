@@ -250,7 +250,11 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <div class="block">Sets filter.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>filter</code> - filter</dd>
+<dd><code>filter</code> - server-defined filter object as a JSON string; invalid
+               JSON completes the future returned by
+               <code>FundContext.funds</code> exceptionally with an
+               <code>OpenApiException</code> (<code>invalid filter JSON: ...</code>)
+               instead of being ignored</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>this instance for chaining</dd>
 </dl>

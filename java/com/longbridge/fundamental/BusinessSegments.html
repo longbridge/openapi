@@ -167,7 +167,35 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#date">date</a></span></code></th>
 <td class="colLast">
-<div class="block">Report date</div>
+<div class="block">Report date, <code>YYYYMMDD</code></div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fpEnd">fpEnd</a></span></code></th>
+<td class="colLast">
+<div class="block">Last day of the reported period, <code>YYYY.MM.DD</code></div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fpStart">fpStart</a></span></code></th>
+<td class="colLast">
+<div class="block">First day of the reported period, <code>YYYY.MM.DD</code></div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="BusinessSegmentItem.html" title="class in com.longbridge.fundamental">BusinessSegmentItem</a>[]</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#regionals">regionals</a></span></code></th>
+<td class="colLast">
+<div class="block">Regional breakdown, in the same shape as <code>business</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#reportTxt">reportTxt</a></span></code></th>
+<td class="colLast">
+<div class="block">Fiscal period label, e.g.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -175,6 +203,13 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#total">total</a></span></code></th>
 <td class="colLast">
 <div class="block">Total revenue</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#yoy">yoy</a></span></code></th>
+<td class="colLast">
+<div class="block">Year-on-year change of <code>total</code>.</div>
 </td>
 </tr>
 </table>
@@ -239,7 +274,7 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <li class="blockList">
 <h4>date</h4>
 <pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> date</pre>
-<div class="block">Report date</div>
+<div class="block">Report date, <code>YYYYMMDD</code></div>
 </li>
 </ul>
 <a id="total">
@@ -262,14 +297,67 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <div class="block">Reporting currency</div>
 </li>
 </ul>
+<a id="reportTxt">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>reportTxt</h4>
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> reportTxt</pre>
+<div class="block">Fiscal period label, e.g. <code>2026.Q2</code>. Follows the issuer's own
+ fiscal calendar, so it does not always match the calendar year of
+ <code>fpEnd</code>.</div>
+</li>
+</ul>
+<a id="fpStart">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>fpStart</h4>
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> fpStart</pre>
+<div class="block">First day of the reported period, <code>YYYY.MM.DD</code></div>
+</li>
+</ul>
+<a id="fpEnd">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>fpEnd</h4>
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> fpEnd</pre>
+<div class="block">Last day of the reported period, <code>YYYY.MM.DD</code></div>
+</li>
+</ul>
+<a id="yoy">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>yoy</h4>
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> yoy</pre>
+<div class="block">Year-on-year change of <code>total</code>. Empty when the server does not supply one.</div>
+</li>
+</ul>
 <a id="business">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>business</h4>
 <pre>public&nbsp;<a href="BusinessSegmentItem.html" title="class in com.longbridge.fundamental">BusinessSegmentItem</a>[] business</pre>
 <div class="block">Business segment breakdown</div>
+</li>
+</ul>
+<a id="regionals">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>regionals</h4>
+<pre>public&nbsp;<a href="BusinessSegmentItem.html" title="class in com.longbridge.fundamental">BusinessSegmentItem</a>[] regionals</pre>
+<div class="block">Regional breakdown, in the same shape as <code>business</code>. Empty for
+ issuers that do not report one.</div>
 </li>
 </ul>
 </li>

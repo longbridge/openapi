@@ -284,7 +284,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Get financial calendar events for the given date range.</p>
-<p>The endpoint paginates: the server caps each response (historically 10 events per page unless a larger <code>count</code> is requested) and returns a <code>next_date</code> cursor. To page through the full window, request a larger <code>count</code>, or re-call with the returned <code>next_date</code> as <code>start</code>. <code>count</code>, <code>offset</code> and <code>next</code> are optional (pass <code>std::nullopt</code> to use the server default). </p>
+<p>Events come back grouped by date. <code>count</code> caps the events returned for <em>each date</em> (server default when omitted), and a group's <code>count</code> field is that date's total, so a group holding fewer events than its <code>count</code> was truncated: fetch the rest by calling again with <code>start</code> = <code>end</code> = that date and <code>offset</code> set to the number of events already received. The <code>next_date</code> cursor points at the next date group and moves past truncated dates. <code>end</code> is not a hard bound: the server may return later dates, so filter by date on the client. <code>count</code>, <code>offset</code> and <code>next</code> are optional (pass <code>std::nullopt</code> to use the server default). </p>
 
 </div>
 </div>

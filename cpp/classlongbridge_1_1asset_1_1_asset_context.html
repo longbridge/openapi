@@ -99,6 +99,26 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9c7a4eb404b2457e74484af693970fa2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#a9c7a4eb404b2457e74484af693970fa2">statement_download_url</a> (const std::string &amp;file_key, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_statement_download_url_response.html">StatementDownloadUrlResponse</a> &gt; callback) const</td></tr>
 <tr class="memdesc:a9c7a4eb404b2457e74484af693970fa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get statement data download URL.  <a href="classlongbridge_1_1asset_1_1_asset_context.html#a9c7a4eb404b2457e74484af693970fa2">More...</a><br /></td></tr>
 <tr class="separator:a9c7a4eb404b2457e74484af693970fa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96942ba3d33aafc78ee16fcf7540f04d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#a96942ba3d33aafc78ee16fcf7540f04d">bank_cards</a> (<a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1asset_1_1_bank_card.html">BankCard</a> &gt;&gt; callback) const</td></tr>
+<tr class="separator:a96942ba3d33aafc78ee16fcf7540f04d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60d1247465253b35c8b3a8c609974bfe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#a60d1247465253b35c8b3a8c609974bfe">edda_applications</a> (const std::string &amp;card_id, const std::string &amp;currency, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1asset_1_1_edda_application.html">EddaApplication</a> &gt;&gt; callback) const</td></tr>
+<tr class="separator:a60d1247465253b35c8b3a8c609974bfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a060f6c457201befc28f791cd037c1c2a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#a060f6c457201befc28f791cd037c1c2a">stock_transfers_in</a> (const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_stock_transfers_in_options.html">GetStockTransfersInOptions</a> &gt; &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_stock_transfer_in_response.html">StockTransferInResponse</a> &gt; callback) const</td></tr>
+<tr class="memdesc:a060f6c457201befc28f791cd037c1c2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get stock transfer-in applications (AP accounts only)  <a href="classlongbridge_1_1asset_1_1_asset_context.html#a060f6c457201befc28f791cd037c1c2a">More...</a><br /></td></tr>
+<tr class="separator:a060f6c457201befc28f791cd037c1c2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9b567a8c1a20a81875422b02928ce90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#ae9b567a8c1a20a81875422b02928ce90">stock_transfers_out</a> (const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_stock_transfers_out_options.html">GetStockTransfersOutOptions</a> &gt; &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1asset_1_1_stock_transfer_out.html">StockTransferOut</a> &gt;&gt; callback) const</td></tr>
+<tr class="memdesc:ae9b567a8c1a20a81875422b02928ce90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get stock transfer-out applications (AP accounts only)  <a href="classlongbridge_1_1asset_1_1_asset_context.html#ae9b567a8c1a20a81875422b02928ce90">More...</a><br /></td></tr>
+<tr class="separator:ae9b567a8c1a20a81875422b02928ce90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb248a6a7ff3ace1ff8fba4626aa96df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#adb248a6a7ff3ace1ff8fba4626aa96df">reward_records</a> (const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_reward_records_options.html">GetRewardRecordsOptions</a> &gt; &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_reward_records_response.html">RewardRecordsResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:adb248a6a7ff3ace1ff8fba4626aa96df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92096d32c02483e82c6c740974cc2682"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#a92096d32c02483e82c6c740974cc2682">coupons</a> (const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_coupons_options.html">GetCouponsOptions</a> &gt; &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_coupons_response.html">CouponsResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:a92096d32c02483e82c6c740974cc2682"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a815d446d1ab632b616f16f026947622a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#a815d446d1ab632b616f16f026947622a">coupon_orders</a> (const std::string &amp;card_id, <a class="el" href="namespacelongbridge_1_1asset.html#acf4352887849e5bc8d95ebde282d9c9f">CouponOrderType</a> order_type, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1asset_1_1_coupon_order.html">CouponOrder</a> &gt;&gt; callback) const</td></tr>
+<tr class="separator:a815d446d1ab632b616f16f026947622a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ac0411cfe3b113c252b856308d89520"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#a7ac0411cfe3b113c252b856308d89520">deposits</a> (const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_deposits_options.html">GetDepositsOptions</a> &gt; &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_deposits_response.html">DepositsResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:a7ac0411cfe3b113c252b856308d89520"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0544a4afb5d0fcb0adb51910d721a5fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#a0544a4afb5d0fcb0adb51910d721a5fc">withdrawals</a> (const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_withdrawals_options.html">GetWithdrawalsOptions</a> &gt; &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_withdrawals_response.html">WithdrawalsResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:a0544a4afb5d0fcb0adb51910d721a5fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -197,6 +217,89 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a96942ba3d33aafc78ee16fcf7540f04d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96942ba3d33aafc78ee16fcf7540f04d">&#9670;&nbsp;</a></span>bank_cards()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::bank_cards </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1asset_1_1_bank_card.html">BankCard</a> &gt;&gt;&#160;</td>
+          <td class="paramname"><em>callback</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the linked bank cards, with their verification, binding and authorization status (AP accounts only) </p>
+
+</div>
+</div>
+<a id="a815d446d1ab632b616f16f026947622a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a815d446d1ab632b616f16f026947622a">&#9670;&nbsp;</a></span>coupon_orders()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::coupon_orders </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>card_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge_1_1asset.html#acf4352887849e5bc8d95ebde282d9c9f">CouponOrderType</a>&#160;</td>
+          <td class="paramname"><em>order_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1asset_1_1_coupon_order.html">CouponOrder</a> &gt;&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the orders a coupon was applied to (AP accounts only). The card id must be 32 hex characters; any other value fails with an error before anything is sent. </p>
+
+</div>
+</div>
+<a id="a92096d32c02483e82c6c740974cc2682"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92096d32c02483e82c6c740974cc2682">&#9670;&nbsp;</a></span>coupons()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::coupons </td>
+          <td>(</td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_coupons_options.html">GetCouponsOptions</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_coupons_response.html">CouponsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get coupons (AP accounts only). By default lists the coupons that have not expired. </p>
+
+</div>
+</div>
 <a id="addf2a7ec158b04ae6242b8bd5f47af8a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#addf2a7ec158b04ae6242b8bd5f47af8a">&#9670;&nbsp;</a></span>create()</h2>
 
@@ -223,6 +326,70 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a7ac0411cfe3b113c252b856308d89520"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ac0411cfe3b113c252b856308d89520">&#9670;&nbsp;</a></span>deposits()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::deposits </td>
+          <td>(</td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_deposits_options.html">GetDepositsOptions</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_deposits_response.html">DepositsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get one page of deposit records (AP accounts only); <code>has_more</code> reports a full page. The page size is always sent: at most 20, default 20. </p>
+
+</div>
+</div>
+<a id="a60d1247465253b35c8b3a8c609974bfe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60d1247465253b35c8b3a8c609974bfe">&#9670;&nbsp;</a></span>edda_applications()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::edda_applications </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>card_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>currency</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1asset_1_1_edda_application.html">EddaApplication</a> &gt;&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the eDDA authorization applications of a bank card in one currency (AP accounts only). The card id must be all digits; any other value fails with an error before anything is sent. </p>
+
+</div>
+</div>
 <a id="a03885d45d6a25c0a5dec952df3ebded5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a03885d45d6a25c0a5dec952df3ebded5">&#9670;&nbsp;</a></span>operator=()</h2>
 
@@ -238,6 +405,35 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="adb248a6a7ff3ace1ff8fba4626aa96df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb248a6a7ff3ace1ff8fba4626aa96df">&#9670;&nbsp;</a></span>reward_records()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::reward_records </td>
+          <td>(</td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_reward_records_options.html">GetRewardRecordsOptions</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_reward_records_response.html">RewardRecordsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get reward records from the reward center (AP accounts only). The route has no date filter: page through the records and filter on their times. </p>
 
 </div>
 </div>
@@ -310,6 +506,95 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get statement data list. </p>
+
+</div>
+</div>
+<a id="a060f6c457201befc28f791cd037c1c2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a060f6c457201befc28f791cd037c1c2a">&#9670;&nbsp;</a></span>stock_transfers_in()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::stock_transfers_in </td>
+          <td>(</td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_stock_transfers_in_options.html">GetStockTransfersInOptions</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_stock_transfer_in_response.html">StockTransferInResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get stock transfer-in applications (AP accounts only) </p>
+
+</div>
+</div>
+<a id="ae9b567a8c1a20a81875422b02928ce90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9b567a8c1a20a81875422b02928ce90">&#9670;&nbsp;</a></span>stock_transfers_out()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::stock_transfers_out </td>
+          <td>(</td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_stock_transfers_out_options.html">GetStockTransfersOutOptions</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1asset_1_1_stock_transfer_out.html">StockTransferOut</a> &gt;&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get stock transfer-out applications (AP accounts only) </p>
+
+</div>
+</div>
+<a id="a0544a4afb5d0fcb0adb51910d721a5fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0544a4afb5d0fcb0adb51910d721a5fc">&#9670;&nbsp;</a></span>withdrawals()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::asset::AssetContext::withdrawals </td>
+          <td>(</td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="structlongbridge_1_1asset_1_1_get_withdrawals_options.html">GetWithdrawalsOptions</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html">AssetContext</a>, <a class="el" href="structlongbridge_1_1asset_1_1_withdrawals_response.html">WithdrawalsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get withdrawal records (AP accounts only). The response's <code>has_more</code> reports a full page of the size sent (default 20, at most 50). </p>
 
 </div>
 </div>

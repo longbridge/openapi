@@ -128,7 +128,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <hr>
 <pre>public class <span class="typeNameLabel">BusinessSegmentItem</span>
 extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a></pre>
-<div class="block">One business segment item (latest snapshot).</div>
+<div class="block">One business or regional segment item (latest snapshot).</div>
 </li>
 </ul>
 </div>
@@ -151,16 +151,38 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#id">id</a></span></code></th>
+<td class="colLast">
+<div class="block">Stable identifier for the segment, usable to align the same segment
+ across periods.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#name">name</a></span></code></th>
 <td class="colLast">
 <div class="block">Segment name</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#percent">percent</a></span></code></th>
 <td class="colLast">
 <div class="block">Percentage of total revenue</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#value">value</a></span></code></th>
+<td class="colLast">
+<div class="block">Absolute value, in the response's currency.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#yoy">yoy</a></span></code></th>
+<td class="colLast">
+<div class="block">Year-on-year change for this segment.</div>
 </td>
 </tr>
 </table>
@@ -231,11 +253,44 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <a id="percent">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>percent</h4>
 <pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> percent</pre>
 <div class="block">Percentage of total revenue</div>
+</li>
+</ul>
+<a id="value">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>value</h4>
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> value</pre>
+<div class="block">Absolute value, in the response's currency. Empty when the server does
+ not supply one.</div>
+</li>
+</ul>
+<a id="id">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>id</h4>
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> id</pre>
+<div class="block">Stable identifier for the segment, usable to align the same segment
+ across periods. Empty when the server does not supply one.</div>
+</li>
+</ul>
+<a id="yoy">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>yoy</h4>
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> yoy</pre>
+<div class="block">Year-on-year change for this segment. Empty when the server does not
+ supply one.</div>
 </li>
 </ul>
 </li>
