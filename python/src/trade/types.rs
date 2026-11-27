@@ -928,6 +928,8 @@ pub(crate) struct CashInfo {
     settling_cash: PyDecimal,
     /// Currency
     currency: String,
+    /// Redeemable cash
+    redemption_cash: PyDecimal,
 }
 
 /// Frozen transaction fee

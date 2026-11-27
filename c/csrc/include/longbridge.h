@@ -6851,6 +6851,10 @@ typedef struct lb_cash_info_t {
    * Currency
    */
   const char *currency;
+  /**
+   * Redeemable cash
+   */
+  const struct lb_decimal_t *redemption_cash;
 } lb_cash_info_t;
 
 /**

@@ -7163,6 +7163,10 @@ class CashInfo:
     """
     Currency
     """
+    redemption_cash: Decimal
+    """
+    Redeemable cash
+    """
 
 class FrozenTransactionFee:
     currency: str
