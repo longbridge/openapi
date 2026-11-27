@@ -11,6 +11,7 @@ public class CashInfo {
     private BigDecimal frozenCash;
     private BigDecimal settlingCash;
     private String currency;
+    private BigDecimal redemptionCash;
 
     /**
      * Returns the withdrawable cash amount.
@@ -57,9 +58,19 @@ public class CashInfo {
         return currency;
     }
 
+    /**
+     * Returns the redeemable cash amount.
+     *
+     * @return redeemable cash
+     */
+    public BigDecimal getRedemptionCash() {
+        return redemptionCash;
+    }
+
     @Override
     public String toString() {
         return "CashInfo [availableCash=" + availableCash + ", currency=" + currency + ", frozenCash=" + frozenCash
-                + ", settlingCash=" + settlingCash + ", withdrawCash=" + withdrawCash + "]";
+                + ", redemptionCash=" + redemptionCash + ", settlingCash=" + settlingCash + ", withdrawCash="
+                + withdrawCash + "]";
     }
 }

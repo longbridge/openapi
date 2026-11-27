@@ -762,7 +762,8 @@ impl_java_class!(
         available_cash,
         frozen_cash,
         settling_cash,
-        currency
+        currency,
+        redemption_cash
     ]
 );
 

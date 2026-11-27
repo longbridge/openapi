@@ -45,6 +45,8 @@ on_account_balance(const struct lb_async_result_t* res)
              lb_decimal_to_double(cash_info->frozen_cash));
       printf("\t\tsettling_cash: %f\n",
              lb_decimal_to_double(cash_info->settling_cash));
+      printf("\t\tredemption_cash: %f\n",
+             lb_decimal_to_double(cash_info->redemption_cash));
     }
   }
 }

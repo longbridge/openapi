@@ -2092,6 +2092,8 @@ struct CashInfo
   Decimal settling_cash;
   /// Currency
   std::string currency;
+  /// Redeemable cash
+  Decimal redemption_cash;
 };
 
 /// Frozen transaction fee

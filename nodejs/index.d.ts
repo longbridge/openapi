@@ -254,10 +254,10 @@ export declare class CalendarContext {
    * `market` is an optional market filter (e.g. `"HK"` or `"US"`).
    *
    * Events come back grouped by date. `count` caps the events returned for
-   * *each date* (server default when omitted), and a group's `count` field is
-   * that date's total, so a group holding fewer events than its `count` was
-   * truncated: fetch the rest by calling again with `start` = `end` = that
-   * date and `offset` set to the number of events already received. The
+   * *each date* (server default when omitted), and a group's `count` field
+   * is that date's total, so a group holding fewer events than its `count`
+   * was truncated: fetch the rest by calling again with `start` = `end` =
+   * that date and `offset` set to the number of events already received. The
    * `nextDate` cursor points at the next date group and moves past truncated
    * dates. `end` is not a hard bound: the server may return later dates, so
    * filter by date on the client.
@@ -362,6 +362,8 @@ export declare class CashInfo {
   get settlingCash(): Decimal
   /** Currency */
   get currency(): string
+  /** Redeemable cash */
+  get redemptionCash(): Decimal
 }
 
 /** Configuration for Longbridge SDK */
@@ -9933,9 +9935,15 @@ export interface ValuationHistoryResponse {
 export interface ValuationMetricData {
   /** Description */
   desc: string
-  /** Upper bound of the fair-value band (not the period maximum; the series can rise above it) */
+  /**
+   * Upper bound of the fair-value band (not the period maximum; the series
+   * can rise above it)
+   */
   high?: string
-  /** Lower bound of the fair-value band (not the period minimum; the series can fall below it) */
+  /**
+   * Lower bound of the fair-value band (not the period minimum; the series
+   * can fall below it)
+   */
   low?: string
   /** Historical median */
   median?: string

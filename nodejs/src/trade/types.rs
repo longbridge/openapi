@@ -789,6 +789,8 @@ pub struct CashInfo {
     settling_cash: Decimal,
     /// Currency
     currency: String,
+    /// Redeemable cash
+    redemption_cash: Decimal,
 }
 
 /// Frozen transaction fee

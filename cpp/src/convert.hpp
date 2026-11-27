@@ -1772,6 +1772,7 @@ convert(const lb_cash_info_t* info)
     Decimal(info->frozen_cash),
     Decimal(info->settling_cash),
     info->currency,
+    Decimal(info->redemption_cash),
   };
 }
 

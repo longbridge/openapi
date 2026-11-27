@@ -780,6 +780,9 @@ pub struct CashInfo {
     pub settling_cash: Decimal,
     /// Currency
     pub currency: String,
+    /// Redeemable cash. Older responses omit it; it then reads as `0`.
+    #[serde(default, with = "serde_utils::decimal_empty_is_0")]
+    pub redemption_cash: Decimal,
 }
 
 /// Frozen transaction fee
@@ -2469,7 +2472,8 @@ mod tests {
                     "available_cash": "195902464.37",
                     "frozen_cash": "11579339.13",
                     "settling_cash": "207288537.81",
-                    "currency": "HKD"
+                    "currency": "HKD",
+                    "redemption_cash": "1500.25"
                   },
                   {
                     "withdraw_cash": "199893416.74",
@@ -2521,12 +2525,15 @@ mod tests {
         assert_eq!(cash_info.frozen_cash, "11579339.13".parse().unwrap());
         assert_eq!(cash_info.settling_cash, "207288537.81".parse().unwrap());
         assert_eq!(cash_info.currency, "HKD");
+        assert_eq!(cash_info.redemption_cash, "1500.25".parse().unwrap());
 
         let cash_info = &balance.cash_infos[1];
         assert_eq!(cash_info.withdraw_cash, "199893416.74".parse().unwrap());
         assert_eq!(cash_info.available_cash, "199893416.74".parse().unwrap());
         assert_eq!(cash_info.frozen_cash, "28723.76".parse().unwrap());
         assert_eq!(cash_info.settling_cash, "-276806.51".parse().unwrap());
+        // An entry without `redemption_cash` (older gateways) still decodes.
+        assert_eq!(cash_info.redemption_cash, Decimal::ZERO);
         assert_eq!(cash_info.currency, "USD");
 
         assert_eq!(balance.frozen_transaction_fees.len(), 1);

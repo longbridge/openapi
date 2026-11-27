@@ -1424,6 +1424,8 @@ pub struct CCashInfo {
     pub settling_cash: *const CDecimal,
     /// Currency
     pub currency: *const c_char,
+    /// Redeemable cash
+    pub redemption_cash: *const CDecimal,
 }
 
 #[derive(Debug)]
@@ -1433,6 +1435,7 @@ pub(crate) struct CCashInfoOwned {
     frozen_cash: CDecimal,
     settling_cash: CDecimal,
     currency: CString,
+    redemption_cash: CDecimal,
 }
 
 impl From<CashInfo> for CCashInfoOwned {
@@ -1443,6 +1446,7 @@ impl From<CashInfo> for CCashInfoOwned {
             frozen_cash,
             settling_cash,
             currency,
+            redemption_cash,
         } = info;
         Self {
             withdraw_cash: withdraw_cash.into(),
@@ -1450,6 +1454,7 @@ impl From<CashInfo> for CCashInfoOwned {
             frozen_cash: frozen_cash.into(),
             settling_cash: settling_cash.into(),
             currency: currency.into(),
+            redemption_cash: redemption_cash.into(),
         }
     }
 }
@@ -1464,6 +1469,7 @@ impl ToFFI for CCashInfoOwned {
             frozen_cash,
             settling_cash,
             currency,
+            redemption_cash,
         } = self;
         CCashInfo {
             withdraw_cash: withdraw_cash.to_ffi_type(),
@@ -1471,6 +1477,7 @@ impl ToFFI for CCashInfoOwned {
             frozen_cash: frozen_cash.to_ffi_type(),
             settling_cash: settling_cash.to_ffi_type(),
             currency: currency.to_ffi_type(),
+            redemption_cash: redemption_cash.to_ffi_type(),
         }
     }
 }
