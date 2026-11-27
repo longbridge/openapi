@@ -16284,18 +16284,22 @@ class CalendarContext:
         """
         Get financial calendar events.
 
-        The endpoint paginates: the server caps each response (historically 10
-        events per page unless a larger ``count`` is requested) and returns a
-        ``next_date`` cursor. To page through the full window, request a larger
-        ``count``, or re-call with the returned ``next_date`` as ``start``.
+        Events come back grouped by date. ``count`` caps the events returned for
+        *each date* (server default when omitted), and a group's ``count`` field is
+        that date's total, so a group holding fewer events than its ``count`` was
+        truncated: fetch the rest by calling again with ``start`` = ``end`` = that
+        date and ``offset`` set to the number of events already received. The
+        ``next_date`` cursor points at the next date group and moves past truncated
+        dates. ``end`` is not a hard bound: the server may return later dates, so
+        filter by date on the client.
 
         Args:
             category: Event category
             start: Start date in ``YYYY-MM-DD`` format
             end: End date in ``YYYY-MM-DD`` format
             market: Optional market filter, e.g. ``"HK"``
-            count: Maximum number of events per page (server default when omitted)
-            offset: Number of events to skip from the start of the window
+            count: Maximum number of events per date (server default when omitted)
+            offset: Number of events to skip within a date
             next: Direction to page from the cursor
         """
         ...
@@ -16325,18 +16329,22 @@ class AsyncCalendarContext:
         """
         Get financial calendar events.
 
-        The endpoint paginates: the server caps each response (historically 10
-        events per page unless a larger ``count`` is requested) and returns a
-        ``next_date`` cursor. To page through the full window, request a larger
-        ``count``, or re-call with the returned ``next_date`` as ``start``.
+        Events come back grouped by date. ``count`` caps the events returned for
+        *each date* (server default when omitted), and a group's ``count`` field is
+        that date's total, so a group holding fewer events than its ``count`` was
+        truncated: fetch the rest by calling again with ``start`` = ``end`` = that
+        date and ``offset`` set to the number of events already received. The
+        ``next_date`` cursor points at the next date group and moves past truncated
+        dates. ``end`` is not a hard bound: the server may return later dates, so
+        filter by date on the client.
 
         Args:
             category: Event category
             start: Start date in ``YYYY-MM-DD`` format
             end: End date in ``YYYY-MM-DD`` format
             market: Optional market filter, e.g. ``"HK"``
-            count: Maximum number of events per page (server default when omitted)
-            offset: Number of events to skip from the start of the window
+            count: Maximum number of events per date (server default when omitted)
+            offset: Number of events to skip within a date
             next: Direction to page from the cursor
         """
         ...

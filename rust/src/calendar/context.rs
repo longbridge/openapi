@@ -48,16 +48,18 @@ impl CalendarContext {
 
     /// Get financial calendar events.
     ///
-    /// The endpoint is paginated. The server caps each response (it
-    /// historically returns at most 10 events per page unless a larger
-    /// `count` is requested) and reports a `next_date` cursor. To page
-    /// through the full window, either request a larger `count`, or re-call
-    /// this method passing the returned `next_date` as `start` until
-    /// `next_date` comes back empty.
+    /// Events come back grouped by date. `count` caps the events returned for
+    /// *each date* (server default when omitted), and a group's `count` field
+    /// is that date's total, so a group holding fewer events than its `count`
+    /// was truncated: fetch the rest by calling again with `start` = `end` =
+    /// that date and `offset` set to the number of events already received. The
+    /// `next_date` cursor points at the next date group and moves past
+    /// truncated dates. `end` is not a hard bound: the server may return later
+    /// dates, so filter by date on the client.
     ///
-    /// - `count` — maximum number of events per page (server default when
+    /// - `count` — maximum number of events per date (server default when
     ///   `None`).
-    /// - `offset` — number of events to skip from the start of the window.
+    /// - `offset` — number of events to skip within a date.
     /// - `next` — direction to page from the cursor (see
     ///   [`CalendarPageDirection`]).
     ///
