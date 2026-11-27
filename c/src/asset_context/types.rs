@@ -8,8 +8,8 @@ use longbridge::asset::{
     CouponIpoInterest, CouponOrder, CouponPlatformFeeDeduct, CouponQuote, CouponStatus,
     CouponStock, CouponStockCounter, CouponStockFallback, CouponStockFragment, CouponTargetType,
     CouponsResponse, Deposit, DepositState, DepositsResponse, EddaApplication, QuoteInvestorType,
-    RewardDeliverStatus, RewardRecord, RewardRecordsResponse, RewardStatus, RewardType,
-    StatementItem, StockTransferIn, StockTransferInResponse, StockTransferInState,
+    RewardDeliverStatus, RewardDetailKind, RewardRecord, RewardRecordsResponse, RewardStatus,
+    RewardType, StatementItem, StockTransferIn, StockTransferInResponse, StockTransferInState,
     StockTransferOut, StockTransferOutState, TransferStock, TransferStockState, Withdrawal,
     WithdrawalState, WithdrawalsResponse,
 };
@@ -19,8 +19,9 @@ use crate::{
     asset_context::enum_types::{
         CAuthorizationStatus, CBankCardBindState, CBankCardStatus, CBankCardWitnessState,
         CCommissionUnlimitedType, CCouponStatus, CCouponTargetType, CDepositState,
-        CIpoCouponTargetType, CQuoteInvestorType, CRewardDeliverStatus, CRewardStatus, CRewardType,
-        CStockTransferInState, CStockTransferOutState, CTransferStockState, CWithdrawalState,
+        CIpoCouponTargetType, CQuoteInvestorType, CRewardDeliverStatus, CRewardDetailKind,
+        CRewardStatus, CRewardType, CStockTransferInState, CStockTransferOutState,
+        CTransferStockState, CWithdrawalState,
     },
     types::{CDecimal, COption, CString, CVec, ToFFI},
 };
@@ -200,6 +201,8 @@ pub struct CBankCard {
     pub account_type: *const c_char,
     /// Country or region of the bank (e.g. `Hong Kong`; not a currency)
     pub country: *const c_char,
+    /// Country or region as displayed in the app, as returned by the server
+    pub country_display: *const c_char,
     /// Region code
     pub region: *const c_char,
     /// Region name
@@ -250,6 +253,7 @@ pub(crate) struct CBankCardOwned {
     account: CString,
     account_type: CString,
     country: CString,
+    country_display: CString,
     region: CString,
     region_name: CString,
     swift_code: CString,
@@ -278,6 +282,7 @@ impl From<BankCard> for CBankCardOwned {
             account: v.account.into(),
             account_type: v.account_type.into(),
             country: v.country.into(),
+            country_display: v.country_display.into(),
             region: v.region.into(),
             region_name: v.region_name.into(),
             swift_code: v.swift_code.into(),
@@ -310,6 +315,7 @@ impl ToFFI for CBankCardOwned {
             account: self.account.to_ffi_type(),
             account_type: self.account_type.to_ffi_type(),
             country: self.country.to_ffi_type(),
+            country_display: self.country_display.to_ffi_type(),
             region: self.region.to_ffi_type(),
             region_name: self.region_name.to_ffi_type(),
             swift_code: self.swift_code.to_ffi_type(),
@@ -458,6 +464,17 @@ pub struct CTransferStock {
     /// this SDK does not know (`state_code` is then `Unknown`); null when the
     /// value is missing or is not a code
     pub state_code_raw: *const i32,
+    /// Quantity held in street name, as returned by the server (null when
+    /// not set)
+    pub street_amount: *const CDecimal,
+    /// Quantity held by a nominee, as returned by the server (null when not
+    /// set)
+    pub nominee_amount: *const CDecimal,
+    /// Quantity held in the holder's own name, as returned by the server
+    /// (null when not set)
+    pub own_amount: *const CDecimal,
+    /// Number of share certificates, as returned by the server
+    pub certificate_count: i64,
     /// Position side
     pub position_side: *const c_char,
 }
@@ -474,6 +491,10 @@ pub(crate) struct CTransferStockOwned {
     cost: Option<CDecimal>,
     state_code: TransferStockState,
     state_code_raw: Option<i32>,
+    street_amount: Option<CDecimal>,
+    nominee_amount: Option<CDecimal>,
+    own_amount: Option<CDecimal>,
+    certificate_count: i64,
     position_side: CString,
 }
 
@@ -490,6 +511,10 @@ impl From<TransferStock> for CTransferStockOwned {
             cost: v.cost.map(Into::into),
             state_code: v.state_code,
             state_code_raw: v.state_code_raw,
+            street_amount: v.street_amount.map(Into::into),
+            nominee_amount: v.nominee_amount.map(Into::into),
+            own_amount: v.own_amount.map(Into::into),
+            certificate_count: v.certificate_count,
             position_side: v.position_side.into(),
         }
     }
@@ -522,6 +547,22 @@ impl ToFFI for CTransferStockOwned {
                 .as_ref()
                 .map(|v| v as *const i32)
                 .unwrap_or(std::ptr::null()),
+            street_amount: self
+                .street_amount
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            nominee_amount: self
+                .nominee_amount
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            own_amount: self
+                .own_amount
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            certificate_count: self.certificate_count,
             position_side: self.position_side.to_ffi_type(),
         }
     }
@@ -906,6 +947,8 @@ pub struct CRewardRecord {
     /// this SDK does not know (`reward_type` is then `Unknown`); null when the
     /// value is missing or is not a code
     pub reward_type_raw: *const i32,
+    /// The detail object the fields below came from
+    pub detail_kind: CRewardDetailKind,
     /// Record ID
     pub record_id: *const c_char,
     /// Title of the activity that granted the reward
@@ -959,6 +1002,7 @@ pub struct CRewardRecord {
 pub(crate) struct CRewardRecordOwned {
     reward_type: RewardType,
     reward_type_raw: Option<i32>,
+    detail_kind: RewardDetailKind,
     record_id: CString,
     activity_title: CString,
     title: CString,
@@ -986,6 +1030,7 @@ impl From<RewardRecord> for CRewardRecordOwned {
         Self {
             reward_type: v.reward_type,
             reward_type_raw: v.reward_type_raw,
+            detail_kind: v.detail_kind,
             record_id: v.record_id.into(),
             activity_title: v.activity_title.into(),
             title: v.title.into(),
@@ -1021,6 +1066,7 @@ impl ToFFI for CRewardRecordOwned {
                 .as_ref()
                 .map(|v| v as *const i32)
                 .unwrap_or(std::ptr::null()),
+            detail_kind: self.detail_kind.into(),
             record_id: self.record_id.to_ffi_type(),
             activity_title: self.activity_title.to_ffi_type(),
             title: self.title.to_ffi_type(),
@@ -2889,12 +2935,16 @@ pub struct CWithdrawalsResponse {
     pub num_list: usize,
     /// Total number of records
     pub total: i64,
+    /// A full page came back (as many records as the page size sent), so the
+    /// next page may hold more
+    pub has_more: bool,
 }
 
 #[derive(Debug)]
 pub(crate) struct CWithdrawalsResponseOwned {
     list: CVec<CWithdrawalOwned>,
     total: i64,
+    has_more: bool,
 }
 
 impl From<WithdrawalsResponse> for CWithdrawalsResponseOwned {
@@ -2902,6 +2952,7 @@ impl From<WithdrawalsResponse> for CWithdrawalsResponseOwned {
         Self {
             list: v.list.into(),
             total: v.total,
+            has_more: v.has_more,
         }
     }
 }
@@ -2914,6 +2965,7 @@ impl ToFFI for CWithdrawalsResponseOwned {
             list: self.list.to_ffi_type(),
             num_list: self.list.len(),
             total: self.total,
+            has_more: self.has_more,
         }
     }
 }
@@ -3012,7 +3064,8 @@ pub struct CGetDepositsOptions {
 pub struct CGetWithdrawalsOptions {
     /// Page number (can be null, default 1)
     pub page: *const i32,
-    /// Page size (can be null)
+    /// Page size (can be null; default 20, max 50: larger values are sent as
+    /// 50, and 0 or a negative value as the default 20)
     pub size: *const i32,
     /// Only withdrawals applied at or after this unix timestamp (can be null)
     pub start: *const i64,

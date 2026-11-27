@@ -17,6 +17,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::StockTransferOutState>()?;
     parent.add_class::<types::TransferStockState>()?;
     parent.add_class::<types::RewardType>()?;
+    parent.add_class::<types::RewardDetailKind>()?;
     parent.add_class::<types::RewardStatus>()?;
     parent.add_class::<types::RewardDeliverStatus>()?;
     parent.add_class::<types::CouponStatus>()?;

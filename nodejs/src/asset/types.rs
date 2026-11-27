@@ -219,6 +219,22 @@ pub enum RewardType {
     Task,
 }
 
+/// Which upstream detail object a reward record came from
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::asset::RewardDetailKind")]
+pub enum RewardDetailKind {
+    /// No known detail object (e.g. a task reward); only the reward type is
+    /// set
+    None,
+    /// The `cash` object
+    Cash,
+    /// The `card` (coupon) object
+    Card,
+    /// The `prize` (gift) object
+    Prize,
+}
+
 /// Status of a reward record
 ///
 /// The numeric values of this enum are not the server codes; each
@@ -532,6 +548,8 @@ pub struct BankCard {
     account_type: String,
     /// Country or region of the bank (e.g. `Hong Kong`; not a currency)
     country: String,
+    /// Country or region as displayed in the app, as returned by the server
+    country_display: String,
     /// Region code
     region: String,
     /// Region name
@@ -636,6 +654,17 @@ pub struct TransferStock {
     /// value is missing or is not a code
     #[js(opt)]
     state_code_raw: Option<i32>,
+    /// Quantity held in street name, as returned by the server
+    #[js(opt)]
+    street_amount: Option<Decimal>,
+    /// Quantity held by a nominee, as returned by the server
+    #[js(opt)]
+    nominee_amount: Option<Decimal>,
+    /// Quantity held in the holder's own name, as returned by the server
+    #[js(opt)]
+    own_amount: Option<Decimal>,
+    /// Number of share certificates, as returned by the server
+    certificate_count: i64,
     /// Position side
     position_side: String,
 }
@@ -791,6 +820,8 @@ pub struct RewardRecord {
     /// value is missing or is not a code
     #[js(opt)]
     reward_type_raw: Option<i32>,
+    /// The detail object the fields below came from
+    detail_kind: RewardDetailKind,
     /// Record ID
     record_id: String,
     /// Title of the activity that granted the reward
@@ -1491,4 +1522,7 @@ pub struct WithdrawalsResponse {
     list: Vec<Withdrawal>,
     /// Total number of records
     total: i64,
+    /// A full page came back (as many records as the page size sent), so the
+    /// next page may hold more
+    has_more: bool,
 }

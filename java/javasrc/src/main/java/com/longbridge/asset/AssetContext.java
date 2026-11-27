@@ -85,6 +85,8 @@ public class AssetContext implements AutoCloseable {
 
     /**
      * Get the eDDA authorization applications of a bank card in one currency.
+     * The card id must be all digits; any other value fails with an error
+     * before anything is sent.
      * <p>
      * AP accounts only: US data-center accounts get a region error.
      *
@@ -171,7 +173,9 @@ public class AssetContext implements AutoCloseable {
 
     /**
      * Get the orders a coupon was applied to. The gateway rate-limits this
-     * route tightly per member, so avoid calling it concurrently.
+     * route tightly per member, so avoid calling it concurrently. The card id
+     * must be 32 hex characters; any other value fails with an error before
+     * anything is sent.
      * <p>
      * AP accounts only: US data-center accounts get a region error.
      *
@@ -208,7 +212,8 @@ public class AssetContext implements AutoCloseable {
     }
 
     /**
-     * Get withdrawal records.
+     * Get withdrawal records. {@link WithdrawalsResponse#getHasMore()} reports
+     * a full page of the size sent (default 20, at most 50).
      * <p>
      * AP accounts only: US data-center accounts get a region error.
      *

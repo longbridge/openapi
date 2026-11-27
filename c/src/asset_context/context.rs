@@ -169,6 +169,9 @@ pub unsafe extern "C" fn lb_asset_context_bank_cards(
 
 /// Get the eDDA authorization applications of a bank card in one currency
 ///
+/// The card id must be all digits; any other value fails with an error before
+/// anything is sent.
+///
 /// AP accounts only: US data-center accounts get a region error.
 ///
 /// The callback data is an array of `lb_edda_application_t`.
@@ -313,6 +316,9 @@ pub unsafe extern "C" fn lb_asset_context_coupons(
 
 /// Get the orders a coupon was applied to
 ///
+/// The card id must be 32 hex characters; any other value fails with an error
+/// before anything is sent.
+///
 /// AP accounts only: US data-center accounts get a region error.
 ///
 /// The callback data is an array of `lb_coupon_order_t`.
@@ -386,6 +392,9 @@ pub unsafe extern "C" fn lb_asset_context_deposits(
 }
 
 /// Get withdrawal records
+///
+/// The response's `has_more` reports a full page of the size sent (default 20,
+/// at most 50).
 ///
 /// AP accounts only: US data-center accounts get a region error.
 ///

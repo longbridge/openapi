@@ -5113,6 +5113,23 @@ convert(asset::TransferStockState ty)
   }
 }
 
+inline asset::RewardDetailKind
+convert(lb_reward_detail_kind_t ty)
+{
+  switch (ty) {
+    case RewardDetailKindNone:
+      return asset::RewardDetailKind::None;
+    case RewardDetailKindCash:
+      return asset::RewardDetailKind::Cash;
+    case RewardDetailKindCard:
+      return asset::RewardDetailKind::Card;
+    case RewardDetailKindPrize:
+      return asset::RewardDetailKind::Prize;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
 inline asset::RewardType
 convert(lb_reward_type_t ty)
 {
@@ -5766,6 +5783,7 @@ convert(const lb_bank_card_t* info)
   out.account = std::string(info->account ? info->account : "");
   out.account_type = std::string(info->account_type ? info->account_type : "");
   out.country = std::string(info->country ? info->country : "");
+  out.country_display = std::string(info->country_display ? info->country_display : "");
   out.region = std::string(info->region ? info->region : "");
   out.region_name = std::string(info->region_name ? info->region_name : "");
   out.swift_code = std::string(info->swift_code ? info->swift_code : "");
@@ -5814,6 +5832,10 @@ convert(const lb_transfer_stock_t* info)
   out.cost = info->cost ? std::optional<Decimal>(Decimal(info->cost)) : std::nullopt;
   out.state_code = convert(info->state_code);
   out.state_code_raw = info->state_code_raw ? std::optional<int32_t>(*info->state_code_raw) : std::nullopt;
+  out.street_amount = info->street_amount ? std::optional<Decimal>(Decimal(info->street_amount)) : std::nullopt;
+  out.nominee_amount = info->nominee_amount ? std::optional<Decimal>(Decimal(info->nominee_amount)) : std::nullopt;
+  out.own_amount = info->own_amount ? std::optional<Decimal>(Decimal(info->own_amount)) : std::nullopt;
+  out.certificate_count = info->certificate_count;
   out.position_side = std::string(info->position_side ? info->position_side : "");
   return out;
 }
@@ -5889,6 +5911,7 @@ convert(const lb_reward_record_t* info)
   asset::RewardRecord out;
   out.reward_type = convert(info->reward_type);
   out.reward_type_raw = info->reward_type_raw ? std::optional<int32_t>(*info->reward_type_raw) : std::nullopt;
+  out.detail_kind = convert(info->detail_kind);
   out.record_id = std::string(info->record_id ? info->record_id : "");
   out.activity_title = std::string(info->activity_title ? info->activity_title : "");
   out.title = std::string(info->title ? info->title : "");
@@ -6288,6 +6311,7 @@ convert(const lb_withdrawals_response_t* info)
   asset::WithdrawalsResponse out;
   out.list = convert_asset_list<asset::Withdrawal>(info->list, info->num_list);
   out.total = info->total;
+  out.has_more = info->has_more;
   return out;
 }
 

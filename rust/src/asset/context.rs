@@ -5,7 +5,7 @@ use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
 use crate::{
-    Config, Result,
+    Config, Error, Result,
     asset::{
         BankCard, BankCardsResponse, CouponOrder, CouponOrderType, CouponOrdersResponse,
         CouponsResponse, DepositsResponse, EddaApplication, EddaApplicationsResponse,
@@ -217,8 +217,17 @@ impl AssetContext {
         card_id: impl Into<String>,
         currency: impl Into<String>,
     ) -> Result<Vec<EddaApplication>> {
+        let card_id = card_id.into().trim().to_string();
+        if card_id.is_empty() || !card_id.bytes().all(|b| b.is_ascii_digit()) {
+            return Err(Error::ParseField {
+                name: "card_id",
+                error: format!(
+                    "edda_applications requires the numeric bank card id (BankCard::id), got {card_id:?}"
+                ),
+            });
+        }
         let query = GetEddaApplicationsQuery {
-            card_id: card_id.into().trim().to_string(),
+            card_id,
             currency: currency.into().trim().to_uppercase(),
         };
         Ok(self
@@ -309,8 +318,22 @@ impl AssetContext {
         card_id: impl Into<String>,
         order_type: CouponOrderType,
     ) -> Result<Vec<CouponOrder>> {
+        let card_id = card_id.into().trim().to_string();
+        if card_id.len() != 32 || !card_id.bytes().all(|b| b.is_ascii_hexdigit()) {
+            let hint = if !card_id.is_empty() && card_id.bytes().all(|b| b.is_ascii_digit()) {
+                " (this looks like a bank card id, BankCard::id)"
+            } else {
+                ""
+            };
+            return Err(Error::ParseField {
+                name: "card_id",
+                error: format!(
+                    "coupon_orders requires the 32-character coupon id (Coupon::card_id), got {card_id:?}{hint}"
+                ),
+            });
+        }
         let query = GetCouponOrdersQuery {
-            card_id: card_id.into().trim().to_string(),
+            card_id,
             order_type: order_type.as_str(),
         };
         Ok(self
@@ -346,6 +369,10 @@ impl AssetContext {
 
     /// Get withdrawal records
     ///
+    /// [`WithdrawalsResponse::has_more`] reports a full page. The page size
+    /// is at most 50 and defaults to 20 (see [`GetWithdrawalsOptions::size`]);
+    /// it is always sent.
+    ///
     /// AP accounts only: US data-center accounts get a region error.
     ///
     /// Path: `GET /v1/account/withdrawals`
@@ -353,8 +380,13 @@ impl AssetContext {
         &self,
         options: impl Into<Option<GetWithdrawalsOptions>>,
     ) -> Result<WithdrawalsResponse> {
-        self.get_account(core::WITHDRAWALS_PATH, options.into().unwrap_or_default())
-            .await
+        let options = options.into().unwrap_or_default();
+        let page_size = options.page_size();
+        let mut resp: WithdrawalsResponse = self
+            .get_account(core::WITHDRAWALS_PATH, options.size(page_size))
+            .await?;
+        resp.has_more = usize::try_from(page_size).is_ok_and(|size| resp.list.len() >= size);
+        Ok(resp)
     }
 }
 
@@ -530,7 +562,7 @@ mod tests {
         let coupons = ctx.coupons(None).await.expect("coupons");
         assert!(coupons.list.is_empty(), "empty list");
         let orders = ctx
-            .coupon_orders("c1", CouponOrderType::Locked)
+            .coupon_orders("0123456789abcdef0123456789ABCDEF", CouponOrderType::Locked)
             .await
             .expect("coupon orders");
         assert!(orders.is_empty(), "empty list");
@@ -556,7 +588,7 @@ mod tests {
             lines[1]
         );
         assert!(
-            lines[1].contains("card_id=c1"),
+            lines[1].contains("card_id=0123456789abcdef0123456789ABCDEF"),
             "own query kept: {}",
             lines[1]
         );
@@ -624,6 +656,99 @@ mod tests {
         assert!(
             !lines[1].contains("account_channel"),
             "an opaque token sends no channel: {}",
+            lines[1]
+        );
+    }
+
+    /// Card ids are checked before anything is sent.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn card_ids_are_checked_locally() {
+        // Port 9 (discard) is never reached: validation fails first.
+        let config = Arc::new(
+            Config::from_apikey("app_key", "app_secret", "opaque").http_url("http://127.0.0.1:9"),
+        );
+        let ctx = AssetContext::new(config);
+        let err = ctx
+            .edda_applications("ab12", "HKD")
+            .await
+            .expect_err("non-numeric bank card id");
+        assert!(
+            matches!(
+                &err,
+                Error::ParseField {
+                    name: "card_id",
+                    ..
+                }
+            ),
+            "{err}"
+        );
+        assert!(err.to_string().contains("numeric bank card id"), "{err}");
+        let err = ctx
+            .coupon_orders("493082", CouponOrderType::Settled)
+            .await
+            .expect_err("bank card id passed as a coupon id");
+        assert!(
+            err.to_string().contains("32-character coupon id")
+                && err.to_string().contains("looks like a bank card id"),
+            "{err}"
+        );
+        let err = ctx
+            .coupon_orders("zz", CouponOrderType::Settled)
+            .await
+            .expect_err("not hex");
+        assert!(!err.to_string().contains("bank card"), "no hint: {err}");
+    }
+
+    /// Withdrawals report a full page of the size actually sent.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn withdrawals_report_a_full_page() {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind a local port");
+        let addr = listener.local_addr().expect("local address");
+        let server = tokio::spawn(async move {
+            let mut lines = Vec::new();
+            for count in [50, 3] {
+                let (mut socket, _) = listener.accept().await.expect("accept");
+                let mut buf = vec![0u8; 8192];
+                let n = socket.read(&mut buf).await.expect("read request");
+                let items = vec![r#"{"id":"w"}"#; count].join(",");
+                let body =
+                    format!(r#"{{"code":0,"message":"","data":{{"list":[{items}],"total":99}}}}"#);
+                let reply = format!(
+                    "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                socket.write_all(reply.as_bytes()).await.expect("reply");
+                let request = String::from_utf8_lossy(&buf[..n]).to_string();
+                lines.push(request.lines().next().unwrap_or_default().to_string());
+            }
+            lines
+        });
+        let config = Arc::new(
+            Config::from_apikey("app_key", "app_secret", "opaque")
+                .http_url(format!("http://{addr}")),
+        );
+        let ctx = AssetContext::new(config);
+        let full = ctx
+            .withdrawals(GetWithdrawalsOptions::new().size(80))
+            .await
+            .expect("withdrawals");
+        assert!(full.has_more, "size 80 is sent as 50, and 50 came back");
+        assert_eq!(full.total, 99, "total kept");
+        let short = ctx.withdrawals(None).await.expect("withdrawals");
+        assert!(!short.has_more, "3 of the default 20");
+        let lines = server.await.expect("server task");
+        assert!(
+            lines[0].contains("size=50"),
+            "capped size sent: {}",
+            lines[0]
+        );
+        assert!(
+            lines[1].contains("size=20"),
+            "default size sent: {}",
             lines[1]
         );
     }

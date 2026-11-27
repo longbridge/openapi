@@ -15,6 +15,7 @@ public class BankCard {
     private String account;
     private String accountType;
     private String country;
+    private String countryDisplay;
     private String region;
     private String regionName;
     private String swiftCode;
@@ -101,6 +102,15 @@ public class BankCard {
      */
     public String getCountry() {
         return country;
+    }
+
+    /**
+     * Returns the country or region as displayed in the app, as returned by the server.
+     *
+     * @return the country or region as displayed in the app, as returned by the server
+     */
+    public String getCountryDisplay() {
+        return countryDisplay;
     }
 
     /**
@@ -246,6 +256,6 @@ public class BankCard {
 
     @Override
     public String toString() {
-        return "BankCard [" + "id=" + id + ", " + "bankId=" + bankId + ", " + "bank=" + bank + ", " + "bankEn=" + bankEn + ", " + "bankCode=" + bankCode + ", " + "account=" + account + ", " + "accountType=" + accountType + ", " + "country=" + country + ", " + "region=" + region + ", " + "regionName=" + regionName + ", " + "swiftCode=" + swiftCode + ", " + "remark=" + remark + ", " + "status=" + status + ", " + "statusRaw=" + statusRaw + ", " + "witnessState=" + witnessState + ", " + "witnessStateRaw=" + witnessStateRaw + ", " + "supportWitness=" + supportWitness + ", " + "bindState=" + bindState + ", " + "bindStateRaw=" + bindStateRaw + ", " + "bindTip=" + bindTip + ", " + "withdrawFee=" + withdrawFee + ", " + "createdAt=" + createdAt + ", " + "authList=" + Arrays.toString(authList) + "]";
+        return "BankCard [" + "id=" + id + ", " + "bankId=" + bankId + ", " + "bank=" + bank + ", " + "bankEn=" + bankEn + ", " + "bankCode=" + bankCode + ", " + "account=" + account + ", " + "accountType=" + accountType + ", " + "country=" + country + ", " + "countryDisplay=" + countryDisplay + ", " + "region=" + region + ", " + "regionName=" + regionName + ", " + "swiftCode=" + swiftCode + ", " + "remark=" + remark + ", " + "status=" + status + ", " + "statusRaw=" + statusRaw + ", " + "witnessState=" + witnessState + ", " + "witnessStateRaw=" + witnessStateRaw + ", " + "supportWitness=" + supportWitness + ", " + "bindState=" + bindState + ", " + "bindStateRaw=" + bindStateRaw + ", " + "bindTip=" + bindTip + ", " + "withdrawFee=" + withdrawFee + ", " + "createdAt=" + createdAt + ", " + "authList=" + Arrays.toString(authList) + "]";
     }
 }

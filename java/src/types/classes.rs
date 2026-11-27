@@ -4543,6 +4543,7 @@ impl_java_class!(
         account,
         account_type,
         country,
+        country_display,
         region,
         region_name,
         swift_code,
@@ -4584,6 +4585,10 @@ impl_java_class!(
         cost,
         state_code,
         state_code_raw,
+        street_amount,
+        nominee_amount,
+        own_amount,
+        certificate_count,
         position_side
     ]
 );
@@ -4662,6 +4667,7 @@ impl_java_class!(
     [
         reward_type,
         reward_type_raw,
+        detail_kind,
         record_id,
         activity_title,
         title,
@@ -5068,6 +5074,7 @@ impl_java_class!(
     [
         #[java(objarray)]
         list,
-        total
+        total,
+        has_more
     ]
 );

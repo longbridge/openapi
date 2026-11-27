@@ -103,7 +103,9 @@ impl AssetContext {
     /// Get the eDDA authorization applications of a bank card in one
     /// currency
     ///
-    /// `cardId` is `BankCard.id`; `currency` is e.g. `HKD` or `USD`.
+    /// `cardId` is `BankCard.id`; `currency` is e.g. `HKD` or `USD`. The card
+    /// id must be all digits; any other value fails with an error before
+    /// anything is sent.
     ///
     /// AP accounts only: US data-center accounts get a region error.
     ///
@@ -244,7 +246,8 @@ impl AssetContext {
 
     /// Get the orders a coupon was applied to
     ///
-    /// `cardId` is `Coupon.cardId` (32 hex characters, not a bank card ID).
+    /// `cardId` is `Coupon.cardId` (32 hex characters, not a bank card ID);
+    /// any other value fails with an error before anything is sent.
     /// The gateway rate-limits this route tightly per member, so avoid
     /// calling it concurrently.
     ///
@@ -303,6 +306,9 @@ impl AssetContext {
     }
 
     /// Get withdrawal records
+    ///
+    /// `hasMore` reports a full page of the size sent (default 20, at most
+    /// 50).
     ///
     /// AP accounts only: US data-center accounts get a region error.
     ///

@@ -12886,6 +12886,40 @@ class RewardType:
         """
         ...
 
+class RewardDetailKind:
+    """
+    Which upstream detail object a reward record came from
+    """
+
+    class None_(RewardDetailKind):
+        """
+        No known detail object (e.g. a task reward); only the reward type is
+        set
+        """
+
+        ...
+
+    class Cash(RewardDetailKind):
+        """
+        The `cash` object
+        """
+
+        ...
+
+    class Card(RewardDetailKind):
+        """
+        The `card` (coupon) object
+        """
+
+        ...
+
+    class Prize(RewardDetailKind):
+        """
+        The `prize` (gift) object
+        """
+
+        ...
+
 class RewardStatus:
     """
     Status of a reward record
@@ -13664,6 +13698,11 @@ class BankCard:
     Country or region of the bank (e.g. `Hong Kong`; not a currency)
     """
 
+    country_display: str
+    """
+    Country or region as displayed in the app, as returned by the server
+    """
+
     region: str
     """
     Region code
@@ -13852,6 +13891,26 @@ class TransferStock:
     The server's numeric code of `state_code`, also when it is a code
     this SDK does not know (`state_code` is then `Unknown`); none when the
     value is missing or is not a code
+    """
+
+    street_amount: Optional[Decimal]
+    """
+    Quantity held in street name, as returned by the server
+    """
+
+    nominee_amount: Optional[Decimal]
+    """
+    Quantity held by a nominee, as returned by the server
+    """
+
+    own_amount: Optional[Decimal]
+    """
+    Quantity held in the holder's own name, as returned by the server
+    """
+
+    certificate_count: int
+    """
+    Number of share certificates, as returned by the server
     """
 
     position_side: str
@@ -14117,6 +14176,11 @@ class RewardRecord:
     The server's numeric code of `reward_type`, also when it is a code
     this SDK does not know (`reward_type` is then `Unknown`); none when the
     value is missing or is not a code
+    """
+
+    detail_kind: Type[RewardDetailKind]
+    """
+    The detail object the fields below came from
     """
 
     record_id: str
@@ -15264,6 +15328,12 @@ class WithdrawalsResponse:
     Total number of records
     """
 
+    has_more: bool
+    """
+    A full page came back (as many records as the page size sent), so the
+    next page may hold more
+    """
+
 class AssetContext:
     """
     Asset context
@@ -15361,6 +15431,8 @@ class AssetContext:
     def edda_applications(self, card_id: str, currency: str) -> List[EddaApplication]:
         """
         Get the eDDA authorization applications of a bank card in one currency.
+        The card id must be all digits; any other value fails with an error
+        before anything is sent.
 
         AP accounts only: US data-center accounts get a region error.
 
@@ -15554,6 +15626,8 @@ class AssetContext:
     def coupon_orders(self, card_id: str, order_type: Type[CouponOrderType]) -> List[CouponOrder]:
         """
         Get the orders a coupon was applied to. The gateway rate-limits this route tightly per member, so avoid calling it concurrently.
+        The card id must be 32 hex characters; any other value fails with an
+        error before anything is sent.
 
         AP accounts only: US data-center accounts get a region error.
 
@@ -15631,13 +15705,14 @@ class AssetContext:
         end: Optional[datetime] = None,
     ) -> WithdrawalsResponse:
         """
-        Get withdrawal records.
+        Get withdrawal records. The response's ``has_more`` reports a full
+        page of the size sent (default 20, at most 50).
 
         AP accounts only: US data-center accounts get a region error.
 
         Args:
             page: Page number (default 1)
-            size: Page size
+            size: Page size (default 20, max 50; larger values are sent as 50, and 0 or a negative value as the default 20)
             start: Only withdrawals applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
             end: Only withdrawals applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
 
@@ -15795,6 +15870,8 @@ class AsyncAssetContext:
     def edda_applications(self, card_id: str, currency: str) -> Awaitable[List[EddaApplication]]:
         """
         Get the eDDA authorization applications of a bank card in one currency.
+        The card id must be all digits; any other value fails with an error
+        before anything is sent.
 
         AP accounts only: US data-center accounts get a region error. Returns an awaitable.
 
@@ -16003,6 +16080,8 @@ class AsyncAssetContext:
     def coupon_orders(self, card_id: str, order_type: Type[CouponOrderType]) -> Awaitable[List[CouponOrder]]:
         """
         Get the orders a coupon was applied to. The gateway rate-limits this route tightly per member, so avoid calling it concurrently.
+        The card id must be 32 hex characters; any other value fails with an
+        error before anything is sent.
 
         AP accounts only: US data-center accounts get a region error. Returns an awaitable.
 
@@ -16086,13 +16165,14 @@ class AsyncAssetContext:
         end: Optional[datetime] = None,
     ) -> Awaitable[WithdrawalsResponse]:
         """
-        Get withdrawal records.
+        Get withdrawal records. The response's ``has_more`` reports a full
+        page of the size sent (default 20, at most 50).
 
         AP accounts only: US data-center accounts get a region error. Returns an awaitable.
 
         Args:
             page: Page number (default 1)
-            size: Page size
+            size: Page size (default 20, max 50; larger values are sent as 50, and 0 or a negative value as the default 20)
             start: Only withdrawals applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
             end: Only withdrawals applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
 

@@ -178,6 +178,20 @@ enum class RewardType
   Task,
 };
 
+/// Which upstream detail object a reward record came from
+enum class RewardDetailKind
+{
+  /// No known detail object (e.g. a task reward); only the reward type is
+  /// set
+  None,
+  /// The `cash` object
+  Cash,
+  /// The `card` (coupon) object
+  Card,
+  /// The `prize` (gift) object
+  Prize,
+};
+
 /// Status of a reward record
 ///
 /// The numeric values of this enum are not the server codes; each
@@ -455,6 +469,8 @@ struct BankCard
   std::string account_type;
   /// Country or region of the bank (e.g. `Hong Kong`; not a currency)
   std::string country;
+  /// Country or region as displayed in the app, as returned by the server
+  std::string country_display;
   /// Region code
   std::string region;
   /// Region name
@@ -545,6 +561,14 @@ struct TransferStock
   /// this SDK does not know (`state_code` is then `Unknown`); null when the
   /// value is missing or is not a code
   std::optional<int32_t> state_code_raw;
+  /// Quantity held in street name, as returned by the server
+  std::optional<Decimal> street_amount;
+  /// Quantity held by a nominee, as returned by the server
+  std::optional<Decimal> nominee_amount;
+  /// Quantity held in the holder's own name, as returned by the server
+  std::optional<Decimal> own_amount;
+  /// Number of share certificates, as returned by the server
+  int64_t certificate_count;
   /// Position side
   std::string position_side;
 };
@@ -669,6 +693,8 @@ struct RewardRecord
   /// this SDK does not know (`reward_type` is then `Unknown`); null when the
   /// value is missing or is not a code
   std::optional<int32_t> reward_type_raw;
+  /// The detail object the fields below came from
+  RewardDetailKind detail_kind;
   /// Record ID
   std::string record_id;
   /// Title of the activity that granted the reward
@@ -1229,6 +1255,9 @@ struct WithdrawalsResponse
   std::vector<Withdrawal> list;
   /// Total number of records
   int64_t total;
+  /// A full page came back (as many records as the page size sent), so the
+  /// next page may hold more
+  bool has_more;
 };
 
 
@@ -1317,7 +1346,8 @@ struct GetWithdrawalsOptions
 {
   /// Page number (default 1)
   std::optional<int32_t> page;
-  /// Page size
+  /// Page size (default 20, max 50; larger values are sent as 50, and 0 or
+  /// a negative value as the default 20)
   std::optional<int32_t> size;
   /// Only withdrawals applied at or after this unix timestamp
   std::optional<int64_t> start;
@@ -1361,7 +1391,8 @@ public:
     AsyncCallback<AssetContext, std::vector<BankCard>> callback) const;
 
   /// Get the eDDA authorization applications of a bank card in one currency
-  /// (AP accounts only)
+  /// (AP accounts only). The card id must be all digits; any other value
+  /// fails with an error before anything is sent.
   void edda_applications(
     const std::string& card_id,
     const std::string& currency,
@@ -1388,7 +1419,9 @@ public:
   void coupons(const std::optional<GetCouponsOptions>& opts,
                AsyncCallback<AssetContext, CouponsResponse> callback) const;
 
-  /// Get the orders a coupon was applied to (AP accounts only)
+  /// Get the orders a coupon was applied to (AP accounts only). The card id
+  /// must be 32 hex characters; any other value fails with an error before
+  /// anything is sent.
   void coupon_orders(
     const std::string& card_id,
     CouponOrderType order_type,
@@ -1399,7 +1432,8 @@ public:
   void deposits(const std::optional<GetDepositsOptions>& opts,
                 AsyncCallback<AssetContext, DepositsResponse> callback) const;
 
-  /// Get withdrawal records (AP accounts only)
+  /// Get withdrawal records (AP accounts only). The response's `has_more`
+  /// reports a full page of the size sent (default 20, at most 50).
   void withdrawals(
     const std::optional<GetWithdrawalsOptions>& opts,
     AsyncCallback<AssetContext, WithdrawalsResponse> callback) const;

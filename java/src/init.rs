@@ -127,6 +127,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::asset::StockTransferOutState,
         longbridge::asset::TransferStockState,
         longbridge::asset::RewardType,
+        longbridge::asset::RewardDetailKind,
         longbridge::asset::RewardStatus,
         longbridge::asset::RewardDeliverStatus,
         longbridge::asset::CouponStatus,

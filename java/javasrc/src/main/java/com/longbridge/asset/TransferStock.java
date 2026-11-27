@@ -16,6 +16,10 @@ public class TransferStock {
     private BigDecimal cost;
     private TransferStockState stateCode;
     private Integer stateCodeRaw;
+    private BigDecimal streetAmount;
+    private BigDecimal nomineeAmount;
+    private BigDecimal ownAmount;
+    private long certificateCount;
     private String positionSide;
 
     /**
@@ -111,6 +115,42 @@ public class TransferStock {
     }
 
     /**
+     * Returns the quantity held in street name, as returned by the server (null when not set).
+     *
+     * @return the quantity held in street name, as returned by the server (null when not set)
+     */
+    public BigDecimal getStreetAmount() {
+        return streetAmount;
+    }
+
+    /**
+     * Returns the quantity held by a nominee, as returned by the server (null when not set).
+     *
+     * @return the quantity held by a nominee, as returned by the server (null when not set)
+     */
+    public BigDecimal getNomineeAmount() {
+        return nomineeAmount;
+    }
+
+    /**
+     * Returns the quantity held in the holder's own name, as returned by the server (null when not set).
+     *
+     * @return the quantity held in the holder's own name, as returned by the server (null when not set)
+     */
+    public BigDecimal getOwnAmount() {
+        return ownAmount;
+    }
+
+    /**
+     * Returns the number of share certificates, as returned by the server.
+     *
+     * @return the number of share certificates, as returned by the server
+     */
+    public long getCertificateCount() {
+        return certificateCount;
+    }
+
+    /**
      * Returns the position side.
      *
      * @return the position side
@@ -121,6 +161,6 @@ public class TransferStock {
 
     @Override
     public String toString() {
-        return "TransferStock [" + "code=" + code + ", " + "name=" + name + ", " + "nameEn=" + nameEn + ", " + "market=" + market + ", " + "counterId=" + counterId + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "cost=" + cost + ", " + "stateCode=" + stateCode + ", " + "stateCodeRaw=" + stateCodeRaw + ", " + "positionSide=" + positionSide + "]";
+        return "TransferStock [" + "code=" + code + ", " + "name=" + name + ", " + "nameEn=" + nameEn + ", " + "market=" + market + ", " + "counterId=" + counterId + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "cost=" + cost + ", " + "stateCode=" + stateCode + ", " + "stateCodeRaw=" + stateCodeRaw + ", " + "streetAmount=" + streetAmount + ", " + "nomineeAmount=" + nomineeAmount + ", " + "ownAmount=" + ownAmount + ", " + "certificateCount=" + certificateCount + ", " + "positionSide=" + positionSide + "]";
     }
 }

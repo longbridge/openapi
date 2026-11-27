@@ -239,6 +239,7 @@ cpp_compat = true
 "CStockTransferOutState" = "lb_stock_transfer_out_state_t"
 "CTransferStockState" = "lb_transfer_stock_state_t"
 "CRewardType" = "lb_reward_type_t"
+"CRewardDetailKind" = "lb_reward_detail_kind_t"
 "CRewardStatus" = "lb_reward_status_t"
 "CRewardDeliverStatus" = "lb_reward_deliver_status_t"
 "CCouponStatus" = "lb_coupon_status_t"

@@ -414,6 +414,12 @@ impl GetDepositsOptions {
     }
 }
 
+/// Default page size of the withdrawal list.
+const DEFAULT_WITHDRAWALS_PAGE_SIZE: i32 = 20;
+
+/// Largest page size of the withdrawal list.
+const MAX_WITHDRAWALS_PAGE_SIZE: i32 = 50;
+
 /// Options for the withdrawal list
 #[derive(Debug, Default, Serialize, Clone)]
 pub struct GetWithdrawalsOptions {
@@ -450,14 +456,25 @@ impl GetWithdrawalsOptions {
         }
     }
 
-    /// Set the page size
+    /// Set the page size (default 20, max 50; larger values are sent as 50,
+    /// and 0 or a negative value as the default 20)
     #[inline]
     #[must_use]
     pub fn size(self, size: i32) -> Self {
+        let size = if size <= 0 {
+            DEFAULT_WITHDRAWALS_PAGE_SIZE
+        } else {
+            size.min(MAX_WITHDRAWALS_PAGE_SIZE)
+        };
         Self {
             size: Some(size),
             ..self
         }
+    }
+
+    /// The page size sent: the one set, or the default 20.
+    pub(crate) fn page_size(&self) -> i32 {
+        self.size.unwrap_or(DEFAULT_WITHDRAWALS_PAGE_SIZE)
     }
 
     /// Only withdrawals applied at or after this time

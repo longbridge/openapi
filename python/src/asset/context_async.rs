@@ -88,7 +88,8 @@ impl AsyncAssetContext {
     }
 
     /// Get the eDDA authorization applications of a bank card in one
-    /// currency. Returns awaitable.
+    /// currency. The card id must be all digits; any other value fails
+    /// with an error before anything is sent. Returns awaitable.
     fn edda_applications(
         &self,
         py: Python<'_>,
@@ -203,7 +204,9 @@ impl AsyncAssetContext {
         .map(|b| b.unbind())
     }
 
-    /// Get the orders a coupon was applied to. Returns awaitable.
+    /// Get the orders a coupon was applied to. The card id must be 32 hex
+    /// characters; any other value fails with an error before anything is
+    /// sent. Returns awaitable.
     fn coupon_orders(
         &self,
         py: Python<'_>,
@@ -245,7 +248,8 @@ impl AsyncAssetContext {
         .map(|b| b.unbind())
     }
 
-    /// Get withdrawal records. Returns awaitable.
+    /// Get withdrawal records. The response's has_more reports a full page
+    /// of the size sent (default 20, at most 50). Returns awaitable.
     #[pyo3(signature = (page = None, size = None, start = None, end = None))]
     fn withdrawals(
         &self,

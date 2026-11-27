@@ -913,6 +913,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/asset/RewardDetailKind",
+    longbridge::asset::RewardDetailKind,
+    [None, Cash, Card, Prize]
+);
+
+impl_java_enum!(
     "com/longbridge/asset/RewardStatus",
     longbridge::asset::RewardStatus,
     [

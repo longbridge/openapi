@@ -944,6 +944,7 @@ module.exports.PushCandlestickMode = nativeBinding.PushCandlestickMode
 module.exports.QuoteInvestorType = nativeBinding.QuoteInvestorType
 module.exports.QuoteTransport = nativeBinding.QuoteTransport
 module.exports.RewardDeliverStatus = nativeBinding.RewardDeliverStatus
+module.exports.RewardDetailKind = nativeBinding.RewardDetailKind
 module.exports.RewardStatus = nativeBinding.RewardStatus
 module.exports.RewardType = nativeBinding.RewardType
 module.exports.SecuritiesUpdateMode = nativeBinding.SecuritiesUpdateMode

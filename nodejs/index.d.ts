@@ -203,7 +203,9 @@ export declare class AssetContext {
    * Get the eDDA authorization applications of a bank card in one
    * currency
    *
-   * `cardId` is `BankCard.id`; `currency` is e.g. `HKD` or `USD`.
+   * `cardId` is `BankCard.id`; `currency` is e.g. `HKD` or `USD`. The card
+   * id must be all digits; any other value fails with an error before
+   * anything is sent.
    *
    * AP accounts only: US data-center accounts get a region error.
    *
@@ -297,7 +299,8 @@ export declare class AssetContext {
   /**
    * Get the orders a coupon was applied to
    *
-   * `cardId` is `Coupon.cardId` (32 hex characters, not a bank card ID).
+   * `cardId` is `Coupon.cardId` (32 hex characters, not a bank card ID);
+   * any other value fails with an error before anything is sent.
    * The gateway rate-limits this route tightly per member, so avoid
    * calling it concurrently.
    *
@@ -338,6 +341,9 @@ export declare class AssetContext {
   deposits(opts?: GetDepositsOptions | undefined | null): Promise<DepositsResponse>
   /**
    * Get withdrawal records
+   *
+   * `hasMore` reports a full page of the size sent (default 20, at most
+   * 50).
    *
    * AP accounts only: US data-center accounts get a region error.
    *
@@ -425,6 +431,8 @@ export declare class BankCard {
   get accountType(): string
   /** Country or region of the bank (e.g. `Hong Kong`; not a currency) */
   get country(): string
+  /** Country or region as displayed in the app, as returned by the server */
+  get countryDisplay(): string
   /** Region code */
   get region(): string
   /** Region name */
@@ -4763,6 +4771,8 @@ export declare class RewardRecord {
    * value is missing or is not a code
    */
   get rewardTypeRaw(): number | null
+  /** The detail object the fields below came from */
+  get detailKind(): RewardDetailKind
   /** Record ID */
   get recordId(): string
   /** Title of the activity that granted the reward */
@@ -5836,6 +5846,14 @@ export declare class TransferStock {
    * value is missing or is not a code
    */
   get stateCodeRaw(): number | null
+  /** Quantity held in street name, as returned by the server */
+  get streetAmount(): Decimal | null
+  /** Quantity held by a nominee, as returned by the server */
+  get nomineeAmount(): Decimal | null
+  /** Quantity held in the holder's own name, as returned by the server */
+  get ownAmount(): Decimal | null
+  /** Number of share certificates, as returned by the server */
+  get certificateCount(): number
   /** Position side */
   get positionSide(): string
 }
@@ -6070,6 +6088,11 @@ export declare class WithdrawalsResponse {
   get list(): Array<Withdrawal>
   /** Total number of records */
   get total(): number
+  /**
+   * A full page came back (as many records as the page size sent), so the
+   * next page may hold more
+   */
+  get hasMore(): boolean
 }
 
 /** Candlestick adjustment type */
@@ -8254,7 +8277,10 @@ export interface GetUSTransactionHistoryOptions {
 export interface GetWithdrawalsOptions {
   /** Page number (default 1) */
   page?: number
-  /** Page size */
+  /**
+   * Page size (default 20, max 50; larger values are sent as 50, and 0 or
+   * a negative value as the default 20)
+   */
   size?: number
   /** Only withdrawals applied at or after this time */
   start?: Date
@@ -9798,6 +9824,21 @@ export declare const enum RewardDeliverStatus {
   AddressFilled = 8,
   /** Shipping (server code 10) */
   Shipping = 9
+}
+
+/** Which upstream detail object a reward record came from */
+export declare const enum RewardDetailKind {
+  /**
+   * No known detail object (e.g. a task reward); only the reward type is
+   * set
+   */
+  None = 0,
+  /** The `cash` object */
+  Cash = 1,
+  /** The `card` (coupon) object */
+  Card = 2,
+  /** The `prize` (gift) object */
+  Prize = 3
 }
 
 /**

@@ -188,6 +188,27 @@ pub enum CTransferStockState {
     TransferStockStateFailed,
 }
 
+/// Which upstream detail object a reward record came from
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::asset::RewardDetailKind")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CRewardDetailKind {
+    /// No known detail object (e.g. a task reward); only the reward type is
+    /// set
+    #[c(remote = "None")]
+    RewardDetailKindNone,
+    /// The `cash` object
+    #[c(remote = "Cash")]
+    RewardDetailKindCash,
+    /// The `card` (coupon) object
+    #[c(remote = "Card")]
+    RewardDetailKindCard,
+    /// The `prize` (gift) object
+    #[c(remote = "Prize")]
+    RewardDetailKindPrize,
+}
+
 /// Type of a reward record
 ///
 /// The numeric values of this enum are not the server codes; each

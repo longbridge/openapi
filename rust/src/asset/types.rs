@@ -198,6 +198,22 @@ pub enum RewardType {
     Task = 3,
 }
 
+/// Which upstream detail object a reward record came from
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RewardDetailKind {
+    /// No known detail object (e.g. a task reward); only the reward type is
+    /// set
+    #[default]
+    None,
+    /// The `cash` object
+    Cash,
+    /// The `card` (coupon) object
+    Card,
+    /// The `prize` (gift) object
+    Prize,
+}
+
 /// Status of a reward record
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Default, FromPrimitive, IntoPrimitive)]
 #[repr(i32)]
@@ -439,6 +455,9 @@ pub struct BankCard {
     /// Country or region of the bank (e.g. `Hong Kong`; not a currency)
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub country: String,
+    /// Country or region as displayed in the app, as returned by the server
+    #[serde(deserialize_with = "serde_utils::string_lenient")]
+    pub country_display: String,
     /// Region code
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub region: String,
@@ -589,6 +608,18 @@ pub struct TransferStock {
     /// SDK does not know (`state_code` is then `Unknown`); `None` when the
     /// value is missing or is not a code
     pub state_code_raw: Option<i32>,
+    /// Quantity held in street name, as returned by the server
+    #[serde(with = "serde_utils::decimal_opt_lenient")]
+    pub street_amount: Option<Decimal>,
+    /// Quantity held by a nominee, as returned by the server
+    #[serde(with = "serde_utils::decimal_opt_lenient")]
+    pub nominee_amount: Option<Decimal>,
+    /// Quantity held in the holder's own name, as returned by the server
+    #[serde(with = "serde_utils::decimal_opt_lenient")]
+    pub own_amount: Option<Decimal>,
+    /// Number of share certificates, as returned by the server
+    #[serde(deserialize_with = "serde_utils::account_int64")]
+    pub certificate_count: i64,
     /// Position side
     #[serde(deserialize_with = "serde_utils::string_lenient")]
     pub position_side: String,
@@ -813,6 +844,8 @@ pub struct RewardRecord {
     /// SDK does not know (`reward_type` is then `Unknown`); `None` when the
     /// value is missing or is not a code
     pub reward_type_raw: Option<i32>,
+    /// The detail object the fields below came from
+    pub detail_kind: RewardDetailKind,
     /// Record ID
     pub record_id: String,
     /// Title of the activity that granted the reward
@@ -935,11 +968,11 @@ impl From<RawRewardRecord> for RewardRecord {
         let (code, reward_type_raw) = typed_and_raw::<RewardType>(&raw.reward_type);
         // Like the app, read the first detail object present and name the
         // type after it; without one, fall back to the server's code.
-        let (reward_type, detail) = match (raw.cash, raw.card, raw.prize) {
-            (Some(d), _, _) => (RewardType::Cash, d),
-            (None, Some(d), _) => (RewardType::Coupon, d),
-            (None, None, Some(d)) => (RewardType::Gift, d),
-            (None, None, None) => (code, RawRewardDetail::default()),
+        let (reward_type, detail_kind, detail) = match (raw.cash, raw.card, raw.prize) {
+            (Some(d), _, _) => (RewardType::Cash, RewardDetailKind::Cash, d),
+            (None, Some(d), _) => (RewardType::Coupon, RewardDetailKind::Card, d),
+            (None, None, Some(d)) => (RewardType::Gift, RewardDetailKind::Prize, d),
+            (None, None, None) => (code, RewardDetailKind::None, RawRewardDetail::default()),
         };
         let prize_type =
             serde_utils::account_int_opt(&detail.prize_type).and_then(|v| i32::try_from(v).ok());
@@ -949,6 +982,7 @@ impl From<RawRewardRecord> for RewardRecord {
         Self {
             reward_type,
             reward_type_raw,
+            detail_kind,
             record_id: detail.record_id,
             activity_title: detail.activity_title,
             title: detail.title,
@@ -1968,6 +2002,9 @@ pub struct WithdrawalsResponse {
     /// Total number of records
     #[serde(deserialize_with = "serde_utils::account_int64")]
     pub total: i64,
+    /// A full page came back (as many records as the page size sent), so the
+    /// next page may hold more
+    pub has_more: bool,
 }
 
 /// The server's numeric code behind a typed value: the wire value when it is
@@ -2719,6 +2756,54 @@ mod tests {
             stock.optional_counters.is_empty(),
             "non-array counters are empty"
         );
+    }
+
+    #[test]
+    fn go_parity_fields_decode() {
+        let cards: BankCardsResponse = serde_json::from_str(
+            r#"{"list":[{"id":"1","country":"Hong Kong","country_display":"HK"}]}"#,
+        )
+        .expect("cards decode");
+        assert_eq!(cards.list[0].country_display, "HK", "country display");
+        let transfers: StockTransferInResponse = serde_json::from_str(
+            r#"{"records":[{"stocks":[{"code":"X","street_amount":"100","nominee_amount":"0",
+                "own_amount":"25.5","certificate_count":"3"},{"code":"Y"}]}]}"#,
+        )
+        .expect("transfers decode");
+        let stock = &transfers.records[0].stocks[0];
+        assert_eq!(stock.street_amount, Some(dec("100")), "street");
+        assert_eq!(stock.nominee_amount, Some(dec("0")), "nominee zero kept");
+        assert_eq!(stock.own_amount, Some(dec("25.5")), "own");
+        assert_eq!(stock.certificate_count, 3, "certificates");
+        let bare = &transfers.records[0].stocks[1];
+        assert!(
+            bare.street_amount.is_none() && bare.certificate_count == 0,
+            "absent"
+        );
+        let rewards: RewardRecordsResponse = serde_json::from_str(
+            r#"{"list":[{"cash":{"title":"a"}},{"card":{"title":"b"}},{"prize":{"title":"c"}},
+                {"reward_type":3}]}"#,
+        )
+        .expect("rewards decode");
+        let kinds: Vec<RewardDetailKind> = rewards.list.iter().map(|r| r.detail_kind).collect();
+        assert_eq!(
+            kinds,
+            vec![
+                RewardDetailKind::Cash,
+                RewardDetailKind::Card,
+                RewardDetailKind::Prize,
+                RewardDetailKind::None
+            ],
+            "detail kinds"
+        );
+        assert_eq!(
+            rewards.list[3].reward_type,
+            RewardType::Task,
+            "type from the code"
+        );
+        let withdrawals: WithdrawalsResponse =
+            serde_json::from_str(r#"{"list":[],"total":0,"has_more":true}"#).expect("decode");
+        assert!(withdrawals.has_more, "has_more round trips");
     }
 
     #[test]

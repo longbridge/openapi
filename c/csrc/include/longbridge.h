@@ -2096,6 +2096,29 @@ typedef enum lb_transfer_stock_state_t {
 } lb_transfer_stock_state_t;
 
 /**
+ * Which upstream detail object a reward record came from
+ */
+typedef enum lb_reward_detail_kind_t {
+  /**
+   * No known detail object (e.g. a task reward); only the reward type is
+   * set
+   */
+  RewardDetailKindNone,
+  /**
+   * The `cash` object
+   */
+  RewardDetailKindCash,
+  /**
+   * The `card` (coupon) object
+   */
+  RewardDetailKindCard,
+  /**
+   * The `prize` (gift) object
+   */
+  RewardDetailKindPrize,
+} lb_reward_detail_kind_t;
+
+/**
  * Status of a coupon
  *
  * The numeric values of this enum are not the server codes; each
@@ -4033,7 +4056,8 @@ typedef struct lb_get_withdrawals_options_t {
    */
   const int32_t *page;
   /**
-   * Page size (can be null)
+   * Page size (can be null; default 20, max 50: larger values are sent as
+   * 50, and 0 or a negative value as the default 20)
    */
   const int32_t *size;
   /**
@@ -7646,6 +7670,10 @@ typedef struct lb_bank_card_t {
    */
   const char *country;
   /**
+   * Country or region as displayed in the app, as returned by the server
+   */
+  const char *country_display;
+  /**
    * Region code
    */
   const char *region;
@@ -7810,6 +7838,25 @@ typedef struct lb_transfer_stock_t {
    * value is missing or is not a code
    */
   const int32_t *state_code_raw;
+  /**
+   * Quantity held in street name, as returned by the server (null when
+   * not set)
+   */
+  const struct lb_decimal_t *street_amount;
+  /**
+   * Quantity held by a nominee, as returned by the server (null when not
+   * set)
+   */
+  const struct lb_decimal_t *nominee_amount;
+  /**
+   * Quantity held in the holder's own name, as returned by the server
+   * (null when not set)
+   */
+  const struct lb_decimal_t *own_amount;
+  /**
+   * Number of share certificates, as returned by the server
+   */
+  int64_t certificate_count;
   /**
    * Position side
    */
@@ -8050,6 +8097,10 @@ typedef struct lb_reward_record_t {
    * value is missing or is not a code
    */
   const int32_t *reward_type_raw;
+  /**
+   * The detail object the fields below came from
+   */
+  enum lb_reward_detail_kind_t detail_kind;
   /**
    * Record ID
    */
@@ -9154,6 +9205,11 @@ typedef struct lb_withdrawals_response_t {
    * Total number of records
    */
   int64_t total;
+  /**
+   * A full page came back (as many records as the page size sent), so the
+   * next page may hold more
+   */
+  bool has_more;
 } lb_withdrawals_response_t;
 
 /**
@@ -16924,6 +16980,9 @@ void lb_asset_context_bank_cards(const struct lb_asset_context_t *ctx,
 /**
  * Get the eDDA authorization applications of a bank card in one currency
  *
+ * The card id must be all digits; any other value fails with an error before
+ * anything is sent.
+ *
  * AP accounts only: US data-center accounts get a region error.
  *
  * The callback data is an array of `lb_edda_application_t`.
@@ -16999,6 +17058,9 @@ void lb_asset_context_coupons(const struct lb_asset_context_t *ctx,
 /**
  * Get the orders a coupon was applied to
  *
+ * The card id must be 32 hex characters; any other value fails with an error
+ * before anything is sent.
+ *
  * AP accounts only: US data-center accounts get a region error.
  *
  * The callback data is an array of `lb_coupon_order_t`.
@@ -17032,6 +17094,9 @@ void lb_asset_context_deposits(const struct lb_asset_context_t *ctx,
 
 /**
  * Get withdrawal records
+ *
+ * The response's `has_more` reports a full page of the size sent (default 20,
+ * at most 50).
  *
  * AP accounts only: US data-center accounts get a region error.
  *

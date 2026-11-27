@@ -195,7 +195,8 @@ impl AssetContext {
     }
 
     /// Get the eDDA authorization applications of a bank card in one
-    /// currency
+    /// currency. The card id must be all digits; any other value fails
+    /// with an error before anything is sent.
     fn edda_applications(
         &self,
         card_id: String,
@@ -278,7 +279,9 @@ impl AssetContext {
         self.ctx.coupons(opts).map_err(ErrorNewType)?.try_into()
     }
 
-    /// Get the orders a coupon was applied to
+    /// Get the orders a coupon was applied to. The card id must be 32 hex
+    /// characters; any other value fails with an error before anything is
+    /// sent.
     fn coupon_orders(
         &self,
         card_id: String,
@@ -307,7 +310,8 @@ impl AssetContext {
         self.ctx.deposits(opts).map_err(ErrorNewType)?.try_into()
     }
 
-    /// Get withdrawal records
+    /// Get withdrawal records. The response's has_more reports a full page
+    /// of the size sent (default 20, at most 50).
     #[pyo3(signature = (page = None, size = None, start = None, end = None))]
     fn withdrawals(
         &self,

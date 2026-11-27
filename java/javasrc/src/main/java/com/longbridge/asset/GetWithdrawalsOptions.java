@@ -24,7 +24,8 @@ public class GetWithdrawalsOptions {
     }
 
     /**
-     * Sets the page size.
+     * Sets the page size (default 20, max 50; larger values are sent as 50,
+     * and 0 or a negative value as the default 20).
      *
      * @param size page size
      * @return this instance for chaining

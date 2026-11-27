@@ -218,6 +218,23 @@ pub(crate) enum RewardType {
     Task,
 }
 
+/// Which upstream detail object a reward record came from
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::asset::RewardDetailKind")]
+pub(crate) enum RewardDetailKind {
+    /// No known detail object (e.g. a task reward); only the reward type is
+    /// set
+    #[py(remote = "None")]
+    None_,
+    /// The `cash` object
+    Cash,
+    /// The `card` (coupon) object
+    Card,
+    /// The `prize` (gift) object
+    Prize,
+}
+
 /// Status of a reward record
 #[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
@@ -504,6 +521,8 @@ pub(crate) struct BankCard {
     account_type: String,
     /// Country or region of the bank (e.g. `Hong Kong`; not a currency)
     country: String,
+    /// Country or region as displayed in the app, as returned by the server
+    country_display: String,
     /// Region code
     region: String,
     /// Region name
@@ -608,6 +627,17 @@ pub(crate) struct TransferStock {
     /// value is missing or is not a code
     #[py(opt)]
     state_code_raw: Option<i32>,
+    /// Quantity held in street name, as returned by the server
+    #[py(opt)]
+    street_amount: Option<PyDecimal>,
+    /// Quantity held by a nominee, as returned by the server
+    #[py(opt)]
+    nominee_amount: Option<PyDecimal>,
+    /// Quantity held in the holder's own name, as returned by the server
+    #[py(opt)]
+    own_amount: Option<PyDecimal>,
+    /// Number of share certificates, as returned by the server
+    certificate_count: i64,
     /// Position side
     position_side: String,
 }
@@ -763,6 +793,8 @@ pub(crate) struct RewardRecord {
     /// value is missing or is not a code
     #[py(opt)]
     reward_type_raw: Option<i32>,
+    /// The detail object the fields below came from
+    detail_kind: RewardDetailKind,
     /// Record ID
     record_id: String,
     /// Title of the activity that granted the reward
@@ -1450,6 +1482,9 @@ pub(crate) struct WithdrawalsResponse {
     list: Vec<Withdrawal>,
     /// Total number of records
     total: i64,
+    /// A full page came back (as many records as the page size sent), so the
+    /// next page may hold more
+    has_more: bool,
 }
 
 #[pymethods]

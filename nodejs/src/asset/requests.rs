@@ -247,7 +247,8 @@ impl From<GetDepositsOptions> for longbridge::asset::GetDepositsOptions {
 pub struct GetWithdrawalsOptions {
     /// Page number (default 1)
     pub page: Option<i32>,
-    /// Page size
+    /// Page size (default 20, max 50; larger values are sent as 50, and 0 or
+    /// a negative value as the default 20)
     pub size: Option<i32>,
     /// Only withdrawals applied at or after this time
     pub start: Option<DateTime<Utc>>,

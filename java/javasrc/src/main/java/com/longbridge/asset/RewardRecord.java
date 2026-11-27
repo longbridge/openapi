@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 public class RewardRecord {
     private RewardType rewardType;
     private Integer rewardTypeRaw;
+    private RewardDetailKind detailKind;
     private String recordId;
     private String activityTitle;
     private String title;
@@ -49,6 +50,15 @@ public class RewardRecord {
      */
     public Integer getRewardTypeRaw() {
         return rewardTypeRaw;
+    }
+
+    /**
+     * Returns the detail object the fields came from.
+     *
+     * @return the detail object the fields came from
+     */
+    public RewardDetailKind getDetailKind() {
+        return detailKind;
     }
 
     /**
@@ -240,6 +250,6 @@ public class RewardRecord {
 
     @Override
     public String toString() {
-        return "RewardRecord [" + "rewardType=" + rewardType + ", " + "rewardTypeRaw=" + rewardTypeRaw + ", " + "recordId=" + recordId + ", " + "activityTitle=" + activityTitle + ", " + "title=" + title + ", " + "description=" + description + ", " + "cardType=" + cardType + ", " + "cardStatus=" + cardStatus + ", " + "cardStatusRaw=" + cardStatusRaw + ", " + "prizeType=" + prizeType + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "status=" + status + ", " + "statusRaw=" + statusRaw + ", " + "deliverStatus=" + deliverStatus + ", " + "deliverStatusRaw=" + deliverStatusRaw + ", " + "exitStatus=" + exitStatus + ", " + "sendTime=" + sendTime + ", " + "startTime=" + startTime + ", " + "endTime=" + endTime + ", " + "effectiveTime=" + effectiveTime + ", " + "receiveDeadline=" + receiveDeadline + "]";
+        return "RewardRecord [" + "rewardType=" + rewardType + ", " + "rewardTypeRaw=" + rewardTypeRaw + ", " + "detailKind=" + detailKind + ", " + "recordId=" + recordId + ", " + "activityTitle=" + activityTitle + ", " + "title=" + title + ", " + "description=" + description + ", " + "cardType=" + cardType + ", " + "cardStatus=" + cardStatus + ", " + "cardStatusRaw=" + cardStatusRaw + ", " + "prizeType=" + prizeType + ", " + "amount=" + amount + ", " + "currency=" + currency + ", " + "status=" + status + ", " + "statusRaw=" + statusRaw + ", " + "deliverStatus=" + deliverStatus + ", " + "deliverStatusRaw=" + deliverStatusRaw + ", " + "exitStatus=" + exitStatus + ", " + "sendTime=" + sendTime + ", " + "startTime=" + startTime + ", " + "endTime=" + endTime + ", " + "effectiveTime=" + effectiveTime + ", " + "receiveDeadline=" + receiveDeadline + "]";
     }
 }
