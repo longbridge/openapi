@@ -72,6 +72,15 @@ impl HttpClient {
         }
     }
 
+    /// The access token requests are signed with: the API-key token, or the
+    /// OAuth session's current token (refreshed when needed).
+    pub async fn access_token(&self) -> HttpClientResult<String> {
+        match &self.config.auth {
+            AuthConfig::ApiKey { access_token, .. } => Ok(access_token.clone()),
+            AuthConfig::OAuth(oauth) => oauth.access_token().await.map_err(HttpClientError::OAuth),
+        }
+    }
+
     /// Create a new request builder
     #[inline]
     pub fn request(

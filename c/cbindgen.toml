@@ -231,6 +231,67 @@ cpp_compat = true
 "CMarketContext" = "lb_market_context_t"
 "CAssetContext" = "lb_asset_context_t"
 "CStatementItem" = "lb_statement_item_t"
+"CBankCardStatus" = "lb_bank_card_status_t"
+"CBankCardWitnessState" = "lb_bank_card_witness_state_t"
+"CBankCardBindState" = "lb_bank_card_bind_state_t"
+"CAuthorizationStatus" = "lb_authorization_status_t"
+"CStockTransferInState" = "lb_stock_transfer_in_state_t"
+"CStockTransferOutState" = "lb_stock_transfer_out_state_t"
+"CTransferStockState" = "lb_transfer_stock_state_t"
+"CRewardType" = "lb_reward_type_t"
+"CRewardDetailKind" = "lb_reward_detail_kind_t"
+"CRewardStatus" = "lb_reward_status_t"
+"CRewardDeliverStatus" = "lb_reward_deliver_status_t"
+"CCouponStatus" = "lb_coupon_status_t"
+"CCouponTargetType" = "lb_coupon_target_type_t"
+"CIpoCouponTargetType" = "lb_ipo_coupon_target_type_t"
+"CCommissionUnlimitedType" = "lb_commission_unlimited_type_t"
+"CQuoteInvestorType" = "lb_quote_investor_type_t"
+"CDepositState" = "lb_deposit_state_t"
+"CWithdrawalState" = "lb_withdrawal_state_t"
+"CCouponOrderType" = "lb_coupon_order_type_t"
+"CBankCardAuthorization" = "lb_bank_card_authorization_t"
+"CBankCard" = "lb_bank_card_t"
+"CEddaApplication" = "lb_edda_application_t"
+"CTransferStock" = "lb_transfer_stock_t"
+"CStockTransferIn" = "lb_stock_transfer_in_t"
+"CStockTransferInResponse" = "lb_stock_transfer_in_response_t"
+"CStockTransferOut" = "lb_stock_transfer_out_t"
+"CRewardRecord" = "lb_reward_record_t"
+"CRewardRecordsResponse" = "lb_reward_records_response_t"
+"CCouponCommission" = "lb_coupon_commission_t"
+"CCouponAiBenefit" = "lb_coupon_ai_benefit_t"
+"CCouponCash" = "lb_coupon_cash_t"
+"CCouponCoffeeStore" = "lb_coupon_coffee_store_t"
+"CCouponCoffee" = "lb_coupon_coffee_t"
+"CCouponCryptoCounter" = "lb_coupon_crypto_counter_t"
+"CCouponCryptoFallback" = "lb_coupon_crypto_fallback_t"
+"CCouponCrypto" = "lb_coupon_crypto_t"
+"CCouponFinanceInterest" = "lb_coupon_finance_interest_t"
+"CCouponFundDeduct" = "lb_coupon_fund_deduct_t"
+"CCouponQuote" = "lb_coupon_quote_t"
+"CCouponIpo" = "lb_coupon_ipo_t"
+"CCouponIpoCommission" = "lb_coupon_ipo_commission_t"
+"CCouponIpoInterest" = "lb_coupon_ipo_interest_t"
+"CCouponPlatformFeeDeduct" = "lb_coupon_platform_fee_deduct_t"
+"CCouponStockCounter" = "lb_coupon_stock_counter_t"
+"CCouponStockFallback" = "lb_coupon_stock_fallback_t"
+"CCouponStock" = "lb_coupon_stock_t"
+"CCouponStockFragmentAmount" = "lb_coupon_stock_fragment_amount_t"
+"CCouponStockFragment" = "lb_coupon_stock_fragment_t"
+"CCoupon" = "lb_coupon_t"
+"CCouponsResponse" = "lb_coupons_response_t"
+"CCouponOrder" = "lb_coupon_order_t"
+"CDeposit" = "lb_deposit_t"
+"CWithdrawal" = "lb_withdrawal_t"
+"CDepositsResponse" = "lb_deposits_response_t"
+"CWithdrawalsResponse" = "lb_withdrawals_response_t"
+"CGetStockTransfersInOptions" = "lb_get_stock_transfers_in_options_t"
+"CGetStockTransfersOutOptions" = "lb_get_stock_transfers_out_options_t"
+"CGetRewardRecordsOptions" = "lb_get_reward_records_options_t"
+"CGetCouponsOptions" = "lb_get_coupons_options_t"
+"CGetDepositsOptions" = "lb_get_deposits_options_t"
+"CGetWithdrawalsOptions" = "lb_get_withdrawals_options_t"
 # MarketContext types
 "CMarketTimeItem" = "lb_market_time_item_t"
 "CMarketStatusResponse" = "lb_market_status_response_t"
@@ -500,8 +561,45 @@ include = [
     "CRiskAssessmentApproval",
     "CRiskAssessmentDeadline",
     "COrderDetail",
-    # AssetContext: statements (reachable only via void* async data pointer)
+    # AssetContext: statements and account records (reachable only via void*
+    # async data pointer)
     "CStatementItem",
+    "CBankCardAuthorization",
+    "CBankCard",
+    "CEddaApplication",
+    "CTransferStock",
+    "CStockTransferIn",
+    "CStockTransferInResponse",
+    "CStockTransferOut",
+    "CRewardRecord",
+    "CRewardRecordsResponse",
+    "CCouponCommission",
+    "CCouponAiBenefit",
+    "CCouponCash",
+    "CCouponCoffeeStore",
+    "CCouponCoffee",
+    "CCouponCryptoCounter",
+    "CCouponCryptoFallback",
+    "CCouponCrypto",
+    "CCouponFinanceInterest",
+    "CCouponFundDeduct",
+    "CCouponQuote",
+    "CCouponIpo",
+    "CCouponIpoCommission",
+    "CCouponIpoInterest",
+    "CCouponPlatformFeeDeduct",
+    "CCouponStockCounter",
+    "CCouponStockFallback",
+    "CCouponStock",
+    "CCouponStockFragmentAmount",
+    "CCouponStockFragment",
+    "CCoupon",
+    "CCouponsResponse",
+    "CCouponOrder",
+    "CDeposit",
+    "CWithdrawal",
+    "CDepositsResponse",
+    "CWithdrawalsResponse",
     # GridContext: grid trading (reachable only via void* async data pointer)
     "CSubmitGridOrderResponse",
     "CGridOrder", "CGridOrderSubOrder", "CGridOrderHistory", "CGridOrderDetail",

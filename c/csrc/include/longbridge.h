@@ -234,6 +234,168 @@ typedef enum lb_alert_frequency_t {
 } lb_alert_frequency_t;
 
 /**
+ * State of a stock transfer-in application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_stock_transfer_in_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  StockTransferInStateUnknown,
+  /**
+   * Submitted (server code 0)
+   */
+  StockTransferInStateSubmitted,
+  /**
+   * Cancelled (server code 1)
+   */
+  StockTransferInStateCancelled,
+  /**
+   * Completed (server code 3)
+   */
+  StockTransferInStateCompleted,
+  /**
+   * Processing (server code 5)
+   */
+  StockTransferInStateProcessing,
+  /**
+   * Partially completed (server code 7)
+   */
+  StockTransferInStatePartiallyCompleted,
+  /**
+   * Failed (server code 8)
+   */
+  StockTransferInStateFailed,
+} lb_stock_transfer_in_state_t;
+
+/**
+ * State of a stock transfer-out application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_stock_transfer_out_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  StockTransferOutStateUnknown,
+  /**
+   * Submitted (the only state that can still be cancelled) (server code 0)
+   */
+  StockTransferOutStateSubmitted,
+  /**
+   * Processing (server code 1)
+   */
+  StockTransferOutStateProcessing,
+  /**
+   * Executing (server code 2)
+   */
+  StockTransferOutStateExecuting,
+  /**
+   * Completed (server code 3)
+   */
+  StockTransferOutStateCompleted,
+  /**
+   * Cancelled (server code 4)
+   */
+  StockTransferOutStateCancelled,
+  /**
+   * Partially completed (server code 5)
+   */
+  StockTransferOutStatePartiallyCompleted,
+  /**
+   * Failed (server code 6)
+   */
+  StockTransferOutStateFailed,
+  /**
+   * Rejected (server code 7)
+   */
+  StockTransferOutStateRejected,
+} lb_stock_transfer_out_state_t;
+
+/**
+ * Type of a reward record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_reward_type_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  RewardTypeUnknown,
+  /**
+   * Cash reward (server code 0)
+   */
+  RewardTypeCash,
+  /**
+   * Gift (prize) (server code 1)
+   */
+  RewardTypeGift,
+  /**
+   * Coupon (server code 2)
+   */
+  RewardTypeCoupon,
+  /**
+   * Task reward (server code 3)
+   */
+  RewardTypeTask,
+} lb_reward_type_t;
+
+/**
+ * Which orders of a coupon to list
+ */
+typedef enum lb_coupon_order_type_t {
+  /**
+   * Orders the coupon is locked to (in progress)
+   */
+  CouponOrderTypeLocked,
+  /**
+   * Orders whose rebate has been settled
+   */
+  CouponOrderTypeSettled,
+} lb_coupon_order_type_t;
+
+/**
+ * State of a deposit record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_deposit_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  DepositStateUnknown,
+  /**
+   * Processing (server code 0)
+   */
+  DepositStateProcessing,
+  /**
+   * Credited to the account (server code 1)
+   */
+  DepositStateCredited,
+  /**
+   * Failed (server code 2)
+   */
+  DepositStateFailed,
+  /**
+   * Cancelled (server code 3)
+   */
+  DepositStateCancelled,
+  /**
+   * Invalidated (server code 4)
+   */
+  DepositStateInvalidated,
+  /**
+   * Rejected (server code 5)
+   */
+  DepositStateRejected,
+} lb_deposit_state_t;
+
+/**
  * Financial calendar event category
  */
 typedef enum lb_calendar_category_t {
@@ -1805,6 +1967,484 @@ typedef enum lb_charge_category_code_t {
 } lb_charge_category_code_t;
 
 /**
+ * Status of a bank-card authorization or of an eDDA application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_authorization_status_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  AuthorizationStatusUnknown,
+  /**
+   * Not authorized (server code 0)
+   */
+  AuthorizationStatusUnauthorized,
+  /**
+   * Authorized (server code 1)
+   */
+  AuthorizationStatusAuthorized,
+  /**
+   * Authorization in progress (server code 2)
+   */
+  AuthorizationStatusAuthorizing,
+  /**
+   * Authorization failed (server code 3)
+   */
+  AuthorizationStatusFailed,
+} lb_authorization_status_t;
+
+/**
+ * Verification status of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_bank_card_status_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  BankCardStatusUnknown,
+  /**
+   * Not verified (server code 0)
+   */
+  BankCardStatusUnverified,
+  /**
+   * Under review (server code 1)
+   */
+  BankCardStatusUnderReview,
+  /**
+   * Verified (server code 2)
+   */
+  BankCardStatusVerified,
+} lb_bank_card_status_t;
+
+/**
+ * Witness (in-person / video verification) state of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_bank_card_witness_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  BankCardWitnessStateUnknown,
+  /**
+   * Witnessing not required (server code 1)
+   */
+  BankCardWitnessStateNotRequired,
+  /**
+   * Witnessing pending (server code 2)
+   */
+  BankCardWitnessStatePending,
+  /**
+   * Witnessed (server code 3)
+   */
+  BankCardWitnessStateWitnessed,
+} lb_bank_card_witness_state_t;
+
+/**
+ * Binding state of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_bank_card_bind_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  BankCardBindStateUnknown,
+  /**
+   * Binding in progress (server code 0)
+   */
+  BankCardBindStateBinding,
+  /**
+   * Bound (server code 1)
+   */
+  BankCardBindStateBound,
+  /**
+   * Binding failed (server code 2)
+   */
+  BankCardBindStateFailed,
+} lb_bank_card_bind_state_t;
+
+/**
+ * State of one stock inside a stock transfer application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_transfer_stock_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  TransferStockStateUnknown,
+  /**
+   * Processing (server code 0)
+   */
+  TransferStockStateProcessing,
+  /**
+   * Succeeded (server code 1)
+   */
+  TransferStockStateSucceeded,
+  /**
+   * Failed (server code 2)
+   */
+  TransferStockStateFailed,
+} lb_transfer_stock_state_t;
+
+/**
+ * Which upstream detail object a reward record came from
+ */
+typedef enum lb_reward_detail_kind_t {
+  /**
+   * No known detail object (e.g. a task reward); only the reward type is
+   * set
+   */
+  RewardDetailKindNone,
+  /**
+   * The `cash` object
+   */
+  RewardDetailKindCash,
+  /**
+   * The `card` (coupon) object
+   */
+  RewardDetailKindCard,
+  /**
+   * The `prize` (gift) object
+   */
+  RewardDetailKindPrize,
+} lb_reward_detail_kind_t;
+
+/**
+ * Status of a coupon
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_coupon_status_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  CouponStatusUnknown,
+  /**
+   * Unused (server code 0)
+   */
+  CouponStatusUnused,
+  /**
+   * Used (server code 1)
+   */
+  CouponStatusUsed,
+  /**
+   * Expired (server code 2)
+   */
+  CouponStatusExpired,
+  /**
+   * Being redeemed (server code 3)
+   */
+  CouponStatusRedeeming,
+  /**
+   * In use (server code 4)
+   */
+  CouponStatusInUse,
+  /**
+   * Processing (server code 5)
+   */
+  CouponStatusProcessing,
+} lb_coupon_status_t;
+
+/**
+ * Status of a reward record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_reward_status_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  RewardStatusUnknown,
+  /**
+   * Upcoming (server code 0)
+   */
+  RewardStatusUpcoming,
+  /**
+   * Cancelled (server code 1)
+   */
+  RewardStatusCancelled,
+  /**
+   * The user exited the activity (server code 2)
+   */
+  RewardStatusExitedActivity,
+  /**
+   * Not claimed yet (server code 8)
+   */
+  RewardStatusUnclaimed,
+  /**
+   * Being issued (server code 10)
+   */
+  RewardStatusIssuing,
+  /**
+   * Issued (server code 12)
+   */
+  RewardStatusIssued,
+  /**
+   * Issuing failed (server code 13)
+   */
+  RewardStatusFailed,
+  /**
+   * Exchanged (server code 16)
+   */
+  RewardStatusExchanged,
+  /**
+   * Expired (server code 17)
+   */
+  RewardStatusExpired,
+  /**
+   * Refunded (server code 18)
+   */
+  RewardStatusRefunded,
+} lb_reward_status_t;
+
+/**
+ * Delivery status of an issued prize
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_reward_deliver_status_t {
+  /**
+   * Unknown: an undocumented code, or no delivery status (never sent to the
+   * server)
+   */
+  RewardDeliverStatusUnknown,
+  /**
+   * Not activated (server code 0)
+   */
+  RewardDeliverStatusNotActivated,
+  /**
+   * Activated, or shipping (server code 1)
+   */
+  RewardDeliverStatusActivatedOrShipping,
+  /**
+   * Consumed (server code 2)
+   */
+  RewardDeliverStatusConsumed,
+  /**
+   * E-voucher activating (server code 5)
+   */
+  RewardDeliverStatusEVoucherActivating,
+  /**
+   * E-voucher expired before activation (server code 6)
+   */
+  RewardDeliverStatusEVoucherExpired,
+  /**
+   * E-voucher invalid (server code 7)
+   */
+  RewardDeliverStatusEVoucherInvalid,
+  /**
+   * Shipping address missing (server code 8)
+   */
+  RewardDeliverStatusAddressMissing,
+  /**
+   * Shipping address filled (server code 9)
+   */
+  RewardDeliverStatusAddressFilled,
+  /**
+   * Shipping (server code 10)
+   */
+  RewardDeliverStatusShipping,
+} lb_reward_deliver_status_t;
+
+/**
+ * Instrument type a coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_coupon_target_type_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  CouponTargetTypeUnknown,
+  /**
+   * Stocks (server code 0, `StockTrade`)
+   */
+  CouponTargetTypeStock,
+  /**
+   * US stock options (server code 1, `UsStockOptions`)
+   */
+  CouponTargetTypeUsOption,
+  /**
+   * HK warrants (server code 2, `HkStockWarrant`)
+   */
+  CouponTargetTypeHkWarrant,
+  /**
+   * ETF (server code 3)
+   */
+  CouponTargetTypeEtf,
+  /**
+   * LOF (server code 4)
+   */
+  CouponTargetTypeLof,
+} lb_coupon_target_type_t;
+
+/**
+ * Kind of commission coupon (the server's `unlimited` code). The meanings are
+ * the ones the Longbridge app gives the codes; the proto names are given in
+ * brackets.
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_commission_unlimited_type_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  CommissionUnlimitedTypeUnknown,
+  /**
+   * Time-limited free commission (`Proportionate`, server code 0)
+   */
+  CommissionUnlimitedTypeProportionate,
+  /**
+   * Commission rebate (`Full`, server code 1)
+   */
+  CommissionUnlimitedTypeFull,
+  /**
+   * Commission deduction (`Lifetime`, server code 2)
+   */
+  CommissionUnlimitedTypeLifetime,
+  /**
+   * Per-use card with a fixed amount per use: `amount / usage_count`
+   * (`ByAmountPer`, server code 6)
+   */
+  CommissionUnlimitedTypeByAmountPer,
+  /**
+   * Per-use discount card, capped at `amount_limit` per use (`ByRatePer`,
+   * server code 7)
+   */
+  CommissionUnlimitedTypeByRatePer,
+} lb_commission_unlimited_type_t;
+
+/**
+ * Investor type a quote coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_quote_investor_type_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  QuoteInvestorTypeUnknown,
+  /**
+   * Any investor (server code 0, `INVESTOR_TYPE_ANY`)
+   */
+  QuoteInvestorTypeAny,
+  /**
+   * Non-professional investors (server code 1,
+   * `INVESTOR_TYPE_NON_PROFESSIONAL`)
+   */
+  QuoteInvestorTypeNonProfessional,
+  /**
+   * Professional investors (server code 2, `INVESTOR_TYPE_PROFESSIONAL`)
+   */
+  QuoteInvestorTypeProfessional,
+} lb_quote_investor_type_t;
+
+/**
+ * IPO subscription type an IPO commission coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_ipo_coupon_target_type_t {
+  /**
+   * Unknown: unset or an undocumented code (never sent to the server)
+   */
+  IpoCouponTargetTypeUnknown,
+  /**
+   * Financing (margin) IPO subscription (server code 1, `FinancingIPO`)
+   */
+  IpoCouponTargetTypeFinancing,
+  /**
+   * Cash IPO subscription (server code 2, `CashIPO`)
+   */
+  IpoCouponTargetTypeCash,
+} lb_ipo_coupon_target_type_t;
+
+/**
+ * State of a withdrawal record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+typedef enum lb_withdrawal_state_t {
+  /**
+   * Unknown: an undocumented code (never sent to the server)
+   */
+  WithdrawalStateUnknown,
+  /**
+   * Submitted (server code 0)
+   */
+  WithdrawalStateSubmitted,
+  /**
+   * Processing (server code 1)
+   */
+  WithdrawalStateProcessing,
+  /**
+   * Rejected (server code 2)
+   */
+  WithdrawalStateRejected,
+  /**
+   * Cancelled (server code 3)
+   */
+  WithdrawalStateCancelled,
+  /**
+   * Remitted (server code 4)
+   */
+  WithdrawalStateRemitted,
+  /**
+   * Failed (server code 5)
+   */
+  WithdrawalStateFailed,
+  /**
+   * Refunded (server code 6)
+   */
+  WithdrawalStateRefunded,
+  /**
+   * Approved, awaiting payout (server code 7)
+   */
+  WithdrawalStateApprovedAwaitingPayout,
+  /**
+   * Large-amount review (server code 8)
+   */
+  WithdrawalStateLargeAmountReview,
+  /**
+   * Change pending approval (server code 9)
+   */
+  WithdrawalStateChangePendingApproval,
+  /**
+   * Deletion pending approval (server code 10)
+   */
+  WithdrawalStateDeletionPendingApproval,
+  /**
+   * Deleted (server code 11)
+   */
+  WithdrawalStateDeleted,
+  /**
+   * Rejection pending approval (server code 12)
+   */
+  WithdrawalStateRejectionPendingApproval,
+  /**
+   * Awaiting confirmation (server code 15)
+   */
+  WithdrawalStateAwaitingConfirmation,
+} lb_withdrawal_state_t;
+
+/**
  * Data granularity
  */
 typedef enum lb_granularity_t {
@@ -3258,6 +3898,177 @@ typedef struct lb_alert_item_t {
    */
   struct CAlertValueMap value_map;
 } lb_alert_item_t;
+
+/**
+ * Options for the stock transfer-in list
+ */
+typedef struct lb_get_stock_transfers_in_options_t {
+  /**
+   * Market filter: `HK`, `US`, `CN` or `SG` (can be null)
+   */
+  const char *market;
+  /**
+   * State filter (can be null for all states; `StockTransferInStateUnknown`
+   * is ignored). Sent to the server as the state's server code, not as the C
+   * enum value.
+   */
+  const enum lb_stock_transfer_in_state_t *state;
+  /**
+   * Only applications created at or after this unix timestamp (can be
+   * null)
+   */
+  const int64_t *start;
+  /**
+   * Only applications created at or before this unix timestamp (can be
+   * null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null, default 1)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null, default 20, max 50)
+   */
+  const int32_t *size;
+} lb_get_stock_transfers_in_options_t;
+
+/**
+ * Options for the stock transfer-out list
+ */
+typedef struct lb_get_stock_transfers_out_options_t {
+  /**
+   * Market filter: `HK`, `US`, `CN` or `SG` (can be null)
+   */
+  const char *market;
+  /**
+   * State filter (can be null for all states; `StockTransferOutStateUnknown`
+   * is ignored). Sent to the server as the state's server code, not as the C
+   * enum value.
+   */
+  const enum lb_stock_transfer_out_state_t *state;
+  /**
+   * Only applications created at or after this unix timestamp (can be
+   * null)
+   */
+  const int64_t *start;
+  /**
+   * Only applications created at or before this unix timestamp (can be
+   * null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null, default 1)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null, default 20, max 50)
+   */
+  const int32_t *size;
+} lb_get_stock_transfers_out_options_t;
+
+/**
+ * Options for the reward record list
+ */
+typedef struct lb_get_reward_records_options_t {
+  /**
+   * Page number (can be null, default 1)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null, max 50)
+   */
+  const int32_t *page_size;
+  /**
+   * Reward type filter (can be null for all types; `RewardTypeUnknown` is
+   * ignored)
+   */
+  const enum lb_reward_type_t *reward_type;
+} lb_get_reward_records_options_t;
+
+/**
+ * Options for the coupon list
+ */
+typedef struct lb_get_coupons_options_t {
+  /**
+   * Page number (can be null, default 1)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null, max 50)
+   */
+  const int32_t *page_size;
+  /**
+   * List expired coupons instead of the ones that have not expired
+   */
+  bool expired;
+  /**
+   * Coupon type filter, e.g. `commission` (can be null for all types)
+   */
+  const char *card_type;
+} lb_get_coupons_options_t;
+
+/**
+ * Options for the deposit list
+ */
+typedef struct lb_get_deposits_options_t {
+  /**
+   * Page number (can be null, default 1)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null; default 20, max 20: larger values are sent as
+   * 20, and 0 or a negative value as the default 20)
+   */
+  const int32_t *size;
+  /**
+   * State filter (can be null)
+   */
+  const enum lb_deposit_state_t *states;
+  /**
+   * Number of states
+   */
+  uintptr_t num_states;
+  /**
+   * Currency filter, e.g. `HKD` (can be null)
+   */
+  const char *const *currencies;
+  /**
+   * Number of currencies
+   */
+  uintptr_t num_currencies;
+  /**
+   * Only deposits applied at or after this unix timestamp (can be null)
+   */
+  const int64_t *start;
+  /**
+   * Only deposits applied at or before this unix timestamp (can be null)
+   */
+  const int64_t *end;
+} lb_get_deposits_options_t;
+
+/**
+ * Options for the withdrawal list
+ */
+typedef struct lb_get_withdrawals_options_t {
+  /**
+   * Page number (can be null, default 1)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null; default 20, max 50: larger values are sent as
+   * 50, and 0 or a negative value as the default 20)
+   */
+  const int32_t *size;
+  /**
+   * Only withdrawals applied at or after this unix timestamp (can be null)
+   */
+  const int64_t *start;
+  /**
+   * Only withdrawals applied at or before this unix timestamp (can be null)
+   */
+  const int64_t *end;
+} lb_get_withdrawals_options_t;
 
 /**
  * Options for the fund list request.
@@ -6749,6 +7560,1657 @@ typedef struct lb_statement_item_t {
    */
   const char *file_key;
 } lb_statement_item_t;
+
+/**
+ * An authorization attached to a bank card (eDDA, bank securities account,
+ * FPS, ...)
+ */
+typedef struct lb_bank_card_authorization_t {
+  /**
+   * Authorization flow: `hk_edda` / `hk_sdda` (eDDA), `hk_bank_sec`,
+   * `hk_fps`, ...
+   */
+  const char *flow_id;
+  /**
+   * Display name of the authorization
+   */
+  const char *name;
+  /**
+   * Authorized currency
+   */
+  const char *currency;
+  /**
+   * Authorization status
+   */
+  enum lb_authorization_status_t status;
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *status_raw;
+  /**
+   * Failure reason (empty unless the authorization failed)
+   */
+  const char *message;
+  /**
+   * Whether this authorization is supported for the card
+   */
+  bool is_support;
+  /**
+   * Maximum amount per debit (null when not set)
+   */
+  const struct lb_decimal_t *max_amount;
+  /**
+   * Whether the per-debit amount is unlimited
+   */
+  bool max_amount_unlimited;
+  /**
+   * Maximum number of debits per day (null when not set)
+   */
+  const int64_t *daily_max_count;
+  /**
+   * Whether the daily debit count is unlimited
+   */
+  bool daily_max_count_unlimited;
+  /**
+   * Expiry date of the authorization as a unix timestamp (null when not set
+   * and for a long-term authorization: the server's 9999-12-31 "never
+   * expires" sentinel is null; see `long_term_valid`)
+   */
+  const int64_t *expiry_date;
+  /**
+   * Whether the authorization never expires
+   */
+  bool long_term_valid;
+  /**
+   * Whether submitted documents are under review
+   */
+  bool doc_reviewing;
+  /**
+   * Whether the "no prior deposit" check is under review
+   */
+  bool no_prior_deposit_reviewing;
+} lb_bank_card_authorization_t;
+
+/**
+ * A linked bank card (holder name, address and ID documents are not modelled)
+ */
+typedef struct lb_bank_card_t {
+  /**
+   * Bank card ID (pass to edda_applications)
+   */
+  const char *id;
+  /**
+   * Bank ID
+   */
+  const char *bank_id;
+  /**
+   * Bank name
+   */
+  const char *bank;
+  /**
+   * Bank name in English
+   */
+  const char *bank_en;
+  /**
+   * Bank code
+   */
+  const char *bank_code;
+  /**
+   * Bank account number, as returned by the server (not masked)
+   */
+  const char *account;
+  /**
+   * Account type
+   */
+  const char *account_type;
+  /**
+   * Country or region of the bank (e.g. `Hong Kong`; not a currency)
+   */
+  const char *country;
+  /**
+   * Country or region as displayed in the app, as returned by the server
+   */
+  const char *country_display;
+  /**
+   * Region code
+   */
+  const char *region;
+  /**
+   * Region name
+   */
+  const char *region_name;
+  /**
+   * SWIFT code
+   */
+  const char *swift_code;
+  /**
+   * Remark
+   */
+  const char *remark;
+  /**
+   * Verification status
+   */
+  enum lb_bank_card_status_t status;
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *status_raw;
+  /**
+   * Witness state
+   */
+  enum lb_bank_card_witness_state_t witness_state;
+  /**
+   * The server's numeric code of `witness_state`, also when it is a code
+   * this SDK does not know (`witness_state` is then `Unknown`); null when
+   * the value is missing or is not a code
+   */
+  const int32_t *witness_state_raw;
+  /**
+   * Whether the card supports witnessing
+   */
+  bool support_witness;
+  /**
+   * Binding state
+   */
+  enum lb_bank_card_bind_state_t bind_state;
+  /**
+   * The server's numeric code of `bind_state`, also when it is a code
+   * this SDK does not know (`bind_state` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *bind_state_raw;
+  /**
+   * Binding hint text
+   */
+  const char *bind_tip;
+  /**
+   * Withdrawal fee text, as returned by the server
+   */
+  const char *withdraw_fee;
+  /**
+   * Time the card was added as a unix timestamp (null when not set)
+   */
+  const int64_t *created_at;
+  /**
+   * Authorizations attached to the card
+   */
+  const struct lb_bank_card_authorization_t *auth_list;
+  /**
+   * Number of `auth_list`
+   */
+  uintptr_t num_auth_list;
+} lb_bank_card_t;
+
+/**
+ * An eDDA authorization application of a bank card
+ */
+typedef struct lb_edda_application_t {
+  /**
+   * Application ID
+   */
+  const char *id;
+  /**
+   * Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda`
+   * (authorized in the app)
+   */
+  const char *flow_id;
+  /**
+   * Display name of the authorization
+   */
+  const char *name;
+  /**
+   * Authorized currency
+   */
+  const char *currency;
+  /**
+   * Application status
+   */
+  enum lb_authorization_status_t status;
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *status_raw;
+  /**
+   * Failure reason (empty unless the application failed)
+   */
+  const char *message;
+  /**
+   * Time the application was filed as a unix timestamp (null when not
+   * set)
+   */
+  const int64_t *created_at;
+  /**
+   * Time the application was last updated as a unix timestamp (null when
+   * not set)
+   */
+  const int64_t *updated_at;
+} lb_edda_application_t;
+
+/**
+ * One stock in a stock transfer application
+ */
+typedef struct lb_transfer_stock_t {
+  /**
+   * Stock code
+   */
+  const char *code;
+  /**
+   * Stock name
+   */
+  const char *name;
+  /**
+   * Stock name in English
+   */
+  const char *name_en;
+  /**
+   * Market
+   */
+  const char *market;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Quantity (null when not set)
+   */
+  const struct lb_decimal_t *amount;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Cost price (null when not set)
+   */
+  const struct lb_decimal_t *cost;
+  /**
+   * State code of this stock in the transfer
+   */
+  enum lb_transfer_stock_state_t state_code;
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *state_code_raw;
+  /**
+   * Quantity held in street name, as returned by the server (null when
+   * not set)
+   */
+  const struct lb_decimal_t *street_amount;
+  /**
+   * Quantity held by a nominee, as returned by the server (null when not
+   * set)
+   */
+  const struct lb_decimal_t *nominee_amount;
+  /**
+   * Quantity held in the holder's own name, as returned by the server
+   * (null when not set)
+   */
+  const struct lb_decimal_t *own_amount;
+  /**
+   * Number of share certificates, as returned by the server
+   */
+  int64_t certificate_count;
+  /**
+   * Position side
+   */
+  const char *position_side;
+} lb_transfer_stock_t;
+
+/**
+ * A stock transfer-in application (another broker -> this account)
+ */
+typedef struct lb_stock_transfer_in_t {
+  /**
+   * Record ID
+   */
+  const char *id;
+  /**
+   * Order ID
+   */
+  const char *order_id;
+  /**
+   * Market
+   */
+  const char *market;
+  /**
+   * Name of the other broker
+   */
+  const char *broker;
+  /**
+   * ID of the other broker
+   */
+  const char *broker_id;
+  /**
+   * English name of the other broker
+   */
+  const char *broker_en;
+  /**
+   * Broker code of the other broker
+   */
+  const char *broker_code;
+  /**
+   * Account number at the other broker, as returned by the server (not
+   * masked)
+   */
+  const char *account;
+  /**
+   * State text, as returned by the server
+   */
+  const char *state;
+  /**
+   * State code
+   */
+  enum lb_stock_transfer_in_state_t state_code;
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *state_code_raw;
+  /**
+   * App-side state: `noticed` means the user tapped "I have notified the
+   * broker" in the app; `default` otherwise
+   */
+  const char *app_state;
+  /**
+   * Whether the application can still be cancelled or changed
+   */
+  bool can_modify;
+  /**
+   * Created time as a unix timestamp (null when not set)
+   */
+  const int64_t *created_at;
+  /**
+   * Updated time as a unix timestamp (null when not set)
+   */
+  const int64_t *updated_at;
+  /**
+   * Processing start time as a unix timestamp (null when not set)
+   */
+  const int64_t *process_at;
+  /**
+   * Execution time as a unix timestamp (null when not executed)
+   */
+  const int64_t *exec_at;
+  /**
+   * Remark
+   */
+  const char *remark;
+  /**
+   * Reason (e.g. for a failure)
+   */
+  const char *reason;
+  /**
+   * Stocks in the application
+   */
+  const struct lb_transfer_stock_t *stocks;
+  /**
+   * Number of `stocks`
+   */
+  uintptr_t num_stocks;
+} lb_stock_transfer_in_t;
+
+/**
+ * Response for the stock transfer-in list
+ */
+typedef struct lb_stock_transfer_in_response_t {
+  /**
+   * Records
+   */
+  const struct lb_stock_transfer_in_t *records;
+  /**
+   * Number of `records`
+   */
+  uintptr_t num_records;
+  /**
+   * Total number of records
+   */
+  int64_t total;
+} lb_stock_transfer_in_response_t;
+
+/**
+ * A stock transfer-out application (this account -> another broker)
+ */
+typedef struct lb_stock_transfer_out_t {
+  /**
+   * Record ID
+   */
+  const char *id;
+  /**
+   * Order ID
+   */
+  const char *order_id;
+  /**
+   * Market
+   */
+  const char *market;
+  /**
+   * Name of the other broker
+   */
+  const char *broker;
+  /**
+   * ID of the other broker
+   */
+  const char *broker_id;
+  /**
+   * English name of the other broker
+   */
+  const char *broker_en;
+  /**
+   * Broker code of the other broker
+   */
+  const char *broker_code;
+  /**
+   * Account number at the other broker, as returned by the server (not
+   * masked)
+   */
+  const char *account;
+  /**
+   * State text, as returned by the server
+   */
+  const char *state;
+  /**
+   * State code (only `Submitted` applications can be cancelled)
+   */
+  enum lb_stock_transfer_out_state_t state_code;
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *state_code_raw;
+  /**
+   * App-side state: `noticed` means the user tapped "I have notified the
+   * broker" in the app (the user's own confirmation, not a Longbridge
+   * action); `default` otherwise
+   */
+  const char *app_state;
+  /**
+   * Created time as a unix timestamp (null when not set)
+   */
+  const int64_t *created_at;
+  /**
+   * Updated time as a unix timestamp (null when not set)
+   */
+  const int64_t *updated_at;
+  /**
+   * Processing start time as a unix timestamp (null when not set)
+   */
+  const int64_t *process_at;
+  /**
+   * Execution time as a unix timestamp (null when not executed)
+   */
+  const int64_t *exec_at;
+  /**
+   * Time the other broker agreed as a unix timestamp (null when not set)
+   */
+  const int64_t *agree_at;
+  /**
+   * Time the application was refused as a unix timestamp (null when not set)
+   */
+  const int64_t *refuse_at;
+  /**
+   * Time the application was cancelled as a unix timestamp (null when not
+   * set)
+   */
+  const int64_t *cancel_at;
+  /**
+   * Remark
+   */
+  const char *remark;
+  /**
+   * Reason (e.g. for a rejection)
+   */
+  const char *reason;
+  /**
+   * Stocks in the application
+   */
+  const struct lb_transfer_stock_t *stocks;
+  /**
+   * Number of `stocks`
+   */
+  uintptr_t num_stocks;
+} lb_stock_transfer_out_t;
+
+/**
+ * A reward record from the reward center (prize redemption secrets
+ * `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are
+ * not modelled)
+ */
+typedef struct lb_reward_record_t {
+  /**
+   * Reward type: named after the first detail object the server sent
+   * (`cash`, `card`, `prize`, in that order), else the server's
+   * `reward_type` code
+   */
+  enum lb_reward_type_t reward_type;
+  /**
+   * The server's numeric code of `reward_type`, also when it is a code
+   * this SDK does not know (`reward_type` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *reward_type_raw;
+  /**
+   * The detail object the fields below came from
+   */
+  enum lb_reward_detail_kind_t detail_kind;
+  /**
+   * Record ID
+   */
+  const char *record_id;
+  /**
+   * Title of the activity that granted the reward
+   */
+  const char *activity_title;
+  /**
+   * Reward title
+   */
+  const char *title;
+  /**
+   * Reward description
+   */
+  const char *description;
+  /**
+   * Coupon type (coupon rewards), e.g. `commission`
+   */
+  const char *card_type;
+  /**
+   * Coupon status code (coupon rewards), as returned by the server
+   */
+  enum lb_coupon_status_t card_status;
+  /**
+   * The server's numeric code of `card_status`, also when it is a code
+   * this SDK does not know (`card_status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *card_status_raw;
+  /**
+   * Prize type code (gift rewards; `0` = physical goods), null when not set
+   */
+  const int32_t *prize_type;
+  /**
+   * Amount (null when not set)
+   */
+  const struct lb_decimal_t *amount;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Reward status
+   */
+  enum lb_reward_status_t status;
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *status_raw;
+  /**
+   * Delivery status (issued gift rewards only)
+   */
+  enum lb_reward_deliver_status_t deliver_status;
+  /**
+   * The server's numeric code of `deliver_status` (e.g. 11 where
+   * `deliver_status` reads `AddressFilled`), also when it is a code this SDK
+   * does not know (`deliver_status` is then `Unknown`); null when the value
+   * is missing or is not a code
+   */
+  const int32_t *deliver_status_raw;
+  /**
+   * Exit status code, as returned by the server
+   */
+  int32_t exit_status;
+  /**
+   * Time the reward was sent as a unix timestamp (null when not set)
+   */
+  const int64_t *send_time;
+  /**
+   * Start time as a unix timestamp (null when not set)
+   */
+  const int64_t *start_time;
+  /**
+   * End time as a unix timestamp (null when not set)
+   */
+  const int64_t *end_time;
+  /**
+   * Effective time as a unix timestamp (null when not set)
+   */
+  const int64_t *effective_time;
+  /**
+   * Deadline to claim the reward as a unix timestamp (null when not set)
+   */
+  const int64_t *receive_deadline;
+} lb_reward_record_t;
+
+/**
+ * Response for the reward record list
+ */
+typedef struct lb_reward_records_response_t {
+  /**
+   * Reward records
+   */
+  const struct lb_reward_record_t *list;
+  /**
+   * Number of `list`
+   */
+  uintptr_t num_list;
+  /**
+   * Total number of records
+   */
+  int64_t total;
+} lb_reward_records_response_t;
+
+/**
+ * Commission terms of a commission coupon (`commission`)
+ */
+typedef struct lb_coupon_commission_t {
+  /**
+   * Markets the coupon applies to
+   */
+  const char *const *markets;
+  /**
+   * Number of `markets`
+   */
+  uintptr_t num_markets;
+  /**
+   * Rebate rate, as returned by the server
+   */
+  const char *rebate_rate;
+  /**
+   * Instrument types the coupon applies to
+   */
+  const enum lb_coupon_target_type_t *bz_types;
+  /**
+   * Number of `bz_types` (always equal to `num_bz_types_raw`)
+   */
+  uintptr_t num_bz_types;
+  /**
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
+   */
+  const int32_t *bz_types_raw;
+  /**
+   * Number of `bz_types_raw` (always equal to `num_bz_types`)
+   */
+  uintptr_t num_bz_types_raw;
+  /**
+   * Remaining commission balance (null when not set)
+   */
+  const struct lb_decimal_t *commission_balance;
+  /**
+   * Commission duration in seconds (the app reads 200 years or more as
+   * lifetime free commission)
+   */
+  int64_t commission_duration;
+  /**
+   * Kind of commission coupon (the server's `unlimited` code)
+   */
+  enum lb_commission_unlimited_type_t unlimited;
+  /**
+   * The server's numeric code of `unlimited`, also when it is a code
+   * this SDK does not know (`unlimited` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *unlimited_raw;
+  /**
+   * Commission expiry time as a unix timestamp (null when not set)
+   */
+  const int64_t *commission_expired_time;
+  /**
+   * Number of times used
+   */
+  int64_t usage_count;
+  /**
+   * Number of uses left
+   */
+  int64_t lave_usage_count;
+  /**
+   * Settlement model, as returned by the server
+   */
+  const char *settlement_model;
+  /**
+   * Amount cap per use of a per-use discount card (`ByRatePer`), as returned
+   * by the server
+   */
+  int64_t amount_limit;
+  /**
+   * Whether the coupon can be combined with other coupons
+   */
+  bool superposition;
+} lb_coupon_commission_t;
+
+/**
+ * Terms of an AI benefit coupon (`ai_benefit`)
+ */
+typedef struct lb_coupon_ai_benefit_t {
+  /**
+   * Length of the benefit in days
+   */
+  int32_t benefit_days;
+  /**
+   * Start of the benefit as a unix timestamp (null when not set)
+   */
+  const int64_t *benefit_start;
+  /**
+   * End of the benefit as a unix timestamp (null when not set)
+   */
+  const int64_t *benefit_end;
+  /**
+   * Benefit tag, as returned by the server
+   */
+  const char *benefit_tag;
+} lb_coupon_ai_benefit_t;
+
+/**
+ * Terms of a cash coupon (`cash`)
+ */
+typedef struct lb_coupon_cash_t {
+  /**
+   * Receive duration, as returned by the server (its unit and meaning are
+   * not confirmed)
+   */
+  int64_t receive_duration;
+} lb_coupon_cash_t;
+
+/**
+ * A store of a coffee coupon
+ */
+typedef struct lb_coupon_coffee_store_t {
+  /**
+   * Store ID
+   */
+  int64_t store_id;
+  /**
+   * Store name
+   */
+  const char *store_name;
+} lb_coupon_coffee_store_t;
+
+/**
+ * Terms of a coffee coupon (`coffee_coupon`)
+ */
+typedef struct lb_coupon_coffee_t {
+  /**
+   * Coupon channel, as returned by the server
+   */
+  const char *coupon_channel;
+  /**
+   * Coupon ID, as returned by the server
+   */
+  const char *coupon_id;
+  /**
+   * Voucher template code, e.g. `coffee-50` (not a personal redemption code)
+   */
+  const char *coupon_no;
+  /**
+   * Whether the coupon can be used at every store
+   */
+  bool is_available_all_store;
+  /**
+   * Period type (e.g. `day`), as returned by the server
+   */
+  const char *period_type;
+  /**
+   * ID of the store the coupon was settled at (`0` when not settled)
+   */
+  int64_t settled_store_id;
+  /**
+   * IDs of the stores the coupon can be used at
+   */
+  const int64_t *store_id_list;
+  /**
+   * Number of `store_id_list`
+   */
+  uintptr_t num_store_id_list;
+  /**
+   * Stores the coupon can be used at
+   */
+  const struct lb_coupon_coffee_store_t *store_list;
+  /**
+   * Number of `store_list`
+   */
+  uintptr_t num_store_list;
+  /**
+   * Threshold, as returned by the server
+   */
+  int64_t threshold;
+  /**
+   * Use limit (`total` or `period`), as returned by the server
+   */
+  const char *use_limit;
+} lb_coupon_coffee_t;
+
+/**
+ * A counter (security) of a crypto coupon
+ */
+typedef struct lb_coupon_crypto_counter_t {
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+} lb_coupon_crypto_counter_t;
+
+/**
+ * Fallback of a crypto coupon
+ */
+typedef struct lb_coupon_crypto_fallback_t {
+  /**
+   * Whether the fallback is enabled
+   */
+  bool enabled;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+} lb_coupon_crypto_fallback_t;
+
+/**
+ * Terms of a crypto coupon (`crypto`)
+ */
+typedef struct lb_coupon_crypto_t {
+  /**
+   * Fallback
+   */
+  struct lb_coupon_crypto_fallback_t fallback;
+  /**
+   * Optional counters
+   */
+  const struct lb_coupon_crypto_counter_t *optional_counters;
+  /**
+   * Number of `optional_counters`
+   */
+  uintptr_t num_optional_counters;
+} lb_coupon_crypto_t;
+
+/**
+ * Terms of a finance interest coupon (`finance_interest`). The meaning of
+ * these fields is not confirmed; they are returned as the server sends them.
+ */
+typedef struct lb_coupon_finance_interest_t {
+  /**
+   * Discount mode, as returned by the server
+   */
+  int32_t discount_mode;
+  /**
+   * Discount rate (null when not set)
+   */
+  const struct lb_decimal_t *discount_rate;
+  /**
+   * Whether the coupon can be combined with other coupons
+   */
+  bool superposition;
+} lb_coupon_finance_interest_t;
+
+/**
+ * Terms of a fund deduction coupon (`fund_deduct`)
+ */
+typedef struct lb_coupon_fund_deduct_t {
+  /**
+   * Maximum risk level, as returned by the server
+   */
+  int32_t max_risk_level;
+  /**
+   * Minimum order amount, as returned by the server
+   */
+  const char *min_order_amount;
+  /**
+   * Order types, as returned by the server
+   */
+  const char *const *order_types;
+  /**
+   * Number of `order_types`
+   */
+  uintptr_t num_order_types;
+  /**
+   * Underlying type, as returned by the server
+   */
+  const char *underlying_type;
+  /**
+   * Underlying values, as returned by the server
+   */
+  const char *const *underlying_values;
+  /**
+   * Number of `underlying_values`
+   */
+  uintptr_t num_underlying_values;
+  /**
+   * Underlying names, as returned by the server
+   */
+  const char *const *underlying_names;
+  /**
+   * Number of `underlying_names`
+   */
+  uintptr_t num_underlying_names;
+} lb_coupon_fund_deduct_t;
+
+/**
+ * Terms of a quote (market data) or fundamental-data coupon (`quote` /
+ * `fundamental`)
+ */
+typedef struct lb_coupon_quote_t {
+  /**
+   * Current end time as a unix timestamp (null when not set)
+   */
+  const int64_t *current_end_time;
+  /**
+   * Whether the coupon is inapplicable, as returned by the server
+   */
+  bool inapplicable;
+  /**
+   * Investor type the coupon applies to
+   */
+  enum lb_quote_investor_type_t investor_type;
+  /**
+   * The server's numeric code of `investor_type`, also when it is a code
+   * this SDK does not know (`investor_type` is then `Unknown`); null when
+   * the value is missing or is not a code
+   */
+  const int32_t *investor_type_raw;
+  /**
+   * Whether the coupon is activated manually
+   */
+  bool manual_activate;
+  /**
+   * Markets
+   */
+  const char *const *markets;
+  /**
+   * Number of `markets`
+   */
+  uintptr_t num_markets;
+  /**
+   * Investor type of the member, as returned by the server
+   */
+  int32_t member_investor_type;
+  /**
+   * Paired SPU number, as returned by the server
+   */
+  const char *pair_spu_no;
+  /**
+   * Quote duration in seconds (the app reads 200 years or more as lifetime)
+   */
+  int64_t quote_duration;
+  /**
+   * Quote market
+   */
+  const char *quote_market;
+  /**
+   * Quote tags
+   */
+  const char *const *quote_tags;
+  /**
+   * Number of `quote_tags`
+   */
+  uintptr_t num_quote_tags;
+  /**
+   * Whether the coupon can be combined with other coupons
+   */
+  bool superposition;
+} lb_coupon_quote_t;
+
+/**
+ * Terms of an IPO coupon (`ipo`)
+ */
+typedef struct lb_coupon_ipo_t {
+  /**
+   * Subscription ID
+   */
+  const char *subscription_id;
+} lb_coupon_ipo_t;
+
+/**
+ * Terms of an IPO commission coupon (`ipo_commission`)
+ */
+typedef struct lb_coupon_ipo_commission_t {
+  /**
+   * IPO subscription types the coupon applies to
+   */
+  const enum lb_ipo_coupon_target_type_t *bz_types;
+  /**
+   * Number of `bz_types` (always equal to `num_bz_types_raw`)
+   */
+  uintptr_t num_bz_types;
+  /**
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
+   */
+  const int32_t *bz_types_raw;
+  /**
+   * Number of `bz_types_raw` (always equal to `num_bz_types`)
+   */
+  uintptr_t num_bz_types_raw;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Counter name
+   */
+  const char *counter_name;
+  /**
+   * Financing limit, as returned by the server
+   */
+  const char *financing_limit;
+} lb_coupon_ipo_commission_t;
+
+/**
+ * Terms of an IPO interest coupon (`ipo_interest`)
+ */
+typedef struct lb_coupon_ipo_interest_t {
+  /**
+   * Annual interest discount rate, as returned by the server (the app
+   * computes the daily discount as rate × financed amount / 365)
+   */
+  const char *discount_rate;
+} lb_coupon_ipo_interest_t;
+
+/**
+ * Terms of a platform fee deduction coupon (`platform_fee_deduct`)
+ */
+typedef struct lb_coupon_platform_fee_deduct_t {
+  /**
+   * Instrument types the coupon applies to
+   */
+  const enum lb_coupon_target_type_t *bz_types;
+  /**
+   * Number of `bz_types` (always equal to `num_bz_types_raw`)
+   */
+  uintptr_t num_bz_types;
+  /**
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
+   */
+  const int32_t *bz_types_raw;
+  /**
+   * Number of `bz_types_raw` (always equal to `num_bz_types`)
+   */
+  uintptr_t num_bz_types_raw;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Counter name
+   */
+  const char *counter_name;
+  /**
+   * Markets the coupon applies to
+   */
+  const char *const *markets;
+  /**
+   * Number of `markets`
+   */
+  uintptr_t num_markets;
+  /**
+   * Number of times used
+   */
+  int64_t usage_count;
+  /**
+   * Number of uses left
+   */
+  int64_t lave_usage_count;
+  /**
+   * Whether the coupon can be combined with other coupons
+   */
+  bool superposition;
+} lb_coupon_platform_fee_deduct_t;
+
+/**
+ * An optional counter of a stock coupon
+ */
+typedef struct lb_coupon_stock_counter_t {
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Shares, as returned by the server
+   */
+  const char *shares;
+} lb_coupon_stock_counter_t;
+
+/**
+ * Fallback of a stock coupon
+ */
+typedef struct lb_coupon_stock_fallback_t {
+  /**
+   * Whether the fallback is enabled
+   */
+  bool enabled;
+  /**
+   * Fallback type (the server's `type`), as returned by the server
+   */
+  const char *fallback_type;
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Shares, as returned by the server
+   */
+  const char *shares;
+} lb_coupon_stock_fallback_t;
+
+/**
+ * Terms of a stock coupon (`stock`)
+ */
+typedef struct lb_coupon_stock_t {
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Counter name
+   */
+  const char *counter_name;
+  /**
+   * Amount (null when not set)
+   */
+  const struct lb_decimal_t *amount;
+  /**
+   * Redemption type (`by_card_value` or `shares_number`), as returned by the
+   * server
+   */
+  const char *redemption_type;
+  /**
+   * Delivery way (`card_exchange` or `account_transfer`), as returned by the
+   * server
+   */
+  const char *send_way;
+  /**
+   * Optional counters
+   */
+  const struct lb_coupon_stock_counter_t *optional_counters;
+  /**
+   * Number of `optional_counters`
+   */
+  uintptr_t num_optional_counters;
+  /**
+   * Fallback
+   */
+  struct lb_coupon_stock_fallback_t fallback;
+} lb_coupon_stock_t;
+
+/**
+ * One `amounts` entry of [`CCouponStockFragment`]
+ */
+typedef struct lb_coupon_stock_fragment_amount_t {
+  /**
+   * Key, as returned by the server
+   */
+  const char *key;
+  /**
+   * Value, as returned by the server
+   */
+  const char *value;
+} lb_coupon_stock_fragment_amount_t;
+
+/**
+ * Terms of a stock fragment coupon (`stock_fragment`)
+ */
+typedef struct lb_coupon_stock_fragment_t {
+  /**
+   * Counter ID
+   */
+  const char *counter_id;
+  /**
+   * Counter name
+   */
+  const char *counter_name;
+  /**
+   * Market
+   */
+  const char *market;
+  /**
+   * Markets
+   */
+  const char *const *markets;
+  /**
+   * Number of `markets`
+   */
+  uintptr_t num_markets;
+  /**
+   * Instrument type the coupon applies to
+   */
+  enum lb_coupon_target_type_t underlying_type;
+  /**
+   * The server's numeric code of `underlying_type`, also when it is a code
+   * this SDK does not know (`underlying_type` is then `Unknown`); null when
+   * the value is missing or is not a code
+   */
+  const int32_t *underlying_type_raw;
+  /**
+   * Amounts, as returned by the server, key-sorted
+   */
+  const struct lb_coupon_stock_fragment_amount_t *amounts;
+  /**
+   * Number of `amounts`
+   */
+  uintptr_t num_amounts;
+} lb_coupon_stock_fragment_t;
+
+/**
+ * A coupon (reward card)
+ */
+typedef struct lb_coupon_t {
+  /**
+   * Coupon ID (32 hex characters; pass to coupon_orders)
+   */
+  const char *card_id;
+  /**
+   * Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`,
+   * `cash`
+   */
+  const char *card_type;
+  /**
+   * Title
+   */
+  const char *title;
+  /**
+   * Secondary title
+   */
+  const char *title_sec;
+  /**
+   * Description
+   */
+  const char *description;
+  /**
+   * Terms and details
+   */
+  const char *detail;
+  /**
+   * Status
+   */
+  enum lb_coupon_status_t card_status;
+  /**
+   * The server's numeric code of `card_status`, also when it is a code
+   * this SDK does not know (`card_status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *card_status_raw;
+  /**
+   * Start of validity as a unix timestamp (null when not set)
+   */
+  const int64_t *start_time;
+  /**
+   * End of validity (none when not set or when the coupon never expires;
+   * see `no_expiry`) as a unix timestamp (null when not set)
+   */
+  const int64_t *end_time;
+  /**
+   * Whether the coupon never expires (the server's end time is in or after
+   * 2100)
+   */
+  bool no_expiry;
+  /**
+   * Activation time (none when not activated) as a unix timestamp (null when
+   * not set)
+   */
+  const int64_t *activate_time;
+  /**
+   * Amount (null when not set)
+   */
+  const struct lb_decimal_t *amount;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Trading sessions the coupon applies to, as display text
+   */
+  const char *available_trade_session;
+  /**
+   * Trading sessions the coupon applies to, as returned by the server
+   */
+  const char *const *trade_sessions;
+  /**
+   * Number of `trade_sessions`
+   */
+  uintptr_t num_trade_sessions;
+  /**
+   * Subscription ID, as returned by the server
+   */
+  const char *subscription_id;
+  /**
+   * Terms of an AI benefit coupon (null for other coupon types)
+   */
+  const struct lb_coupon_ai_benefit_t *ai_benefit;
+  /**
+   * Terms of a cash coupon (null for other coupon types)
+   */
+  const struct lb_coupon_cash_t *cash;
+  /**
+   * Terms of a coffee coupon (null for other coupon types)
+   */
+  const struct lb_coupon_coffee_t *coffee_coupon;
+  /**
+   * Terms of a commission coupon (null for other coupon types)
+   */
+  const struct lb_coupon_commission_t *commission;
+  /**
+   * Terms of a crypto coupon (null for other coupon types)
+   */
+  const struct lb_coupon_crypto_t *crypto;
+  /**
+   * Terms of a finance interest coupon (null for other coupon types)
+   */
+  const struct lb_coupon_finance_interest_t *finance_interest;
+  /**
+   * Terms of a fund deduction coupon (null for other coupon types)
+   */
+  const struct lb_coupon_fund_deduct_t *fund_deduct;
+  /**
+   * Terms of a fundamental-data coupon (null for other coupon types)
+   */
+  const struct lb_coupon_quote_t *fundamental;
+  /**
+   * Terms of an IPO coupon (null for other coupon types)
+   */
+  const struct lb_coupon_ipo_t *ipo;
+  /**
+   * Terms of an IPO commission coupon (null for other coupon types)
+   */
+  const struct lb_coupon_ipo_commission_t *ipo_commission;
+  /**
+   * Terms of an IPO interest coupon (null for other coupon types)
+   */
+  const struct lb_coupon_ipo_interest_t *ipo_interest;
+  /**
+   * Terms of a platform fee deduction coupon (null for other coupon types)
+   */
+  const struct lb_coupon_platform_fee_deduct_t *platform_fee_deduct;
+  /**
+   * Terms of a quote (market data) coupon (null for other coupon types)
+   */
+  const struct lb_coupon_quote_t *quote;
+  /**
+   * Terms of a stock coupon (null for other coupon types)
+   */
+  const struct lb_coupon_stock_t *stock;
+  /**
+   * Terms of a stock fragment coupon (null for other coupon types)
+   */
+  const struct lb_coupon_stock_fragment_t *stock_fragment;
+} lb_coupon_t;
+
+/**
+ * Response for the coupon list
+ */
+typedef struct lb_coupons_response_t {
+  /**
+   * Pinned coupons shown above the list (repeated on every page)
+   */
+  const struct lb_coupon_t *top_list;
+  /**
+   * Number of `top_list`
+   */
+  uintptr_t num_top_list;
+  /**
+   * Coupons on this page
+   */
+  const struct lb_coupon_t *list;
+  /**
+   * Number of `list`
+   */
+  uintptr_t num_list;
+  /**
+   * Pinned coupons shown below the list (repeated on every page)
+   */
+  const struct lb_coupon_t *bottom_list;
+  /**
+   * Number of `bottom_list`
+   */
+  uintptr_t num_bottom_list;
+  /**
+   * Total number of coupons
+   */
+  int64_t total;
+  /**
+   * Number of expired coupons
+   */
+  int64_t expired_count;
+} lb_coupons_response_t;
+
+/**
+ * An order a coupon was applied to
+ */
+typedef struct lb_coupon_order_t {
+  /**
+   * Order ID
+   */
+  const char *order_id;
+  /**
+   * State text, as returned by the server
+   */
+  const char *state;
+  /**
+   * State value, as returned by the server (e.g. `FilledStatus`)
+   */
+  const char *state_val;
+  /**
+   * Executed price (null when not set)
+   */
+  const struct lb_decimal_t *executed_price;
+  /**
+   * Executed quantity (null when not set)
+   */
+  const struct lb_decimal_t *executed_quantity;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Settlement currency
+   */
+  const char *settlement_currency;
+  /**
+   * Rebate amount (null when not set)
+   */
+  const struct lb_decimal_t *rebate;
+  /**
+   * Rebate date, as returned by the server
+   */
+  const char *rebate_dt;
+} lb_coupon_order_t;
+
+/**
+ * A deposit record (receipt images are not modelled)
+ */
+typedef struct lb_deposit_t {
+  /**
+   * Record ID
+   */
+  const char *id;
+  /**
+   * Created time as a unix timestamp (null when not set)
+   */
+  const int64_t *created_at;
+  /**
+   * Updated time as a unix timestamp (null when not set)
+   */
+  const int64_t *updated_at;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Notified (applied) amount (null when not set)
+   */
+  const struct lb_decimal_t *amount;
+  /**
+   * Received amount (`0` = not received yet; null when not set)
+   */
+  const struct lb_decimal_t *receivable_amount;
+  /**
+   * State text, as returned by the server
+   */
+  const char *state;
+  /**
+   * State code
+   */
+  enum lb_deposit_state_t state_code;
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *state_code_raw;
+  /**
+   * Sub-state code, as returned by the server
+   */
+  int32_t sub_state_code;
+  /**
+   * Deposit method ID
+   */
+  const char *bank_operation_type_id;
+  /**
+   * Deposit method name
+   */
+  const char *bank_operation_type_name;
+  /**
+   * Reference number
+   */
+  const char *reference_no;
+  /**
+   * Whether the deposit can still be cancelled
+   */
+  bool can_cancel;
+  /**
+   * SWIFT code of the paying bank
+   */
+  const char *user_bank_swift_code;
+  /**
+   * Number of receipts uploaded with the deposit
+   */
+  int64_t voucher_count;
+} lb_deposit_t;
+
+/**
+ * A withdrawal record
+ */
+typedef struct lb_withdrawal_t {
+  /**
+   * Record ID
+   */
+  const char *id;
+  /**
+   * Order ID
+   */
+  const char *order_id;
+  /**
+   * Created time as a unix timestamp (null when not set)
+   */
+  const int64_t *created_at;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Applied amount (null when not set)
+   */
+  const struct lb_decimal_t *amount;
+  /**
+   * Fee (null when not set)
+   */
+  const struct lb_decimal_t *fee;
+  /**
+   * Amount paid out (null when not set)
+   */
+  const struct lb_decimal_t *settlement_amount;
+  /**
+   * State code
+   */
+  enum lb_withdrawal_state_t state_code;
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  const int32_t *state_code_raw;
+  /**
+   * Raw state, as returned by the server
+   */
+  const char *raw_state;
+  /**
+   * State display text, as returned by the server
+   */
+  const char *state_description;
+  /**
+   * Receiving bank account number, as returned by the server (not masked)
+   */
+  const char *bank_account;
+  /**
+   * Receiving bank account, as displayed in the app
+   */
+  const char *display_bank_account;
+  /**
+   * SWIFT code of the receiving bank
+   */
+  const char *user_bank_swift_code;
+  /**
+   * Account channel
+   */
+  const char *account_channel;
+} lb_withdrawal_t;
+
+/**
+ * One page of deposit records
+ *
+ * The server also returns a `total`, but it follows the page size rather
+ * than the record count, so it is not modelled; see `has_more`.
+ */
+typedef struct lb_deposits_response_t {
+  /**
+   * Deposit records, newest first
+   */
+  const struct lb_deposit_t *items;
+  /**
+   * Number of `items`
+   */
+  uintptr_t num_items;
+  /**
+   * A full page came back (as many records as the page size sent, at most
+   * 20), so the next page may hold more
+   */
+  bool has_more;
+} lb_deposits_response_t;
+
+/**
+ * Response for the withdrawal list
+ */
+typedef struct lb_withdrawals_response_t {
+  /**
+   * Withdrawal records
+   */
+  const struct lb_withdrawal_t *list;
+  /**
+   * Number of `list`
+   */
+  uintptr_t num_list;
+  /**
+   * Total number of records
+   */
+  int64_t total;
+  /**
+   * A full page came back (as many records as the page size sent), so the
+   * next page may hold more
+   */
+  bool has_more;
+} lb_withdrawals_response_t;
 
 /**
  * Response for submit grid trading order request
@@ -14502,6 +16964,150 @@ void lb_asset_context_download_url(const struct lb_asset_context_t *ctx,
                                    const char *file_key,
                                    lb_async_callback_t callback,
                                    void *userdata);
+
+/**
+ * Get the linked bank cards, with their verification, binding and
+ * authorization (eDDA, bank securities account, FPS) status
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is an array of `lb_bank_card_t`.
+ */
+void lb_asset_context_bank_cards(const struct lb_asset_context_t *ctx,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get the eDDA authorization applications of a bank card in one currency
+ *
+ * The card id must be all digits; any other value fails with an error before
+ * anything is sent.
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is an array of `lb_edda_application_t`.
+ *
+ * @param card_id   Bank card ID (`lb_bank_card_t.id`)
+ * @param currency  Currency, e.g. `HKD` or `USD`
+ */
+void lb_asset_context_edda_applications(const struct lb_asset_context_t *ctx,
+                                        const char *card_id,
+                                        const char *currency,
+                                        lb_async_callback_t callback,
+                                        void *userdata);
+
+/**
+ * Get stock transfer-in applications (another broker → this account)
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is a `lb_stock_transfer_in_response_t`.
+ *
+ * @param[in] opts Options (can be null)
+ */
+void lb_asset_context_stock_transfers_in(const struct lb_asset_context_t *ctx,
+                                         const struct lb_get_stock_transfers_in_options_t *opts,
+                                         lb_async_callback_t callback,
+                                         void *userdata);
+
+/**
+ * Get stock transfer-out applications (this account → another broker)
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is an array of `lb_stock_transfer_out_t`.
+ *
+ * @param[in] opts Options (can be null)
+ */
+void lb_asset_context_stock_transfers_out(const struct lb_asset_context_t *ctx,
+                                          const struct lb_get_stock_transfers_out_options_t *opts,
+                                          lb_async_callback_t callback,
+                                          void *userdata);
+
+/**
+ * Get reward records from the reward center
+ *
+ * The route has no date filter: to find rewards in a time range, page
+ * through the records and filter on their times.
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is a `lb_reward_records_response_t`.
+ *
+ * @param[in] opts Options (can be null)
+ */
+void lb_asset_context_reward_records(const struct lb_asset_context_t *ctx,
+                                     const struct lb_get_reward_records_options_t *opts,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
+
+/**
+ * Get coupons (reward cards)
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is a `lb_coupons_response_t`.
+ *
+ * @param[in] opts Options (can be null: coupons that have not expired)
+ */
+void lb_asset_context_coupons(const struct lb_asset_context_t *ctx,
+                              const struct lb_get_coupons_options_t *opts,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Get the orders a coupon was applied to
+ *
+ * The card id must be 32 hex characters; any other value fails with an error
+ * before anything is sent.
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is an array of `lb_coupon_order_t`.
+ *
+ * @param card_id     Coupon ID (`lb_coupon_t.card_id`, 32 hex characters)
+ * @param order_type  Locked (in progress) or settled orders
+ */
+void lb_asset_context_coupon_orders(const struct lb_asset_context_t *ctx,
+                                    const char *card_id,
+                                    enum lb_coupon_order_type_t order_type,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Get one page of deposit records
+ *
+ * The server's total follows the page size rather than the record count, so
+ * it is not returned; `has_more` reports a full page instead. The page size
+ * is always sent: at most 20, default 20.
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is a `lb_deposits_response_t`.
+ *
+ * @param[in] opts Options (can be null)
+ */
+void lb_asset_context_deposits(const struct lb_asset_context_t *ctx,
+                               const struct lb_get_deposits_options_t *opts,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get withdrawal records
+ *
+ * The response's `has_more` reports a full page of the size sent (default 20,
+ * at most 50).
+ *
+ * AP accounts only: US data-center accounts get a region error.
+ *
+ * The callback data is a `lb_withdrawals_response_t`.
+ *
+ * @param[in] opts Options (can be null)
+ */
+void lb_asset_context_withdrawals(const struct lb_asset_context_t *ctx,
+                                  const struct lb_get_withdrawals_options_t *opts,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
 
 const struct lb_calendar_context_t *lb_calendar_context_new(const struct lb_config_t *config);
 

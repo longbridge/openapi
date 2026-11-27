@@ -1,2 +1,11 @@
 pub(crate) const GET_STATEMENT_DATA_LIST_PATH: &str = "/v1/statement/list";
 pub(crate) const GET_STATEMENT_DATA_DOWNLOAD_URL_PATH: &str = "/v1/statement/download";
+pub(crate) const BANK_CARDS_PATH: &str = "/v2/account/bank-cards";
+pub(crate) const EDDA_STATUS_PATH: &str = "/v1/account/edda-status";
+pub(crate) const STOCK_TRANSFERS_IN_PATH: &str = "/v1/account/stock-transfers/in";
+pub(crate) const STOCK_TRANSFERS_OUT_PATH: &str = "/v1/account/stock-transfers/out";
+pub(crate) const REWARDS_PATH: &str = "/v1/account/rewards";
+pub(crate) const COUPONS_PATH: &str = "/v1/account/cards";
+pub(crate) const COUPON_ORDERS_PATH: &str = "/v1/account/card-orders";
+pub(crate) const DEPOSITS_PATH: &str = "/v1/account/deposits";
+pub(crate) const WITHDRAWALS_PATH: &str = "/v1/account/withdrawals";

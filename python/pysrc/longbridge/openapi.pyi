@@ -12463,6 +12463,2877 @@ class GetStatementResponse:
     Presigned download URL
     """
 
+class BankCardStatus:
+    """
+    Verification status of a bank card
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(BankCardStatus):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Unverified(BankCardStatus):
+        """
+        Not verified (server code 0)
+        """
+
+        ...
+
+    class UnderReview(BankCardStatus):
+        """
+        Under review (server code 1)
+        """
+
+        ...
+
+    class Verified(BankCardStatus):
+        """
+        Verified (server code 2)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class BankCardWitnessState:
+    """
+    Witness (in-person / video verification) state of a bank card
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(BankCardWitnessState):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class NotRequired(BankCardWitnessState):
+        """
+        Witnessing not required (server code 1)
+        """
+
+        ...
+
+    class Pending(BankCardWitnessState):
+        """
+        Witnessing pending (server code 2)
+        """
+
+        ...
+
+    class Witnessed(BankCardWitnessState):
+        """
+        Witnessed (server code 3)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class BankCardBindState:
+    """
+    Binding state of a bank card
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(BankCardBindState):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Binding(BankCardBindState):
+        """
+        Binding in progress (server code 0)
+        """
+
+        ...
+
+    class Bound(BankCardBindState):
+        """
+        Bound (server code 1)
+        """
+
+        ...
+
+    class Failed(BankCardBindState):
+        """
+        Binding failed (server code 2)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class AuthorizationStatus:
+    """
+    Status of a bank-card authorization (eDDA, bank securities account, FPS) or of
+    an eDDA application
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(AuthorizationStatus):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Unauthorized(AuthorizationStatus):
+        """
+        Not authorized (server code 0)
+        """
+
+        ...
+
+    class Authorized(AuthorizationStatus):
+        """
+        Authorized (server code 1)
+        """
+
+        ...
+
+    class Authorizing(AuthorizationStatus):
+        """
+        Authorization in progress (server code 2)
+        """
+
+        ...
+
+    class Failed(AuthorizationStatus):
+        """
+        Authorization failed (see the message field for the reason) (server code 3)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class StockTransferInState:
+    """
+    State of a stock transfer-in application (another broker to this account)
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(StockTransferInState):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Submitted(StockTransferInState):
+        """
+        Submitted (server code 0)
+        """
+
+        ...
+
+    class Cancelled(StockTransferInState):
+        """
+        Cancelled (server code 1)
+        """
+
+        ...
+
+    class Completed(StockTransferInState):
+        """
+        Completed (server code 3)
+        """
+
+        ...
+
+    class Processing(StockTransferInState):
+        """
+        Processing (server code 5)
+        """
+
+        ...
+
+    class PartiallyCompleted(StockTransferInState):
+        """
+        Partially completed (server code 7)
+        """
+
+        ...
+
+    class Failed(StockTransferInState):
+        """
+        Failed (server code 8)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class StockTransferOutState:
+    """
+    State of a stock transfer-out application (this account to another broker)
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(StockTransferOutState):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Submitted(StockTransferOutState):
+        """
+        Submitted (the only state in which the application can still be cancelled) (server code 0)
+        """
+
+        ...
+
+    class Processing(StockTransferOutState):
+        """
+        Processing (server code 1)
+        """
+
+        ...
+
+    class Executing(StockTransferOutState):
+        """
+        Executing (server code 2)
+        """
+
+        ...
+
+    class Completed(StockTransferOutState):
+        """
+        Completed (server code 3)
+        """
+
+        ...
+
+    class Cancelled(StockTransferOutState):
+        """
+        Cancelled (server code 4)
+        """
+
+        ...
+
+    class PartiallyCompleted(StockTransferOutState):
+        """
+        Partially completed (server code 5)
+        """
+
+        ...
+
+    class Failed(StockTransferOutState):
+        """
+        Failed (server code 6)
+        """
+
+        ...
+
+    class Rejected(StockTransferOutState):
+        """
+        Rejected (server code 7)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class TransferStockState:
+    """
+    State of one stock inside a stock transfer application
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(TransferStockState):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Processing(TransferStockState):
+        """
+        Processing (server code 0)
+        """
+
+        ...
+
+    class Succeeded(TransferStockState):
+        """
+        Succeeded (server code 1)
+        """
+
+        ...
+
+    class Failed(TransferStockState):
+        """
+        Failed (server code 2)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class RewardType:
+    """
+    Type of a reward record
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(RewardType):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Cash(RewardType):
+        """
+        Cash reward (server code 0)
+        """
+
+        ...
+
+    class Gift(RewardType):
+        """
+        Gift (prize) (server code 1)
+        """
+
+        ...
+
+    class Coupon(RewardType):
+        """
+        Coupon (server code 2)
+        """
+
+        ...
+
+    class Task(RewardType):
+        """
+        Task reward (server code 3)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class RewardDetailKind:
+    """
+    Which upstream detail object a reward record came from
+    """
+
+    class None_(RewardDetailKind):
+        """
+        No known detail object (e.g. a task reward); only the reward type is
+        set
+        """
+
+        ...
+
+    class Cash(RewardDetailKind):
+        """
+        The `cash` object
+        """
+
+        ...
+
+    class Card(RewardDetailKind):
+        """
+        The `card` (coupon) object
+        """
+
+        ...
+
+    class Prize(RewardDetailKind):
+        """
+        The `prize` (gift) object
+        """
+
+        ...
+
+class RewardStatus:
+    """
+    Status of a reward record
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(RewardStatus):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Upcoming(RewardStatus):
+        """
+        Upcoming (server code 0)
+        """
+
+        ...
+
+    class Cancelled(RewardStatus):
+        """
+        Cancelled (server code 1)
+        """
+
+        ...
+
+    class ExitedActivity(RewardStatus):
+        """
+        The user exited the activity (server code 2)
+        """
+
+        ...
+
+    class Unclaimed(RewardStatus):
+        """
+        Not claimed yet (server code 8)
+        """
+
+        ...
+
+    class Issuing(RewardStatus):
+        """
+        Being issued (server code 10)
+        """
+
+        ...
+
+    class Issued(RewardStatus):
+        """
+        Issued (server code 12)
+        """
+
+        ...
+
+    class Failed(RewardStatus):
+        """
+        Issuing failed (server code 13)
+        """
+
+        ...
+
+    class Exchanged(RewardStatus):
+        """
+        Exchanged (server code 16)
+        """
+
+        ...
+
+    class Expired(RewardStatus):
+        """
+        Expired (server code 17)
+        """
+
+        ...
+
+    class Refunded(RewardStatus):
+        """
+        Refunded (server code 18)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class RewardDeliverStatus:
+    """
+    Delivery status of an issued prize (only meaningful for issued gift rewards)
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(RewardDeliverStatus):
+        """
+        Unknown: an undocumented code, or no delivery status (never sent to the
+        server)
+        """
+
+        ...
+
+    class NotActivated(RewardDeliverStatus):
+        """
+        Not activated (server code 0)
+        """
+
+        ...
+
+    class ActivatedOrShipping(RewardDeliverStatus):
+        """
+        Activated, or shipping (server code 1)
+        """
+
+        ...
+
+    class Consumed(RewardDeliverStatus):
+        """
+        Consumed (server code 2)
+        """
+
+        ...
+
+    class EVoucherActivating(RewardDeliverStatus):
+        """
+        E-voucher activating (server code 5)
+        """
+
+        ...
+
+    class EVoucherExpired(RewardDeliverStatus):
+        """
+        E-voucher expired before activation (server code 6)
+        """
+
+        ...
+
+    class EVoucherInvalid(RewardDeliverStatus):
+        """
+        E-voucher invalid (server code 7)
+        """
+
+        ...
+
+    class AddressMissing(RewardDeliverStatus):
+        """
+        Shipping address missing (server code 8)
+        """
+
+        ...
+
+    class AddressFilled(RewardDeliverStatus):
+        """
+        Shipping address filled (server code 9)
+        """
+
+        ...
+
+    class Shipping(RewardDeliverStatus):
+        """
+        Shipping (server code 10)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class CouponTargetType:
+    """
+    Instrument type a coupon applies to
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(CouponTargetType):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Stock(CouponTargetType):
+        """
+        Stocks (server code 0, `StockTrade`)
+        """
+
+        ...
+
+    class UsOption(CouponTargetType):
+        """
+        US stock options (server code 1, `UsStockOptions`)
+        """
+
+        ...
+
+    class HkWarrant(CouponTargetType):
+        """
+        HK warrants (server code 2, `HkStockWarrant`)
+        """
+
+        ...
+
+    class Etf(CouponTargetType):
+        """
+        ETF (server code 3)
+        """
+
+        ...
+
+    class Lof(CouponTargetType):
+        """
+        LOF (server code 4)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class IpoCouponTargetType:
+    """
+    IPO subscription type an IPO commission coupon applies to
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(IpoCouponTargetType):
+        """
+        Unknown: unset or an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Financing(IpoCouponTargetType):
+        """
+        Financing (margin) IPO subscription (server code 1, `FinancingIPO`)
+        """
+
+        ...
+
+    class Cash(IpoCouponTargetType):
+        """
+        Cash IPO subscription (server code 2, `CashIPO`)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class CommissionUnlimitedType:
+    """
+    Kind of commission coupon (the server's `unlimited` code). The meanings are the ones the Longbridge app gives the codes; the proto names are given in brackets.
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(CommissionUnlimitedType):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Proportionate(CommissionUnlimitedType):
+        """
+        Time-limited free commission (`Proportionate`, server code 0)
+        """
+
+        ...
+
+    class Full(CommissionUnlimitedType):
+        """
+        Commission rebate (`Full`, server code 1)
+        """
+
+        ...
+
+    class Lifetime(CommissionUnlimitedType):
+        """
+        Commission deduction (`Lifetime`, server code 2)
+        """
+
+        ...
+
+    class ByAmountPer(CommissionUnlimitedType):
+        """
+        Per-use card with a fixed amount per use: `amount / usage_count` (`ByAmountPer`, server code 6)
+        """
+
+        ...
+
+    class ByRatePer(CommissionUnlimitedType):
+        """
+        Per-use discount card, capped at `amount_limit` per use (`ByRatePer`, server code 7)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class QuoteInvestorType:
+    """
+    Investor type a quote coupon applies to
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(QuoteInvestorType):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Any(QuoteInvestorType):
+        """
+        Any investor (server code 0, `INVESTOR_TYPE_ANY`)
+        """
+
+        ...
+
+    class NonProfessional(QuoteInvestorType):
+        """
+        Non-professional investors (server code 1,
+        `INVESTOR_TYPE_NON_PROFESSIONAL`)
+        """
+
+        ...
+
+    class Professional(QuoteInvestorType):
+        """
+        Professional investors (server code 2, `INVESTOR_TYPE_PROFESSIONAL`)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class CouponStatus:
+    """
+    Status of a coupon
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(CouponStatus):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Unused(CouponStatus):
+        """
+        Unused (server code 0)
+        """
+
+        ...
+
+    class Used(CouponStatus):
+        """
+        Used (server code 1)
+        """
+
+        ...
+
+    class Expired(CouponStatus):
+        """
+        Expired (server code 2)
+        """
+
+        ...
+
+    class Redeeming(CouponStatus):
+        """
+        Being redeemed (server code 3)
+        """
+
+        ...
+
+    class InUse(CouponStatus):
+        """
+        In use (server code 4)
+        """
+
+        ...
+
+    class Processing(CouponStatus):
+        """
+        Processing (server code 5)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class DepositState:
+    """
+    State of a deposit record
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(DepositState):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Processing(DepositState):
+        """
+        Processing (server code 0)
+        """
+
+        ...
+
+    class Credited(DepositState):
+        """
+        Credited to the account (server code 1)
+        """
+
+        ...
+
+    class Failed(DepositState):
+        """
+        Failed (server code 2)
+        """
+
+        ...
+
+    class Cancelled(DepositState):
+        """
+        Cancelled (server code 3)
+        """
+
+        ...
+
+    class Invalidated(DepositState):
+        """
+        Invalidated (server code 4)
+        """
+
+        ...
+
+    class Rejected(DepositState):
+        """
+        Rejected (server code 5)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class WithdrawalState:
+    """
+    State of a withdrawal record
+
+    The enum's own integer value is not the server code: use ``code`` to
+    get the code the server uses.
+    """
+
+    class Unknown(WithdrawalState):
+        """
+        Unknown: an undocumented code (never sent to the server)
+        """
+
+        ...
+
+    class Submitted(WithdrawalState):
+        """
+        Submitted (server code 0)
+        """
+
+        ...
+
+    class Processing(WithdrawalState):
+        """
+        Processing (server code 1)
+        """
+
+        ...
+
+    class Rejected(WithdrawalState):
+        """
+        Rejected (server code 2)
+        """
+
+        ...
+
+    class Cancelled(WithdrawalState):
+        """
+        Cancelled (server code 3)
+        """
+
+        ...
+
+    class Remitted(WithdrawalState):
+        """
+        Remitted (server code 4)
+        """
+
+        ...
+
+    class Failed(WithdrawalState):
+        """
+        Failed (server code 5)
+        """
+
+        ...
+
+    class Refunded(WithdrawalState):
+        """
+        Refunded (server code 6)
+        """
+
+        ...
+
+    class ApprovedAwaitingPayout(WithdrawalState):
+        """
+        Approved, awaiting payout (server code 7)
+        """
+
+        ...
+
+    class LargeAmountReview(WithdrawalState):
+        """
+        Large-amount review (server code 8)
+        """
+
+        ...
+
+    class ChangePendingApproval(WithdrawalState):
+        """
+        Change pending approval (server code 9)
+        """
+
+        ...
+
+    class DeletionPendingApproval(WithdrawalState):
+        """
+        Deletion pending approval (server code 10)
+        """
+
+        ...
+
+    class Deleted(WithdrawalState):
+        """
+        Deleted (server code 11)
+        """
+
+        ...
+
+    class RejectionPendingApproval(WithdrawalState):
+        """
+        Rejection pending approval (server code 12)
+        """
+
+        ...
+
+    class AwaitingConfirmation(WithdrawalState):
+        """
+        Awaiting confirmation (server code 15)
+        """
+
+        ...
+
+    @property
+    def code(self) -> int:
+        """
+        The server code of this value (``-1`` for ``Unknown``, which is not a
+        server code)
+        """
+        ...
+
+class CouponOrderType:
+    """
+    Which orders of a coupon to list
+    """
+
+    class Locked(CouponOrderType):
+        """
+        Orders the coupon is locked to (in progress)
+        """
+
+        ...
+
+    class Settled(CouponOrderType):
+        """
+        Orders whose rebate has been settled
+        """
+
+        ...
+
+class BankCardAuthorization:
+    """
+    An authorization attached to a bank card (eDDA, bank securities account, FPS,
+    ...)
+    """
+
+    flow_id: str
+    """
+    Authorization flow: `hk_edda` / `hk_sdda` (eDDA), `hk_bank_sec`, `hk_fps`, ...
+    """
+
+    name: str
+    """
+    Display name of the authorization
+    """
+
+    currency: str
+    """
+    Authorized currency
+    """
+
+    status: Type[AuthorizationStatus]
+    """
+    Authorization status
+    """
+
+    status_raw: Optional[int]
+    """
+    The server's numeric code of `status`, also when it is a code
+    this SDK does not know (`status` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    message: str
+    """
+    Failure reason (empty unless the authorization failed)
+    """
+
+    is_support: bool
+    """
+    Whether this authorization is supported for the card
+    """
+
+    max_amount: Optional[Decimal]
+    """
+    Maximum amount per debit (none when not set)
+    """
+
+    max_amount_unlimited: bool
+    """
+    Whether the per-debit amount is unlimited
+    """
+
+    daily_max_count: Optional[int]
+    """
+    Maximum number of debits per day (none when not set)
+    """
+
+    daily_max_count_unlimited: bool
+    """
+    Whether the daily debit count is unlimited
+    """
+
+    expiry_date: Optional[datetime]
+    """
+    Expiry date of the authorization (none when not set, and for a long-term
+    authorization: the server's 9999-12-31 "never expires" sentinel, like any
+    date in or after 2100, is none; check ``long_term_valid``)
+    """
+
+    long_term_valid: bool
+    """
+    Whether the authorization never expires
+    """
+
+    doc_reviewing: bool
+    """
+    Whether submitted documents are under review
+    """
+
+    no_prior_deposit_reviewing: bool
+    """
+    Whether the "no prior deposit" check is under review
+    """
+
+class BankCard:
+    """
+    A linked bank card
+    """
+
+    id: str
+    """
+    Bank card ID (pass to edda_applications)
+    """
+
+    bank_id: str
+    """
+    Bank ID
+    """
+
+    bank: str
+    """
+    Bank name
+    """
+
+    bank_en: str
+    """
+    Bank name in English
+    """
+
+    bank_code: str
+    """
+    Bank code
+    """
+
+    account: str
+    """
+    Bank account number, as returned by the server (not masked)
+    """
+
+    account_type: str
+    """
+    Account type
+    """
+
+    country: str
+    """
+    Country or region of the bank (e.g. `Hong Kong`; not a currency)
+    """
+
+    country_display: str
+    """
+    Country or region as displayed in the app, as returned by the server
+    """
+
+    region: str
+    """
+    Region code
+    """
+
+    region_name: str
+    """
+    Region name
+    """
+
+    swift_code: str
+    """
+    SWIFT code
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+    status: Type[BankCardStatus]
+    """
+    Verification status
+    """
+
+    status_raw: Optional[int]
+    """
+    The server's numeric code of `status`, also when it is a code
+    this SDK does not know (`status` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    witness_state: Type[BankCardWitnessState]
+    """
+    Witness state
+    """
+
+    witness_state_raw: Optional[int]
+    """
+    The server's numeric code of `witness_state`, also when it is a code
+    this SDK does not know (`witness_state` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    support_witness: bool
+    """
+    Whether the card supports witnessing
+    """
+
+    bind_state: Type[BankCardBindState]
+    """
+    Binding state
+    """
+
+    bind_state_raw: Optional[int]
+    """
+    The server's numeric code of `bind_state`, also when it is a code
+    this SDK does not know (`bind_state` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    bind_tip: str
+    """
+    Binding hint text
+    """
+
+    withdraw_fee: str
+    """
+    Withdrawal fee text, as returned by the server
+    """
+
+    created_at: Optional[datetime]
+    """
+    Time the card was added
+    """
+
+    auth_list: List[BankCardAuthorization]
+    """
+    Authorizations attached to the card
+    """
+
+class EddaApplication:
+    """
+    An eDDA authorization application of a bank card
+    """
+
+    id: str
+    """
+    Application ID
+    """
+
+    flow_id: str
+    """
+    Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda` (authorized in the app)
+    """
+
+    name: str
+    """
+    Display name of the authorization
+    """
+
+    currency: str
+    """
+    Authorized currency
+    """
+
+    status: Type[AuthorizationStatus]
+    """
+    Application status
+    """
+
+    status_raw: Optional[int]
+    """
+    The server's numeric code of `status`, also when it is a code
+    this SDK does not know (`status` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    message: str
+    """
+    Failure reason (empty unless the application failed)
+    """
+
+    created_at: Optional[datetime]
+    """
+    Time the application was filed
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Time the application was last updated
+    """
+
+class TransferStock:
+    """
+    One stock in a stock transfer application
+    """
+
+    code: str
+    """
+    Stock code
+    """
+
+    name: str
+    """
+    Stock name
+    """
+
+    name_en: str
+    """
+    Stock name in English
+    """
+
+    market: str
+    """
+    Market
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    amount: Optional[Decimal]
+    """
+    Quantity
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    cost: Optional[Decimal]
+    """
+    Cost price
+    """
+
+    state_code: Type[TransferStockState]
+    """
+    State code of this stock in the transfer
+    """
+
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    street_amount: Optional[Decimal]
+    """
+    Quantity held in street name, as returned by the server
+    """
+
+    nominee_amount: Optional[Decimal]
+    """
+    Quantity held by a nominee, as returned by the server
+    """
+
+    own_amount: Optional[Decimal]
+    """
+    Quantity held in the holder's own name, as returned by the server
+    """
+
+    certificate_count: int
+    """
+    Number of share certificates, as returned by the server
+    """
+
+    position_side: str
+    """
+    Position side
+    """
+
+class StockTransferIn:
+    """
+    A stock transfer-in application (another broker to this account)
+    """
+
+    id: str
+    """
+    Record ID
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    market: str
+    """
+    Market
+    """
+
+    broker: str
+    """
+    Name of the other broker
+    """
+
+    broker_id: str
+    """
+    ID of the other broker
+    """
+
+    broker_en: str
+    """
+    English name of the other broker
+    """
+
+    broker_code: str
+    """
+    Broker code of the other broker
+    """
+
+    account: str
+    """
+    Account number at the other broker, as returned by the server (not masked)
+    """
+
+    state: str
+    """
+    State text, as returned by the server
+    """
+
+    state_code: Type[StockTransferInState]
+    """
+    State code
+    """
+
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    app_state: str
+    """
+    App-side state: `noticed` means the user tapped "I have notified the broker" in
+    the app (the user's own confirmation, not a Longbridge action); `default`
+    otherwise
+    """
+
+    can_modify: bool
+    """
+    Whether the application can still be cancelled or changed
+    """
+
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Updated time
+    """
+
+    process_at: Optional[datetime]
+    """
+    Processing start time (none when not set)
+    """
+
+    exec_at: Optional[datetime]
+    """
+    Execution time (none when not executed)
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+    reason: str
+    """
+    Reason (e.g. for a failure)
+    """
+
+    stocks: List[TransferStock]
+    """
+    Stocks in the application
+    """
+
+class StockTransferInResponse:
+    """
+    Response for the stock transfer-in list
+    """
+
+    records: List[StockTransferIn]
+    """
+    Records
+    """
+
+    total: int
+    """
+    Total number of records
+    """
+
+class StockTransferOut:
+    """
+    A stock transfer-out application (this account to another broker)
+    """
+
+    id: str
+    """
+    Record ID
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    market: str
+    """
+    Market
+    """
+
+    broker: str
+    """
+    Name of the other broker
+    """
+
+    broker_id: str
+    """
+    ID of the other broker
+    """
+
+    broker_en: str
+    """
+    English name of the other broker
+    """
+
+    broker_code: str
+    """
+    Broker code of the other broker
+    """
+
+    account: str
+    """
+    Account number at the other broker, as returned by the server (not masked)
+    """
+
+    state: str
+    """
+    State text, as returned by the server
+    """
+
+    state_code: Type[StockTransferOutState]
+    """
+    State code. Only `Submitted` applications can be cancelled
+    """
+
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    app_state: str
+    """
+    App-side state: ``noticed`` means the user tapped "I have notified the
+    broker" in the app (the user's own confirmation, not a Longbridge action);
+    ``default`` otherwise
+    """
+
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Updated time
+    """
+
+    process_at: Optional[datetime]
+    """
+    Processing start time (none when not set)
+    """
+
+    exec_at: Optional[datetime]
+    """
+    Execution time (none when not executed)
+    """
+
+    agree_at: Optional[datetime]
+    """
+    Time the other broker agreed (none when not set)
+    """
+
+    refuse_at: Optional[datetime]
+    """
+    Time the application was refused (none when not set)
+    """
+
+    cancel_at: Optional[datetime]
+    """
+    Time the application was cancelled (none when not set)
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+    reason: str
+    """
+    Reason (e.g. for a rejection)
+    """
+
+    stocks: List[TransferStock]
+    """
+    Stocks in the application
+    """
+
+class RewardRecord:
+    """
+    A reward record from the reward center (prize redemption secrets `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are not modelled)
+    """
+
+    reward_type: Type[RewardType]
+    """
+    Reward type: named after the first detail object the server sent (`cash`, `card`, `prize`, in that order), else the server's `reward_type` code
+    """
+
+    reward_type_raw: Optional[int]
+    """
+    The server's numeric code of `reward_type`, also when it is a code
+    this SDK does not know (`reward_type` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    detail_kind: Type[RewardDetailKind]
+    """
+    The detail object the fields below came from
+    """
+
+    record_id: str
+    """
+    Record ID
+    """
+
+    activity_title: str
+    """
+    Title of the activity that granted the reward
+    """
+
+    title: str
+    """
+    Reward title
+    """
+
+    description: str
+    """
+    Reward description
+    """
+
+    card_type: str
+    """
+    Coupon type (coupon rewards), e.g. `commission`
+    """
+
+    card_status: Type[CouponStatus]
+    """
+    Coupon status (coupon rewards; ``CouponStatus.Unknown`` otherwise)
+    """
+
+    card_status_raw: Optional[int]
+    """
+    The server's numeric code of `card_status`, also when it is a code
+    this SDK does not know (`card_status` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    prize_type: Optional[int]
+    """
+    Prize type code (gift rewards; `0` = physical goods), none when not set
+    """
+
+    amount: Optional[Decimal]
+    """
+    Amount
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    status: Type[RewardStatus]
+    """
+    Reward status
+    """
+
+    status_raw: Optional[int]
+    """
+    The server's numeric code of `status`, also when it is a code
+    this SDK does not know (`status` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    deliver_status: Type[RewardDeliverStatus]
+    """
+    Delivery status (issued gift rewards only)
+    """
+
+    deliver_status_raw: Optional[int]
+    """
+    The server's numeric code of `deliver_status` (e.g. 11 where `deliver_status` reads `AddressFilled`), also when it is a code
+    this SDK does not know (`deliver_status` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    exit_status: int
+    """
+    Exit status code, as returned by the server
+    """
+
+    send_time: Optional[datetime]
+    """
+    Time the reward was sent
+    """
+
+    start_time: Optional[datetime]
+    """
+    Start time
+    """
+
+    end_time: Optional[datetime]
+    """
+    End time
+    """
+
+    effective_time: Optional[datetime]
+    """
+    Effective time
+    """
+
+    receive_deadline: Optional[datetime]
+    """
+    Deadline to claim the reward
+    """
+
+class RewardRecordsResponse:
+    """
+    Response for the reward record list
+    """
+
+    list: List[RewardRecord]
+    """
+    Reward records
+    """
+
+    total: int
+    """
+    Total number of records
+    """
+
+class CouponCommission:
+    """
+    Commission terms of a commission coupon (`commission`)
+    """
+
+    markets: List[str]
+    """
+    Markets the coupon applies to
+    """
+
+    rebate_rate: str
+    """
+    Rebate rate, as returned by the server
+    """
+
+    bz_types: List[Type[CouponTargetType]]
+    """
+    Instrument types the coupon applies to
+    """
+
+    bz_types_raw: List[int]
+    """
+    The server's numeric codes of `bz_types`, including codes this
+    SDK does not know (`Unknown` in `bz_types`); always the same
+    length and order as `bz_types`: elements that are neither a code
+    nor a known name are left out of both
+    """
+
+    commission_balance: Optional[Decimal]
+    """
+    Remaining commission balance
+    """
+
+    commission_duration: int
+    """
+    Commission duration in seconds (the app reads 200 years or more as lifetime free commission)
+    """
+
+    unlimited: Type[CommissionUnlimitedType]
+    """
+    Kind of commission coupon (the server's `unlimited` code)
+    """
+
+    unlimited_raw: Optional[int]
+    """
+    The server's numeric code of `unlimited`, also when it is a code
+    this SDK does not know (`unlimited` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    commission_expired_time: Optional[datetime]
+    """
+    Commission expiry time (none when not set)
+    """
+
+    usage_count: int
+    """
+    Number of times used
+    """
+
+    lave_usage_count: int
+    """
+    Number of uses left
+    """
+
+    settlement_model: str
+    """
+    Settlement model, as returned by the server
+    """
+
+    amount_limit: int
+    """
+    Amount cap per use of a per-use discount card (`ByRatePer`), as returned by the server
+    """
+
+    superposition: bool
+    """
+    Whether the coupon can be combined with other coupons
+    """
+
+class CouponAiBenefit:
+    """
+    Terms of an AI benefit coupon (`ai_benefit`)
+    """
+
+    benefit_days: int
+    """
+    Length of the benefit in days
+    """
+
+    benefit_start: Optional[datetime]
+    """
+    Start of the benefit (none when not set)
+    """
+
+    benefit_end: Optional[datetime]
+    """
+    End of the benefit (none when not set)
+    """
+
+    benefit_tag: str
+    """
+    Benefit tag, as returned by the server
+    """
+
+class CouponCash:
+    """
+    Terms of a cash coupon (`cash`)
+    """
+
+    receive_duration: int
+    """
+    Receive duration, as returned by the server (its unit and meaning are not confirmed)
+    """
+
+class CouponCoffeeStore:
+    """
+    A store of a coffee coupon
+    """
+
+    store_id: int
+    """
+    Store ID
+    """
+
+    store_name: str
+    """
+    Store name
+    """
+
+class CouponCoffee:
+    """
+    Terms of a coffee coupon (`coffee_coupon`)
+    """
+
+    coupon_channel: str
+    """
+    Coupon channel, as returned by the server
+    """
+
+    coupon_id: str
+    """
+    Coupon ID, as returned by the server
+    """
+
+    coupon_no: str
+    """
+    Voucher template code, e.g. `coffee-50` (not a personal redemption code)
+    """
+
+    is_available_all_store: bool
+    """
+    Whether the coupon can be used at every store
+    """
+
+    period_type: str
+    """
+    Period type (e.g. `day`), as returned by the server
+    """
+
+    settled_store_id: int
+    """
+    ID of the store the coupon was settled at (`0` when not settled)
+    """
+
+    store_id_list: List[int]
+    """
+    IDs of the stores the coupon can be used at
+    """
+
+    store_list: List[CouponCoffeeStore]
+    """
+    Stores the coupon can be used at
+    """
+
+    threshold: int
+    """
+    Threshold, as returned by the server
+    """
+
+    use_limit: str
+    """
+    Use limit (`total` or `period`), as returned by the server
+    """
+
+class CouponCryptoCounter:
+    """
+    A counter (security) of a crypto coupon
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+class CouponCryptoFallback:
+    """
+    Fallback of a crypto coupon
+    """
+
+    enabled: bool
+    """
+    Whether the fallback is enabled
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+class CouponCrypto:
+    """
+    Terms of a crypto coupon (`crypto`)
+    """
+
+    fallback: CouponCryptoFallback
+    """
+    Fallback
+    """
+
+    optional_counters: List[CouponCryptoCounter]
+    """
+    Optional counters
+    """
+
+class CouponFinanceInterest:
+    """
+    Terms of a finance interest coupon (`finance_interest`). The meaning of these fields is not confirmed; they are returned as the server sends them.
+    """
+
+    discount_mode: int
+    """
+    Discount mode, as returned by the server
+    """
+
+    discount_rate: Optional[Decimal]
+    """
+    Discount rate
+    """
+
+    superposition: bool
+    """
+    Whether the coupon can be combined with other coupons
+    """
+
+class CouponFundDeduct:
+    """
+    Terms of a fund deduction coupon (`fund_deduct`)
+    """
+
+    max_risk_level: int
+    """
+    Maximum risk level, as returned by the server
+    """
+
+    min_order_amount: str
+    """
+    Minimum order amount, as returned by the server
+    """
+
+    order_types: List[str]
+    """
+    Order types, as returned by the server
+    """
+
+    underlying_type: str
+    """
+    Underlying type, as returned by the server
+    """
+
+    underlying_values: List[str]
+    """
+    Underlying values, as returned by the server
+    """
+
+    underlying_names: List[str]
+    """
+    Underlying names, as returned by the server
+    """
+
+class CouponQuote:
+    """
+    Terms of a quote (market data) or fundamental-data coupon (`quote` /
+    `fundamental`)
+    """
+
+    current_end_time: Optional[datetime]
+    """
+    Current end time (none when not set)
+    """
+
+    inapplicable: bool
+    """
+    Whether the coupon is inapplicable, as returned by the server
+    """
+
+    investor_type: Type[QuoteInvestorType]
+    """
+    Investor type the coupon applies to
+    """
+
+    investor_type_raw: Optional[int]
+    """
+    The server's numeric code of `investor_type`, also when it is a code
+    this SDK does not know (`investor_type` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    manual_activate: bool
+    """
+    Whether the coupon is activated manually
+    """
+
+    markets: List[str]
+    """
+    Markets
+    """
+
+    member_investor_type: int
+    """
+    Investor type of the member, as returned by the server
+    """
+
+    pair_spu_no: str
+    """
+    Paired SPU number, as returned by the server
+    """
+
+    quote_duration: int
+    """
+    Quote duration in seconds (the app reads 200 years or more as lifetime)
+    """
+
+    quote_market: str
+    """
+    Quote market
+    """
+
+    quote_tags: List[str]
+    """
+    Quote tags
+    """
+
+    superposition: bool
+    """
+    Whether the coupon can be combined with other coupons
+    """
+
+class CouponIpo:
+    """
+    Terms of an IPO coupon (`ipo`)
+    """
+
+    subscription_id: str
+    """
+    Subscription ID
+    """
+
+class CouponIpoCommission:
+    """
+    Terms of an IPO commission coupon (`ipo_commission`)
+    """
+
+    bz_types: List[Type[IpoCouponTargetType]]
+    """
+    IPO subscription types the coupon applies to
+    """
+
+    bz_types_raw: List[int]
+    """
+    The server's numeric codes of `bz_types`, including codes this
+    SDK does not know (`Unknown` in `bz_types`); always the same
+    length and order as `bz_types`: elements that are neither a code
+    nor a known name are left out of both
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    counter_name: str
+    """
+    Counter name
+    """
+
+    financing_limit: str
+    """
+    Financing limit, as returned by the server
+    """
+
+class CouponIpoInterest:
+    """
+    Terms of an IPO interest coupon (`ipo_interest`)
+    """
+
+    discount_rate: str
+    """
+    Annual interest discount rate, as returned by the server (the app computes the daily discount as rate × financed amount / 365)
+    """
+
+class CouponPlatformFeeDeduct:
+    """
+    Terms of a platform fee deduction coupon (`platform_fee_deduct`)
+    """
+
+    bz_types: List[Type[CouponTargetType]]
+    """
+    Instrument types the coupon applies to
+    """
+
+    bz_types_raw: List[int]
+    """
+    The server's numeric codes of `bz_types`, including codes this
+    SDK does not know (`Unknown` in `bz_types`); always the same
+    length and order as `bz_types`: elements that are neither a code
+    nor a known name are left out of both
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    counter_name: str
+    """
+    Counter name
+    """
+
+    markets: List[str]
+    """
+    Markets the coupon applies to
+    """
+
+    usage_count: int
+    """
+    Number of times used
+    """
+
+    lave_usage_count: int
+    """
+    Number of uses left
+    """
+
+    superposition: bool
+    """
+    Whether the coupon can be combined with other coupons
+    """
+
+class CouponStockCounter:
+    """
+    An optional counter of a stock coupon
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    shares: str
+    """
+    Shares, as returned by the server
+    """
+
+class CouponStockFallback:
+    """
+    Fallback of a stock coupon
+    """
+
+    enabled: bool
+    """
+    Whether the fallback is enabled
+    """
+
+    fallback_type: str
+    """
+    Fallback type (the server's `type`), as returned by the server
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    shares: str
+    """
+    Shares, as returned by the server
+    """
+
+class CouponStock:
+    """
+    Terms of a stock coupon (`stock`)
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    counter_name: str
+    """
+    Counter name
+    """
+
+    amount: Optional[Decimal]
+    """
+    Amount
+    """
+
+    redemption_type: str
+    """
+    Redemption type (`by_card_value` or `shares_number`), as returned by the
+    server
+    """
+
+    send_way: str
+    """
+    Delivery way (`card_exchange` or `account_transfer`), as returned by the
+    server
+    """
+
+    optional_counters: List[CouponStockCounter]
+    """
+    Optional counters
+    """
+
+    fallback: CouponStockFallback
+    """
+    Fallback
+    """
+
+class CouponStockFragment:
+    """
+    Terms of a stock fragment coupon (`stock_fragment`)
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    counter_name: str
+    """
+    Counter name
+    """
+
+    market: str
+    """
+    Market
+    """
+
+    markets: List[str]
+    """
+    Markets
+    """
+
+    underlying_type: Type[CouponTargetType]
+    """
+    Instrument type the coupon applies to
+    """
+
+    underlying_type_raw: Optional[int]
+    """
+    The server's numeric code of `underlying_type`, also when it is a code
+    this SDK does not know (`underlying_type` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    amounts: dict[str, str]
+    """
+    Amounts, as returned by the server (a `dict` of strings)
+    """
+
+class Coupon:
+    """
+    A coupon (reward card)
+    """
+
+    card_id: str
+    """
+    Coupon ID (32 hex characters; pass to coupon_orders)
+    """
+
+    card_type: str
+    """
+    Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`,
+    `cash`
+    """
+
+    title: str
+    """
+    Title
+    """
+
+    title_sec: str
+    """
+    Secondary title
+    """
+
+    description: str
+    """
+    Description
+    """
+
+    detail: str
+    """
+    Terms and details
+    """
+
+    card_status: Type[CouponStatus]
+    """
+    Status
+    """
+
+    card_status_raw: Optional[int]
+    """
+    The server's numeric code of `card_status`, also when it is a code
+    this SDK does not know (`card_status` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    start_time: Optional[datetime]
+    """
+    Start of validity
+    """
+
+    end_time: Optional[datetime]
+    """
+    End of validity (none when not set or when the coupon never expires;
+    see `no_expiry`)
+    """
+
+    no_expiry: bool
+    """
+    Whether the coupon never expires (the server's end time is in or after
+    2100)
+    """
+
+    activate_time: Optional[datetime]
+    """
+    Activation time (none when not activated)
+    """
+
+    amount: Optional[Decimal]
+    """
+    Amount
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    available_trade_session: str
+    """
+    Trading sessions the coupon applies to, as display text
+    """
+
+    trade_sessions: List[str]
+    """
+    Trading sessions the coupon applies to, as returned by the server
+    """
+
+    subscription_id: str
+    """
+    Subscription ID, as returned by the server
+    """
+
+    ai_benefit: Optional[CouponAiBenefit]
+    """
+    Terms of an AI benefit coupon (none for other coupon types)
+    """
+
+    cash: Optional[CouponCash]
+    """
+    Terms of a cash coupon (none for other coupon types)
+    """
+
+    coffee_coupon: Optional[CouponCoffee]
+    """
+    Terms of a coffee coupon (none for other coupon types)
+    """
+
+    commission: Optional[CouponCommission]
+    """
+    Terms of a commission coupon (none for other coupon types)
+    """
+
+    crypto: Optional[CouponCrypto]
+    """
+    Terms of a crypto coupon (none for other coupon types)
+    """
+
+    finance_interest: Optional[CouponFinanceInterest]
+    """
+    Terms of a finance interest coupon (none for other coupon types)
+    """
+
+    fund_deduct: Optional[CouponFundDeduct]
+    """
+    Terms of a fund deduction coupon (none for other coupon types)
+    """
+
+    fundamental: Optional[CouponQuote]
+    """
+    Terms of a fundamental-data coupon (none for other coupon types)
+    """
+
+    ipo: Optional[CouponIpo]
+    """
+    Terms of an IPO coupon (none for other coupon types)
+    """
+
+    ipo_commission: Optional[CouponIpoCommission]
+    """
+    Terms of an IPO commission coupon (none for other coupon types)
+    """
+
+    ipo_interest: Optional[CouponIpoInterest]
+    """
+    Terms of an IPO interest coupon (none for other coupon types)
+    """
+
+    platform_fee_deduct: Optional[CouponPlatformFeeDeduct]
+    """
+    Terms of a platform fee deduction coupon (none for other coupon types)
+    """
+
+    quote: Optional[CouponQuote]
+    """
+    Terms of a quote (market data) coupon (none for other coupon types)
+    """
+
+    stock: Optional[CouponStock]
+    """
+    Terms of a stock coupon (none for other coupon types)
+    """
+
+    stock_fragment: Optional[CouponStockFragment]
+    """
+    Terms of a stock fragment coupon (none for other coupon types)
+    """
+
+class CouponsResponse:
+    """
+    Response for the coupon list
+    """
+
+    top_list: List[Coupon]
+    """
+    Pinned coupons shown above the list (repeated on every page)
+    """
+
+    list: List[Coupon]
+    """
+    Coupons on this page
+    """
+
+    bottom_list: List[Coupon]
+    """
+    Pinned coupons shown below the list (repeated on every page)
+    """
+
+    total: int
+    """
+    Total number of coupons
+    """
+
+    expired_count: int
+    """
+    Number of expired coupons
+    """
+
+class CouponOrder:
+    """
+    An order a coupon was applied to
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    state: str
+    """
+    State text, as returned by the server
+    """
+
+    state_val: str
+    """
+    State value, as returned by the server (e.g. `FilledStatus`)
+    """
+
+    executed_price: Optional[Decimal]
+    """
+    Executed price
+    """
+
+    executed_quantity: Optional[Decimal]
+    """
+    Executed quantity
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    settlement_currency: str
+    """
+    Settlement currency
+    """
+
+    rebate: Optional[Decimal]
+    """
+    Rebate amount
+    """
+
+    rebate_dt: str
+    """
+    Rebate date, as returned by the server
+    """
+
+class Deposit:
+    """
+    A deposit record
+    """
+
+    id: str
+    """
+    Record ID
+    """
+
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Updated time
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    amount: Optional[Decimal]
+    """
+    Notified (applied) amount
+    """
+
+    receivable_amount: Optional[Decimal]
+    """
+    Received amount (`0` = not received yet)
+    """
+
+    state: str
+    """
+    State text, as returned by the server
+    """
+
+    state_code: Type[DepositState]
+    """
+    State code
+    """
+
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    sub_state_code: int
+    """
+    Sub-state code, as returned by the server
+    """
+
+    bank_operation_type_id: str
+    """
+    Deposit method ID
+    """
+
+    bank_operation_type_name: str
+    """
+    Deposit method name
+    """
+
+    reference_no: str
+    """
+    Reference number
+    """
+
+    can_cancel: bool
+    """
+    Whether the deposit can still be cancelled
+    """
+
+    user_bank_swift_code: str
+    """
+    SWIFT code of the paying bank
+    """
+
+    voucher_count: int
+    """
+    Number of receipts uploaded with the deposit
+    """
+
+class Withdrawal:
+    """
+    A withdrawal record
+    """
+
+    id: str
+    """
+    Record ID
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    amount: Optional[Decimal]
+    """
+    Applied amount
+    """
+
+    fee: Optional[Decimal]
+    """
+    Fee
+    """
+
+    settlement_amount: Optional[Decimal]
+    """
+    Amount paid out
+    """
+
+    state_code: Type[WithdrawalState]
+    """
+    State code
+    """
+
+    state_code_raw: Optional[int]
+    """
+    The server's numeric code of `state_code`, also when it is a code
+    this SDK does not know (`state_code` is then `Unknown`); none when the
+    value is missing or is not a code
+    """
+
+    raw_state: str
+    """
+    Raw state, as returned by the server
+    """
+
+    state_description: str
+    """
+    State display text, as returned by the server
+    """
+
+    bank_account: str
+    """
+    Receiving bank account number, as returned by the server (not masked)
+    """
+
+    display_bank_account: str
+    """
+    Receiving bank account, as displayed in the app
+    """
+
+    user_bank_swift_code: str
+    """
+    SWIFT code of the receiving bank
+    """
+
+    account_channel: str
+    """
+    Account channel
+    """
+
+class DepositsResponse:
+    """
+    One page of deposit records
+
+    The server also returns a ``total``, but it follows the page size rather than the record count, so it is not modelled; see ``has_more``.
+    """
+
+    items: List[Deposit]
+    """
+    Deposit records, newest first
+    """
+
+    has_more: bool
+    """
+    A full page came back (as many records as the page size sent, at most 20), so the next page may hold more
+    """
+
+class WithdrawalsResponse:
+    """
+    Response for the withdrawal list
+    """
+
+    list: List[Withdrawal]
+    """
+    Withdrawal records
+    """
+
+    total: int
+    """
+    Total number of records
+    """
+
+    has_more: bool
+    """
+    A full page came back (as many records as the page size sent), so the
+    next page may hold more
+    """
+
 class AssetContext:
     """
     Asset context
@@ -12528,6 +15399,340 @@ class AssetContext:
                 if resp.list:
                     url_resp = ctx.statement_download_url(resp.list[0].file_key)
                     print(url_resp.url)
+        """
+        ...
+
+    def bank_cards(self) -> List[BankCard]:
+        """
+        Get the linked bank cards, with their verification, binding and authorization (eDDA, bank securities account, FPS) status.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Returns:
+            List[BankCard]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.bank_cards()
+                for card in resp:
+                    print(card.bank, card.status)
+        """
+        ...
+
+    def edda_applications(self, card_id: str, currency: str) -> List[EddaApplication]:
+        """
+        Get the eDDA authorization applications of a bank card in one currency.
+        The card id must be all digits; any other value fails with an error
+        before anything is sent.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            card_id: Bank card ID (``BankCard.id``)
+            currency: Authorized currency, e.g. ``HKD`` or ``USD``
+
+        Returns:
+            List[EddaApplication]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.edda_applications("12345", "HKD")
+                print(resp)
+        """
+        ...
+
+    def stock_transfers_in(
+        self,
+        market: Optional[str] = None,
+        state: Optional[Type[StockTransferInState]] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> StockTransferInResponse:
+        """
+        Get stock transfer-in applications (another broker to this account).
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
+            state: Filter by state (sent to the server as its server code,
+                ``StockTransferInState.X.code``; ``StockTransferInState.Unknown`` is ignored)
+            start: Only applications created at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only applications created at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            page: Page number (default 1)
+            size: Page size (default 20, max 50)
+
+        Returns:
+            StockTransferInResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.stock_transfers_in(market="HK")
+                for record in resp.records:
+                    print(record.broker, record.state_code)
+        """
+        ...
+
+    def stock_transfers_out(
+        self,
+        market: Optional[str] = None,
+        state: Optional[Type[StockTransferOutState]] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[StockTransferOut]:
+        """
+        Get stock transfer-out applications (this account to another broker).
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
+            state: Filter by state (sent to the server as its server code,
+                ``StockTransferOutState.X.code``; ``StockTransferOutState.Unknown`` is ignored)
+            start: Only applications created at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only applications created at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            page: Page number (default 1)
+            size: Page size (default 20, max 50)
+
+        Returns:
+            List[StockTransferOut]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.stock_transfers_out()
+                for record in resp:
+                    print(record.broker, record.state_code)
+        """
+        ...
+
+    def reward_records(
+        self,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        reward_type: Optional[Type[RewardType]] = None,
+    ) -> RewardRecordsResponse:
+        """
+        Get reward records from the reward center (cash, gifts, coupons, task rewards).
+
+        The route has no date filter: to find rewards in a time range, page through
+        the records and filter on their times.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            page: Page number (default 1)
+            page_size: Page size (max 50)
+            reward_type: Filter by reward type (default: all types; ``RewardType.Unknown``
+                is ignored)
+
+        Returns:
+            RewardRecordsResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.reward_records(reward_type=RewardType.Cash)
+                for record in resp.list:
+                    print(record.title, record.status)
+        """
+        ...
+
+    def coupons(
+        self,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        expired: bool = False,
+        card_type: Optional[str] = None,
+    ) -> CouponsResponse:
+        """
+        Get coupons (reward cards). The pinned ``top_list`` / ``bottom_list`` are repeated on every page.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            page: Page number (default 1)
+            page_size: Page size (max 50)
+            expired: List expired coupons instead of the ones that have not expired
+            card_type: Filter by coupon type (e.g. ``commission``, ``platform_fee_deduct``, ``stock``, ``quote``, ``cash``)
+
+        Returns:
+            CouponsResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.coupons()
+                for coupon in resp.list:
+                    print(coupon.card_id, coupon.title, coupon.card_status)
+        """
+        ...
+
+    def coupon_orders(self, card_id: str, order_type: Type[CouponOrderType]) -> List[CouponOrder]:
+        """
+        Get the orders a coupon was applied to. The gateway rate-limits this route tightly per member, so avoid calling it concurrently.
+        The card id must be 32 hex characters; any other value fails with an
+        error before anything is sent.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            card_id: Coupon ID (``Coupon.card_id``, 32 hex characters; not a bank card ID)
+            order_type: ``CouponOrderType.Locked`` (in progress) or ``CouponOrderType.Settled`` (rebate settled)
+
+        Returns:
+            List[CouponOrder]
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.coupon_orders("bd6b0000000000000000000000000000", CouponOrderType.Settled)
+                print(resp)
+        """
+        ...
+
+    def deposits(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        states: Optional[List[Type[DepositState]]] = None,
+        currencies: Optional[List[str]] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> DepositsResponse:
+        """
+        Get one page of deposit records. The server's total follows the page size rather than the record count, so it is not returned; ``has_more`` reports a full page instead. The page size is always sent: at most 20, default 20.
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 20, max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them, and 0 or a negative value as the default 20)
+            states: Filter by states (``DepositState.Unknown`` is ignored)
+            currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
+            start: Only deposits applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only deposits applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+
+        Returns:
+            DepositsResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.deposits(currencies=["HKD"])
+                for deposit in resp.items:
+                    print(deposit.amount, deposit.state_code)
+                print("more:", resp.has_more)
+        """
+        ...
+
+    def withdrawals(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> WithdrawalsResponse:
+        """
+        Get withdrawal records. The response's ``has_more`` reports a full
+        page of the size sent (default 20, at most 50).
+
+        AP accounts only: US data-center accounts get a region error.
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 20, max 50; larger values are sent as 50, and 0 or a negative value as the default 20)
+            start: Only withdrawals applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only withdrawals applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+
+        Returns:
+            WithdrawalsResponse
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, RewardType, CouponOrderType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.withdrawals()
+                for withdrawal in resp.list:
+                    print(withdrawal.amount, withdrawal.state)
         """
         ...
 
@@ -12628,6 +15833,367 @@ class AsyncAssetContext:
                     if resp.list:
                         url_resp = await ctx.statement_download_url(resp.list[0].file_key)
                         print(url_resp.url)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def bank_cards(self) -> Awaitable[List[BankCard]]:
+        """
+        Get the linked bank cards, with their verification, binding and authorization (eDDA, bank securities account, FPS) status.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Returns:
+            List[BankCard]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.bank_cards()
+                    for card in resp:
+                        print(card.bank, card.status)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def edda_applications(self, card_id: str, currency: str) -> Awaitable[List[EddaApplication]]:
+        """
+        Get the eDDA authorization applications of a bank card in one currency.
+        The card id must be all digits; any other value fails with an error
+        before anything is sent.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            card_id: Bank card ID (``BankCard.id``)
+            currency: Authorized currency, e.g. ``HKD`` or ``USD``
+
+        Returns:
+            List[EddaApplication]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.edda_applications("12345", "HKD")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def stock_transfers_in(
+        self,
+        market: Optional[str] = None,
+        state: Optional[Type[StockTransferInState]] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> Awaitable[StockTransferInResponse]:
+        """
+        Get stock transfer-in applications (another broker to this account).
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
+            state: Filter by state (sent to the server as its server code,
+                ``StockTransferInState.X.code``; ``StockTransferInState.Unknown`` is ignored)
+            start: Only applications created at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only applications created at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            page: Page number (default 1)
+            size: Page size (default 20, max 50)
+
+        Returns:
+            StockTransferInResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.stock_transfers_in(market="HK")
+                    for record in resp.records:
+                        print(record.broker, record.state_code)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def stock_transfers_out(
+        self,
+        market: Optional[str] = None,
+        state: Optional[Type[StockTransferOutState]] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> Awaitable[List[StockTransferOut]]:
+        """
+        Get stock transfer-out applications (this account to another broker).
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            market: Filter by market (``HK``, ``US``, ``CN``, ``SG``)
+            state: Filter by state (sent to the server as its server code,
+                ``StockTransferOutState.X.code``; ``StockTransferOutState.Unknown`` is ignored)
+            start: Only applications created at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only applications created at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            page: Page number (default 1)
+            size: Page size (default 20, max 50)
+
+        Returns:
+            List[StockTransferOut]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.stock_transfers_out()
+                    for record in resp:
+                        print(record.broker, record.state_code)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def reward_records(
+        self,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        reward_type: Optional[Type[RewardType]] = None,
+    ) -> Awaitable[RewardRecordsResponse]:
+        """
+        Get reward records from the reward center (cash, gifts, coupons, task rewards).
+
+        The route has no date filter: to find rewards in a time range, page through
+        the records and filter on their times.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            page: Page number (default 1)
+            page_size: Page size (max 50)
+            reward_type: Filter by reward type (default: all types; ``RewardType.Unknown``
+                is ignored)
+
+        Returns:
+            RewardRecordsResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.reward_records(reward_type=RewardType.Cash)
+                    for record in resp.list:
+                        print(record.title, record.status)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def coupons(
+        self,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        expired: bool = False,
+        card_type: Optional[str] = None,
+    ) -> Awaitable[CouponsResponse]:
+        """
+        Get coupons (reward cards). The pinned ``top_list`` / ``bottom_list`` are repeated on every page.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            page: Page number (default 1)
+            page_size: Page size (max 50)
+            expired: List expired coupons instead of the ones that have not expired
+            card_type: Filter by coupon type (e.g. ``commission``, ``platform_fee_deduct``, ``stock``, ``quote``, ``cash``)
+
+        Returns:
+            CouponsResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.coupons()
+                    for coupon in resp.list:
+                        print(coupon.card_id, coupon.title, coupon.card_status)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def coupon_orders(self, card_id: str, order_type: Type[CouponOrderType]) -> Awaitable[List[CouponOrder]]:
+        """
+        Get the orders a coupon was applied to. The gateway rate-limits this route tightly per member, so avoid calling it concurrently.
+        The card id must be 32 hex characters; any other value fails with an
+        error before anything is sent.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            card_id: Coupon ID (``Coupon.card_id``, 32 hex characters; not a bank card ID)
+            order_type: ``CouponOrderType.Locked`` (in progress) or ``CouponOrderType.Settled`` (rebate settled)
+
+        Returns:
+            List[CouponOrder]
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.coupon_orders("bd6b0000000000000000000000000000", CouponOrderType.Settled)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def deposits(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        states: Optional[List[Type[DepositState]]] = None,
+        currencies: Optional[List[str]] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> Awaitable[DepositsResponse]:
+        """
+        Get one page of deposit records. The server's total follows the page size rather than the record count, so it is not returned; ``has_more`` reports a full page instead. The page size is always sent: at most 20, default 20.
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 20, max 20; larger values are sent as 20, because the deposit list returns a short 10-record page for them, and 0 or a negative value as the default 20)
+            states: Filter by states (``DepositState.Unknown`` is ignored)
+            currencies: Filter by currencies (e.g. ``HKD``, ``USD``)
+            start: Only deposits applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only deposits applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+
+        Returns:
+            DepositsResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.deposits(currencies=["HKD"])
+                    for deposit in resp.items:
+                        print(deposit.amount, deposit.state_code)
+                    print("more:", resp.has_more)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def withdrawals(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> Awaitable[WithdrawalsResponse]:
+        """
+        Get withdrawal records. The response's ``has_more`` reports a full
+        page of the size sent (default 20, at most 50).
+
+        AP accounts only: US data-center accounts get a region error. Returns an awaitable.
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 20, max 50; larger values are sent as 50, and 0 or a negative value as the default 20)
+            start: Only withdrawals applied at or after this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+            end: Only withdrawals applied at or before this time. A naive ``datetime`` is read as UTC; an aware one by its own offset
+
+        Returns:
+            WithdrawalsResponse
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, RewardType, CouponOrderType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.withdrawals()
+                    for withdrawal in resp.list:
+                        print(withdrawal.amount, withdrawal.state)
 
                 asyncio.run(main())
         """
