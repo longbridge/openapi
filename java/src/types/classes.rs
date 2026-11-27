@@ -4508,3 +4508,574 @@ impl_java_class!(
         action, amount, counter_id, created_at, fund_name, id, msg, status, units
     ]
 );
+
+impl_java_class!(
+    "com/longbridge/asset/BankCardAuthorization",
+    longbridge::asset::BankCardAuthorization,
+    [
+        flow_id,
+        name,
+        currency,
+        status,
+        status_raw,
+        message,
+        is_support,
+        max_amount,
+        max_amount_unlimited,
+        #[java(set_as_opt = crate::types::JavaLong)]
+        daily_max_count,
+        daily_max_count_unlimited,
+        expiry_date,
+        long_term_valid,
+        doc_reviewing,
+        no_prior_deposit_reviewing
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/BankCard",
+    longbridge::asset::BankCard,
+    [
+        id,
+        bank_id,
+        bank,
+        bank_en,
+        bank_code,
+        account,
+        account_type,
+        country,
+        country_display,
+        region,
+        region_name,
+        swift_code,
+        remark,
+        status,
+        status_raw,
+        witness_state,
+        witness_state_raw,
+        support_witness,
+        bind_state,
+        bind_state_raw,
+        bind_tip,
+        withdraw_fee,
+        created_at,
+        #[java(objarray)]
+        auth_list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/EddaApplication",
+    longbridge::asset::EddaApplication,
+    [
+        id, flow_id, name, currency, status, status_raw, message, created_at, updated_at
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/TransferStock",
+    longbridge::asset::TransferStock,
+    [
+        code,
+        name,
+        name_en,
+        market,
+        counter_id,
+        amount,
+        currency,
+        cost,
+        state_code,
+        state_code_raw,
+        street_amount,
+        nominee_amount,
+        own_amount,
+        certificate_count,
+        position_side
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/StockTransferIn",
+    longbridge::asset::StockTransferIn,
+    [
+        id,
+        order_id,
+        market,
+        broker,
+        broker_id,
+        broker_en,
+        broker_code,
+        account,
+        state,
+        state_code,
+        state_code_raw,
+        app_state,
+        can_modify,
+        created_at,
+        updated_at,
+        process_at,
+        exec_at,
+        remark,
+        reason,
+        #[java(objarray)]
+        stocks
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/StockTransferInResponse",
+    longbridge::asset::StockTransferInResponse,
+    [
+        #[java(objarray)]
+        records,
+        total
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/StockTransferOut",
+    longbridge::asset::StockTransferOut,
+    [
+        id,
+        order_id,
+        market,
+        broker,
+        broker_id,
+        broker_en,
+        broker_code,
+        account,
+        state,
+        state_code,
+        state_code_raw,
+        app_state,
+        created_at,
+        updated_at,
+        process_at,
+        exec_at,
+        agree_at,
+        refuse_at,
+        cancel_at,
+        remark,
+        reason,
+        #[java(objarray)]
+        stocks
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/RewardRecord",
+    longbridge::asset::RewardRecord,
+    [
+        reward_type,
+        reward_type_raw,
+        detail_kind,
+        record_id,
+        activity_title,
+        title,
+        description,
+        card_type,
+        card_status,
+        card_status_raw,
+        #[java(set_as_opt = crate::types::JavaInteger)]
+        prize_type,
+        amount,
+        currency,
+        status,
+        status_raw,
+        deliver_status,
+        deliver_status_raw,
+        exit_status,
+        send_time,
+        start_time,
+        end_time,
+        effective_time,
+        receive_deadline
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/RewardRecordsResponse",
+    longbridge::asset::RewardRecordsResponse,
+    [
+        #[java(objarray)]
+        list,
+        total
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCommission",
+    longbridge::asset::CouponCommission,
+    [
+        #[java(objarray)]
+        markets,
+        rebate_rate,
+        #[java(objarray)]
+        bz_types,
+        #[java(priarray)]
+        bz_types_raw,
+        commission_balance,
+        commission_duration,
+        unlimited,
+        unlimited_raw,
+        commission_expired_time,
+        usage_count,
+        lave_usage_count,
+        settlement_model,
+        amount_limit,
+        superposition
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponAiBenefit",
+    longbridge::asset::CouponAiBenefit,
+    [benefit_days, benefit_start, benefit_end, benefit_tag]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCash",
+    longbridge::asset::CouponCash,
+    [receive_duration]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCoffeeStore",
+    longbridge::asset::CouponCoffeeStore,
+    [store_id, store_name]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCoffee",
+    longbridge::asset::CouponCoffee,
+    [
+        coupon_channel,
+        coupon_id,
+        coupon_no,
+        is_available_all_store,
+        period_type,
+        settled_store_id,
+        #[java(priarray)]
+        store_id_list,
+        #[java(objarray)]
+        store_list,
+        threshold,
+        use_limit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCryptoCounter",
+    longbridge::asset::CouponCryptoCounter,
+    [counter_id]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCryptoFallback",
+    longbridge::asset::CouponCryptoFallback,
+    [enabled, counter_id]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponCrypto",
+    longbridge::asset::CouponCrypto,
+    [
+        fallback,
+        #[java(objarray)]
+        optional_counters
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponFinanceInterest",
+    longbridge::asset::CouponFinanceInterest,
+    [discount_mode, discount_rate, superposition]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponFundDeduct",
+    longbridge::asset::CouponFundDeduct,
+    [
+        max_risk_level,
+        min_order_amount,
+        #[java(objarray)]
+        order_types,
+        underlying_type,
+        #[java(objarray)]
+        underlying_values,
+        #[java(objarray)]
+        underlying_names
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponQuote",
+    longbridge::asset::CouponQuote,
+    [
+        current_end_time,
+        inapplicable,
+        investor_type,
+        investor_type_raw,
+        manual_activate,
+        #[java(objarray)]
+        markets,
+        member_investor_type,
+        pair_spu_no,
+        quote_duration,
+        quote_market,
+        #[java(objarray)]
+        quote_tags,
+        superposition
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponIpo",
+    longbridge::asset::CouponIpo,
+    [subscription_id]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponIpoCommission",
+    longbridge::asset::CouponIpoCommission,
+    [
+        #[java(objarray)]
+        bz_types,
+        #[java(priarray)]
+        bz_types_raw,
+        counter_id,
+        counter_name,
+        financing_limit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponIpoInterest",
+    longbridge::asset::CouponIpoInterest,
+    [discount_rate]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponPlatformFeeDeduct",
+    longbridge::asset::CouponPlatformFeeDeduct,
+    [
+        #[java(objarray)]
+        bz_types,
+        #[java(priarray)]
+        bz_types_raw,
+        counter_id,
+        counter_name,
+        #[java(objarray)]
+        markets,
+        usage_count,
+        lave_usage_count,
+        superposition
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponStockCounter",
+    longbridge::asset::CouponStockCounter,
+    [counter_id, shares]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponStockFallback",
+    longbridge::asset::CouponStockFallback,
+    [enabled, fallback_type, counter_id, shares]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponStock",
+    longbridge::asset::CouponStock,
+    [
+        counter_id,
+        counter_name,
+        amount,
+        redemption_type,
+        send_way,
+        #[java(objarray)]
+        optional_counters,
+        fallback
+    ]
+);
+
+/// JNI-side view of [`longbridge::asset::CouponStockFragment`]: the
+/// `amounts` map crosses the boundary as JSON text, which the Java class
+/// parses into a `Map` with gson.
+pub(crate) struct CouponStockFragment {
+    pub(crate) counter_id: String,
+    pub(crate) counter_name: String,
+    pub(crate) market: String,
+    pub(crate) markets: Vec<String>,
+    pub(crate) underlying_type: longbridge::asset::CouponTargetType,
+    pub(crate) underlying_type_raw: Option<i32>,
+    pub(crate) amounts: serde_json::Value,
+}
+
+impl From<longbridge::asset::CouponStockFragment> for CouponStockFragment {
+    fn from(value: longbridge::asset::CouponStockFragment) -> Self {
+        Self {
+            counter_id: value.counter_id,
+            counter_name: value.counter_name,
+            market: value.market,
+            markets: value.markets,
+            underlying_type: value.underlying_type,
+            underlying_type_raw: value.underlying_type_raw,
+            amounts: serde_json::to_value(value.amounts).unwrap_or_default(),
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/asset/CouponStockFragment",
+    CouponStockFragment,
+    [
+        counter_id,
+        counter_name,
+        market,
+        #[java(objarray)]
+        markets,
+        underlying_type,
+        underlying_type_raw,
+        amounts
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/Coupon",
+    longbridge::asset::Coupon,
+    [
+        card_id,
+        card_type,
+        title,
+        title_sec,
+        description,
+        detail,
+        card_status,
+        card_status_raw,
+        start_time,
+        end_time,
+        no_expiry,
+        activate_time,
+        amount,
+        currency,
+        available_trade_session,
+        #[java(objarray)]
+        trade_sessions,
+        subscription_id,
+        ai_benefit,
+        cash,
+        coffee_coupon,
+        commission,
+        crypto,
+        finance_interest,
+        fund_deduct,
+        fundamental,
+        ipo,
+        ipo_commission,
+        ipo_interest,
+        platform_fee_deduct,
+        quote,
+        stock,
+        #[java(set_as_opt = CouponStockFragment)]
+        stock_fragment
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponsResponse",
+    longbridge::asset::CouponsResponse,
+    [
+        #[java(objarray)]
+        top_list,
+        #[java(objarray)]
+        list,
+        #[java(objarray)]
+        bottom_list,
+        total,
+        expired_count
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/CouponOrder",
+    longbridge::asset::CouponOrder,
+    [
+        order_id,
+        state,
+        state_val,
+        executed_price,
+        executed_quantity,
+        currency,
+        settlement_currency,
+        rebate,
+        rebate_dt
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/Deposit",
+    longbridge::asset::Deposit,
+    [
+        id,
+        created_at,
+        updated_at,
+        currency,
+        amount,
+        receivable_amount,
+        state,
+        state_code,
+        state_code_raw,
+        sub_state_code,
+        bank_operation_type_id,
+        bank_operation_type_name,
+        reference_no,
+        can_cancel,
+        user_bank_swift_code,
+        voucher_count
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/Withdrawal",
+    longbridge::asset::Withdrawal,
+    [
+        id,
+        order_id,
+        created_at,
+        currency,
+        amount,
+        fee,
+        settlement_amount,
+        state_code,
+        state_code_raw,
+        raw_state,
+        state_description,
+        bank_account,
+        display_bank_account,
+        user_bank_swift_code,
+        account_channel
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/DepositsResponse",
+    longbridge::asset::DepositsResponse,
+    [
+        #[java(objarray)]
+        items,
+        has_more
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/asset/WithdrawalsResponse",
+    longbridge::asset::WithdrawalsResponse,
+    [
+        #[java(objarray)]
+        list,
+        total,
+        has_more
+    ]
+);

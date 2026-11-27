@@ -181,6 +181,184 @@ export declare class AssetContext {
   statements(req?: GetStatementListRequest | undefined | null): Promise<GetStatementListResponse>
   /** Get statement data download URL */
   statementDownloadUrl(req: GetStatementDownloadUrlRequest): Promise<GetStatementDownloadUrlResponse>
+  /**
+   * Get the linked bank cards, with their verification, binding and
+   * authorization (eDDA, bank securities account, FPS) status
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.bankCards();
+   * console.log(resp);
+   * ```
+   */
+  bankCards(): Promise<Array<BankCard>>
+  /**
+   * Get the eDDA authorization applications of a bank card in one
+   * currency
+   *
+   * `cardId` is `BankCard.id`; `currency` is e.g. `HKD` or `USD`. The card
+   * id must be all digits; any other value fails with an error before
+   * anything is sent.
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.eddaApplications('12345', 'HKD');
+   * console.log(resp);
+   * ```
+   */
+  eddaApplications(cardId: string, currency: string): Promise<Array<EddaApplication>>
+  /**
+   * Get stock transfer-in applications (another broker to this account)
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.stockTransfersIn({ market: 'HK' });
+   * console.log(resp);
+   * ```
+   */
+  stockTransfersIn(opts?: GetStockTransfersInOptions | undefined | null): Promise<StockTransferInResponse>
+  /**
+   * Get stock transfer-out applications (this account to another broker)
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.stockTransfersOut();
+   * console.log(resp);
+   * ```
+   */
+  stockTransfersOut(opts?: GetStockTransfersOutOptions | undefined | null): Promise<Array<StockTransferOut>>
+  /**
+   * Get reward records from the reward center (cash, gifts, coupons, task
+   * rewards)
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * The route has no date filter: to find rewards in a time range, page
+   * through the records and filter on their times.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.rewardRecords({ pageSize: 20 });
+   * console.log(resp);
+   * ```
+   */
+  rewardRecords(opts?: GetRewardRecordsOptions | undefined | null): Promise<RewardRecordsResponse>
+  /**
+   * Get coupons (reward cards)
+   *
+   * By default lists the coupons that have not expired (set `expired`).
+   * The pinned `topList` / `bottomList` are repeated on every page.
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.coupons({ expired: false });
+   * console.log(resp);
+   * ```
+   */
+  coupons(opts?: GetCouponsOptions | undefined | null): Promise<CouponsResponse>
+  /**
+   * Get the orders a coupon was applied to
+   *
+   * `cardId` is `Coupon.cardId` (32 hex characters, not a bank card ID);
+   * any other value fails with an error before anything is sent.
+   * The gateway rate-limits this route tightly per member, so avoid
+   * calling it concurrently.
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.couponOrders(couponId, CouponOrderType.Settled);
+   * console.log(resp);
+   * ```
+   */
+  couponOrders(cardId: string, orderType: CouponOrderType): Promise<Array<CouponOrder>>
+  /**
+   * Get one page of deposit records
+   *
+   * The server's total follows the page size rather than the record
+   * count, so it is not returned; `hasMore` reports a full page instead.
+   * The page size is always sent: at most 20, default 20.
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.deposits({ size: 20 });
+   * console.log(resp.items, resp.hasMore);
+   * ```
+   */
+  deposits(opts?: GetDepositsOptions | undefined | null): Promise<DepositsResponse>
+  /**
+   * Get withdrawal records
+   *
+   * `hasMore` reports a full page of the size sent (default 20, at most
+   * 50).
+   *
+   * AP accounts only: US data-center accounts get a region error.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, AssetContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = AssetContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.withdrawals({ size: 20 });
+   * console.log(resp);
+   * ```
+   */
+  withdrawals(opts?: GetWithdrawalsOptions | undefined | null): Promise<WithdrawalsResponse>
 }
 
 /** Attached order detail */
@@ -231,6 +409,122 @@ export declare class AttachedOrderDetail {
   get submitPrice(): Decimal | null
   /** Bid/ask depth level of the limit order submitted price */
   get limitDepthLevel(): number | null
+}
+
+/** A linked bank card */
+export declare class BankCard {
+  toString(): string
+  toJSON(): any
+  /** Bank card ID (pass to edda_applications) */
+  get id(): string
+  /** Bank ID */
+  get bankId(): string
+  /** Bank name */
+  get bank(): string
+  /** Bank name in English */
+  get bankEn(): string
+  /** Bank code */
+  get bankCode(): string
+  /** Bank account number, as returned by the server (not masked) */
+  get account(): string
+  /** Account type */
+  get accountType(): string
+  /** Country or region of the bank (e.g. `Hong Kong`; not a currency) */
+  get country(): string
+  /** Country or region as displayed in the app, as returned by the server */
+  get countryDisplay(): string
+  /** Region code */
+  get region(): string
+  /** Region name */
+  get regionName(): string
+  /** SWIFT code */
+  get swiftCode(): string
+  /** Remark */
+  get remark(): string
+  /** Verification status */
+  get status(): BankCardStatus
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get statusRaw(): number | null
+  /** Witness state */
+  get witnessState(): BankCardWitnessState
+  /**
+   * The server's numeric code of `witness_state`, also when it is a code
+   * this SDK does not know (`witness_state` is then `Unknown`); null when
+   * the value is missing or is not a code
+   */
+  get witnessStateRaw(): number | null
+  /** Whether the card supports witnessing */
+  get supportWitness(): boolean
+  /** Binding state */
+  get bindState(): BankCardBindState
+  /**
+   * The server's numeric code of `bind_state`, also when it is a code
+   * this SDK does not know (`bind_state` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get bindStateRaw(): number | null
+  /** Binding hint text */
+  get bindTip(): string
+  /** Withdrawal fee text, as returned by the server */
+  get withdrawFee(): string
+  /** Time the card was added */
+  get createdAt(): Date | null
+  /** Authorizations attached to the card */
+  get authList(): Array<BankCardAuthorization>
+}
+
+/**
+ * An authorization attached to a bank card (eDDA, bank securities account,
+ * FPS, ...)
+ */
+export declare class BankCardAuthorization {
+  toString(): string
+  toJSON(): any
+  /**
+   * Authorization flow: `hk_edda` / `hk_sdda` (eDDA), `hk_bank_sec`,
+   * `hk_fps`, ...
+   */
+  get flowId(): string
+  /** Display name of the authorization */
+  get name(): string
+  /** Authorized currency */
+  get currency(): string
+  /** Authorization status */
+  get status(): AuthorizationStatus
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get statusRaw(): number | null
+  /** Failure reason (empty unless the authorization failed) */
+  get message(): string
+  /** Whether this authorization is supported for the card */
+  get isSupport(): boolean
+  /** Maximum amount per debit (none when not set) */
+  get maxAmount(): Decimal | null
+  /** Whether the per-debit amount is unlimited */
+  get maxAmountUnlimited(): boolean
+  /** Maximum number of debits per day (none when not set) */
+  get dailyMaxCount(): number | null
+  /** Whether the daily debit count is unlimited */
+  get dailyMaxCountUnlimited(): boolean
+  /**
+   * Expiry date of the authorization (none when not set and for a
+   * long-term authorization: the server's 9999-12-31 "never expires"
+   * sentinel is none; see `long_term_valid`)
+   */
+  get expiryDate(): Date | null
+  /** Whether the authorization never expires */
+  get longTermValid(): boolean
+  /** Whether submitted documents are under review */
+  get docReviewing(): boolean
+  /** Whether the "no prior deposit" check is under review */
+  get noPriorDepositReviewing(): boolean
 }
 
 /** Brokers */
@@ -480,6 +774,478 @@ export declare class ContentContext {
   news(symbol: string): Promise<Array<NewsItem>>
 }
 
+/** A coupon (reward card) */
+export declare class Coupon {
+  toString(): string
+  toJSON(): any
+  /** Coupon ID (32 hex characters; pass to coupon_orders) */
+  get cardId(): string
+  /**
+   * Coupon type, e.g. `commission`, `platform_fee_deduct`, `stock`, `quote`,
+   * `cash`
+   */
+  get cardType(): string
+  /** Title */
+  get title(): string
+  /** Secondary title */
+  get titleSec(): string
+  /** Description */
+  get description(): string
+  /** Terms and details */
+  get detail(): string
+  /** Status */
+  get cardStatus(): CouponStatus
+  /**
+   * The server's numeric code of `card_status`, also when it is a code
+   * this SDK does not know (`card_status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get cardStatusRaw(): number | null
+  /** Start of validity */
+  get startTime(): Date | null
+  /**
+   * End of validity (none when not set or when the coupon never expires;
+   * see `noExpiry`)
+   */
+  get endTime(): Date | null
+  /**
+   * Whether the coupon never expires (the server's end time is in or after
+   * 2100)
+   */
+  get noExpiry(): boolean
+  /** Activation time (none when not activated) */
+  get activateTime(): Date | null
+  /** Amount */
+  get amount(): Decimal | null
+  /** Currency */
+  get currency(): string
+  /** Trading sessions the coupon applies to, as display text */
+  get availableTradeSession(): string
+  /** Trading sessions the coupon applies to, as returned by the server */
+  get tradeSessions(): Array<string>
+  /** Subscription ID, as returned by the server */
+  get subscriptionId(): string
+  /** Terms of an AI benefit coupon (none for other coupon types) */
+  get aiBenefit(): CouponAiBenefit | null
+  /** Terms of a cash coupon (none for other coupon types) */
+  get cash(): CouponCash | null
+  /** Terms of a coffee coupon (none for other coupon types) */
+  get coffeeCoupon(): CouponCoffee | null
+  /** Terms of a commission coupon (none for other coupon types) */
+  get commission(): CouponCommission | null
+  /** Terms of a crypto coupon (none for other coupon types) */
+  get crypto(): CouponCrypto | null
+  /** Terms of a finance interest coupon (none for other coupon types) */
+  get financeInterest(): CouponFinanceInterest | null
+  /** Terms of a fund deduction coupon (none for other coupon types) */
+  get fundDeduct(): CouponFundDeduct | null
+  /** Terms of a fundamental-data coupon (none for other coupon types) */
+  get fundamental(): CouponQuote | null
+  /** Terms of an IPO coupon (none for other coupon types) */
+  get ipo(): CouponIpo | null
+  /** Terms of an IPO commission coupon (none for other coupon types) */
+  get ipoCommission(): CouponIpoCommission | null
+  /** Terms of an IPO interest coupon (none for other coupon types) */
+  get ipoInterest(): CouponIpoInterest | null
+  /** Terms of a platform fee deduction coupon (none for other coupon types) */
+  get platformFeeDeduct(): CouponPlatformFeeDeduct | null
+  /** Terms of a quote (market data) coupon (none for other coupon types) */
+  get quote(): CouponQuote | null
+  /** Terms of a stock coupon (none for other coupon types) */
+  get stock(): CouponStock | null
+  /** Terms of a stock fragment coupon (none for other coupon types) */
+  get stockFragment(): CouponStockFragment | null
+}
+
+/** Terms of an AI benefit coupon (`ai_benefit`) */
+export declare class CouponAiBenefit {
+  toString(): string
+  toJSON(): any
+  /** Length of the benefit in days */
+  get benefitDays(): number
+  /** Start of the benefit (none when not set) */
+  get benefitStart(): Date | null
+  /** End of the benefit (none when not set) */
+  get benefitEnd(): Date | null
+  /** Benefit tag, as returned by the server */
+  get benefitTag(): string
+}
+
+/** Terms of a cash coupon (`cash`) */
+export declare class CouponCash {
+  toString(): string
+  toJSON(): any
+  /**
+   * Receive duration, as returned by the server (its unit and meaning are
+   * not confirmed)
+   */
+  get receiveDuration(): number
+}
+
+/** Terms of a coffee coupon (`coffee_coupon`) */
+export declare class CouponCoffee {
+  toString(): string
+  toJSON(): any
+  /** Coupon channel, as returned by the server */
+  get couponChannel(): string
+  /** Coupon ID, as returned by the server */
+  get couponId(): string
+  /** Voucher template code, e.g. `coffee-50` (not a personal redemption code) */
+  get couponNo(): string
+  /** Whether the coupon can be used at every store */
+  get isAvailableAllStore(): boolean
+  /** Period type (e.g. `day`), as returned by the server */
+  get periodType(): string
+  /** ID of the store the coupon was settled at (`0` when not settled) */
+  get settledStoreId(): number
+  /** IDs of the stores the coupon can be used at */
+  get storeIdList(): Array<number>
+  /** Stores the coupon can be used at */
+  get storeList(): Array<CouponCoffeeStore>
+  /** Threshold, as returned by the server */
+  get threshold(): number
+  /** Use limit (`total` or `period`), as returned by the server */
+  get useLimit(): string
+}
+
+/** A store of a coffee coupon */
+export declare class CouponCoffeeStore {
+  toString(): string
+  toJSON(): any
+  /** Store ID */
+  get storeId(): number
+  /** Store name */
+  get storeName(): string
+}
+
+/** Commission terms of a commission coupon (`commission`) */
+export declare class CouponCommission {
+  toString(): string
+  toJSON(): any
+  /** Markets the coupon applies to */
+  get markets(): Array<string>
+  /** Rebate rate, as returned by the server */
+  get rebateRate(): string
+  /** Instrument types the coupon applies to */
+  get bzTypes(): Array<CouponTargetType>
+  /**
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
+   */
+  get bzTypesRaw(): Array<number>
+  /** Remaining commission balance */
+  get commissionBalance(): Decimal | null
+  /**
+   * Commission duration in seconds (the app reads 200 years or more as
+   * lifetime free commission)
+   */
+  get commissionDuration(): number
+  /** Kind of commission coupon (the server's `unlimited` code) */
+  get unlimited(): CommissionUnlimitedType
+  /**
+   * The server's numeric code of `unlimited`, also when it is a code
+   * this SDK does not know (`unlimited` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get unlimitedRaw(): number | null
+  /** Commission expiry time (none when not set) */
+  get commissionExpiredTime(): Date | null
+  /** Number of times used */
+  get usageCount(): number
+  /** Number of uses left */
+  get laveUsageCount(): number
+  /** Settlement model, as returned by the server */
+  get settlementModel(): string
+  /**
+   * Amount cap per use of a per-use discount card (`ByRatePer`), as returned
+   * by the server
+   */
+  get amountLimit(): number
+  /** Whether the coupon can be combined with other coupons */
+  get superposition(): boolean
+}
+
+/** Terms of a crypto coupon (`crypto`) */
+export declare class CouponCrypto {
+  toString(): string
+  toJSON(): any
+  /** Fallback */
+  get fallback(): CouponCryptoFallback
+  /** Optional counters */
+  get optionalCounters(): Array<CouponCryptoCounter>
+}
+
+/** A counter (security) of a crypto coupon */
+export declare class CouponCryptoCounter {
+  toString(): string
+  toJSON(): any
+  /** Counter ID */
+  get counterId(): string
+}
+
+/** Fallback of a crypto coupon */
+export declare class CouponCryptoFallback {
+  toString(): string
+  toJSON(): any
+  /** Whether the fallback is enabled */
+  get enabled(): boolean
+  /** Counter ID */
+  get counterId(): string
+}
+
+/**
+ * Terms of a finance interest coupon (`finance_interest`). The meaning of
+ * these fields is not confirmed; they are returned as the server sends them.
+ */
+export declare class CouponFinanceInterest {
+  toString(): string
+  toJSON(): any
+  /** Discount mode, as returned by the server */
+  get discountMode(): number
+  /** Discount rate */
+  get discountRate(): Decimal | null
+  /** Whether the coupon can be combined with other coupons */
+  get superposition(): boolean
+}
+
+/** Terms of a fund deduction coupon (`fund_deduct`) */
+export declare class CouponFundDeduct {
+  toString(): string
+  toJSON(): any
+  /** Maximum risk level, as returned by the server */
+  get maxRiskLevel(): number
+  /** Minimum order amount, as returned by the server */
+  get minOrderAmount(): string
+  /** Order types, as returned by the server */
+  get orderTypes(): Array<string>
+  /** Underlying type, as returned by the server */
+  get underlyingType(): string
+  /** Underlying values, as returned by the server */
+  get underlyingValues(): Array<string>
+  /** Underlying names, as returned by the server */
+  get underlyingNames(): Array<string>
+}
+
+/** Terms of an IPO coupon (`ipo`) */
+export declare class CouponIpo {
+  toString(): string
+  toJSON(): any
+  /** Subscription ID */
+  get subscriptionId(): string
+}
+
+/** Terms of an IPO commission coupon (`ipo_commission`) */
+export declare class CouponIpoCommission {
+  toString(): string
+  toJSON(): any
+  /** IPO subscription types the coupon applies to */
+  get bzTypes(): Array<IpoCouponTargetType>
+  /**
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
+   */
+  get bzTypesRaw(): Array<number>
+  /** Counter ID */
+  get counterId(): string
+  /** Counter name */
+  get counterName(): string
+  /** Financing limit, as returned by the server */
+  get financingLimit(): string
+}
+
+/** Terms of an IPO interest coupon (`ipo_interest`) */
+export declare class CouponIpoInterest {
+  toString(): string
+  toJSON(): any
+  /**
+   * Annual interest discount rate, as returned by the server (the app
+   * computes the daily discount as rate × financed amount / 365)
+   */
+  get discountRate(): string
+}
+
+/** An order a coupon was applied to */
+export declare class CouponOrder {
+  toString(): string
+  toJSON(): any
+  /** Order ID */
+  get orderId(): string
+  /** State text, as returned by the server */
+  get state(): string
+  /** State value, as returned by the server (e.g. `FilledStatus`) */
+  get stateVal(): string
+  /** Executed price */
+  get executedPrice(): Decimal | null
+  /** Executed quantity */
+  get executedQuantity(): Decimal | null
+  /** Currency */
+  get currency(): string
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Rebate amount */
+  get rebate(): Decimal | null
+  /** Rebate date, as returned by the server */
+  get rebateDt(): string
+}
+
+/** Terms of a platform fee deduction coupon (`platform_fee_deduct`) */
+export declare class CouponPlatformFeeDeduct {
+  toString(): string
+  toJSON(): any
+  /** Instrument types the coupon applies to */
+  get bzTypes(): Array<CouponTargetType>
+  /**
+   * The server's numeric codes of `bz_types`, including codes this
+   * SDK does not know (`Unknown` in `bz_types`); always the same
+   * length and order as `bz_types`: elements that are neither a code
+   * nor a known name are left out of both
+   */
+  get bzTypesRaw(): Array<number>
+  /** Counter ID */
+  get counterId(): string
+  /** Counter name */
+  get counterName(): string
+  /** Markets the coupon applies to */
+  get markets(): Array<string>
+  /** Number of times used */
+  get usageCount(): number
+  /** Number of uses left */
+  get laveUsageCount(): number
+  /** Whether the coupon can be combined with other coupons */
+  get superposition(): boolean
+}
+
+/**
+ * Terms of a quote (market data) or fundamental-data coupon (`quote` /
+ * `fundamental`)
+ */
+export declare class CouponQuote {
+  toString(): string
+  toJSON(): any
+  /** Current end time (none when not set) */
+  get currentEndTime(): Date | null
+  /** Whether the coupon is inapplicable, as returned by the server */
+  get inapplicable(): boolean
+  /** Investor type the coupon applies to */
+  get investorType(): QuoteInvestorType
+  /**
+   * The server's numeric code of `investor_type`, also when it is a code
+   * this SDK does not know (`investor_type` is then `Unknown`); null when
+   * the value is missing or is not a code
+   */
+  get investorTypeRaw(): number | null
+  /** Whether the coupon is activated manually */
+  get manualActivate(): boolean
+  /** Markets */
+  get markets(): Array<string>
+  /** Investor type of the member, as returned by the server */
+  get memberInvestorType(): number
+  /** Paired SPU number, as returned by the server */
+  get pairSpuNo(): string
+  /** Quote duration in seconds (the app reads 200 years or more as lifetime) */
+  get quoteDuration(): number
+  /** Quote market */
+  get quoteMarket(): string
+  /** Quote tags */
+  get quoteTags(): Array<string>
+  /** Whether the coupon can be combined with other coupons */
+  get superposition(): boolean
+}
+
+/** Response for the coupon list */
+export declare class CouponsResponse {
+  toString(): string
+  toJSON(): any
+  /** Pinned coupons shown above the list (repeated on every page) */
+  get topList(): Array<Coupon>
+  /** Coupons on this page */
+  get list(): Array<Coupon>
+  /** Pinned coupons shown below the list (repeated on every page) */
+  get bottomList(): Array<Coupon>
+  /** Total number of coupons */
+  get total(): number
+  /** Number of expired coupons */
+  get expiredCount(): number
+}
+
+/** Terms of a stock coupon (`stock`) */
+export declare class CouponStock {
+  toString(): string
+  toJSON(): any
+  /** Counter ID */
+  get counterId(): string
+  /** Counter name */
+  get counterName(): string
+  /** Amount */
+  get amount(): Decimal | null
+  /**
+   * Redemption type (`by_card_value` or `shares_number`), as returned by the
+   * server
+   */
+  get redemptionType(): string
+  /**
+   * Delivery way (`card_exchange` or `account_transfer`), as returned by the
+   * server
+   */
+  get sendWay(): string
+  /** Optional counters */
+  get optionalCounters(): Array<CouponStockCounter>
+  /** Fallback */
+  get fallback(): CouponStockFallback
+}
+
+/** An optional counter of a stock coupon */
+export declare class CouponStockCounter {
+  toString(): string
+  toJSON(): any
+  /** Counter ID */
+  get counterId(): string
+  /** Shares, as returned by the server */
+  get shares(): string
+}
+
+/** Fallback of a stock coupon */
+export declare class CouponStockFallback {
+  toString(): string
+  toJSON(): any
+  /** Whether the fallback is enabled */
+  get enabled(): boolean
+  /** Fallback type (the server's `type`), as returned by the server */
+  get fallbackType(): string
+  /** Counter ID */
+  get counterId(): string
+  /** Shares, as returned by the server */
+  get shares(): string
+}
+
+/** Terms of a stock fragment coupon (`stock_fragment`) */
+export declare class CouponStockFragment {
+  toString(): string
+  toJSON(): any
+  /** Counter ID */
+  get counterId(): string
+  /** Counter name */
+  get counterName(): string
+  /** Market */
+  get market(): string
+  /** Markets */
+  get markets(): Array<string>
+  /** Instrument type the coupon applies to */
+  get underlyingType(): CouponTargetType
+  /**
+   * The server's numeric code of `underlying_type`, also when it is a code
+   * this SDK does not know (`underlying_type` is then `Unknown`); null when
+   * the value is missing or is not a code
+   */
+  get underlyingTypeRaw(): number | null
+  /** Amounts, as returned by the server (an object of strings) */
+  get amounts(): Record<string, string>
+}
+
 /** Dollar-cost averaging (DCA) plan management context. */
 export declare class DcaContext {
   /** Create a new DCAContext. */
@@ -682,6 +1448,66 @@ export declare class Decimal {
   toJSON(): any
 }
 
+/** A deposit record */
+export declare class Deposit {
+  toString(): string
+  toJSON(): any
+  /** Record ID */
+  get id(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Updated time */
+  get updatedAt(): Date | null
+  /** Currency */
+  get currency(): string
+  /** Notified (applied) amount */
+  get amount(): Decimal | null
+  /** Received amount (`0` = not received yet) */
+  get receivableAmount(): Decimal | null
+  /** State text, as returned by the server */
+  get state(): string
+  /** State code */
+  get stateCode(): DepositState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get stateCodeRaw(): number | null
+  /** Sub-state code, as returned by the server */
+  get subStateCode(): number
+  /** Deposit method ID */
+  get bankOperationTypeId(): string
+  /** Deposit method name */
+  get bankOperationTypeName(): string
+  /** Reference number */
+  get referenceNo(): string
+  /** Whether the deposit can still be cancelled */
+  get canCancel(): boolean
+  /** SWIFT code of the paying bank */
+  get userBankSwiftCode(): string
+  /** Number of receipts uploaded with the deposit */
+  get voucherCount(): number
+}
+
+/**
+ * One page of deposit records
+ *
+ * The server also returns a `total`, but it follows the page size rather
+ * than the record count, so it is not modelled; see `hasMore`.
+ */
+export declare class DepositsResponse {
+  toString(): string
+  toJSON(): any
+  /** Deposit records, newest first */
+  get items(): Array<Deposit>
+  /**
+   * A full page came back (as many records as the page size sent, at
+   * most 20), so the next page may hold more
+   */
+  get hasMore(): boolean
+}
+
 /** Depth */
 export declare class Depth {
   toString(): string
@@ -694,6 +1520,37 @@ export declare class Depth {
   get volume(): number
   /** Number of orders */
   get orderNum(): number
+}
+
+/** An eDDA authorization application of a bank card */
+export declare class EddaApplication {
+  toString(): string
+  toJSON(): any
+  /** Application ID */
+  get id(): string
+  /**
+   * Authorization flow: `hk_edda` (authorized at the bank) or `hk_sdda`
+   * (authorized in the app)
+   */
+  get flowId(): string
+  /** Display name of the authorization */
+  get name(): string
+  /** Authorized currency */
+  get currency(): string
+  /** Application status */
+  get status(): AuthorizationStatus
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get statusRaw(): number | null
+  /** Failure reason (empty unless the application failed) */
+  get message(): string
+  /** Time the application was filed */
+  get createdAt(): Date | null
+  /** Time the application was last updated */
+  get updatedAt(): Date | null
 }
 
 /** Response for estimate maximum purchase quantity */
@@ -3900,6 +4757,93 @@ export declare class RealtimeQuote {
   get tradeStatus(): TradeStatus
 }
 
+/**
+ * A reward record from the reward center (prize redemption secrets
+ * `coupon_secret`, cash card codes `cash_card_code` and shipping contacts are
+ * not modelled)
+ */
+export declare class RewardRecord {
+  toString(): string
+  toJSON(): any
+  /**
+   * Reward type: named after the first detail object the server sent
+   * (`cash`, `card`, `prize`, in that order), else the server's
+   * `reward_type` code
+   */
+  get rewardType(): RewardType
+  /**
+   * The server's numeric code of `reward_type`, also when it is a code
+   * this SDK does not know (`reward_type` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get rewardTypeRaw(): number | null
+  /** The detail object the fields below came from */
+  get detailKind(): RewardDetailKind
+  /** Record ID */
+  get recordId(): string
+  /** Title of the activity that granted the reward */
+  get activityTitle(): string
+  /** Reward title */
+  get title(): string
+  /** Reward description */
+  get description(): string
+  /** Coupon type (coupon rewards), e.g. `commission` */
+  get cardType(): string
+  /** Coupon status (coupon rewards; `CouponStatus.Unknown` otherwise) */
+  get cardStatus(): CouponStatus
+  /**
+   * The server's numeric code of `card_status`, also when it is a code
+   * this SDK does not know (`card_status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get cardStatusRaw(): number | null
+  /** Prize type code (gift rewards; `0` = physical goods), none when not set */
+  get prizeType(): number | null
+  /** Amount */
+  get amount(): Decimal | null
+  /** Currency */
+  get currency(): string
+  /** Reward status */
+  get status(): RewardStatus
+  /**
+   * The server's numeric code of `status`, also when it is a code
+   * this SDK does not know (`status` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get statusRaw(): number | null
+  /** Delivery status (issued gift rewards only) */
+  get deliverStatus(): RewardDeliverStatus
+  /**
+   * The server's numeric code of `deliver_status` (e.g. 11 where
+   * `deliver_status` reads `AddressFilled`), also when it is a code this SDK
+   * does not know (`deliver_status` is then `Unknown`); null when the value
+   * is missing or is not a code
+   */
+  get deliverStatusRaw(): number | null
+  /** Exit status code, as returned by the server */
+  get exitStatus(): number
+  /** Time the reward was sent */
+  get sendTime(): Date | null
+  /** Start time */
+  get startTime(): Date | null
+  /** End time */
+  get endTime(): Date | null
+  /** Effective time */
+  get effectiveTime(): Date | null
+  /** Deadline to claim the reward */
+  get receiveDeadline(): Date | null
+}
+
+/** Response for the reward record list */
+export declare class RewardRecordsResponse {
+  toString(): string
+  toJSON(): any
+  /** Reward records */
+  get list(): Array<RewardRecord>
+  /** Total number of records */
+  get total(): number
+}
+
 /** Screener context */
 export declare class ScreenerContext {
   /** Create a new `ScreenerContext` */
@@ -4205,6 +5149,134 @@ export declare class StockPositionsResponse {
   toJSON(): any
   /** Channels */
   get channels(): Array<StockPositionChannel>
+}
+
+/** A stock transfer-in application (another broker to this account) */
+export declare class StockTransferIn {
+  toString(): string
+  toJSON(): any
+  /** Record ID */
+  get id(): string
+  /** Order ID */
+  get orderId(): string
+  /** Market */
+  get market(): string
+  /** Name of the other broker */
+  get broker(): string
+  /** ID of the other broker */
+  get brokerId(): string
+  /** English name of the other broker */
+  get brokerEn(): string
+  /** Broker code of the other broker */
+  get brokerCode(): string
+  /**
+   * Account number at the other broker, as returned by the server (not
+   * masked)
+   */
+  get account(): string
+  /** State text, as returned by the server */
+  get state(): string
+  /** State code */
+  get stateCode(): StockTransferInState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get stateCodeRaw(): number | null
+  /**
+   * App-side state: `noticed` means the user tapped "I have notified the
+   * broker" in the app (the user's own confirmation, not a Longbridge
+   * action); `default` otherwise
+   */
+  get appState(): string
+  /** Whether the application can still be cancelled or changed */
+  get canModify(): boolean
+  /** Created time */
+  get createdAt(): Date | null
+  /** Updated time */
+  get updatedAt(): Date | null
+  /** Processing start time (none when not set) */
+  get processAt(): Date | null
+  /** Execution time (none when not executed) */
+  get execAt(): Date | null
+  /** Remark */
+  get remark(): string
+  /** Reason (e.g. for a failure) */
+  get reason(): string
+  /** Stocks in the application */
+  get stocks(): Array<TransferStock>
+}
+
+/** Response for the stock transfer-in list */
+export declare class StockTransferInResponse {
+  toString(): string
+  toJSON(): any
+  /** Records */
+  get records(): Array<StockTransferIn>
+  /** Total number of records */
+  get total(): number
+}
+
+/** A stock transfer-out application (this account to another broker) */
+export declare class StockTransferOut {
+  toString(): string
+  toJSON(): any
+  /** Record ID */
+  get id(): string
+  /** Order ID */
+  get orderId(): string
+  /** Market */
+  get market(): string
+  /** Name of the other broker */
+  get broker(): string
+  /** ID of the other broker */
+  get brokerId(): string
+  /** English name of the other broker */
+  get brokerEn(): string
+  /** Broker code of the other broker */
+  get brokerCode(): string
+  /**
+   * Account number at the other broker, as returned by the server (not
+   * masked)
+   */
+  get account(): string
+  /** State text, as returned by the server */
+  get state(): string
+  /** State code. Only `Submitted` applications can be cancelled */
+  get stateCode(): StockTransferOutState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get stateCodeRaw(): number | null
+  /**
+   * App-side state: `noticed` means the user tapped "I have notified the
+   * broker" in the app (the user's own confirmation, not a Longbridge
+   * action); `default` otherwise
+   */
+  get appState(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Updated time */
+  get updatedAt(): Date | null
+  /** Processing start time (none when not set) */
+  get processAt(): Date | null
+  /** Execution time (none when not executed) */
+  get execAt(): Date | null
+  /** Time the other broker agreed (none when not set) */
+  get agreeAt(): Date | null
+  /** Time the application was refused (none when not set) */
+  get refuseAt(): Date | null
+  /** Time the application was cancelled (none when not set) */
+  get cancelAt(): Date | null
+  /** Remark */
+  get remark(): string
+  /** Reason (e.g. for a rejection) */
+  get reason(): string
+  /** Stocks in the application */
+  get stocks(): Array<TransferStock>
 }
 
 /** Response for submit grid trading order request */
@@ -4752,6 +5824,46 @@ export declare class TradingSessionInfo {
   get tradeSession(): TradeSession
 }
 
+/** One stock in a stock transfer application */
+export declare class TransferStock {
+  toString(): string
+  toJSON(): any
+  /** Stock code */
+  get code(): string
+  /** Stock name */
+  get name(): string
+  /** Stock name in English */
+  get nameEn(): string
+  /** Market */
+  get market(): string
+  /** Counter ID */
+  get counterId(): string
+  /** Quantity */
+  get amount(): Decimal | null
+  /** Currency */
+  get currency(): string
+  /** Cost price */
+  get cost(): Decimal | null
+  /** State code of this stock in the transfer */
+  get stateCode(): TransferStockState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get stateCodeRaw(): number | null
+  /** Quantity held in street name, as returned by the server */
+  get streetAmount(): Decimal | null
+  /** Quantity held by a nominee, as returned by the server */
+  get nomineeAmount(): Decimal | null
+  /** Quantity held in the holder's own name, as returned by the server */
+  get ownAmount(): Decimal | null
+  /** Number of share certificates, as returned by the server */
+  get certificateCount(): number
+  /** Position side */
+  get positionSide(): string
+}
+
 /** A grid trigger-history entry (one triggered order). */
 export declare class TriggerOrder {
   toString(): string
@@ -4932,6 +6044,61 @@ export declare class WatchlistSecurity {
   get watchedAt(): Date
   /** Whether the security is pinned to the top of the group */
   get isPinned(): boolean
+}
+
+/** A withdrawal record */
+export declare class Withdrawal {
+  toString(): string
+  toJSON(): any
+  /** Record ID */
+  get id(): string
+  /** Order ID */
+  get orderId(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Currency */
+  get currency(): string
+  /** Applied amount */
+  get amount(): Decimal | null
+  /** Fee */
+  get fee(): Decimal | null
+  /** Amount paid out */
+  get settlementAmount(): Decimal | null
+  /** State code */
+  get stateCode(): WithdrawalState
+  /**
+   * The server's numeric code of `state_code`, also when it is a code
+   * this SDK does not know (`state_code` is then `Unknown`); null when the
+   * value is missing or is not a code
+   */
+  get stateCodeRaw(): number | null
+  /** Raw state, as returned by the server */
+  get rawState(): string
+  /** State display text, as returned by the server */
+  get stateDescription(): string
+  /** Receiving bank account number, as returned by the server (not masked) */
+  get bankAccount(): string
+  /** Receiving bank account, as displayed in the app */
+  get displayBankAccount(): string
+  /** SWIFT code of the receiving bank */
+  get userBankSwiftCode(): string
+  /** Account channel */
+  get accountChannel(): string
+}
+
+/** Response for the withdrawal list */
+export declare class WithdrawalsResponse {
+  toString(): string
+  toJSON(): any
+  /** Withdrawal records */
+  get list(): Array<Withdrawal>
+  /** Total number of records */
+  get total(): number
+  /**
+   * A full page came back (as many records as the page size sent), so the
+   * next page may hold more
+   */
+  get hasMore(): boolean
 }
 
 /** Candlestick adjustment type */
@@ -5274,6 +6441,29 @@ export declare const enum AttachedOrderType {
   Bracket = 3
 }
 
+/**
+ * Status of a bank-card authorization (eDDA, bank securities account, FPS) or
+ * of an eDDA application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum AuthorizationStatus {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Not authorized (server code 0) */
+  Unauthorized = 1,
+  /** Authorized (server code 1) */
+  Authorized = 2,
+  /** Authorization in progress (server code 2) */
+  Authorizing = 3,
+  /**
+   * Authorization failed (see the message field for the reason) (server code
+   * 3)
+   */
+  Failed = 4
+}
+
 export declare const enum BalanceType {
   /** Unknown */
   Unknown = 0,
@@ -5283,6 +6473,57 @@ export declare const enum BalanceType {
   Stock = 2,
   /** Fund */
   Fund = 3
+}
+
+/**
+ * Binding state of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum BankCardBindState {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Binding in progress (server code 0) */
+  Binding = 1,
+  /** Bound (server code 1) */
+  Bound = 2,
+  /** Binding failed (server code 2) */
+  Failed = 3
+}
+
+/**
+ * Verification status of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum BankCardStatus {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Not verified (server code 0) */
+  Unverified = 1,
+  /** Under review (server code 1) */
+  UnderReview = 2,
+  /** Verified (server code 2) */
+  Verified = 3
+}
+
+/**
+ * Witness (in-person / video verification) state of a bank card
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum BankCardWitnessState {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Witnessing not required (server code 1) */
+  NotRequired = 1,
+  /** Witnessing pending (server code 2) */
+  Pending = 2,
+  /** Witnessed (server code 3) */
+  Witnessed = 3
 }
 
 /** Changes in broker holding over 1 / 5 / 20 / 60 day periods */
@@ -5655,6 +6896,35 @@ export declare const enum CommissionFreeStatus {
   Ready = 4
 }
 
+/**
+ * Kind of commission coupon (the server's `unlimited` code). The meanings are
+ * the ones the Longbridge app gives the codes; the proto names are given in
+ * brackets.
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum CommissionUnlimitedType {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Time-limited free commission (`Proportionate`, server code 0) */
+  Proportionate = 1,
+  /** Commission rebate (`Full`, server code 1) */
+  Full = 2,
+  /** Commission deduction (`Lifetime`, server code 2) */
+  Lifetime = 3,
+  /**
+   * Per-use card with a fixed amount per use: `amount / usage_count`
+   * (`ByAmountPer`, server code 6)
+   */
+  ByAmountPer = 4,
+  /**
+   * Per-use discount card, capped at `amount_limit` per use (`ByRatePer`,
+   * server code 7)
+   */
+  ByRatePer = 5
+}
+
 /** Company overview response */
 export interface CompanyOverview {
   /** Short name */
@@ -6024,6 +7294,58 @@ export interface CorpActions {
   items: Array<CorpActionItem>
 }
 
+/** Which orders of a coupon to list */
+export declare const enum CouponOrderType {
+  /** Orders the coupon is locked to (in progress) */
+  Locked = 0,
+  /** Orders whose rebate has been settled */
+  Settled = 1
+}
+
+/**
+ * Status of a coupon
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum CouponStatus {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Unused (server code 0) */
+  Unused = 1,
+  /** Used (server code 1) */
+  Used = 2,
+  /** Expired (server code 2) */
+  Expired = 3,
+  /** Being redeemed (server code 3) */
+  Redeeming = 4,
+  /** In use (server code 4) */
+  InUse = 5,
+  /** Processing (server code 5) */
+  Processing = 6
+}
+
+/**
+ * Instrument type a coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum CouponTargetType {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Stocks (server code 0, `StockTrade`) */
+  Stock = 1,
+  /** US stock options (server code 1, `UsStockOptions`) */
+  UsOption = 2,
+  /** HK warrants (server code 2, `HkStockWarrant`) */
+  HkWarrant = 3,
+  /** ETF (server code 3) */
+  Etf = 4,
+  /** LOF (server code 4) */
+  Lof = 5
+}
+
 /** Options for creating a topic */
 export interface CreateTopicRequest {
   /** Topic title (required) */
@@ -6218,6 +7540,29 @@ export interface DeleteWatchlistGroup {
   id: number
   /** Move securities in this group to the default group */
   purge: boolean
+}
+
+/**
+ * State of a deposit record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum DepositState {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Processing (server code 0) */
+  Processing = 1,
+  /** Credited to the account (server code 1) */
+  Credited = 2,
+  /** Failed (server code 2) */
+  Failed = 3,
+  /** Cancelled (server code 3) */
+  Cancelled = 4,
+  /** Invalidated (server code 4) */
+  Invalidated = 5,
+  /** Rejected (server code 5) */
+  Rejected = 6
 }
 
 /** Derivative type */
@@ -6575,6 +7920,44 @@ export interface GetCashFlowOptions {
   size?: number
 }
 
+/** Options for the coupon list */
+export interface GetCouponsOptions {
+  /** Page number (default 1) */
+  page?: number
+  /** Page size (max 50) */
+  pageSize?: number
+  /**
+   * List expired coupons instead of the ones that have not expired
+   * (default false)
+   */
+  expired?: boolean
+  /**
+   * Filter by coupon type (e.g. `commission`, `platform_fee_deduct`,
+   * `stock`, `quote`, `cash`; default: all types)
+   */
+  cardType?: string
+}
+
+/** Options for the deposit list */
+export interface GetDepositsOptions {
+  /** Page number (default 1) */
+  page?: number
+  /**
+   * Page size (default 20, max 20; larger values are sent as 20, because
+   * the deposit list returns a short 10-record page for them, and 0 or a
+   * negative value as the default 20)
+   */
+  size?: number
+  /** Filter by states (`Unknown` is ignored) */
+  states?: Array<DepositState>
+  /** Filter by currencies (e.g. `HKD`, `USD`) */
+  currencies?: Array<string>
+  /** Only deposits applied at or after this time */
+  start?: Date
+  /** Only deposits applied at or before this time */
+  end?: Date
+}
+
 /** Options for the fund analysis / trend / comparison endpoints. */
 export interface GetFundAnalysisOptions {
   /** Analysis period */
@@ -6767,6 +8150,19 @@ export interface GetHistoryOrdersOptions {
   endAt?: Date
 }
 
+/** Options for the reward record list */
+export interface GetRewardRecordsOptions {
+  /** Page number (default 1) */
+  page?: number
+  /** Page size (max 50) */
+  pageSize?: number
+  /**
+   * Filter by reward type (default: all types; `RewardType.Unknown` is
+   * ignored)
+   */
+  rewardType?: RewardType
+}
+
 /** Options for getting a statement download URL */
 export interface GetStatementDownloadUrlRequest {
   /** File key obtained from the list statements endpoint */
@@ -6793,6 +8189,44 @@ export interface GetStatementListRequest {
 export interface GetStatementListResponse {
   /** List of statement items */
   list: Array<StatementItem>
+}
+
+/** Options for the stock transfer-in list */
+export interface GetStockTransfersInOptions {
+  /** Filter by market (`HK`, `US`, `CN`, `SG`) */
+  market?: string
+  /**
+   * Filter by state (sent to the server as the state's server code;
+   * `StockTransferInState.Unknown` is ignored)
+   */
+  state?: StockTransferInState
+  /** Only applications created at or after this time */
+  start?: Date
+  /** Only applications created at or before this time */
+  end?: Date
+  /** Page number (default 1) */
+  page?: number
+  /** Page size (default 20, max 50) */
+  size?: number
+}
+
+/** Options for the stock transfer-out list */
+export interface GetStockTransfersOutOptions {
+  /** Filter by market (`HK`, `US`, `CN`, `SG`) */
+  market?: string
+  /**
+   * Filter by state (sent to the server as the state's server code;
+   * `StockTransferOutState.Unknown` is ignored)
+   */
+  state?: StockTransferOutState
+  /** Only applications created at or after this time */
+  start?: Date
+  /** Only applications created at or before this time */
+  end?: Date
+  /** Page number (default 1) */
+  page?: number
+  /** Page size (default 20, max 50) */
+  size?: number
 }
 
 /** Options for get today executions request */
@@ -6843,6 +8277,21 @@ export interface GetUSTransactionHistoryOptions {
   types?: Array<string>
   /** Currency filter, e.g. `USD`; empty means all */
   currency?: string
+}
+
+/** Options for the withdrawal list */
+export interface GetWithdrawalsOptions {
+  /** Page number (default 1) */
+  page?: number
+  /**
+   * Page size (default 20, max 50; larger values are sent as 50, and 0 or
+   * a negative value as the default 20)
+   */
+  size?: number
+  /** Only withdrawals applied at or after this time */
+  start?: Date
+  /** Only withdrawals applied at or before this time */
+  end?: Date
 }
 
 /** Data granularity */
@@ -7218,6 +8667,21 @@ export interface InvestSecurity {
   sharesRank: string
   /** Market value of holding */
   sharesValue?: string
+}
+
+/**
+ * IPO subscription type an IPO commission coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum IpoCouponTargetType {
+  /** Unknown: unset or an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Financing (margin) IPO subscription (server code 1, `FinancingIPO`) */
+  Financing = 1,
+  /** Cash IPO subscription (server code 2, `CashIPO`) */
+  Cash = 2
 }
 
 export declare const enum Language {
@@ -8065,6 +9529,26 @@ export interface QuestionOption {
   description: string
 }
 
+/**
+ * Investor type a quote coupon applies to
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum QuoteInvestorType {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Any investor (server code 0, `INVESTOR_TYPE_ANY`) */
+  Any = 1,
+  /**
+   * Non-professional investors (server code 1,
+   * `INVESTOR_TYPE_NON_PROFESSIONAL`)
+   */
+  NonProfessional = 2,
+  /** Professional investors (server code 2, `INVESTOR_TYPE_PROFESSIONAL`) */
+  Professional = 3
+}
+
 export declare const enum QuoteTransport {
   /** Send pull requests over the quote WebSocket connection (default) */
   WebSocket = 0,
@@ -8314,6 +9798,103 @@ export interface ReplaceOrderOptions {
    * precedence over `delayedUntil`)
    */
   clearDelayedUntil?: boolean
+}
+
+/**
+ * Delivery status of an issued prize (only meaningful for issued gift rewards)
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum RewardDeliverStatus {
+  /**
+   * Unknown: an undocumented code, or no delivery status (never sent to the
+   * server)
+   */
+  Unknown = 0,
+  /** Not activated (server code 0) */
+  NotActivated = 1,
+  /** Activated, or shipping (server code 1) */
+  ActivatedOrShipping = 2,
+  /** Consumed (server code 2) */
+  Consumed = 3,
+  /** E-voucher activating (server code 5) */
+  EVoucherActivating = 4,
+  /** E-voucher expired before activation (server code 6) */
+  EVoucherExpired = 5,
+  /** E-voucher invalid (server code 7) */
+  EVoucherInvalid = 6,
+  /** Shipping address missing (server code 8) */
+  AddressMissing = 7,
+  /** Shipping address filled (server code 9) */
+  AddressFilled = 8,
+  /** Shipping (server code 10) */
+  Shipping = 9
+}
+
+/** Which upstream detail object a reward record came from */
+export declare const enum RewardDetailKind {
+  /**
+   * No known detail object (e.g. a task reward); only the reward type is
+   * set
+   */
+  None = 0,
+  /** The `cash` object */
+  Cash = 1,
+  /** The `card` (coupon) object */
+  Card = 2,
+  /** The `prize` (gift) object */
+  Prize = 3
+}
+
+/**
+ * Status of a reward record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum RewardStatus {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Upcoming (server code 0) */
+  Upcoming = 1,
+  /** Cancelled (server code 1) */
+  Cancelled = 2,
+  /** The user exited the activity (server code 2) */
+  ExitedActivity = 3,
+  /** Not claimed yet (server code 8) */
+  Unclaimed = 4,
+  /** Being issued (server code 10) */
+  Issuing = 5,
+  /** Issued (server code 12) */
+  Issued = 6,
+  /** Issuing failed (server code 13) */
+  Failed = 7,
+  /** Exchanged (server code 16) */
+  Exchanged = 8,
+  /** Expired (server code 17) */
+  Expired = 9,
+  /** Refunded (server code 18) */
+  Refunded = 10
+}
+
+/**
+ * Type of a reward record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum RewardType {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Cash reward (server code 0) */
+  Cash = 1,
+  /** Gift (prize) (server code 1) */
+  Gift = 2,
+  /** Coupon (server code 2) */
+  Coupon = 3,
+  /** Task reward (server code 3) */
+  Task = 4
 }
 
 /** Risk assessment (suitability questionnaire) result of the current member */
@@ -8712,6 +10293,59 @@ export interface StockRatings {
   industryRank?: number
   /** Full ratings array as a JSON string */
   ratingsJson: string
+}
+
+/**
+ * State of a stock transfer-in application (another broker to this account)
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum StockTransferInState {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Submitted (server code 0) */
+  Submitted = 1,
+  /** Cancelled (server code 1) */
+  Cancelled = 2,
+  /** Completed (server code 3) */
+  Completed = 3,
+  /** Processing (server code 5) */
+  Processing = 4,
+  /** Partially completed (server code 7) */
+  PartiallyCompleted = 5,
+  /** Failed (server code 8) */
+  Failed = 6
+}
+
+/**
+ * State of a stock transfer-out application (this account to another broker)
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum StockTransferOutState {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /**
+   * Submitted (the only state in which the application can still be
+   * cancelled) (server code 0)
+   */
+  Submitted = 1,
+  /** Processing (server code 1) */
+  Processing = 2,
+  /** Executing (server code 2) */
+  Executing = 3,
+  /** Completed (server code 3) */
+  Completed = 4,
+  /** Cancelled (server code 4) */
+  Cancelled = 5,
+  /** Partially completed (server code 5) */
+  PartiallyCompleted = 6,
+  /** Failed (server code 6) */
+  Failed = 7,
+  /** Rejected (server code 7) */
+  Rejected = 8
 }
 
 /** Payload of a `subagent_finished` stream event */
@@ -9145,6 +10779,23 @@ export declare const enum TradeStatus {
   WarrantPrepareList = 9,
   /** Warrant To BeListed */
   Suspend = 10
+}
+
+/**
+ * State of one stock inside a stock transfer application
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum TransferStockState {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Processing (server code 0) */
+  Processing = 1,
+  /** Succeeded (server code 1) */
+  Succeeded = 2,
+  /** Failed (server code 2) */
+  Failed = 3
 }
 
 /**
@@ -10045,6 +11696,45 @@ export declare const enum WarrantType {
   Bear = 4,
   /** Inline */
   Inline = 5
+}
+
+/**
+ * State of a withdrawal record
+ *
+ * The numeric values of this enum are not the server codes; each
+ * member's description names its server code.
+ */
+export declare const enum WithdrawalState {
+  /** Unknown: an undocumented code (never sent to the server) */
+  Unknown = 0,
+  /** Submitted (server code 0) */
+  Submitted = 1,
+  /** Processing (server code 1) */
+  Processing = 2,
+  /** Rejected (server code 2) */
+  Rejected = 3,
+  /** Cancelled (server code 3) */
+  Cancelled = 4,
+  /** Remitted (server code 4) */
+  Remitted = 5,
+  /** Failed (server code 5) */
+  Failed = 6,
+  /** Refunded (server code 6) */
+  Refunded = 7,
+  /** Approved, awaiting payout (server code 7) */
+  ApprovedAwaitingPayout = 8,
+  /** Large-amount review (server code 8) */
+  LargeAmountReview = 9,
+  /** Change pending approval (server code 9) */
+  ChangePendingApproval = 10,
+  /** Deletion pending approval (server code 10) */
+  DeletionPendingApproval = 11,
+  /** Deleted (server code 11) */
+  Deleted = 12,
+  /** Rejection pending approval (server code 12) */
+  RejectionPendingApproval = 13,
+  /** Awaiting confirmation (server code 15) */
+  AwaitingConfirmation = 14
 }
 
 /** `inputs` of a `workflow_started` stream event */

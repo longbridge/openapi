@@ -77,6 +77,15 @@ where
     }
 }
 
+impl<V> ToJSON for std::collections::BTreeMap<String, V>
+where
+    V: ToJSON,
+{
+    fn to_json(&self) -> Value {
+        Value::Object(self.iter().map(|(k, v)| (k.clone(), v.to_json())).collect())
+    }
+}
+
 impl<T> ToJSON for Vec<T>
 where
     T: ToJSON,
