@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.1] - 2026-11-28
+
+Republishes 5.6.0 with no code changes, because 5.6.0 did not reach every registry:
+
+- **Python:** the 5.6.0 upload hit PyPI's project size limit after 35 of 49 wheels (no Python 3.8 / 3.9 wheels). The partial 5.6.0 was then deleted to free space, and PyPI never accepts a filename again once it has been used, so 5.6.0 cannot be uploaded and PyPI's latest stayed 5.5.0. 5.6.1 carries the full wheel set.
+- **Java:** Maven Central rejected the 5.6.0 deployment, so Maven Central's latest stayed 5.5.0.
+
+Rust (crates.io), Node.js (npm) and C / C++ published 5.6.0 normally; 5.6.1 is identical for them. See 5.6.0 below for the changes.
+
 ## [5.6.0] - 2026-11-27
 
 ### Added
